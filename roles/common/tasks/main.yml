@@ -15,9 +15,3 @@
       - lsof
       - sudo
     state: present
-
-- name: Ensure systemd-timesyncd is enabled (for time sync)
-  systemd:
-    name: systemd-timesyncd
-    enabled: yes
-    state: started
