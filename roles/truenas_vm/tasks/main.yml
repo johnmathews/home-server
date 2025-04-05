@@ -4,23 +4,22 @@
   community.general.proxmox_kvm:
     api_user: root@pam
     api_password: "{{ vault_proxmox_password }}"
-    api_host: "{{ inventory_hostname }}"
-    node: pve
+    api_host: "{{ hostvars[inventory_hostname]['ansible_host'] }}"
+    node: "{{ hostvars[inventory_hostname]['proxmox_node_name'] }}"
     vmid: 200
     name: truenas
     cores: 4
     memory: 12288
     scsihw: virtio-scsi-pci
     boot: order=scsi0;ide2
-    bootdisk: scsi0
     ide:
-      ide2: media=cdrom,volume=local:iso/TrueNAS-SCALE-24.10.2.1.iso
+      ide2: local:iso/TrueNAS-SCALE-24.10.2.1.iso,media=cdrom
     scsi:
-      scsi0: size=16G,storage=local-lvm
+      scsi0: local-lvm:16
     net:
-      net0: model=virtio,bridge=vmbr0
+      net0: virtio,bridge=vmbr0
     ostype: l26
-    onboot: yes
+    onboot: true
     state: present
   delegate_to: localhost
   become: false
