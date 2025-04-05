@@ -12,9 +12,13 @@
     memory: 12288
     scsihw: virtio-scsi-pci
     boot: order=scsi0;ide2
-    ide2: local:iso/TrueNAS-SCALE-23.10.1.iso,media=cdrom
-    scsi0: local-lvm:16
-    net0: virtio,bridge=vmbr0
+    bootdisk: scsi0
+    ide:
+      ide2: media=cdrom,volume=local:iso/TrueNAS-SCALE-24.10.2.1.iso
+    scsi:
+      scsi0: size=16G,storage=local-lvm
+    net:
+      net0: model=virtio,bridge=vmbr0
     ostype: l26
     onboot: yes
     state: present
