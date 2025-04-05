@@ -13,6 +13,7 @@
         cache_valid_time: 3600
 
   roles:
-    - common
-    - zram
-    - postfix
+    - role: pve-repos
+    - role: common
+    - role: zram
+    - role: postfix
