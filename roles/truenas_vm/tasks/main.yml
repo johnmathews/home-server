@@ -1,0 +1,21 @@
+# roles/truenas_vm/tasks/main.yml
+---
+- name: Create TrueNAS VM
+  community.general.proxmox_kvm:
+    api_user: root@pam
+    api_password: "{{ vault_proxmox_password }}"
+    api_host: "{{ inventory_hostname }}"
+    node: pve
+    vmid: 200
+    name: truenas
+    cores: 4
+    memory: 12288
+    scsihw: virtio-scsi-pci
+    boot: order=scsi0;ide2
+    ide2: local:iso/TrueNAS-SCALE-23.10.1.iso,media=cdrom
+    scsi0: local-lvm:16
+    net0: virtio,bridge=vmbr0
+    ostype: l26
+    onboot: yes
+    state: present
+  delegate_to: localhost

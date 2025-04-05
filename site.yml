@@ -17,3 +17,5 @@
     - role: common
     - role: zram
     - role: postfix
+    - role: upload_iso
+    - role: truenas_vm

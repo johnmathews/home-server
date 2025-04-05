@@ -1,0 +1,31 @@
+---
+- name: Fetch latest TrueNAS SCALE LTS release info
+  uri:
+    url: https://api.github.com/repos/truenas/truenas-scale/releases
+    return_content: yes
+  register: truenas_releases
+
+- name: Set fact for latest LTS ISO URL
+  set_fact:
+    truenas_lts_iso_url: >-
+      {{
+        (truenas_releases.content | from_json)
+        | selectattr('prerelease', 'equalto', false)
+        | selectattr('draft', 'equalto', false)
+        | selectattr('name', 'search', 'LTS')
+        | map(attribute='assets')
+        | map('selectattr', 'name', 'search', 'iso$')
+        | map('map', attribute='browser_download_url')
+        | list
+      }}[0][0]
+
+- name: Set fact for ISO filename
+  set_fact:
+    truenas_lts_iso_name: "{{ truenas_lts_iso_url | basename }}"
+
+- name: Download ISO to Proxmox if it does not exist
+  ansible.builtin.get_url:
+    url: "{{ truenas_lts_iso_url }}"
+    dest: "/var/lib/vz/template/iso/{{ truenas_lts_iso_name }}"
+    mode: '0644'
+    force: no

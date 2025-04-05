@@ -1,0 +1,24 @@
+---
+- import_tasks: download_latest_iso.yml
+
+- name: Find local ISO file in files/ directory
+  find:
+    paths: "{{ role_path }}/files"
+    patterns: "*.iso"
+  register: iso_files
+
+- name: Fail if no ISO files found
+  fail:
+    msg: "No ISO file found in {{ role_path }}/files"
+  when: iso_files.matched == 0
+
+- name: Upload latest ISO to Proxmox if not present
+  copy:
+    src: "{{ item.path }}"
+    dest: "/var/lib/vz/template/iso/{{ item.path | basename }}"
+    mode: '0644'
+    force: no
+  loop: "{{ iso_files.files }}"
+  loop_control:
+    label: "{{ item.path | basename }}"
+  tags: upload_iso
