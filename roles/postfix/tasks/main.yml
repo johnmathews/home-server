@@ -23,6 +23,7 @@
     regexp: '^root:'
     line: "root: {{ email_address }}"
     create: yes
+  notify: restart postfix
 
 - name: Run newaliases
   command: newaliases
