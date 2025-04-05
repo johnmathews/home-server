@@ -1,0 +1,23 @@
+# roles/common/tasks/main.yml
+---
+- name: Upgrade all packages
+  apt:
+    upgrade: dist
+    update_cache: yes
+
+- name: Install useful packages
+  apt:
+    name:
+      - vim
+      - htop
+      - curl
+      - git
+      - lsof
+      - sudo
+    state: present
+
+- name: Ensure systemd-timesyncd is enabled (for time sync)
+  systemd:
+    name: systemd-timesyncd
+    enabled: yes
+    state: started
