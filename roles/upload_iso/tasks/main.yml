@@ -1,24 +1,35 @@
+# roles/upload_iso/tasks/main.yml
 ---
-- import_tasks: download_latest_iso.yml
+- name: Ensure ISO directory exists in project
+  stat:
+    path: "{{ playbook_dir }}/iso-images"
+  register: iso_dir
+  delegate_to: localhost
 
-- name: Find local ISO file in files/ directory
-  find:
-    paths: "{{ role_path }}/files"
-    patterns: "*.iso"
-  register: iso_files
-
-- name: Fail if no ISO files found
+- name: Fail if ISO directory is missing
   fail:
-    msg: "No ISO file found in {{ role_path }}/files"
-  when: iso_files.matched == 0
+    msg: "Directory iso-images/ not found. Please create it and place the TrueNAS ISO inside."
+  when: not iso_dir.stat.exists
+  delegate_to: localhost
 
-- name: Upload latest ISO to Proxmox if not present
+- name: Find TrueNAS ISO file
+  find:
+    paths: "{{ playbook_dir }}/iso-images"
+    patterns: "TrueNAS-SCALE-*.iso"
+    use_regex: false
+  register: found_isos
+  delegate_to: localhost
+
+- name: Fail if no ISO is found
+  fail:
+    msg: "No TrueNAS ISO found in iso-images/. Please download it and place it there."
+  when: found_isos.matched == 0
+  delegate_to: localhost
+
+- name: Upload TrueNAS ISO to Proxmox (if not already present)
   copy:
     src: "{{ item.path }}"
     dest: "/var/lib/vz/template/iso/{{ item.path | basename }}"
     mode: '0644'
     force: no
-  loop: "{{ iso_files.files }}"
-  loop_control:
-    label: "{{ item.path | basename }}"
-  tags: upload_iso
+  loop: "{{ found_isos.files }}" 
