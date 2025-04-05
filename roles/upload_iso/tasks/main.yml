@@ -5,12 +5,14 @@
     path: "{{ playbook_dir }}/iso-images"
   register: iso_dir
   delegate_to: localhost
+  become: false
 
 - name: Fail if ISO directory is missing
   fail:
     msg: "Directory iso-images/ not found. Please create it and place the TrueNAS ISO inside."
   when: not iso_dir.stat.exists
   delegate_to: localhost
+  become: false
 
 - name: Find TrueNAS ISO file
   find:
@@ -19,12 +21,14 @@
     use_regex: false
   register: found_isos
   delegate_to: localhost
+  become: false
 
 - name: Fail if no ISO is found
   fail:
     msg: "No TrueNAS ISO found in iso-images/. Please download it and place it there."
   when: found_isos.matched == 0
   delegate_to: localhost
+  become: false
 
 - name: Upload TrueNAS ISO to Proxmox (if not already present)
   copy:
