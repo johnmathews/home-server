@@ -6,18 +6,28 @@
     api_password: "{{ vault_proxmox_password }}"
     api_host: "{{ hostvars[inventory_hostname]['ansible_host'] }}"
     node: "{{ hostvars[inventory_hostname]['proxmox_node_name'] }}"
+
+    # Basic VM Settings
     vmid: 200
     name: truenas
     cores: 4
     memory: 12288
+    balloon: 0 # Disable balloon - trueNAS expects fixed memory
     scsihw: virtio-scsi-pci
     boot: order=scsi0;ide2
+
+    # Attach ISO as a CD-ROM drive
     ide:
       ide2: local:iso/TrueNAS-SCALE-24.10.2.1.iso,media=cdrom
+
+    # Define boot disk
     scsi:
       scsi0: local-lvm:16
+
+    # Network interface
     net:
       net0: virtio,bridge=vmbr0
+
     ostype: l26
     onboot: true
     state: present
