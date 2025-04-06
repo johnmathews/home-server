@@ -1,3 +1,4 @@
+# site.yml
 ---
 - name: Proxmox VE Configuration
   hosts: proxmox
@@ -19,3 +20,5 @@
     - role: postfix
     - role: upload_iso
     - role: truenas_vm
+    - role: upload_cloud_image
+    - role: media_vm

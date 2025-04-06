@@ -1,0 +1,30 @@
+# roles/media_vm/tasks/main.yml
+---
+- name: Create Media VM
+  community.general.proxmox_kvm:
+    api_user: root@pam
+    api_password: "{{ vault_proxmox_password }}"
+    api_host: "{{ hostvars[inventory_hostname]['ansible_host'] }}"
+    node: "{{ hostvars[inventory_hostname]['proxmox_node_name'] }}"
+    vmid: 201
+    name: media
+    cores: 4
+    memory: 8192
+    scsihw: virtio-scsi-pci
+    sata:
+      sata0: local:cloudinit
+    scsi:
+      scsi0: local:200/vm-201-disk-0.raw
+    boot: order=scsi0
+    bootdisk: scsi0
+    ide:
+      ide2: local:cloudinit
+    net:
+      net0: virtio,bridge=vmbr0
+    ostype: l26
+    onboot: true
+    ciuser: ubuntu
+    cipassword: "{{ vault_ubuntu_media_password }}"
+    sshkeys: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+    state: present
+  delegate_to: localhost
