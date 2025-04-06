@@ -1,0 +1,12 @@
+media_stack_user: media
+media_stack_group: media
+media_stack_base_dir: /opt/media-stack
+media_stack_data_dir: /opt/media-stack/config
+
+media_stack_services:
+  jellyfin_port: 8096
+  qbittorrent_port: 8080
+  sonarr_port: 8989
+  radarr_port: 7878
+  jackett_port: 9117
+  bazarr_port: 6767

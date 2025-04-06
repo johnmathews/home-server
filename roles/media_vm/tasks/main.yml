@@ -11,20 +11,26 @@
     cores: 4
     memory: 8192
     scsihw: virtio-scsi-pci
+    # Attach cloud-init drive automatically created by Proxmox
     sata:
-      # Attach cloud-init drive automatically created by Proxmox
       sata0: local:cloudinit
+    # Main boot disk (created outside this task)
     scsi:
-      scsi0: local:200/vm-201-disk-0.raw
+      scsi0: local-lvm:32  # creates a new 32GB disk in the default storage
     boot: order=scsi0
     bootdisk: scsi0
     net:
       net0: virtio,bridge=vmbr0
     ostype: l26
     onboot: true
+
+    # Cloud-init configuration
+    citype: nocloud
     ciuser: ubuntu
     cipassword: '{{ vault_ubuntu_media_password }}'
     sshkeys: '{{ sshkeys }}'
+
     state: present
+    # timeout: 300   # Wait up to 5 minutes (default is 30s)
   delegate_to: localhost
   become: false 

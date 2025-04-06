@@ -1,0 +1,5 @@
+---
+- name: Restart media stack
+  command: docker-compose down && docker-compose up -d
+  args:
+    chdir: "{{ media_stack_base_dir }}"

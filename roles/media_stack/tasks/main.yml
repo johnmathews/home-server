@@ -1,0 +1,49 @@
+# roles/media_stack/tasks/main.yml
+---
+- name: Install Docker dependencies
+  apt:
+    name: [apt-transport-https, ca-certificates, curl, gnupg, lsb-release]
+    state: present
+    update_cache: yes
+
+- name: Install Docker
+  shell: |
+    curl -fsSL https://get.docker.com | sh
+  args:
+    creates: /usr/bin/docker
+
+- name: Add user to docker group
+  user:
+    name: ubuntu
+    groups: docker
+    append: yes
+
+- name: Install Docker Compose v2
+  get_url:
+    url: https://github.com/docker/compose/releases/download/v2.27.0/docker-compose-linux-x86_64
+    dest: /usr/local/bin/docker-compose
+    mode: '0755'
+  when: ansible_architecture == "x86_64"
+
+- name: Create media stack base directory
+  file:
+    path: /srv/media
+    state: directory
+    mode: '0755'
+
+- name: Copy docker-compose.yml
+  copy:
+    src: docker-compose.yml
+    dest: /srv/media/docker-compose.yml
+    mode: '0644'
+
+- name: Create environment file from template
+  template:
+    src: env.j2
+    dest: /srv/media/.env
+    mode: '0600'
+
+- name: Start media stack containers
+  community.docker.docker_compose_v2:
+    project_src: /srv/media
+    state: present

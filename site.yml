@@ -31,3 +31,5 @@
       tags: cloud_image
     - role: media_vm
       tags: media
+    - role: media_stack
+      tags: media_stack
