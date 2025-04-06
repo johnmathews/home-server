@@ -33,3 +33,16 @@
     state: present
   delegate_to: localhost
   become: false
+- name: Set boot order to disk only and remove ISO (if installed)
+  community.general.proxmox_kvm:
+    api_user: root@pam
+    api_password: "{{ vault_proxmox_password }}"
+    api_host: "{{ hostvars[inventory_hostname]['ansible_host'] }}"
+    node: "{{ hostvars[inventory_hostname]['proxmox_node_name'] }}"
+    vmid: 200
+    boot: order=scsi0
+    ide: {}
+    state: present
+  when: truenas_installed
+  delegate_to: localhost
+  become: false

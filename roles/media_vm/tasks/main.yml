@@ -25,6 +25,6 @@
     onboot: true
     ciuser: ubuntu
     cipassword: "{{ vault_ubuntu_media_password }}"
-    sshkeys: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+    sshkeys: "{{ sshkeys }}"
     state: present
   delegate_to: localhost

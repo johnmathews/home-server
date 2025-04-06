@@ -14,11 +14,20 @@
         cache_valid_time: 3600
 
   roles:
+    # Each role has a tag so you can target subsets with --tags or --skip-tags
     - role: pve-repos
+      tags: common
     - role: common
+      tags: common
     - role: zram
+      tags: common
     - role: postfix
+      tags: common
     - role: upload_iso
+      tags: upload_iso
     - role: truenas_vm
+      tags: truenas
     - role: upload_cloud_image
+      tags: cloud_image
     - role: media_vm
+      tags: media

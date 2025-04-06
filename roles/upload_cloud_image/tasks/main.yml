@@ -1,6 +1,6 @@
 # roles/upload_cloud_image/tasks/main.yml
 ---
-- name: Ensure cloud-image directory exists on Ansible control machine
+- name: Ensure cloud-image directory exists
   file:
     path: "{{ playbook_dir }}/cloud-images"
     state: directory
@@ -16,12 +16,16 @@
   delegate_to: localhost
   become: false
 
+- name: Ensure cloud image directory exists on Proxmox
+  file:
+    path: "/var/lib/vz/template/qemu"
+    state: directory
+    mode: '0755'
+
 - name: Check if cloud image already exists on Proxmox
   stat:
     path: "/var/lib/vz/template/qemu/{{ cloud_image_filename }}"
   register: cloud_image
-  delegate_to: pve
-  check_mode: no
 
 - name: Upload Ubuntu cloud image to Proxmox
   copy:
@@ -30,4 +34,3 @@
     mode: '0644'
     force: no
   when: not cloud_image.stat.exists
-  delegate_to: pve
