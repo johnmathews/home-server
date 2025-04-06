@@ -1,16 +1,10 @@
 # roles/upload_iso/tasks/main.yml
 ---
 - name: Ensure ISO directory exists in project
-  stat:
+  file:
     path: "{{ playbook_dir }}/iso-images"
-  register: iso_dir
-  delegate_to: localhost
-  become: false
-
-- name: Fail if ISO directory is missing
-  fail:
-    msg: "Directory iso-images/ not found. Please create it and place the TrueNAS ISO inside."
-  when: not iso_dir.stat.exists
+    state: directory
+    mode: '0755'
   delegate_to: localhost
   become: false
 
@@ -30,10 +24,17 @@
   delegate_to: localhost
   become: false
 
-- name: Upload TrueNAS ISO to Proxmox (if not already present)
+- name: Sort ISOs by filename (descending)
+  set_fact:
+    latest_iso: "{{ (found_isos.files | sort(attribute='path') | reverse)[0] }}"
+  delegate_to: localhost
+  become: false
+
+- name: Upload latest TrueNAS ISO to Proxmox (if not already present)
   copy:
-    src: "{{ item.path }}"
-    dest: "/var/lib/vz/template/iso/{{ item.path | basename }}"
+    src: "{{ latest_iso.path }}"
+    dest: "/var/lib/vz/template/iso/{{ latest_iso.path | basename }}"
     mode: '0644'
     force: no
-  loop: "{{ found_isos.files }}" 
+  delegate_to: localhost
+  become: false
