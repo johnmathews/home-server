@@ -1,7 +1,7 @@
 # roles/upload_cloud_image/tasks/main.yml
 ---
 
-# Sets up an Ubuntu VM by downloading the ISO and uploading it to Proxmox
+# Helps set up an Ubuntu VM by downloading the cloud image and uploading it to Proxmox
 
 - name: Ensure cloud-image directory exists on localhost
   file:
@@ -37,18 +37,6 @@
     mode: '0644'
     force: no
   when: not cloud_image.stat.exists
-
-- name: Import Ubuntu cloud image as a disk for VM
-  community.general.proxmox_disk:
-    api_user: root@pam
-    api_password: "{{ vault_proxmox_password }}"
-    api_host: "{{ hostvars[inventory_hostname]['ansible_host'] }}"
-    vmid: "{{ cloud_image_vmid }}"
-    disk_image: "/var/lib/vz/template/qemu/{{ cloud_image_filename }}"
-    storage: "{{ cloud_image_storage }}"
-    format: raw
-    state: present
-  when: not cloud_image_disk_exists.stat.exists
 
 - name: Check if disk was imported
   stat:

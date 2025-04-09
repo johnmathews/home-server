@@ -1,7 +1,9 @@
 # site.yml
 ---
+
 - name: Proxmox VE Configuration
   hosts: proxmox
+  gather_facts: false
   become: true
 
   vars:
@@ -14,7 +16,6 @@
         cache_valid_time: 3600
 
   roles:
-    # Each role has a tag so you can target subsets with --tags or --skip-tags
     - role: pve-repos
       tags: common
     - role: common
@@ -23,10 +24,27 @@
       tags: common
     - role: postfix
       tags: common
+
+- name: TrueNAS VM
+  hosts: proxmox
+  gather_facts: false
+  become: true
+
+  vars:
+    email_address: "john@johnmathews.is"
+
+  roles:
     - role: upload_iso
       tags: upload_iso
     - role: truenas_vm
       tags: truenas
+
+- name: Configure Media Stack
+  hosts: media
+  become: true
+  gather_facts: true
+
+  roles:
     - role: upload_cloud_image
       tags: cloud_image
     - role: media_vm

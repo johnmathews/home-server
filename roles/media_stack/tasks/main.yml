@@ -1,39 +1,15 @@
 # roles/media_stack/tasks/main.yml
 ---
-- name: Update apt cache if needed
-  apt:
-    update_cache: yes
-    cache_valid_time: 3600
 
-- name: Install Docker dependencies
-  apt:
-    name:
-      - apt-transport-https
-      - ca-certificates
-      - curl
-      - gnupg
-      - lsb-release
-    state: present
-    force_apt_get: yes
+- name: Install Docker using official role
+  import_role:
+    name: geerlingguy.docker
 
-- name: Install Docker
-  shell: |
-    curl -fsSL https://get.docker.com | sh
-  args:
-    creates: /usr/bin/docker
-
-- name: Add user to docker group
+- name: Add ubuntu user to docker group
   user:
     name: ubuntu
     groups: docker
     append: yes
-
-- name: Install Docker Compose v2
-  get_url:
-    url: https://github.com/docker/compose/releases/download/v2.27.0/docker-compose-linux-x86_64
-    dest: /usr/local/bin/docker-compose
-    mode: '0755'
-  when: ansible_architecture == "x86_64"
 
 - name: Create media stack base directory
   file:
