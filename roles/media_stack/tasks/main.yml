@@ -1,10 +1,20 @@
 # roles/media_stack/tasks/main.yml
 ---
+- name: Update apt cache if needed
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
 - name: Install Docker dependencies
   apt:
-    name: [apt-transport-https, ca-certificates, curl, gnupg, lsb-release]
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
     state: present
-    update_cache: yes
+    force_apt_get: yes
 
 - name: Install Docker
   shell: |
