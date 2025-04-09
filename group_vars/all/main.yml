@@ -1,0 +1,6 @@
+cloud_image_url: "https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img"
+cloud_image_filename: "jammy-server-cloudimg-amd64.img"
+cloud_image_vmid: 201
+cloud_image_storage: "local-lvm"
+
+sshkeys: "{{ lookup('file', lookup('env', 'HOME') + '/.ssh/id_ed25519.pub') }}"

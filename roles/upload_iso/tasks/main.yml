@@ -1,5 +1,9 @@
 # roles/upload_iso/tasks/main.yml
 ---
+
+# Uploads the latest TrueNAS ISO to proxmox if its not their already
+# You have to download manually from TrueNas webiste onto your laptop.
+
 - name: Ensure ISO directory exists in project
   file:
     path: "{{ playbook_dir }}/iso-images"

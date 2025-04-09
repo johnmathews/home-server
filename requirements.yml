@@ -1,0 +1,10 @@
+# requirements.yml
+
+collections:
+  - name: community.general
+    version: ">=6.0.0"
+
+roles:
+  - name: geerlingguy.docker
+    src: geerlingguy.docker
+    version: "latest"

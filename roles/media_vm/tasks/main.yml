@@ -12,11 +12,11 @@
     memory: 8192
     scsihw: virtio-scsi-pci
     # Attach cloud-init drive automatically created by Proxmox
-    sata:
-      sata0: local:cloudinit
+    ide:
+      ide2: local:cloudinit
     # Main boot disk (created outside this task)
     scsi:
-      scsi0: local-lvm:32  # creates a new 32GB disk in the default storage
+      scsi0: local-lvm:vm-201-disk-0,size=32G
     boot: order=scsi0
     bootdisk: scsi0
     net:
