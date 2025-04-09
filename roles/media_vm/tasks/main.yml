@@ -1,94 +1,42 @@
 # roles/media_vm/tasks/main.yml
 ---
 
-- name: Authenticate with Proxmox API and get ticket
-  uri:
-    url: "https://{{ hostvars[inventory_hostname]['ansible_host'] }}:8006/api2/json/access/ticket"
-    method: POST
-    body_format: form-urlencoded
-    body:
-      username: "root@pam"
-      password: "{{ vault_proxmox_password }}"
-    validate_certs: false
-  register: proxmox_auth
-  delegate_to: localhost
-  become: false
-
-- name: Check if VM {{ cloud_image_vmid }} exists
-  uri:
-    url: "https://{{ hostvars[inventory_hostname]['ansible_host'] }}:8006/api2/json/nodes/{{ hostvars[inventory_hostname]['proxmox_node_name'] }}/qemu/{{ cloud_image_vmid }}/status/current"
-    method: GET
-    validate_certs: false
-    headers:
-      Cookie: "PVEAuthCookie={{ proxmox_auth.json.data.ticket }}"
-      CSRFPreventionToken: "{{ proxmox_auth.json.data.CSRFPreventionToken }}"
-  register: vm_status
-  failed_when: vm_status.status not in [200, 404]
-  delegate_to: localhost
-  become: false
-
-- name: Set vm_exists fact
-  set_fact:
-    vm_exists: "{{ vm_status.status == 200 }}"
-
-- name: Create empty VM {{ cloud_image_vmid }}
-  community.general.proxmox_kvm:
-    api_user: root@pam
-    api_password: "{{ vault_proxmox_password }}"
-    api_host: "{{ hostvars[inventory_hostname]['ansible_host'] }}"
-    vmid: "{{ cloud_image_vmid }}"
-    name: "media"
-    node: "{{ hostvars[inventory_hostname]['proxmox_node_name'] }}"
-    memory: 512
-    cores: 2
-    ostype: l26
-    scsihw: virtio-scsi-pci
-    state: present
-  when: not vm_exists
-  delegate_to: localhost
-  become: false
-
-- name: Check if disk was imported
-  stat:
-    path: "/var/lib/pve/images/{{ cloud_image_vmid }}/vm-{{ cloud_image_vmid }}-disk-0.raw"
-  register: cloud_image_disk_exists
-  delegate_to: localhost
-  become: false
-
-- name: Import Ubuntu cloud image as a disk for VM
+- name: Import raw disk into Proxmox VM
   community.general.proxmox_disk:
     api_user: root@pam
     api_password: "{{ vault_proxmox_password }}"
-    api_host: "{{ hostvars[inventory_hostname]['ansible_host'] }}"
+    api_host: "{{ hostvars['pve']['ansible_host'] }}"
     vmid: "{{ cloud_image_vmid }}"
-    disk: "scsi0"
+    disk: scsi0
     import_from: "/var/lib/vz/template/qemu/{{ cloud_image_filename }}"
     storage: "{{ cloud_image_storage }}"
     format: raw
     state: present
-  delegate_to: localhost
-  become: false
-  when: not cloud_image_disk_exists.stat.exists
+  delegate_to: pve
+  become: true
 
-- name: Finalize Media VM configuration and ensure it's running
+- name: Check for imported disk on Proxmox
+  ansible.builtin.shell: ls -lh /var/lib/pve/images/{{ cloud_image_vmid }}
+  register: disk_contents
+  delegate_to: pve
+  become: true
+
+- debug:
+    var: disk_contents.stdout_lines
+
+- name: Finalize and start VM
   community.general.proxmox_kvm:
     api_user: root@pam
-    api_password: '{{ vault_proxmox_password }}'
-    api_host: "{{ hostvars[inventory_hostname]['ansible_host'] }}"
-    node: "{{ hostvars[inventory_hostname]['proxmox_node_name'] }}"
+    api_password: "{{ vault_proxmox_password }}"
+    api_host: "{{ proxmox_api_host }}"
+    node: "{{ proxmox_node }}"
     vmid: "{{ cloud_image_vmid }}"
     name: media
-
-    # Final hardware settings
-    cores: 4
     memory: 8192
+    cores: 4
     ostype: l26
     scsihw: virtio-scsi-pci
     onboot: true
-
-    # Attach cloud-init drive
-    ide:
-      ide2: local:cloudinit
 
     # Attach imported disk
     scsi:
@@ -96,25 +44,17 @@
     boot: order=scsi0
     bootdisk: scsi0
 
-    # Networking
+    # Cloud-init settings
+    ide:
+      ide2: local:cloudinit
     ipconfig:
       ipconfig0: "{{ mediaVM.ipconfig0 }}"
     net:
       net0: "virtio={{ mediaVM.mac }},bridge={{ mediaVM.net_bridge }}"
-
-
-    # Cloud-init
     citype: nocloud
     ciuser: "{{ mediaVM.ciuser }}"
     cipassword: '{{ vault_ubuntu_media_password }}'
     sshkeys: '{{ sshkeys }}'
 
     state: started
-
   delegate_to: localhost
-  become: false
-
-- name: Wait for SSH to become available
-  wait_for_connection:
-    delay: 10
-    timeout: 180

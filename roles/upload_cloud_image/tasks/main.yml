@@ -3,42 +3,49 @@
 
 # Helps set up an Ubuntu VM by downloading the cloud image and uploading it to Proxmox
 
-- name: Ensure cloud-image directory exists on localhost
+- name: Ensure cloud-images directory exists
   file:
-    path: "{{ playbook_dir }}/cloud-images"
+    path: "{{ cloud_image_dir }}"
     state: directory
     mode: '0755'
   delegate_to: localhost
-  become: false
 
 - name: Download Ubuntu cloud image if not already present
   get_url:
     url: "{{ cloud_image_url }}"
-    dest: "{{ playbook_dir }}/cloud-images/{{ cloud_image_filename }}"
+    dest: "{{ cloud_image_dir }}/{{ cloud_image_base_filename }}"
     mode: '0644'
   delegate_to: localhost
-  become: false
 
-- name: Ensure cloud image directory exists on Proxmox
+- name: Convert .img to .raw using qemu-img
+  command: >
+    qemu-img convert -O raw {{ cloud_image_dir }}/{{ cloud_image_base_filename }} {{ cloud_image_dir }}/{{ cloud_image_filename }}
+  args:
+    creates: "{{ cloud_image_dir }}/{{ cloud_image_filename }}"
+  delegate_to: localhost
+
+- name: Ensure Proxmox image upload directory exists
   file:
     path: "/var/lib/vz/template/qemu"
     state: directory
     mode: '0755'
+  delegate_to: pve
+  become: true
 
-- name: Check if cloud image already exists on Proxmox
+- name: Check if .raw file is already on Proxmox
   stat:
     path: "/var/lib/vz/template/qemu/{{ cloud_image_filename }}"
-  register: cloud_image
+  register: proxmox_image_file
+  delegate_to: pve
+  become: true
 
-- name: Upload Ubuntu cloud image to Proxmox
+- name: Upload .raw disk to Proxmox
   copy:
-    src: "{{ playbook_dir }}/cloud-images/{{ cloud_image_filename }}"
+    src: "{{ cloud_image_dir }}/{{ cloud_image_filename }}"
     dest: "/var/lib/vz/template/qemu/{{ cloud_image_filename }}"
     mode: '0644'
     force: no
-  when: not cloud_image.stat.exists
+  when: not proxmox_image_file.stat.exists
+  delegate_to: pve
+  become: true
 
-- name: Check if disk was imported
-  stat:
-    path: "/var/lib/pve/images/{{ cloud_image_vmid }}/vm-{{ cloud_image_vmid }}-disk-0.raw"
-  register: cloud_image_disk_exists

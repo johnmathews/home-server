@@ -1,0 +1,5 @@
+ansible_host: 192.168.2.214
+ansible_user: root
+proxmox_node_name: proxmox
+proxmox_host: pve
+

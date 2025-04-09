@@ -1,38 +1,69 @@
 # roles/truenas_vm/tasks/main.yml
 ---
-- name: Create TrueNAS VM
+
+- name: Authenticate with Proxmox API
+  uri:
+    url: "https://{{ hostvars[inventory_hostname]['ansible_host'] }}:8006/api2/json/access/ticket"
+    method: POST
+    body_format: form-urlencoded
+    body:
+      username: "root@pam"
+      password: "{{ vault_proxmox_password }}"
+    validate_certs: false
+  register: proxmox_auth
+  delegate_to: localhost
+  become: false
+
+- name: Check if TrueNAS VM (ID 200) exists
+  uri:
+    url: "https://{{ hostvars[inventory_hostname]['ansible_host'] }}:8006/api2/json/nodes/{{ hostvars[inventory_hostname]['proxmox_node_name'] }}/qemu/200/status/current"
+    method: GET
+    validate_certs: false
+    headers:
+      Cookie: "PVEAuthCookie={{ proxmox_auth.json.data.ticket }}"
+      CSRFPreventionToken: "{{ proxmox_auth.json.data.CSRFPreventionToken }}"
+  register: truenas_status
+  failed_when: truenas_status.status not in [200, 404]
+  delegate_to: localhost
+  become: false
+
+- name: Set truenas_exists fact
+  set_fact:
+    truenas_exists: "{{ truenas_status.status == 200 }}"
+
+- name: Ensure ISO directory exists on Proxmox
+  file:
+    path: /var/lib/vz/template/iso
+    state: directory
+    mode: '0755'
+  delegate_to: "{{ inventory_hostname }}"
+
+- name: Create TrueNAS VM (only if not present)
   community.general.proxmox_kvm:
     api_user: root@pam
     api_password: "{{ vault_proxmox_password }}"
     api_host: "{{ hostvars[inventory_hostname]['ansible_host'] }}"
     node: "{{ hostvars[inventory_hostname]['proxmox_node_name'] }}"
-
-    # Basic VM Settings
     vmid: 200
     name: truenas
     cores: 4
     memory: 12288
-    balloon: 0 # Disable balloon - trueNAS expects fixed memory
+    balloon: 0
     scsihw: virtio-scsi-pci
     boot: order=scsi0;ide2
-
-    # Attach ISO as a CD-ROM drive
     ide:
       ide2: local:iso/TrueNAS-SCALE-24.10.2.1.iso,media=cdrom
-
-    # Define boot disk
     scsi:
       scsi0: local-lvm:16
-
-    # Network interface
     net:
       net0: virtio,bridge=vmbr0
-
     ostype: l26
     onboot: true
     state: present
+  when: not truenas_exists
   delegate_to: localhost
   become: false
+
 - name: Set boot order to disk only and remove ISO (if installed)
   community.general.proxmox_kvm:
     api_user: root@pam
@@ -43,6 +74,6 @@
     boot: order=scsi0
     ide: {}
     state: present
-  when: truenas_installed
+  when: truenas_installed | default(false)
   delegate_to: localhost
   become: false

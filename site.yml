@@ -3,7 +3,7 @@
 
 - name: Proxmox VE Configuration
   hosts: proxmox
-  gather_facts: false
+  gather_facts: true
   become: true
 
   vars:
@@ -27,7 +27,7 @@
 
 - name: TrueNAS VM
   hosts: proxmox
-  gather_facts: false
+  gather_facts: true
   become: true
 
   vars:
@@ -39,14 +39,19 @@
     - role: truenas_vm
       tags: truenas
 
-- name: Configure Media Stack
-  hosts: media
-  become: true
-  gather_facts: true
-
+- name: Upload Cloud Image
+  hosts: proxmox
+  gather_facts: false
   roles:
     - role: upload_cloud_image
       tags: cloud_image
+
+- name: Media VM 
+  hosts: media
+  gather_facts: false
+  become: true
+
+  roles:
     - role: media_vm
       tags: media
     - role: media_stack

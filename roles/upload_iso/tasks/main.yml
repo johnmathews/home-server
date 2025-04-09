@@ -34,11 +34,18 @@
   delegate_to: localhost
   become: false
 
-- name: Upload latest TrueNAS ISO to Proxmox (if not already present)
-  copy:
+- name: Ensure ISO directory exists on Proxmox
+  file:
+    path: /var/lib/vz/template/iso
+    state: directory
+    mode: '0755'
+  delegate_to: pve
+  become: true
+
+- name: Upload latest TrueNAS ISO to Proxmox using rsync
+  ansible.posix.synchronize:
     src: "{{ latest_iso.path }}"
-    dest: "/var/lib/vz/template/iso/{{ latest_iso.path | basename }}"
-    mode: '0644'
-    force: no
+    dest: "/var/lib/vz/template/iso/"
+    mode: push
   delegate_to: localhost
   become: false
