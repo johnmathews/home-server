@@ -14,7 +14,15 @@
   delegate_to: localhost
   become: false
 
-- name: Check if TrueNAS VM (ID 200) exists
+- name: Ensure ISO directory exists on Proxmox
+  file:
+    path: /var/lib/vz/template/iso
+    state: directory
+    mode: '0755'
+  delegate_to: "{{ inventory_hostname }}"
+
+
+- name: Check if TrueNAS VM (ID 200) already exists
   uri:
     url: "https://{{ hostvars[inventory_hostname]['ansible_host'] }}:8006/api2/json/nodes/{{ hostvars[inventory_hostname]['proxmox_node_name'] }}/qemu/200/status/current"
     method: GET
@@ -23,20 +31,13 @@
       Cookie: "PVEAuthCookie={{ proxmox_auth.json.data.ticket }}"
       CSRFPreventionToken: "{{ proxmox_auth.json.data.CSRFPreventionToken }}"
   register: truenas_status
-  failed_when: truenas_status.status not in [200, 404]
+  failed_when: truenas_status.status not in [200, 404, 500]
   delegate_to: localhost
   become: false
 
 - name: Set truenas_exists fact
   set_fact:
     truenas_exists: "{{ truenas_status.status == 200 }}"
-
-- name: Ensure ISO directory exists on Proxmox
-  file:
-    path: /var/lib/vz/template/iso
-    state: directory
-    mode: '0755'
-  delegate_to: "{{ inventory_hostname }}"
 
 - name: Create TrueNAS VM (only if not present)
   community.general.proxmox_kvm:

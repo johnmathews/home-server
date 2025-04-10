@@ -9,12 +9,6 @@
   vars:
     email_address: "john@johnmathews.is"
 
-  pre_tasks:
-    - name: Update apt cache
-      apt:
-        update_cache: yes
-        cache_valid_time: 3600
-
   roles:
     - role: pve-repos
       tags: common
