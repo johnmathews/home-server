@@ -21,19 +21,44 @@ Provisioning the server is done in distinct, idempotent steps. Each step is back
     - upload_cloud_image downloads and uploads Ubuntu Server cloud image for VM creation
 
 3.	VM Provisioning
-•	media_vm: creates Ubuntu Server VM (cloud-init), 4 vCPUs, 8GB RAM, 32GB disk
-•	truenas_vm: TrueNAS SCALE VM with raw disk passthrough
-4.	LXC Container Setup
-•	Unprivileged LXC for Pi-hole with static IP
-•	Lightweight LXC for Cloudflare Tunnel
-5.	Service Configuration
-•	Media VM: Docker + Docker Compose stack for Jellyfin, Sonarr, Radarr, qBittorrent, etc.
-•	Home Assistant VM: HAOS image, USB passthrough for Zigbee
-6.	Storage Configuration
-•	TrueNAS manages ZFS pools with mirror vdevs
-•	Snapshots and replication to 3TB/1TB HDDs
-7.	Backup & Recovery
-•	Optional Proxmox Backup Server VM
-•	PBS deduplication and retention
-•	Proxmox backup jobs + TrueNAS snapshots
+    - media_vm: creates Ubuntu Server VM (cloud-init), 4 vCPUs, 8GB RAM, 32GB disk
+    - truenas_vm: TrueNAS SCALE VM with raw disk passthrough
 
+4.	LXC Container Setup
+    - Unprivileged LXC for Pi-hole with static IP
+    - Lightweight LXC for Cloudflare Tunnel
+5.	Service Configuration
+    - Media VM: Docker + Docker Compose stack for Jellyfin, Sonarr, Radarr, qBittorrent, etc.
+    - Home Assistant VM: HAOS image, USB passthrough for Zigbee
+
+6.	Storage Configuration
+    - TrueNAS manages ZFS pools with mirror vdevs
+    - Snapshots and replication to 3TB/1TB HDDs
+
+7.	Backup & Recovery
+    - Optional Proxmox Backup Server VM
+    - PBS deduplication and retention
+    - Proxmox backup jobs + TrueNAS snapshots
+
+## 🎯 Priorities, Objectives & Tradeoffs
+
+### Main goals:
+
+- A reliable and extensible home server
+- Minimal power draw at idle (below 20% load)
+- Capable of running VMs, containers, and media services
+- Maintainable and repeatable provisioning (via Ansible)
+
+### Priorities:
+
+- Flexibility: Modular VM/container layout, easy to expand
+- Simplicity: Clear separation of concerns, avoid over-engineering
+- Power efficiency: Idle power draw is more important than peak performance
+- Storage resilience: ZFS mirror pools, snapshot-based backups
+
+### Trade-offs:
+
+- No GPU initially: Media server may rely on CPU transcoding
+- NAS (TrueNAS) runs in a VM, not bare metal
+- Network speed limits off-server editing (e.g., video editing still happens locally)
+- Services exposed via Cloudflare Tunnel (less control than direct reverse proxy)
