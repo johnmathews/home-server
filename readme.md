@@ -8,6 +8,22 @@ storage (TrueNAS), media streaming (Jellyfin, Sonarr, Radarr, qBittorrent), home
 automation (Home Assistant), network security (Pi-hole), and remote access
 (Cloudflare Tunnel).
 
+
+
+## Manual steps
+
+1. Install Proxmox using a USB drive.
+1. You need to manually download a TrueNas image and have the ISO locally.
+1. You need to update `/etc/pve/storage.cfg` and add `images` to the `local` block.
+
+    ```sh
+    dir: local
+        path /var/lib/vz
+        content iso,vztmpl,backup,images
+    ```
+1.  Store the credentials etc in 1Password.
+
+
 ## 🛠 Overview of Setup Steps
 
 Provisioning the server is done in distinct, idempotent steps. Each step is backed by an Ansible role:
