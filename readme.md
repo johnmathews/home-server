@@ -13,6 +13,13 @@ automation (Home Assistant), network security (Pi-hole), and remote access
 ## Manual steps
 
 1. Install Proxmox using a USB drive.
+1. You will need to remove the host key from `~/.ssh/known_hosts` to avoid warnings and make ssh in Ansible work.
+1. Copy your public key onto the server, otherwise SSH authentication wont work.
+
+   ```sh
+   ssh-copy-id -i ~/.ssh/id_ed25519.pub root@192.168.2.214
+   ```
+
 1. You need to manually download a TrueNas image and have the ISO locally.
 1. You need to update `/etc/pve/storage.cfg` and add `images` to the `local` block.
 
@@ -26,22 +33,23 @@ automation (Home Assistant), network security (Pi-hole), and remote access
 
 ## 🛠 Overview of Setup Steps
 
-Provisioning the server is done in distinct, idempotent steps. Each step is backed by an Ansible role:
+Provisioning the server is done in distinct, idempotent steps. 
+Each step is backed by an Ansible role:
 
 1.	Initial Proxmox Setup
 
-   - OS installed manually on NVMe
+   - Proxmox is installed manually on the NVMe drive. Format the entire NVMe drive as ext4.
    - SSH enabled, enterprise repo disabled, packages installed
    - ZRAM configured, email notifications via Postfix
 
-2.	Image Preparation
+	Image Preparation
 
-   - upload_cloud_image downloads and uploads Ubuntu Server cloud image for VM creation
+   - `upload_cloud_image` downloads and uploads Ubuntu Server cloud image for VM creation
 
 3.	VM Provisioning
 
-   - media_vm: creates Ubuntu Server VM (cloud-init), 4 vCPUs, 8GB RAM, 32GB disk
-   - truenas_vm: TrueNAS SCALE VM with raw disk passthrough
+   - `media_vm`: creates Ubuntu Server VM (cloud-init), 4 vCPUs, 8GB RAM, 32GB disk
+   - `truenas_vm`: TrueNAS SCALE VM with raw disk passthrough
 
 4.	LXC Container Setup
 
