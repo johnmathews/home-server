@@ -71,3 +71,32 @@ Provisioning the server is done in distinct, idempotent steps. Each step is back
 - NAS (TrueNAS) runs in a VM, not bare metal
 - Network speed limits off-server editing (e.g., video editing still happens locally)
 - Services exposed via Cloudflare Tunnel (less control than direct reverse proxy)
+
+## ✅ Current Progress
+
+| Task                                 | Status     |
+|--------------------------------------|------------|
+| Proxmox base setup                   | ✅ Done     |
+| Upload cloud image role              | ✅ Done     |
+| Media VM provisioning via Ansible    | ✅ Done     |
+| TrueNAS VM created                   | ✅ Done     |
+| Services installed via Docker stack  | 🔄 In progress |
+| Pi-hole container setup              | 🔲 Pending  |
+| Cloudflare Tunnel container          | 🔲 Pending  |
+| Backup strategy implemented          | 🔲 Pending  |
+
+---
+
+## 🌐 Networking Overview
+
+| Device              | Interface     | Speed         |
+|---------------------|---------------|---------------|
+| Home Server         | Ethernet      | 1 Gbps        |
+| MacBook Pro M2 Max  | Wi-Fi         | ~120–140 Mbps |
+| ISP Connection      | Fiber         | 100 Mbps up/down |
+
+## Notes:
+
+- Server is connected via Gigabit Ethernet to home router
+- Clients (e.g., MacBook) access server over Wi-Fi, so local transfer speeds are capped around 130 Mbps
+- Cloudflare Tunnel provides secure remote access without port forwarding
