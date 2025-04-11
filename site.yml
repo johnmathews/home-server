@@ -50,3 +50,8 @@
       tags: media
     - role: media_stack
       tags: media_stack
+
+- name: Provision and configure Cloudflared LXC container
+  hosts: proxmox
+  roles:
+    - cloudflared_lxc

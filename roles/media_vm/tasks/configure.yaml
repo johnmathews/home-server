@@ -1,4 +1,4 @@
-# roles/media_stack/tasks/main.yml
+# roles/media_vm/tasks/main.yml
 ---
 - name: Gather facts for media-vm
   ansible.builtin.setup:
@@ -50,3 +50,4 @@
   community.docker.docker_compose_v2:
     project_src: /srv/media
     state: present
+

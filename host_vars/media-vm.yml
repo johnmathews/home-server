@@ -1,13 +1,18 @@
 # host_vars/media-vm.yml
 ansible_host: 192.168.2.216
-ansible_user: ubuntu
+ansible_user: john
 ansible_ssh_private_key_file: ~/.ssh/id_ed25519
 
 proxmox_node_name: proxmox
 
-mediaVM:
+vm_config:
+  name: media-vm
   ip: 192.168.2.216
-  ipconfig0: "ip=192.168.2.216/24,gw=192.168.2.254"
   mac: "02:00:00:12:34:56"
-  ciuser: "ubuntu"
-  net_bridge: "vmbr0"
+  ipconfig0: "ip=192.168.2.216/24,gw={{ vm_defaults.gateway }}"
+  cores: 4
+  memory: 8192
+  disk_size: 32G
+  ciuser: "{{ vm_defaults.ciuser }}"
+  net_bridge: "{{ vm_defaults.net_bridge }}"
+  ssh_key: "{{ vm_defaults.ssh_key }}"

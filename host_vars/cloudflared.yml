@@ -1,0 +1,28 @@
+# host_vars/cloudflared.yml
+ansible_host: 192.168.2.215
+ansible_user: root
+
+proxmox_node_name: proxmox
+
+vm_config:
+  hostname: cloudflared
+  vmid: 105
+  mac_address: "02:00:00:cf:00:01"
+  ip_address: 192.168.2.215
+  ipconfig0: "ip=192.168.2.215/24,gw={{ vm_defaults.gateway }}"
+  mac: "02:00:00:cf:00:01"
+  net_bridge: "{{ vm_defaults.net_bridge }}"
+  cores: 1
+  memory: 512
+  netmask: 24
+  ciuser: "{{ vm_defaults.ciuser }}"
+  ssh_key: "{{ vm_defaults.ssh_key }}"
+  domain: "johnmathews.is"
+  ostemplate: local:vztmpl/ubuntu-22.04-standard_*.tar.gz
+  storage: local-lvm
+  tunnel_token: "{{ vault_cloudflared_token }}"
+  services:
+    - hostname: "home.{{ domain_name }}"
+      url: "{{ media_vm.vm_config.ip }}:8123"
+    - hostname: "jellyfin.{{ domain_name }}"
+      url: "{{ media_vm.vm_config.ip }}:8096"

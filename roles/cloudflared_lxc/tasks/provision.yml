@@ -1,0 +1,45 @@
+- name: Create unprivileged LXC container
+  community.general.proxmox_lxc:
+    api_user: root@pam
+    api_password: "{{ vault_proxmox_password }}"
+    api_host: "{{ hostvars['pve']['ansible_host'] }}"
+    vmid: "{{ vm_config.vmid }}"
+    hostname: "{{ vm_config.name }}"
+    ostemplate: "{{ lxc_template }}"
+    password: "changeme"
+    unprivileged: true
+    cores: "{{ vm_config.cores }}"
+    memory: "{{ vm_config.memory }}"
+    netif:
+      net0: "name=eth0,ip={{ vm_config.ip }}/24,gw={{ vm_defaults.gateway }},hwaddr={{ vm_config.mac }}"
+    storage: "{{ lxc_storage }}"
+    ssh_public_keys: "{{ lookup('file', vm_config.ssh_key) }}"
+    state: present
+    force: false
+    validate_certs: false
+  tags: cloudflared_provision
+
+- name: Start the container
+  community.general.proxmox_lxc:
+    vmid: "{{ vm_config.vmid }}"
+    state: started
+    api_user: root@pam
+    api_password: "{{ vault_proxmox_password }}"
+    api_host: "{{ hostvars['pve']['ansible_host'] }}"
+    validate_certs: false
+  tags: cloudflared_provision
+
+- name: Wait for SSH to be ready
+  wait_for:
+    host: "{{ vm_config.ip }}"
+    port: 22
+    timeout: 60
+  tags: cloudflared_provision
+
+- name: Add cloudflared container to dynamic inventory
+  add_host:
+    name: "{{ vm_config.name }}"
+    ansible_host: "{{ vm_config.ip }}"
+    ansible_user: root
+    groups: cloudflared
+  tags: cloudflared_provision

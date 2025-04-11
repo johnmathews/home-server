@@ -1,0 +1,9 @@
+tunnel: {{ vm_config.tunnel_token }}
+credentials-file: /etc/cloudflared/credentials.json
+
+ingress:
+  - hostname: home.{{ vm_config.domain }}
+    service: http://{{ hostvars['media-vm'].vm_config.ip }}:8123
+  - hostname: jellyfin.{{ vm_config.domain }}
+    service: http://{{ hostvars['media-vm'].vm_config.ip }}:8096
+  - service: http_status:404
