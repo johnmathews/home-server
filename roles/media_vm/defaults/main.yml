@@ -1,5 +1,9 @@
 # media_vm/defaults/main.yml
 
+# sane defaults that are easily overriden elsehwere in ansible
+# defaults/main.yml has the lowest priority. host_vars/media-vm.yml has highest priority.
+
+
 cloud_image_url: https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img
 
 cloud_image_dir: "{{ playbook_dir }}/cloud-images"
@@ -9,8 +13,7 @@ cloud_image_filename: "jammy-server-cloudimg-amd64.raw"
 proxmox_api_host: "{{ hostvars['pve']['ansible_host'] }}"
 
 
-
-media_stack_user: media
+media_stack_user: john
 media_stack_group: media
 media_stack_base_dir: /opt/media-stack
 media_stack_data_dir: /opt/media-stack/config

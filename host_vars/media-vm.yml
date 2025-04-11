@@ -1,4 +1,7 @@
 # host_vars/media-vm.yml
+
+# variables in host_vars files have high precedence and override defaults/main.yaml and group_vars .yml files.
+
 ansible_host: 192.168.2.216
 ansible_user: john
 ansible_ssh_private_key_file: ~/.ssh/id_ed25519

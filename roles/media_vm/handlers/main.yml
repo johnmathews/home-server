@@ -1,3 +1,5 @@
+# a hander is a deferred action. it runs once at the end of a play only if a task has 
+# triggered it using `notify`. if it is triggered multiple times it still only runs once. 
 ---
 - name: Restart media stack
   command: docker-compose down && docker-compose up -d
