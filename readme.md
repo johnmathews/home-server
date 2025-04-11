@@ -8,6 +8,28 @@ storage (TrueNAS), media streaming (Jellyfin, Sonarr, Radarr, qBittorrent), home
 automation (Home Assistant), network security (Pi-hole), and remote access
 (Cloudflare Tunnel).
 
+## 🚀 Quickstart
+
+```sh
+# Clone the repo and enter it
+git clone git@github.com:yourname/home-server.git
+cd home-server
+
+# Create and activate the virtual environment (using uv)
+uv venv
+source .venv/bin/activate
+
+# Install Python + Ansible dependencies
+uv pip install -r requirements.txt
+ansible-galaxy install -r requirements.yml
+
+# Run lint and dry-run to validate everything
+make ci
+
+# Provision everything (safe to rerun)
+make site
+```
+
 ## 🛠 Tooling
 
 - Provisioning is driven by `ansible-playbook` and structured with a Makefile
