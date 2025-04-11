@@ -55,48 +55,6 @@ make clean              # Remove retry/log files
 
 ---
 
-## 🗂 Project Structure
-
-```
-.
-├── ansible.cfg
-├── makefile
-├── inventory.ini
-├── requirements.txt
-├── requirements.yml
-├── group_vars/
-│   └── all/
-│       ├── main.yml
-│       └── vault.yml
-├── host_vars/
-│   ├── pve.yml
-│   ├── media-vm.yml
-│   └── cloudflared.yml
-├── playbooks/
-│   ├── site.yml            # Master playbook
-│   ├── proxmox.yml
-│   ├── media_vm.yml
-│   ├── cloudflared.yml
-│   ├── truenas.yml
-│   └── cloud_image.yml
-└── roles/
-    ├── common/
-    ├── media_vm/
-    │   ├── tasks/{main,provision,configure}.yml
-    │   ├── templates/env.j2
-    │   └── files/docker-compose.yml
-    ├── cloudflared_lxc/
-    │   ├── tasks/{main,provision,configure}.yml
-    │   └── templates/config.yml.j2
-    ├── truenas_vm/
-    ├── upload_cloud_image/
-    ├── upload_iso/
-    ├── postfix/
-    ├── pve-repos/
-    └── zram/
-```
-
----
 
 ## ⚙️ Manual steps
 
@@ -205,3 +163,47 @@ lvmthin: local-lvm
 - Clients (MacBook, phones) access via Wi-Fi
 - Cloudflare Tunnel for remote access without port forwarding
 
+---
+
+## 🗂 Project Structure
+
+```
+.
+├── ansible.cfg
+├── makefile
+├── inventory.ini
+├── requirements.txt
+├── requirements.yml
+├── group_vars/
+│   └── all/
+│       ├── main.yml
+│       └── vault.yml
+├── host_vars/
+│   ├── pve.yml
+│   ├── media-vm.yml
+│   └── cloudflared.yml
+├── playbooks/
+│   ├── site.yml            # Master playbook
+│   ├── proxmox.yml
+│   ├── media_vm.yml
+│   ├── cloudflared.yml
+│   ├── truenas.yml
+│   └── cloud_image.yml
+└── roles/
+    ├── common/
+    ├── media_vm/
+    │   ├── tasks/{main,provision,configure}.yml
+    │   ├── templates/env.j2
+    │   └── files/docker-compose.yml
+    ├── cloudflared_lxc/
+    │   ├── tasks/{main,provision,configure}.yml
+    │   └── templates/config.yml.j2
+    ├── truenas_vm/
+    ├── upload_cloud_image/
+    ├── upload_iso/
+    ├── postfix/
+    ├── pve-repos/
+    └── zram/
+```
+
+---
