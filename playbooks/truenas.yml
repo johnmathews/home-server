@@ -1,0 +1,13 @@
+- name: TrueNAS VM
+  hosts: proxmox
+  gather_facts: true
+  become: true
+
+  vars:
+    email_address: "john@johnmathews.is"
+
+  roles:
+    - role: upload_iso
+      tags: upload_iso
+    - role: truenas_vm
+      tags: truenas

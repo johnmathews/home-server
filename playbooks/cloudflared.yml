@@ -1,0 +1,7 @@
+- name: Cloudflared LXC
+  hosts: proxmox
+  gather_facts: false
+
+  roles:
+    - role: cloudflared_lxc
+      tags: cloudflared

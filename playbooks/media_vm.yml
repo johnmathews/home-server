@@ -1,0 +1,8 @@
+- name: Media VM
+  hosts: media
+  gather_facts: false
+  become: true
+
+  roles:
+    - role: media_vm
+      tags: media_vm

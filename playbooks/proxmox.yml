@@ -1,0 +1,17 @@
+- name: Proxmox VE Configuration
+  hosts: proxmox
+  gather_facts: true
+  become: true
+
+  vars:
+    email_address: "john@johnmathews.is"
+
+  roles:
+    - role: pve-repos
+      tags: common
+    - role: common
+      tags: common
+    - role: zram
+      tags: common
+    - role: postfix
+      tags: common
