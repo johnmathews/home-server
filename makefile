@@ -35,6 +35,20 @@ media_configure:
 cloudflared:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/cloudflared.yml $(VAULT)
 
+# ───────────── Quality Checks ─────────────
+check:
+	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/site.yml --check $(VAULT)
+
+lint:
+	.venv/bin/ansible-lint $(PLAYBOOK_DIR) roles/
+
+clean:
+	rm -f *.retry
+	rm -f .ansible.log
+
+ci: lint check
+
+# ───────────── Help Message ───────────────
 help:
 	@echo ""
 	@echo "🚀 Available make commands:"
@@ -47,5 +61,9 @@ help:
 	@echo "  make media_provision  → Only provision Media VM"
 	@echo "  make media_configure  → Only configure Media VM (Docker, services)"
 	@echo "  make cloudflared      → Provision and configure Cloudflared LXC"
+	@echo "  make check            → Dry run (no changes applied)"
+	@echo "  make lint             → Lint playbooks and roles"
+	@echo "  make clean            → Remove temp files and retry logs"
+	@echo "  make ci               → Run lint + dry run (ideal for pre-commit or CI)"
 	@echo "  make help             → Show this message"
 	@echo ""

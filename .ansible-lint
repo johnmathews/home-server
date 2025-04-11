@@ -1,0 +1,27 @@
+# .ansible-lint - Project-specific linting rules
+
+# Rules we *allow* to fail the build
+enable_list:
+  - all
+
+# Rules we *want to see*, but not fail the build yet
+warn_list:
+  - fqcn                            # We want to move to fully qualified module names
+  - var-naming                      # Gradually prefix variables inside roles
+  - yaml[truthy]                    # Watch for 'True' vs 'true'
+  - no-changed-when                 # Flag missing changed_when where needed
+  - risky-file-permissions          # Warn if mode: is missing on sensitive files
+  - name[casing]                    # Enforce naming conventions
+  - yaml[trailing-spaces]          # Visual cleanup
+  - yaml[empty-lines]              # Visual cleanup
+  - yaml[line-length]              # Non-blocking formatting issues
+
+# Files to exclude
+exclude_paths:
+  - .venv/
+  - cloud-images/
+  - iso-images/
+
+# Optional: reduce noise when using roles downloaded with ansible-galaxy
+skip_list:
+  - experimental                   # Skip experimental rules for now
