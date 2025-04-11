@@ -8,119 +8,155 @@ storage (TrueNAS), media streaming (Jellyfin, Sonarr, Radarr, qBittorrent), home
 automation (Home Assistant), network security (Pi-hole), and remote access
 (Cloudflare Tunnel).
 
-## Manual steps
+## 🛠 Tooling
 
-1. Install Proxmox using a USB drive.
-1. Id this is a do over, remove the old host key from `~/.ssh/known_hosts` to
-   avoid warnings and make ssh in Ansible work.
-1. Copy a public key onto the server, otherwise SSH authentication wont work.
+- Provisioning is driven by `ansible-playbook` and structured with a Makefile
+- Project structure is modular and separated by playbooks per service
+- Linting and CI-style checks are included for reliability
 
-   ```sh
-   ssh-copy-id -i ~/.ssh/id_ed25519.pub root@192.168.2.214
-   ```
+### Makefile Targets
 
-1. You need to manually download a TrueNas image and have the ISO locally.
-1. You need to update `/etc/pve/storage.cfg` and add `images` to the `local`
-   block.
+```sh
+make site               # Run full home server provisioning
+make media              # Provision and configure Media VM
+make media_provision    # Only provision Media VM (no Docker)
+make media_configure    # Configure services inside Media VM
+make cloudflared        # Setup Cloudflare Tunnel LXC
+make proxmox            # Configure base Proxmox OS setup
+make truenas            # Create TrueNAS VM
+make cloud_image        # Upload Ubuntu cloud-init image
+make check              # Dry-run of full site.yml
+make lint               # Lint all playbooks and roles
+make ci                 # Run lint + check for validation
+make clean              # Remove retry/log files
+```
 
-   ```sh
-   dir: local
-           path /var/lib/vz
-           content iso,vztmpl,backup,images
+---
 
-   lvmthin: local-lvm
-           thinpool data
-           vgname pve
-           content rootdir,images
-   ```
+## 🗂 Project Structure
 
- Store the credentials etc in 1Password.
+```
+.
+├── ansible.cfg
+├── makefile
+├── inventory.ini
+├── requirements.txt
+├── requirements.yml
+├── group_vars/
+│   └── all/
+│       ├── main.yml
+│       └── vault.yml
+├── host_vars/
+│   ├── pve.yml
+│   ├── media-vm.yml
+│   └── cloudflared.yml
+├── playbooks/
+│   ├── site.yml            # Master playbook
+│   ├── proxmox.yml
+│   ├── media_vm.yml
+│   ├── cloudflared.yml
+│   ├── truenas.yml
+│   └── cloud_image.yml
+├── roles/
+│   ├── common/
+│   ├── media_vm/
+│   │   ├── tasks/{main,provision,configure}.yml
+│   │   ├── templates/env.j2
+│   │   └── files/docker-compose.yml
+│   ├── cloudflared_lxc/
+│   │   ├── tasks/{main,provision,configure}.yml
+│   │   └── templates/config.yml.j2
+│   ├── truenas_vm/
+│   ├── upload_cloud_image/
+│   ├── upload_iso/
+│   ├── postfix/
+│   ├── pve-repos/
+│   └── zram/
+```
 
-### TrueNAS VM
+---
 
-- After Ansible has created the VM and attached the TrueNAS ISO to its CD Drive,
-  install TrueNAS yourself.
-- Turn it on and click through the install process.
-- Remove the CD Drive and reboot
-- It gets a new different MAC address each time, update the reserved IP
-  address.
+## ⚙️ Manual steps
 
-## MediaVM
+1. Install Proxmox from USB
+2. (If reinstalling) Remove old host key from `~/.ssh/known_hosts`
+3. Copy your public SSH key to the host:
 
-- Add the user and password at the `cloud-init` tab in Proxmox UI.
-- Add the public key `~/.ssh/id_ed25519.pub` also.
-- Then reboot
+```sh
+ssh-copy-id -i ~/.ssh/id_ed25519.pub root@192.168.2.214
+```
 
-## 🛠 Overview of Setup Steps
+4. Manually download and place the TrueNAS ISO in `iso-images/`
+5. Edit `/etc/pve/storage.cfg` on the Proxmox host:
 
-Provisioning the server is done in distinct, idempotent steps. Each step is
-backed by an Ansible role:
+```conf
+dir: local
+    path /var/lib/vz
+    content iso,vztmpl,backup,images
 
-1. Initial Proxmox Setup
+lvmthin: local-lvm
+    thinpool data
+    vgname pve
+    content rootdir,images
+```
 
-- Proxmox is installed manually on the NVMe drive. Format the entire NVMe drive
-  as ext4.
-- SSH enabled, enterprise repo disabled, packages installed
-- ZRAM configured, email notifications via Postfix
+6. Store credentials and secrets in 1Password (referenced via `vault.yml`)
 
-  Image Preparation
+---
 
-- `upload_cloud_image` downloads and uploads Ubuntu Server cloud image for VM
-  creation
+## 🧭 VM & Container Provisioning Workflow
 
-3. VM Provisioning
+1. **Base Proxmox Setup**  
+   Configure SSH, ZRAM, Postfix, disable enterprise repo
 
-- `media_vm`: creates Ubuntu Server VM (cloud-init), 4 vCPUs, 8GB RAM, 32GB disk
-- `truenas_vm`: TrueNAS SCALE VM with raw disk passthrough
+2. **Image Preparation**  
+   Upload Ubuntu cloud image using `upload_cloud_image` role
 
-4. LXC Container Setup
+3. **VMs**
+   - `media_vm`: Ubuntu server w/ cloud-init, Docker + media stack
+   - `truenas_vm`: TrueNAS VM with raw disk passthrough
 
-- Unprivileged LXC for Pi-hole with static IP
-- Lightweight LXC for Cloudflare Tunnel
+4. **LXC Containers**
+   - `cloudflared_lxc`: Cloudflare Tunnel container (LXC)
+   - Pi-hole: Unprivileged LXC (not yet implemented)
 
-5. Service Configuration
+5. **Service Configuration**  
+   - Docker stack in `media_vm`: Jellyfin, Sonarr, Radarr, qBittorrent
+   - Home Assistant (planned): HAOS image with USB passthrough
 
-- Media VM: Docker + Docker Compose stack for Jellyfin, Sonarr, Radarr,
-  qBittorrent, etc.
-- Home Assistant VM: HAOS image, USB pass through for Zigbee
+6. **Storage**
+   - TrueNAS manages ZFS pools (mirrored vdevs)
+   - Snapshots & replication to backup drives
 
-6. Storage Configuration
+7. **Backups**
+   - Optional PBS VM
+   - Proxmox + TrueNAS-based snapshot + dedup backups
 
-- TrueNAS manages ZFS pools with mirror vdevs
-- Snapshots and replication to 3TB/1TB HDDs
+---
 
-7. Backup & Recovery
+## 🎯 Objectives, Priorities & Tradeoffs
 
-- Optional Proxmox Backup Server VM
-- PBS deduplication and retention
-- Proxmox backup jobs + TrueNAS snapshots
+### Main Goals
+- Reliable and extensible home server
+- Power-efficient (20% draw at idle)
+- VM + container support
+- Repeatable provisioning with Ansible
 
-## 🎯 Priorities, Objectives & Tradeoffs
+### Priorities
+- ⚙️ Flexibility: Modular VMs & services
+- ✨ Simplicity: Separation of concerns
+- 🔋 Efficiency: Low idle power draw
+- 💾 Storage resilience: ZFS + snapshots
 
-### Main goals:
+### Tradeoffs
+- No GPU (initially) → CPU transcoding
+- TrueNAS runs in VM, not bare metal
+- Editing via Wi-Fi limits throughput
+- External access via Cloudflare Tunnel (not NGINX)
 
-- A reliable and extensible home server
-- Minimal power draw at idle (below 20% load)
-- Capable of running VMs, containers, and media services
-- Maintainable and repeatable provisioning (via Ansible)
+---
 
-### Priorities:
-
-- Flexibility: Modular VM/container layout, easy to expand
-- Simplicity: Clear separation of concerns, avoid over-engineering
-- Power efficiency: Idle power draw is more important than peak performance
-- Storage resilience: ZFS mirror pools, snapshot-based backups
-
-### Trade-offs:
-
-- No GPU initially: Media server may rely on CPU transcoding
-- NAS (TrueNAS) runs in a VM, not bare metal
-- Network speed limits off-server editing (e.g., video editing still happens
-  locally)
-- Services exposed via Cloudflare Tunnel (less control than direct reverse
-  proxy)
-
-## ✅ Current Progress
+## ✅ Current Status
 
 | Task                                | Status         |
 | ----------------------------------- | -------------- |
@@ -130,7 +166,7 @@ backed by an Ansible role:
 | TrueNAS VM created                  | ✅ Done        |
 | Services installed via Docker stack | 🔄 In progress |
 | Pi-hole container setup             | 🔲 Pending     |
-| Cloudflare Tunnel container         | 🔲 Pending     |
+| Cloudflare Tunnel container         | 🔄 In progress |
 | Backup strategy implemented         | 🔲 Pending     |
 
 ---
@@ -143,9 +179,7 @@ backed by an Ansible role:
 | MacBook Pro M2 Max | Wi-Fi     | ~120–140 Mbps    |
 | ISP Connection     | Fiber     | 100 Mbps up/down |
 
-## Notes:
+- Server is wired to home router
+- Clients (MacBook, phones) access via Wi-Fi
+- Cloudflare Tunnel for remote access without port forwarding
 
-- Server is connected via Gigabit Ethernet to home router
-- Clients (e.g., MacBook) access server over Wi-Fi, so local transfer speeds are
-  capped around 130 Mbps
-- Cloudflare Tunnel provides secure remote access without port forwarding
