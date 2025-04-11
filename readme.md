@@ -57,21 +57,21 @@ make clean              # Remove retry/log files
 │   ├── cloudflared.yml
 │   ├── truenas.yml
 │   └── cloud_image.yml
-├── roles/
-│   ├── common/
-│   ├── media_vm/
-│   │   ├── tasks/{main,provision,configure}.yml
-│   │   ├── templates/env.j2
-│   │   └── files/docker-compose.yml
-│   ├── cloudflared_lxc/
-│   │   ├── tasks/{main,provision,configure}.yml
-│   │   └── templates/config.yml.j2
-│   ├── truenas_vm/
-│   ├── upload_cloud_image/
-│   ├── upload_iso/
-│   ├── postfix/
-│   ├── pve-repos/
-│   └── zram/
+└── roles/
+    ├── common/
+    ├── media_vm/
+    │   ├── tasks/{main,provision,configure}.yml
+    │   ├── templates/env.j2
+    │   └── files/docker-compose.yml
+    ├── cloudflared_lxc/
+    │   ├── tasks/{main,provision,configure}.yml
+    │   └── templates/config.yml.j2
+    ├── truenas_vm/
+    ├── upload_cloud_image/
+    ├── upload_iso/
+    ├── postfix/
+    ├── pve-repos/
+    └── zram/
 ```
 
 ---
