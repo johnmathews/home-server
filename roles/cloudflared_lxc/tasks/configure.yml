@@ -3,7 +3,6 @@
     deb: https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
     state: present
   delegate_to: "{{ vm_config.name }}"
-  tags: cloudflared_configure
 
 - name: Create cloudflared config directory
   file:
@@ -11,7 +10,6 @@
     state: directory
     mode: '0755'
   delegate_to: "{{ vm_config.name }}"
-  tags: cloudflared_configure
 
 - name: Deploy tunnel config
   template:
@@ -19,14 +17,12 @@
     dest: /etc/cloudflared/config.yml
     mode: '0600'
   delegate_to: "{{ vm_config.name }}"
-  tags: cloudflared_configure
 
 - name: Install systemd service
   command: cloudflared service install
   args:
     creates: /etc/systemd/system/cloudflared.service
   delegate_to: "{{ vm_config.name }}"
-  tags: cloudflared_configure
 
 - name: Enable and start cloudflared service
   systemd:
@@ -34,4 +30,3 @@
     enabled: true
     state: started
   delegate_to: "{{ vm_config.name }}"
-  tags: cloudflared_configure

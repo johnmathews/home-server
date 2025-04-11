@@ -5,7 +5,6 @@
   set_fact:
     proxmox_api_host: "{{ hostvars['media-vm']['ansible_host'] }}"
     proxmox_node: "{{ proxmox_node_name }}"
-  tags: media_vm
 
 
 - name: Check if VM exists
@@ -16,7 +15,6 @@
     node: "{{ proxmox_node_name }}"
   register: vm_info
   delegate_to: pve
-  tags: media_vm
 
 - name: Create VM shell if it does not exist
   community.general.proxmox_kvm:
@@ -41,7 +39,6 @@
       net0: "virtio={{ vm_config.mac }},bridge={{ vm_config.net_bridge }}"
   when: "vm_config.name not in (vm_info.proxmox_vms | map(attribute='name') | list)"
   delegate_to: pve
-  tags: media_vm
 
 - name: Import raw disk into Proxmox VM
   community.general.proxmox_disk:
@@ -56,14 +53,12 @@
     state: present
   delegate_to: pve
   become: true
-  tags: media_vm
 
 - name: Resize imported disk
   ansible.builtin.command: >
     qm resize {{ cloud_image_vmid }} scsi0 {{ vm_config.disk_size }}
   delegate_to: pve
   become: true
-  tags: media_vm
 
 - name: Finalize and start VM
   community.general.proxmox_kvm:
@@ -99,4 +94,3 @@
       serial0: socket
     force: true
   delegate_to: pve
-  tags: media_vm

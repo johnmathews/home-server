@@ -17,7 +17,6 @@
     state: present
     force: false
     validate_certs: false
-  tags: cloudflared_provision
 
 - name: Start the container
   community.general.proxmox_lxc:
@@ -27,14 +26,12 @@
     api_password: "{{ vault_proxmox_password }}"
     api_host: "{{ hostvars['pve']['ansible_host'] }}"
     validate_certs: false
-  tags: cloudflared_provision
 
 - name: Wait for SSH to be ready
   wait_for:
     host: "{{ vm_config.ip }}"
     port: 22
     timeout: 60
-  tags: cloudflared_provision
 
 - name: Add cloudflared container to dynamic inventory
   add_host:
@@ -42,4 +39,3 @@
     ansible_host: "{{ vm_config.ip }}"
     ansible_user: root
     groups: cloudflared
-  tags: cloudflared_provision

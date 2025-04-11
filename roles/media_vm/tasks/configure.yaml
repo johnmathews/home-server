@@ -3,56 +3,47 @@
 ---
 - name: Gather facts for media-vm
   ansible.builtin.setup:
-  tags: media_stack
 
 - name: Ensure broken package state is fixed
   ansible.builtin.command: apt --fix-broken install -y
   become: true
   changed_when: false  # Optional: suppresses 'changed' output unless something is actually fixed
-  tags: media_stack
 
 - name: Perform dist upgrade
   ansible.builtin.apt:
     upgrade: dist
     update_cache: true
   become: true
-  tags: media_stack
 
 - name: Install Docker using official role
   import_role:
     name: geerlingguy.docker
-  tags: media_stack
 
 - name: Add ubuntu user to docker group
   user:
     name: ubuntu
     groups: docker
     append: yes
-  tags: media_stack
 
 - name: Create media stack base directory
   file:
     path: /srv/media
     state: directory
     mode: '0755'
-  tags: media_stack
 
 - name: Copy docker-compose.yml
   copy:
     src: docker-compose.yml
     dest: /srv/media/docker-compose.yml
     mode: '0644'
-  tags: media_stack
 
 - name: Create environment file from template
   template:
     src: env.j2
     dest: /srv/media/.env
     mode: '0600'
-  tags: media_stack
 
 - name: Start media stack containers
   community.docker.docker_compose_v2:
     project_src: /srv/media
     state: present
-  tags: media_stack

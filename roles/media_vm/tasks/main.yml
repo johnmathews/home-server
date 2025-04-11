@@ -2,6 +2,8 @@
 
 - name: Provision cloudflared LXC
   import_tasks: provision.yml
+  tags: media_provision
 
 - name: Configure cloudflared in LXC
   import_tasks: configure.yml
+  tags: media_configure
