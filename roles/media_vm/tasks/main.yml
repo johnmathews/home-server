@@ -59,6 +59,12 @@
   delegate_to: pve
   become: true
 
+- name: Resize imported disk to 32G
+  ansible.builtin.command: >
+    qm resize {{ cloud_image_vmid }} scsi0 32G
+  delegate_to: pve
+  become: true
+
 - name: Finalize and start VM
   community.general.proxmox_kvm:
     api_user: root@pam
@@ -71,27 +77,28 @@
     cores: 4
     ostype: l26
     scsihw: virtio-scsi-pci
-    boot: order=scsi0
     onboot: true
+    state: started
 
-    # Attach imported disk
-    scsi:
-      scsi0: "{{ cloud_image_storage }}:vm-{{ cloud_image_vmid }}-disk-0"
+    # Storage
+    boot: order=scsi0
     bootdisk: scsi0
+    scsi:
+      scsi0: "{{ cloud_image_storage }}:vm-{{ cloud_image_vmid }}-disk-0,format=raw"
 
-    # Cloud-init settings
+    # Cloud-init
     ide:
       ide2: local:cloudinit
+    citype: nocloud
+    ciuser: "{{ mediaVM.ciuser }}"
+    cipassword: "{{ vault_ubuntu_media_password }}"
+    sshkeys: "{{ sshkeys }}"
     ipconfig:
       ipconfig0: "{{ mediaVM.ipconfig0 }}"
     net:
       net0: "virtio={{ mediaVM.mac }},bridge={{ mediaVM.net_bridge }}"
-    citype: nocloud
-    ciuser: "{{ mediaVM.ciuser }}"
-    cipassword: '{{ vault_ubuntu_media_password }}'
-    sshkeys: '{{ sshkeys }}'
+    serial:
+      serial0: socket
 
-    state: started
+    force: true  # <- This is the key that makes Proxmox apply cloud-init changes
   delegate_to: pve
-
-

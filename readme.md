@@ -45,6 +45,12 @@ automation (Home Assistant), network security (Pi-hole), and remote access
 - It gets a new different MAC address each time, update the reserved IP
   address.
 
+## MediaVM
+
+- Add the user and password at the `cloud-init` tab in Proxmox UI.
+- Add the public key `~/.ssh/id_ed25519.pub` also.
+- Then reboot
+
 ## 🛠 Overview of Setup Steps
 
 Provisioning the server is done in distinct, idempotent steps. Each step is
