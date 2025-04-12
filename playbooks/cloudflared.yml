@@ -1,6 +1,11 @@
+# playbooks/cloudflared.yml
+
+---
+
 - name: Cloudflared LXC
   hosts: proxmox
   gather_facts: false
+  become: true 
 
   roles:
     - role: cloudflared_lxc

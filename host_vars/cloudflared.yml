@@ -6,9 +6,9 @@ proxmox_node_name: proxmox
 
 vm_config:
   hostname: cloudflared
-  vmid: 105
+  vmid: 202
   mac_address: "02:00:00:cf:00:01"
-  ip_address: 192.168.2.215
+  ip_address: 192.168.2.217
   ipconfig0: "ip=192.168.2.215/24,gw={{ vm_defaults.gateway }}"
   mac: "02:00:00:cf:00:01"
   net_bridge: "{{ vm_defaults.net_bridge }}"
@@ -23,6 +23,6 @@ vm_config:
   tunnel_token: "{{ vault_cloudflared_token }}"
   services:
     - hostname: "home.{{ domain_name }}"
-      url: "{{ media_vm.vm_config.ip }}:8123"
+      url: "{{ media_vm.vm_config.ip_address }}:8123"
     - hostname: "jellyfin.{{ domain_name }}"
-      url: "{{ media_vm.vm_config.ip }}:8096"
+      url: "{{ media_vm.vm_config.ip_address }}:8096"

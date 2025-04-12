@@ -1,41 +1,47 @@
-- name: Create unprivileged LXC container
-  community.general.proxmox_lxc:
-    api_user: root@pam
-    api_password: "{{ vault_proxmox_password }}"
-    api_host: "{{ hostvars['pve']['ansible_host'] }}"
-    vmid: "{{ vm_config.vmid }}"
-    hostname: "{{ vm_config.name }}"
-    ostemplate: "{{ lxc_template }}"
-    password: "changeme"
-    unprivileged: true
-    cores: "{{ vm_config.cores }}"
-    memory: "{{ vm_config.memory }}"
-    netif:
-      net0: "name=eth0,ip={{ vm_config.ip }}/24,gw={{ vm_defaults.gateway }},hwaddr={{ vm_config.mac }}"
-    storage: "{{ lxc_storage }}"
-    ssh_public_keys: "{{ lookup('file', vm_config.ssh_key) }}"
-    state: present
-    force: false
-    validate_certs: false
+# roles/cloudflared_lxc/tasks/provision.yml
+---
 
-- name: Start the container
-  community.general.proxmox_lxc:
-    vmid: "{{ vm_config.vmid }}"
-    state: started
-    api_user: root@pam
-    api_password: "{{ vault_proxmox_password }}"
-    api_host: "{{ hostvars['pve']['ansible_host'] }}"
-    validate_certs: false
+- name: Build LXC create command
+  set_fact:
+    lxc_create_cmd: >-
+      pct create {{ hostvars['cloudflared'].vm_config.vmid }} {{ hostvars['cloudflared'].vm_config.ostemplate }}
+      --hostname {{ hostvars['cloudflared'].vm_config.hostname }}
+      --cores {{ hostvars['cloudflared'].vm_config.cores }}
+      --memory {{ hostvars['cloudflared'].vm_config.memory }}
+      --net0 name=eth0,bridge={{ hostvars['cloudflared'].vm_config.net_bridge }},ip={{ hostvars['cloudflared'].vm_config.ip_address }}/{{ hostvars['cloudflared'].vm_config.netmask }},gw={{ vm_defaults.gateway }},hwaddr={{ hostvars['cloudflared'].vm_config.mac }}
+      --storage {{ hostvars['cloudflared'].vm_config.storage }}
+      --unprivileged 1
+      --rootfs {{ hostvars['cloudflared'].vm_config.storage }}:2
+      --onboot 1
+      --password changeme
+      --ssh-public-keys {{ lookup('file', hostvars['cloudflared'].vm_config.ssh_key) }}
 
-- name: Wait for SSH to be ready
+- name: Check if LXC config file exists
+  ansible.builtin.stat:
+    path: "/etc/pve/nodes/proxmox/lxc/{{ hostvars['cloudflared'].vm_config.vmid }}.conf"
+  register: lxc_conf
+  delegate_to: pve
+
+- name: Create LXC if it doesn't exist
+  ansible.builtin.command: "{{ lxc_create_cmd }}"
+  when: not lxc_conf.stat.exists
+  delegate_to: pve
+  become: true
+
+- name: Start LXC container
+  ansible.builtin.command: pct start {{ hostvars['cloudflared'].vm_config.vmid }}
+  delegate_to: pve
+  become: true
+
+- name: Wait for SSH to be available
   wait_for:
-    host: "{{ vm_config.ip }}"
+    host: "{{ hostvars['cloudflared'].vm_config.ip_address }}"
     port: 22
     timeout: 60
 
-- name: Add cloudflared container to dynamic inventory
+- name: Add cloudflared container to inventory
   add_host:
-    name: "{{ vm_config.name }}"
-    ansible_host: "{{ vm_config.ip }}"
+    name: "{{ hostvars['cloudflared'].vm_config.hostname }}"
+    ansible_host: "{{ hostvars['cloudflared'].vm_config.ip_address }}"
     ansible_user: root
     groups: cloudflared

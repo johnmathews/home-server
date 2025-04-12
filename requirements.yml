@@ -1,7 +1,11 @@
 # requirements.yml
 
 collections:
-- name: community.general
+  - name: community.general
+    version: ">=7.4.7" 
+  - name: community.proxmox
 
 roles:
-- name: geerlingguy.docker
+  - name: geerlingguy.pip
+  - name: geerlingguy.docker
+  - name: bellackn.homelab

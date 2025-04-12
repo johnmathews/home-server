@@ -1,3 +1,5 @@
+# group_vars/all/main.yml
+---
 cloud_image_url: "https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img"
 cloud_image_filename: "jammy-server-cloudimg-amd64.img"
 cloud_image_vmid: 201

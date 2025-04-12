@@ -10,7 +10,7 @@ proxmox_node_name: proxmox
 
 vm_config:
   name: media-vm
-  ip: 192.168.2.216
+  ip_address: 192.168.2.216
   mac: "02:00:00:12:34:56"
   ipconfig0: "ip=192.168.2.216/24,gw={{ vm_defaults.gateway }}"
   cores: 4
