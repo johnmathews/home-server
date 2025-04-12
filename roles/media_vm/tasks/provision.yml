@@ -84,7 +84,7 @@
       ide2: local:cloudinit
     citype: nocloud
     ciuser: "{{ vm_config.ciuser }}"
-    cipassword: "{{ vault_ubuntu_media_password }}"
+    cipassword: "{{ vault_media_john_password }}"
     sshkeys: "{{ lookup('file', vm_defaults.ssh_key) }}"
     ipconfig:
       ipconfig0: "{{ vm_config.ipconfig0 }}"
