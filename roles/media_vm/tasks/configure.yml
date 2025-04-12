@@ -6,14 +6,12 @@
 
 - name: Ensure broken package state is fixed
   ansible.builtin.command: apt --fix-broken install -y
-  become: true
   changed_when: false  # Optional: suppresses 'changed' output unless something is actually fixed
 
 - name: Perform dist upgrade
   ansible.builtin.apt:
     upgrade: dist
     update_cache: true
-  become: true
 
 - name: Install Docker using official role
   import_role:

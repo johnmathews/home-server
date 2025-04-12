@@ -1,8 +1,10 @@
 # media_vm/defaults/main.yml
 
-# sane defaults that are easily overriden elsehwere in ansible
 # defaults/main.yml has the lowest priority. host_vars/media-vm.yml has highest priority.
 
+PUID: 1000
+PGID: 1000
+TZ: Europe/Amsterdam
 
 cloud_image_url: https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img
 
@@ -26,3 +28,19 @@ media_stack_services:
   jackett_port: 9117
   bazarr_port: 6767
 
+
+media_stack_users:
+  jellyfin:
+    username: john
+  qbittorrent:
+    username: john
+  sonarr:
+    username: john
+  radarr:
+    username: john
+  bazarr:
+    username: john
+  jackett:
+    username: john
+  filebrowser:
+    username: john

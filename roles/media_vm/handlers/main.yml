@@ -3,6 +3,7 @@
 # often used for restarting a service, or rebooting a machine.
 
 ---
+# currently not used
 - name: Restart media stack
   command: docker-compose down && docker-compose up -d
   args:

@@ -20,6 +20,8 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
+      - WEBUI_USERNAME=${QBITTORRENT_USERNAME}
+      - WEBUI_PASSWORD=${QBITTORRENT_PASSWORD}
     volumes:
       - ${CONFIG_DIR}/qbittorrent:/config
       - ${DOWNLOAD_DIR}:/downloads

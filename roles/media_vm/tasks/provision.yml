@@ -40,6 +40,13 @@
   when: "vm_config.name not in (vm_info.proxmox_vms | map(attribute='name') | list)"
   delegate_to: pve
 
+
+- name: Check if VM disk already exists
+  ansible.builtin.stat:
+    path: "/var/lib/vz/images/{{ cloud_image_vmid }}/vm-{{ cloud_image_vmid }}-disk-0.raw"
+  register: disk_stat
+  delegate_to: pve
+
 - name: Import raw disk into Proxmox VM
   community.general.proxmox_disk:
     api_user: root@pam
@@ -52,13 +59,41 @@
     format: raw
     state: present
   delegate_to: pve
-  become: true
+  when: not disk_stat.stat.exists
 
-- name: Resize imported disk
-  ansible.builtin.command: >
-    qm resize {{ cloud_image_vmid }} scsi0 {{ vm_config.disk_size }}
+- name: Get VM config from Proxmox
+  ansible.builtin.command: qm config {{ cloud_image_vmid }}
+  register: vm_config_output
+  changed_when: false
   delegate_to: pve
-  become: true
+
+- name: Extract current disk size
+  set_fact:
+    current_disk_size: "{{ (vm_config_output.stdout | regex_search('scsi0:.*size=(\\d+)([GMK])', '\\1 \\2')) | default('0 G') }}"
+  delegate_to: localhost
+
+- name: Convert current disk size to MiB
+  set_fact:
+    current_disk_mib: >-
+      {{
+        (current_disk_size.split()[0] | int) *
+        (
+          1024 if current_disk_size.split()[1] == 'G' else
+          1 if current_disk_size.split()[1] == 'M' else
+          0
+        )
+      }}
+  delegate_to: localhost
+
+- name: Convert target disk size to MiB
+  set_fact:
+    target_disk_mib: "{{ (vm_config.disk_size | regex_replace('G', '') | int) * 1024 }}"
+  delegate_to: localhost
+
+- name: Resize disk if current size is smaller
+  ansible.builtin.command: qm resize {{ cloud_image_vmid }} scsi0 {{ vm_config.disk_size }}
+  when: current_disk_mib < target_disk_mib
+  delegate_to: pve
 
 - name: Finalize and start VM
   community.general.proxmox_kvm:
@@ -94,3 +129,12 @@
       serial0: socket
     force: true
   delegate_to: pve
+
+- name: Wait for SSH to become available on media VM
+  wait_for:
+    host: "{{ hostvars['media-vm']['ansible_host'] }}"
+    port: 22
+    delay: 5
+    timeout: 120
+    state: started
+  delegate_to: localhost
