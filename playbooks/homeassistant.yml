@@ -1,0 +1,12 @@
+# playbooks/homeassistant.yml
+
+---
+
+- name: Home Assistant VM 
+  hosts: proxmox
+  gather_facts: false
+  become: true 
+
+  roles:
+    - role: cloudflared_lxc
+      tags: cloudflared

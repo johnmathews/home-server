@@ -1,3 +1,7 @@
+# playbooks/proxmox.yml
+
+---
+
 - name: Proxmox VE Configuration
   hosts: proxmox
   gather_facts: true

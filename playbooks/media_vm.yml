@@ -1,3 +1,7 @@
+# playbooks/media_vm.yml
+
+---
+
 - name: Media VM
   hosts: media
   gather_facts: false

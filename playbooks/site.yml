@@ -6,3 +6,4 @@
 - import_playbook: cloud_image.yml
 - import_playbook: media_vm.yml
 - import_playbook: cloudflared.yml
+- import_playbook: homeassistant.yml

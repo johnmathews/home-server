@@ -1,0 +1,52 @@
+# homeassistant_vm/tasks/provision.yml
+
+---
+- name: Download latest Home Assistant QCOW2 image
+  get_url:
+    url: https://github.com/home-assistant/operating-system/releases/latest/download/haos_ova.qcow2.xz
+    dest: /var/lib/vz/template/qemu/haos_ova.qcow2.xz
+    mode: '0644'
+  delegate_to: proxmox_host
+
+- name: Decompress Home Assistant QCOW2 image
+  ansible.builtin.command:
+    cmd: "unxz -f /var/lib/vz/template/qemu/haos_ova.qcow2.xz"
+    creates: /var/lib/vz/template/qemu/haos_ova.qcow2
+  delegate_to: proxmox_host
+
+- name: Create Home Assistant VM
+  community.general.proxmox_kvm:
+    api_user: "{{ proxmox_user }}"
+    api_password: "{{ proxmox_password }}"
+    api_host: "{{ proxmox_host }}"
+    vmid: 203
+    name: homeassistant
+    node: "{{ proxmox_node }}"
+    cores: 2
+    memory: 4096
+    ostype: l26
+    scsihw: virtio-scsi-pci
+    boot: order=scsi0
+    bootdisk: scsi0
+    bios: ovmf
+    efidisk0: local-lvm:1,format=raw,efitype=4m,pre-enrolled-keys=0
+    net0: virtio,bridge=vmbr0,tag=0,firewall=0,macaddr=auto
+    sata0: local-lvm:vm-203-disk-0
+    onboot: true
+    state: present
+  delegate_to: localhost
+
+- name: Import QCOW2 disk into Proxmox VM
+  ansible.builtin.command:
+    cmd: "qm importdisk 203 /var/lib/vz/template/qemu/haos_ova.qcow2 local-lvm --format qcow2"
+  delegate_to: proxmox_host
+
+- name: Attach imported disk to VM
+  ansible.builtin.command:
+    cmd: "qm set 203 --scsi0 local-lvm:vm-203-disk-0"
+  delegate_to: proxmox_host
+
+- name: Set static IP via cloud-init (optional step - HA may ignore this)
+  ansible.builtin.command:
+    cmd: "qm set 203 --ipconfig0 ip=192.168.2.218/24,gw=192.168.2.1"
+  delegate_to: proxmox_host
