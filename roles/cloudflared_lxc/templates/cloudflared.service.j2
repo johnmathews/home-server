@@ -1,0 +1,11 @@
+[Unit]
+Description=Cloudflare Tunnel
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/cloudflared tunnel run --token {{ hostvars['cloudflared'].vm_config.tunnel_token }}
+Restart=on-failure
+User=root
+
+[Install]
+WantedBy=multi-user.target

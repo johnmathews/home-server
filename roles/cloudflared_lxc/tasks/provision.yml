@@ -1,6 +1,27 @@
 # roles/cloudflared_lxc/tasks/provision.yml
 ---
 
+- name: Read public key from file
+  set_fact:
+    lxc_ssh_key: "{{ lookup('file', hostvars['cloudflared'].vm_config.ssh_key) }}"
+
+- name: Write public key to a temporary file on Proxmox
+  copy:
+    content: "{{ lxc_ssh_key }}"
+    dest: "/tmp/{{ hostvars['cloudflared'].vm_config.hostname }}_key.pub"
+    mode: '0644'
+  delegate_to: pve
+
+- name: Ensure container template exists
+  ansible.builtin.shell: |
+    if ! pveam list {{ hostvars['cloudflared'].vm_config.template_storage }} | grep -q "{{ hostvars['cloudflared'].vm_config.ostemplate }}"; then
+      pveam download {{ hostvars['cloudflared'].vm_config.template_storage }} {{ hostvars['cloudflared'].vm_config.ostemplate | regex_replace('^.*vztmpl/', '') }}
+    fi
+  args:
+    executable: /bin/bash
+  delegate_to: pve
+  become: true
+
 - name: Build LXC create command
   set_fact:
     lxc_create_cmd: >-
@@ -14,7 +35,7 @@
       --rootfs {{ hostvars['cloudflared'].vm_config.storage }}:2
       --onboot 1
       --password changeme
-      --ssh-public-keys {{ lookup('file', hostvars['cloudflared'].vm_config.ssh_key) }}
+      --ssh-public-keys /tmp/{{ hostvars['cloudflared'].vm_config.hostname }}_key.pub
 
 - name: Check if LXC config file exists
   ansible.builtin.stat:
@@ -28,8 +49,15 @@
   delegate_to: pve
   become: true
 
-- name: Start LXC container
-  ansible.builtin.command: pct start {{ hostvars['cloudflared'].vm_config.vmid }}
+- name: Get container status
+  command: pct status {{ hostvars['cloudflared'].vm_config.vmid }}
+  register: pct_status
+  delegate_to: pve
+  changed_when: false
+
+- name: Start LXC container if not running
+  command: pct start {{ hostvars['cloudflared'].vm_config.vmid }}
+  when: "'status: stopped' in pct_status.stdout"
   delegate_to: pve
   become: true
 
@@ -39,9 +67,17 @@
     port: 22
     timeout: 60
 
-- name: Add cloudflared container to inventory
+# this was a gotcha. vm_config.hostname was the same as a host in inventory.ini, which led to 
+# host_vars/<host_name> being looked up and `ansible_host` being read automagically.
+- name: Add cloudflared container to inventory - DYNAMIC HOST (inventory)
   add_host:
     name: "{{ hostvars['cloudflared'].vm_config.hostname }}"
     ansible_host: "{{ hostvars['cloudflared'].vm_config.ip_address }}"
     ansible_user: root
     groups: cloudflared
+
+- name: Remove temporary SSH key file
+  file:
+    path: "/tmp/{{ hostvars['cloudflared'].vm_config.hostname }}_key.pub"
+    state: absent
+  delegate_to: pve
