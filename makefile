@@ -26,14 +26,17 @@ cloud_image:
 media:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/media_vm.yml $(VAULT)
 
-media_provision:
+media-provision:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/media_vm.yml --tags media_provision $(VAULT)
 
-media_configure:
+media-configure:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/media_vm.yml --tags media_configure $(VAULT)
 
 cloudflared:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/cloudflared.yml $(VAULT)
+
+requirements:
+	.venv/bin/ansible-galaxy install -r requirements.yml
 
 # ───────────── Quality Checks ─────────────
 check:
@@ -58,12 +61,13 @@ help:
 	@echo "  make truenas          → Setup TrueNAS VM"
 	@echo "  make cloud_image      → Upload Ubuntu cloud image"
 	@echo "  make media            → Full Media VM provisioning and config"
-	@echo "  make media_provision  → Only provision Media VM"
-	@echo "  make media_configure  → Only configure Media VM (Docker, services)"
+	@echo "  make media-provision  → Only provision Media VM"
+	@echo "  make media-configure  → Only configure Media VM (Docker, services)"
 	@echo "  make cloudflared      → Provision and configure Cloudflared LXC"
 	@echo "  make check            → Dry run (no changes applied)"
 	@echo "  make lint             → Lint playbooks and roles"
 	@echo "  make clean            → Remove temp files and retry logs"
 	@echo "  make ci               → Run lint + dry run (ideal for pre-commit or CI)"
+	@echo "  make requirements     → Install ansible-galaxy roles"
 	@echo "  make help             → Show this message"
 	@echo ""
