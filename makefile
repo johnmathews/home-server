@@ -7,7 +7,7 @@ ANSIBLE := .venv/bin/ansible-playbook
 INVENTORY := -i inventory.ini
 
 # Declare all available commands as .PHONY (always run)
-.PHONY: all site proxmox truenas cloud_image media media_provision media_configure cloudflared help
+.PHONY: all site proxmox truenas cloud_image media media_provision media_configure cloudflared help homeassistant
 
 all: site
 
@@ -19,6 +19,9 @@ proxmox:
 
 truenas:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/truenas.yml $(VAULT)
+
+homeassistant:
+	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/homeassistant.yml $(VAULT)
 
 cloud_image:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/cloud_image.yml $(VAULT)
@@ -60,6 +63,7 @@ help:
 	@echo "  make proxmox          → Provision Proxmox base services"
 	@echo "  make truenas          → Setup TrueNAS VM"
 	@echo "  make cloud_image      → Upload Ubuntu cloud image"
+	@echo "  make homeassistant    → Provision and configure Home Assistant VM"
 	@echo "  make media            → Full Media VM provisioning and config"
 	@echo "  make media-provision  → Only provision Media VM"
 	@echo "  make media-configure  → Only configure Media VM (Docker, services)"

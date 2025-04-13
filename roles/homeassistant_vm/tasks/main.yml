@@ -4,5 +4,5 @@
 - name: Provision Home Assistant VM
   import_tasks: provision.yml
 
-- name: Configure Home Assistant VM
-  import_tasks: configure.yml
+# - name: Configure Home Assistant VM
+#   import_tasks: configure.yml

@@ -8,5 +8,5 @@
   become: true 
 
   roles:
-    - role: cloudflared_lxc
-      tags: cloudflared
+    - role: homeassistant_vm
+      tags: homeassistant_vm

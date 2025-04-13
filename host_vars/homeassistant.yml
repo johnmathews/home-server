@@ -1,0 +1,23 @@
+# host_vars/homeassistant.yml
+
+# variables in host_vars files have high precedence and override defaults/main.yaml and group_vars .yml files.
+
+ansible_host: 192.168.2.218
+ansible_user: john
+ansible_ssh_private_key_file: ~/.ssh/id_ed25519
+
+proxmox_node_name: proxmox
+
+home_assistant_os_image_url: https://github.com/home-assistant/operating-system/releases/download/15.1/haos_ova-15.1.ova
+
+vm_config:
+  name: homeassistant-vm
+  ip_address: 192.168.2.218
+  mac: "02:00:00:12:46:66"
+  ipconfig0: "ip=192.168.2.218/24,gw={{ vm_defaults.gateway }}"
+  cores: 4
+  memory: 8192
+  disk_size: 32G
+  ciuser: "{{ vm_defaults.ciuser }}"
+  net_bridge: "{{ vm_defaults.net_bridge }}"
+  ssh_key: "{{ vm_defaults.ssh_key }}"
