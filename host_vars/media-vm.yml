@@ -9,7 +9,7 @@ ansible_ssh_private_key_file: ~/.ssh/id_ed25519
 proxmox_node_name: proxmox
 
 vm_config:
-  name: media-vm
+  vm_name: media-vm
   ip_address: 192.168.2.216
   mac: "02:00:00:12:34:56"
   ipconfig0: "ip=192.168.2.216/24,gw={{ vm_defaults.gateway }}"

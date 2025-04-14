@@ -40,7 +40,6 @@
   when: "vm_config.name not in (vm_info.proxmox_vms | map(attribute='name') | list)"
   delegate_to: pve
 
-
 - name: Check if VM disk already exists
   ansible.builtin.stat:
     path: "/var/lib/vz/images/{{ cloud_image_vmid }}/vm-{{ cloud_image_vmid }}-disk-0.raw"
