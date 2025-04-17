@@ -10,6 +10,16 @@ storage (TrueNAS), media streaming (Jellyfin, Sonarr, Radarr, qBittorrent), home
 automation (Home Assistant), network security (Pi-hole), and remote access
 (Cloudflare Tunnel).
 
+
+## Proxmox Install
+
+1. Use the M.2 Drive
+1. Use ZFS (Raid0)
+1. Server name is Proxmox
+1. Management Interface is which Ethernet port its going to use. Different ports will give different MAC addresses.
+1. Gateway is the URL of the router.
+
+
 ## 🚀 Quickstart
 
 ```sh
@@ -57,33 +67,35 @@ make clean              # Remove retry/log files
 
 ---
 
-## ⚙️ Manual steps
+##  Manual steps
 
-1. Install Proxmox from USB
+1. Store credentials and secrets in 1Password (referenced via `vault.yml`)
+
+2. Install Proxmox from USB - remove and reinsert the drive when the installer is searching and not finding.
+
 2. (If reinstalling) Remove old host key from `~/.ssh/known_hosts`
-3. Copy your public SSH key to the host:
 
-```sh
-ssh-copy-id -i ~/.ssh/id_ed25519.pub root@192.168.2.214
-```
+2. Copy public SSH keys to the host:
 
-4. Manually download and place the TrueNAS ISO in `iso-images/`
-5. Edit `/etc/pve/storage.cfg` on the Proxmox host:
+    ```sh
+    ssh-copy-id -i ~/.ssh/id_ed25519.pub root@192.168.2.214
+    ```
 
-```conf
-dir: local
-    path /var/lib/vz
-    content iso,vztmpl,backup,images
+1. Add `images` to first block in `/etc/pve/storage.cfg`, on the Proxmox host:
 
-lvmthin: local-lvm
-    thinpool data
-    vgname pve
-    content rootdir,images
-```
+    ```conf
+    dir: local
+        path /var/lib/vz
+        content iso,vztmpl,backup,images
 
-6. Store credentials and secrets in 1Password (referenced via `vault.yml`)
+    lvmthin: local-lvm
+        thinpool data
+        vgname pve
+        content rootdir,images
+    ```
+1. ~~Manually download and place the TrueNAS ISO in `iso-images/`~~
 
----
+--
 
 ## 🧭 VM & Container Provisioning Workflow
 
