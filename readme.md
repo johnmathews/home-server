@@ -10,17 +10,112 @@ storage (TrueNAS), media streaming (Jellyfin, Sonarr, Radarr, qBittorrent), home
 automation (Home Assistant), network security (Pi-hole), and remote access
 (Cloudflare Tunnel).
 
+Proxmox helper scripts are run manually, the configuration options are listed here.
+
 
 ## Proxmox Install
 
-1. Use the M.2 Drive
-1. Use ZFS (Raid0)
-1. Server name is Proxmox
-1. Management Interface is which Ethernet port its going to use. Different ports will give different MAC addresses.
-1. Gateway is the URL of the router.
+1. Install Proxmox from USB 
+    1. Remove and reinsert the drive when the installer is searching and not finding.
+    1. Use the M.2 Drive
+    2. Use ZFS (Raid0)
+    3. Server name is Proxmox
+    4. Management Interface is which Ethernet port its going to use. Different ports will give different MAC addresses.
+    5. Gateway is the URL of the router.
+2. (If reinstalling) Remove old host key from `~/.ssh/known_hosts`
 
+2. Copy public SSH keys to the host:
 
-## 🚀 Quickstart
+    ```sh
+    ssh-copy-id -i ~/.ssh/id_ed25519.pub root@192.168.2.214
+    ```
+
+1. [This might not be necessary] Add `images` to first block in `/etc/pve/storage.cfg`, on the Proxmox host:
+
+    ```conf
+    dir: local
+        path /var/lib/vz
+        content iso,vztmpl,backup,images
+
+    lvmthin: local-lvm
+        thinpool data
+        vgname pve
+        content rootdir,images
+    ```
+1. ~~Manually download and place the TrueNAS ISO in `iso-images/`~~
+
+1. Run [proxmox post install](https://community-scripts.github.io/ProxmoxVE/scripts?id=post-pve-install):
+   - Correct VE Sources: `Y`
+   - Disable PVE enterprise Repo: `Y`
+   - Enable PVE no subscription Repo: `Y`
+   - Correct Ceph package sources: `Y`
+   - Add (disabled) `pvetest` repo: `Y`
+   - Disable subscription nag: `Y`
+   - Disable high availability: `Y`
+   - Update Proxmox VE: `Y`
+   - Reboot Proxmox now? : `Y`
+
+1. Run [cloudflared LXC script](https://community-scripts.github.io/ProxmoxVE/scripts?id=cloudflared):
+    - Advanced Settings:
+        - Unprivileged Container
+        - Root password: `blank`
+        - Container id: `100`
+        - Hostname: `cloudflared`
+        - Set disksize: `2GB`
+        - CPU Cores: `1`
+        - Allocate RAM: `512MB`
+        - Bridge: `vmbr0`
+        - Static IPv4 CIDR Address (/24): `dhcp`
+        - APT-cacher IP: `blank`
+        - Disable IPv6: `Yes`
+        - Interface MTU Size: `blank`
+        - DNS search domain: `blank`
+        - DNS server IP: `blank` but if you know the Pi-hole IP you could add it here. Can update later at `/etc/resolv.conf`
+        - MAC address: `02:00:00:00:00:01`
+        - VLAN: `blank`
+        - Tags: `community-script`, `network`, `cloudflare`
+        - Verbose mode: `Yes`
+        - DNS-over-HTTPS (DoH) Proxy: `No`
+
+1. Run [Pi-hole LXC](https://community-scripts.github.io/ProxmoxVE/scripts?id=pihole):
+   - Advanced Settings:
+        - Unprivileged Container
+        - Root password: `blank`
+        - Container ID: `101`
+        - Hostname: `pihole`
+        - Disk size: `2GB`
+        - CPU cores: `1`
+        - RAM: `512MB`
+        - Bridge: `vmbr0`
+        - Static IPv4 CIDR Address: `dhcp`
+        - APT-cacher IP: `blank`
+        - Disable IPv6: `Yes`
+        - Interface MTU Size: `blank`
+        - DNS Search Domain: `blank`
+        - DNS Server IP: `1.1.1.1`
+        - MAC Address: `02:00:00:00:00:02`
+        - VLAN: `blank`
+        - Tags: `community-script`, `adblock`
+        - Verbose Mode: `Yes`
+        - Add unbound: `Yes`
+        - Should Unbound be in Forwarding Mode or Recursive Mode: `Recursive`
+
+1. Run [Home Assistant VM](https://community-scripts.github.io/ProxmoxVE/scripts?id=haos-vm)
+   - Advanced Settings:
+        - Version: `stable`
+        - Virtual Machine ID: `102`
+        - Machine Type: `q35`
+        - Disk Cache: `Write Through`
+        - Host Name: `home-assistant`
+        - CPU Model: `host`
+        - CPU Cores: `2`
+        - RAM: `4096MB`
+        - Bridge: `vmbr0`
+        - MAC Address: `02:00:00:00:00:03`
+        - VLAN: `blank`
+        - MTU Size: `blank`
+
+## Ansible Steps
 
 ```sh
 # Clone the repo and enter it
@@ -67,35 +162,10 @@ make clean              # Remove retry/log files
 
 ---
 
-##  Manual steps
 
-1. Store credentials and secrets in 1Password (referenced via `vault.yml`)
+##  Manual steps instead of running `make site`
 
-2. Install Proxmox from USB - remove and reinsert the drive when the installer is searching and not finding.
-
-2. (If reinstalling) Remove old host key from `~/.ssh/known_hosts`
-
-2. Copy public SSH keys to the host:
-
-    ```sh
-    ssh-copy-id -i ~/.ssh/id_ed25519.pub root@192.168.2.214
-    ```
-
-1. Add `images` to first block in `/etc/pve/storage.cfg`, on the Proxmox host:
-
-    ```conf
-    dir: local
-        path /var/lib/vz
-        content iso,vztmpl,backup,images
-
-    lvmthin: local-lvm
-        thinpool data
-        vgname pve
-        content rootdir,images
-    ```
-1. ~~Manually download and place the TrueNAS ISO in `iso-images/`~~
-
---
+-
 
 ## 🧭 VM & Container Provisioning Workflow
 
@@ -142,10 +212,10 @@ make clean              # Remove retry/log files
 
 ### Priorities
 
-- ⚙️ Flexibility: Modular VMs & services
-- ✨ Simplicity: Separation of concerns
-- 🔋 Efficiency: Low idle power draw
-- 💾 Storage resilience: ZFS + snapshots
+- Flexibility: Modular VMs & services
+- Simplicity: Separation of concerns
+- Efficiency: Low idle power draw
+- Storage resilience: ZFS + snapshots
 
 ### Tradeoffs
 
@@ -156,18 +226,18 @@ make clean              # Remove retry/log files
 
 ---
 
-## ✅ Current Status
+## Current Status
 
-| Task                                | Status         |
-| ----------------------------------- | -------------- |
-| Proxmox base setup                  | ✅ Done        |
-| Upload cloud image role             | ✅ Done        |
-| Media VM provisioning via Ansible   | ✅ Done        |
-| TrueNAS VM created                  | ✅ Done        |
-| Services installed via Docker stack | 🔄 In progress |
-| Pi-hole container setup             | 🔲 Pending     |
-| Cloudflare Tunnel container         | 🔄 In progress |
-| Backup strategy implemented         | 🔲 Pending     |
+| Task                                | Status      |
+| ----------------------------------- | ----------- |
+| Proxmox base setup                  | Done        |
+| Upload cloud image role             | Done        |
+| Media VM provisioning via Ansible   | Done        |
+| TrueNAS VM created                  | Done        |
+| Services installed via Docker stack | In progress |
+| Pi-hole container setup             | Pending     |
+| Cloudflare Tunnel container         | In progress |
+| Backup strategy implemented         | Pending     |
 
 ---
 
