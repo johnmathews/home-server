@@ -3,48 +3,55 @@
 This project is about setting up my home server. It contains the commands and
 Ansible playbooks used to provision a home server based on Proxmox.
 
-[Proxmox helper scripts](https://community-scripts.github.io/ProxmoxVE/) are used.
+[Proxmox helper scripts](https://community-scripts.github.io/ProxmoxVE/) are
+used.
 
 It automates the setup of virtual machines and containers for services like
 storage (TrueNAS), media streaming (Jellyfin, Sonarr, Radarr, qBittorrent), home
 automation (Home Assistant), network security (Pi-hole), and remote access
 (Cloudflare Tunnel).
 
-Proxmox helper scripts are run manually, the configuration options are listed here.
-
+Proxmox helper scripts are run manually, the configuration options are listed
+here.
 
 ## Setup
 
-1. Install Proxmox from USB 
-    1. Remove and reinsert the drive when the installer is searching and not finding.
-    1. Use the M.2 Drive
-    2. Use ZFS (Raid0)
-    3. Server name is Proxmox
-    4. Management Interface is which Ethernet port its going to use. Different ports will give different MAC addresses.
-    5. Gateway is the URL of the router.
+1. Install Proxmox from USB
+   1. Remove and reinsert the drive when the installer is searching and not
+      finding.
+   1. Use the M.2 Drive
+   1. Use ZFS (Raid0)
+   1. Server name is Proxmox
+   1. Management Interface is which Ethernet port its going to use. Different
+      ports will give different MAC addresses.
+   1. Gateway is the URL of the router.
 2. (If reinstalling) Remove old host key from `~/.ssh/known_hosts`
 
-2. Copy public SSH keys to the host:
+3. Copy public SSH keys to the host:
 
-    ```sh
-    ssh-copy-id -i ~/.ssh/id_ed25519.pub root@192.168.2.214
-    ```
+   ```sh
+   ssh-copy-id -i ~/.ssh/id_ed25519.pub root@192.168.2.214
+   ```
 
-1. [This might not be necessary] Add `images` to first block in `/etc/pve/storage.cfg`, on the Proxmox host:
+4. [This might not be necessary] Add `images` to first block in
+   `/etc/pve/storage.cfg`, on the Proxmox host:
 
-    ```conf
-    dir: local
-        path /var/lib/vz
-        content iso,vztmpl,backup,images
+   ```conf
+   dir: local
+       path /var/lib/vz
+       content iso,vztmpl,backup,images
 
-    lvmthin: local-lvm
-        thinpool data
-        vgname pve
-        content rootdir,images
-    ```
-1. ~~Manually download and place the TrueNAS ISO in `iso-images/`~~
+   lvmthin: local-lvm
+       thinpool data
+       vgname pve
+       content rootdir,images
+   ```
 
-1. Run [proxmox post install](https://community-scripts.github.io/ProxmoxVE/scripts?id=post-pve-install):
+5. ~~Manually download and place the TrueNAS ISO in `iso-images/`~~
+
+6. Run
+   [proxmox post install](https://community-scripts.github.io/ProxmoxVE/scripts?id=post-pve-install):
+
    - Correct VE Sources: `Y`
    - Disable PVE enterprise Repo: `Y`
    - Enable PVE no subscription Repo: `Y`
@@ -55,75 +62,106 @@ Proxmox helper scripts are run manually, the configuration options are listed he
    - Update Proxmox VE: `Y`
    - Reboot Proxmox now? : `Y`
 
-1. Run [cloudflared LXC script](https://community-scripts.github.io/ProxmoxVE/scripts?id=cloudflared):
+7. Run
+   [cloudflared LXC script](https://community-scripts.github.io/ProxmoxVE/scripts?id=cloudflared):
+
+   - Advanced Settings:
+     - Unprivileged Container
+     - Root password: `blank`
+     - Container id: `100`
+     - Hostname: `cloudflared`
+     - Set disksize: `2GB`
+     - CPU Cores: `1`
+     - Allocate RAM: `512MB`
+     - Bridge: `vmbr0`
+     - Static IPv4 CIDR Address (/24): `dhcp`
+     - APT-cacher IP: `blank`
+     - Disable IPv6: `Yes`
+     - Interface MTU Size: `blank`
+     - DNS search domain: `blank`
+     - DNS server IP: `blank` but if you know the Pi-hole IP you could add it
+       here. Can update later at `/etc/resolv.conf`
+     - MAC address: `02:00:00:00:00:01`
+     - VLAN: `blank`
+     - Tags: `community-script`, `network`, `cloudflare`
+     - Verbose mode: `Yes`
+     - DNS-over-HTTPS (DoH) Proxy: `No`
+
+8. Run
+   [Pi-hole LXC](https://community-scripts.github.io/ProxmoxVE/scripts?id=pihole):
+
+   - Advanced Settings:
+     - Unprivileged Container
+     - Root password: `blank`
+     - Container ID: `101`
+     - Hostname: `pihole`
+     - Disk size: `2GB`
+     - CPU cores: `1`
+     - RAM: `512MB`
+     - Bridge: `vmbr0`
+     - Static IPv4 CIDR Address: `dhcp`
+     - APT-cacher IP: `blank`
+     - Disable IPv6: `Yes`
+     - Interface MTU Size: `blank`
+     - DNS Search Domain: `blank`
+     - DNS Server IP: `1.1.1.1`
+     - MAC Address: `02:00:00:00:00:02`
+     - VLAN: `blank`
+     - Tags: `community-script`, `adblock`
+     - Verbose Mode: `Yes`
+     - Add unbound: `Yes`
+     - Should Unbound be in Forwarding Mode or Recursive Mode: `Recursive`
+
+9. Run
+   [Home Assistant VM](https://community-scripts.github.io/ProxmoxVE/scripts?id=haos-vm):
+
+   - Advanced Settings:
+     - Version: `stable`
+     - Virtual Machine ID: `102`
+     - Machine Type: `q35`
+     - Disk Cache: `Write Through`
+     - Host Name: `home-assistant`
+     - CPU Model: `host`
+     - CPU Cores: `2`
+     - RAM: `4096MB`
+     - Bridge: `vmbr0`
+     - MAC Address: `02:00:00:00:00:03`
+     - VLAN: `blank`
+     - MTU Size: `blank`
+
+10. Run
+    [Ubuntu 22.04 VM](https://community-scripts.github.io/ProxmoxVE/scripts?id=ubuntu2204-vm).
+    This will be the VM to run data engineering projects on:
+
     - Advanced Settings:
-        - Unprivileged Container
-        - Root password: `blank`
-        - Container id: `100`
-        - Hostname: `cloudflared`
-        - Set disksize: `2GB`
-        - CPU Cores: `1`
-        - Allocate RAM: `512MB`
-        - Bridge: `vmbr0`
-        - Static IPv4 CIDR Address (/24): `dhcp`
-        - APT-cacher IP: `blank`
-        - Disable IPv6: `Yes`
-        - Interface MTU Size: `blank`
-        - DNS search domain: `blank`
-        - DNS server IP: `blank` but if you know the Pi-hole IP you could add it here. Can update later at `/etc/resolv.conf`
-        - MAC address: `02:00:00:00:00:01`
-        - VLAN: `blank`
-        - Tags: `community-script`, `network`, `cloudflare`
-        - Verbose mode: `Yes`
-        - DNS-over-HTTPS (DoH) Proxy: `No`
+      - VMID: `103`
+      - Machine Type: `q35`
+      - Disk Size: `120GB`
+      - Disk Cache: `0 None`
+      - Host Name: `Ubuntu`
+      - CPU Model: `Host`
+      - CPU Cores: `6`
+      - RAM: `8192MB`
+      - Bridge: `vmbr0`
+      - MAC Address: `02:00:00:00:00:04`
+      - VLAN: `blank`
+      - MTU Size: `blank`
 
-1. Run [Pi-hole LXC](https://community-scripts.github.io/ProxmoxVE/scripts?id=pihole):
-   - Advanced Settings:
-        - Unprivileged Container
-        - Root password: `blank`
-        - Container ID: `101`
-        - Hostname: `pihole`
-        - Disk size: `2GB`
-        - CPU cores: `1`
-        - RAM: `512MB`
-        - Bridge: `vmbr0`
-        - Static IPv4 CIDR Address: `dhcp`
-        - APT-cacher IP: `blank`
-        - Disable IPv6: `Yes`
-        - Interface MTU Size: `blank`
-        - DNS Search Domain: `blank`
-        - DNS Server IP: `1.1.1.1`
-        - MAC Address: `02:00:00:00:00:02`
-        - VLAN: `blank`
-        - Tags: `community-script`, `adblock`
-        - Verbose Mode: `Yes`
-        - Add unbound: `Yes`
-        - Should Unbound be in Forwarding Mode or Recursive Mode: `Recursive`
+    Setup Cloud-Init before starting. Set:
 
-1. Run [Home Assistant VM](https://community-scripts.github.io/ProxmoxVE/scripts?id=haos-vm):
-   - Advanced Settings:
-        - Version: `stable`
-        - Virtual Machine ID: `102`
-        - Machine Type: `q35`
-        - Disk Cache: `Write Through`
-        - Host Name: `home-assistant`
-        - CPU Model: `host`
-        - CPU Cores: `2`
-        - RAM: `4096MB`
-        - Bridge: `vmbr0`
-        - MAC Address: `02:00:00:00:00:03`
-        - VLAN: `blank`
-        - MTU Size: `blank`
+    - User (as root)
+    - Password
+    - SSH Public Key
 
-1. Next step - make a Data Engineering LAB using an proxmox helper 
-2. Then, Do TrueNAS scale and then do Media VM
+    More info at https://github.com/community-scripts/ProxmoxVE/discussions/272
+    about resizing disks, getting SSH to work, installing Docker, etc.
+
+1. Then, Do TrueNAS scale and then do Media VM
 
 1. TrueNAS SCALE:
-   - Provision VM
-   -
-1. Data Engineering Lab VM
-1. Media VM
-
+    - Provision VM
+    -
+2. Media VM
 
 ## Ansible Steps
 
@@ -172,8 +210,7 @@ make clean              # Remove retry/log files
 
 ---
 
-
-##  Manual steps instead of running `make site`
+## Manual steps instead of running `make site`
 
 -
 
