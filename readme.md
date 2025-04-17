@@ -1,7 +1,9 @@
 # Home Server Provisioning with Ansible
 
-This project contains the Ansible playbooks and roles used to provision a home
-server based on Proxmox.
+This project is about setting up my home server. It contains the commands and
+Ansible playbooks used to provision a home server based on Proxmox.
+
+[Proxmox helper scripts](https://community-scripts.github.io/ProxmoxVE/) are used.
 
 It automates the setup of virtual machines and containers for services like
 storage (TrueNAS), media streaming (Jellyfin, Sonarr, Radarr, qBittorrent), home
@@ -55,7 +57,6 @@ make clean              # Remove retry/log files
 
 ---
 
-
 ## ⚙️ Manual steps
 
 1. Install Proxmox from USB
@@ -93,18 +94,22 @@ lvmthin: local-lvm
    Upload Ubuntu cloud image using `upload_cloud_image` role
 
 3. **VMs**
+
    - `media_vm`: Ubuntu server w/ cloud-init, Docker + media stack
    - `truenas_vm`: TrueNAS VM with raw disk passthrough
 
 4. **LXC Containers**
+
    - `cloudflared_lxc`: Cloudflare Tunnel container (LXC)
    - Pi-hole: Unprivileged LXC (not yet implemented)
 
-5. **Service Configuration**  
+5. **Service Configuration**
+
    - Docker stack in `media_vm`: Jellyfin, Sonarr, Radarr, qBittorrent
    - Home Assistant (planned): HAOS image with USB passthrough
 
 6. **Storage**
+
    - TrueNAS manages ZFS pools (mirrored vdevs)
    - Snapshots & replication to backup drives
 
@@ -117,18 +122,21 @@ lvmthin: local-lvm
 ## 🎯 Objectives, Priorities & Tradeoffs
 
 ### Main Goals
+
 - Reliable and extensible home server
 - Power-efficient (20% draw at idle)
 - VM + container support
 - Repeatable provisioning with Ansible
 
 ### Priorities
+
 - ⚙️ Flexibility: Modular VMs & services
 - ✨ Simplicity: Separation of concerns
 - 🔋 Efficiency: Low idle power draw
 - 💾 Storage resilience: ZFS + snapshots
 
 ### Tradeoffs
+
 - No GPU (initially) → CPU transcoding
 - TrueNAS runs in VM, not bare metal
 - Editing via Wi-Fi limits throughput
