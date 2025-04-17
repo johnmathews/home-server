@@ -1,9 +1,0 @@
-# File: roles/cloudflared_lxc/tasks/main.yml
-
-- name: Provision cloudflared LXC
-  import_tasks: provision.yml
-  tags: cloudflared, cloudflared_provision
-
-- name: Configure cloudflared in LXC
-  import_tasks: configure.yml
-  tags: cloudflared, cloudflared_configure

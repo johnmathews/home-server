@@ -1,6 +1,0 @@
-ingress:
-{% for service in vm_config.services %}
-  - hostname: "{{ service.subdomain }}.{{ vm_config.domain }}"
-    service: "http://{{ service.subdomain }}.{{ vm_config.domain }}:{{ service.port }}"
-{% endfor %}
-  - service: http_status:404

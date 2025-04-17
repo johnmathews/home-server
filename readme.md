@@ -13,7 +13,7 @@ automation (Home Assistant), network security (Pi-hole), and remote access
 Proxmox helper scripts are run manually, the configuration options are listed here.
 
 
-## Proxmox Install
+## Setup
 
 1. Install Proxmox from USB 
     1. Remove and reinsert the drive when the installer is searching and not finding.
@@ -100,7 +100,7 @@ Proxmox helper scripts are run manually, the configuration options are listed he
         - Add unbound: `Yes`
         - Should Unbound be in Forwarding Mode or Recursive Mode: `Recursive`
 
-1. Run [Home Assistant VM](https://community-scripts.github.io/ProxmoxVE/scripts?id=haos-vm)
+1. Run [Home Assistant VM](https://community-scripts.github.io/ProxmoxVE/scripts?id=haos-vm):
    - Advanced Settings:
         - Version: `stable`
         - Virtual Machine ID: `102`
@@ -114,6 +114,13 @@ Proxmox helper scripts are run manually, the configuration options are listed he
         - MAC Address: `02:00:00:00:00:03`
         - VLAN: `blank`
         - MTU Size: `blank`
+
+1. TrueNAS SCALE:
+   - Provision VM
+   -
+1. Data Engineering Lab VM
+1. Media VM
+
 
 ## Ansible Steps
 
