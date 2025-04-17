@@ -115,6 +115,9 @@ Proxmox helper scripts are run manually, the configuration options are listed he
         - VLAN: `blank`
         - MTU Size: `blank`
 
+1. Next step - make a Data Engineering LAB using an proxmox helper 
+2. Then, Do TrueNAS scale and then do Media VM
+
 1. TrueNAS SCALE:
    - Provision VM
    -
