@@ -156,12 +156,10 @@ here.
     More info at https://github.com/community-scripts/ProxmoxVE/discussions/272
     about resizing disks, getting SSH to work, installing Docker, etc.
 
-1. Then, Do TrueNAS scale and then do Media VM
-
-1. TrueNAS SCALE:
+ TrueNAS SCALE:
     - Provision VM
     -
-2. Media VM
+ Media VM
 
 ## Ansible Steps
 
