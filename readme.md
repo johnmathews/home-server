@@ -160,8 +160,7 @@ here.
 
  11. TrueNAS SCALE:
 
-   - Run `make TrueNAS` 
-   - This runs an Ansible play
+   - Run `make TrueNAS`. This runs an Ansible play
    - Then in Proxmox start the new TrueNAS VM and install the OS.
    - Then cleanup:
       - ssh into proxmox and edit 

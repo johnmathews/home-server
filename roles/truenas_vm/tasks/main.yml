@@ -1,6 +1,64 @@
 # roles/truenas_vm/tasks/main.yml
 ---
 
+- name: Set ISO directory path
+  set_fact:
+    iso_dir: "{{ playbook_dir }}/../iso-images"
+  delegate_to: localhost
+  become: false
+
+- name: Ensure ISO directory exists
+  file:
+    path: "{{ iso_dir }}"
+    state: directory
+    mode: '0755'
+  delegate_to: localhost
+  become: false
+
+- name: Find TrueNAS ISO file
+  find:
+    paths: "{{ iso_dir }}"
+    patterns: "TrueNAS-SCALE-*.iso"
+    use_regex: false
+  register: found_isos
+  delegate_to: localhost
+  become: false
+
+# - name: Show ISO search directory and number of matches
+#   debug:
+#     msg: >
+#       Searching for TrueNAS ISOs in "{{ iso_dir }}".
+#       Found {{ found_isos.matched }} file(s).
+
+- name: Fail if no ISO is found
+  fail:
+    msg: "No TrueNAS ISO found in {{ iso_dir }}. Please download it and place it there."
+  when: found_isos.matched == 0
+  delegate_to: localhost
+  become: false
+
+- name: Sort ISOs by filename (descending)
+  set_fact:
+    latest_iso: "{{ (found_isos.files | sort(attribute='path') | reverse)[0] }}"
+  delegate_to: localhost
+  become: false
+
+- name: Ensure ISO directory exists on Proxmox
+  file:
+    path: /var/lib/vz/template/iso
+    state: directory
+    mode: '0755'
+  delegate_to: pve
+  become: true
+
+- name: Upload latest TrueNAS ISO to Proxmox using rsync
+  ansible.posix.synchronize:
+    src: "{{ latest_iso.path }}"
+    dest: "/var/lib/vz/template/iso/"
+    mode: push
+  delegate_to: localhost
+  become: false
+
 - name: Authenticate with Proxmox API
   uri:
     url: "https://{{ hostvars[inventory_hostname]['ansible_host'] }}:8006/api2/json/access/ticket"
@@ -20,7 +78,6 @@
     state: directory
     mode: '0755'
   delegate_to: "{{ inventory_hostname }}"
-
 
 - name: Check if TrueNAS VM (ID 200) already exists
   uri:
