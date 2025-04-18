@@ -7,21 +7,15 @@ ANSIBLE := .venv/bin/ansible-playbook
 INVENTORY := -i inventory.ini
 
 # Declare all available commands as .PHONY (always run)
-.PHONY: all site proxmox truenas cloud_image media media_provision media_configure cloudflared help homeassistant
+.PHONY: all site truenas cloud_image media media_provision media_configure help
 
 all: site
 
 site:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/site.yml $(VAULT)
 
-proxmox:
-	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/proxmox.yml $(VAULT)
-
 truenas:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/truenas.yml $(VAULT)
-
-homeassistant:
-	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/homeassistant.yml $(VAULT)
 
 media:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/media_vm.yml $(VAULT)
@@ -31,9 +25,6 @@ media-provision:
 
 media-configure:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/media_vm.yml --tags media_configure $(VAULT)
-
-cloudflared:
-	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/cloudflared.yml $(VAULT)
 
 requirements:
 	.venv/bin/ansible-galaxy install -r requirements.yml
@@ -57,7 +48,6 @@ help:
 	@echo "🚀 Available make commands:"
 	@echo ""
 	@echo "  make site             → Run full home server setup"
-	@echo "  make proxmox          → Provision Proxmox base services"
 	@echo "  make truenas          → Setup TrueNAS VM by provisioning a VM and uploading a TrueNAS ISO"
 	@echo "  make media            → Full Media VM provisioning and config"
 	@echo "  make media-provision  → Only provision Media VM"
