@@ -23,9 +23,6 @@ truenas:
 homeassistant:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/homeassistant.yml $(VAULT)
 
-cloud_image:
-	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/cloud_image.yml $(VAULT)
-
 media:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/media_vm.yml $(VAULT)
 
@@ -61,13 +58,10 @@ help:
 	@echo ""
 	@echo "  make site             → Run full home server setup"
 	@echo "  make proxmox          → Provision Proxmox base services"
-	@echo "  make truenas          → Setup TrueNAS VM"
-	@echo "  make cloud_image      → Upload Ubuntu cloud image"
-	@echo "  make homeassistant    → Provision and configure Home Assistant VM"
+	@echo "  make truenas          → Setup TrueNAS VM by provisioning a VM and uploading a TrueNAS ISO"
 	@echo "  make media            → Full Media VM provisioning and config"
 	@echo "  make media-provision  → Only provision Media VM"
 	@echo "  make media-configure  → Only configure Media VM (Docker, services)"
-	@echo "  make cloudflared      → Provision and configure Cloudflared LXC"
 	@echo "  make check            → Dry run (no changes applied)"
 	@echo "  make lint             → Lint playbooks and roles"
 	@echo "  make clean            → Remove temp files and retry logs"

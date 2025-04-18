@@ -45,19 +45,18 @@
     api_password: "{{ vault_proxmox_password }}"
     api_host: "{{ hostvars[inventory_hostname]['ansible_host'] }}"
     node: "{{ hostvars[inventory_hostname]['proxmox_node_name'] }}"
-    vmid: 200
-    name: truenas
-    cores: 4
-    memory: 12288
+    name: "{{ vm_name }}"
+    cores: "{{ cores }}"
+    memory: "{{ memory }}"
     balloon: 0
     scsihw: virtio-scsi-pci
     boot: order=scsi0;ide2
     ide:
-      ide2: local:iso/TrueNAS-SCALE-24.10.2.1.iso,media=cdrom
+      ide2: "{{ iso_storage }}:iso/{{iso_filename}},media=cdrom"
     scsi:
-      scsi0: local-lvm:16
+      scsi0: "{{ disk_storage }}:{{ disk_size }}"
     net:
-      net0: virtio,bridge=vmbr0
+      net0: "virtio={{ mac_address }},bridge=vmbr0"
     ostype: l26
     onboot: true
     state: present

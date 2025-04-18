@@ -1,12 +1,14 @@
-# roles/upload_iso/tasks/main.yml
 ---
 
-# Uploads the latest TrueNAS ISO to proxmox if its not their already
-# You have to download manually from TrueNas webiste onto your laptop.
+- name: Set ISO directory path
+  set_fact:
+    iso_dir: "{{ playbook_dir }}/../iso-images"
+  delegate_to: localhost
+  become: false
 
-- name: Ensure ISO directory exists in project
+- name: Ensure ISO directory exists
   file:
-    path: "{{ playbook_dir }}/iso-images"
+    path: "{{ iso_dir }}"
     state: directory
     mode: '0755'
   delegate_to: localhost
@@ -14,16 +16,22 @@
 
 - name: Find TrueNAS ISO file
   find:
-    paths: "{{ playbook_dir }}/iso-images"
+    paths: "{{ iso_dir }}"
     patterns: "TrueNAS-SCALE-*.iso"
     use_regex: false
   register: found_isos
   delegate_to: localhost
   become: false
 
+# - name: Show ISO search directory and number of matches
+#   debug:
+#     msg: >
+#       Searching for TrueNAS ISOs in "{{ iso_dir }}".
+#       Found {{ found_isos.matched }} file(s).
+
 - name: Fail if no ISO is found
   fail:
-    msg: "No TrueNAS ISO found in iso-images/. Please download it and place it there."
+    msg: "No TrueNAS ISO found in {{ iso_dir }}. Please download it and place it there."
   when: found_isos.matched == 0
   delegate_to: localhost
   become: false

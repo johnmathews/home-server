@@ -36,16 +36,18 @@ here.
 4. [This might not be necessary] Add `images` to first block in
    `/etc/pve/storage.cfg`, on the Proxmox host:
 
-   ```conf
+   ```cfg
    dir: local
-       path /var/lib/vz
-       content iso,vztmpl,backup,images
+           path /var/lib/vz
+           content iso,vztmpl,backup,images
 
-   lvmthin: local-lvm
-       thinpool data
-       vgname pve
-       content rootdir,images
+   zfspool: local-zfs
+           pool rpool/data
+           sparse
+           content images,rootdir
+
    ```
+
 
 5. ~~Manually download and place the TrueNAS ISO in `iso-images/`~~
 
@@ -131,7 +133,7 @@ here.
 
 10. Run
     [Ubuntu 22.04 VM](https://community-scripts.github.io/ProxmoxVE/scripts?id=ubuntu2204-vm).
-    This will be the VM to run data engineering projects on:
+    This will be the VM to run data engineering projects:
 
     - Advanced Settings:
       - VMID: `103`
@@ -156,10 +158,18 @@ here.
     More info at https://github.com/community-scripts/ProxmoxVE/discussions/272
     about resizing disks, getting SSH to work, installing Docker, etc.
 
- TrueNAS SCALE:
-    - Provision VM
-    -
- Media VM
+ 11. TrueNAS SCALE:
+
+   - Run `make TrueNAS` 
+   - This runs an Ansible play
+   - Then in Proxmox start the new TrueNAS VM and install the OS.
+   - Then cleanup:
+      - ssh into proxmox and edit 
+      - remove the line starting `ide2` (the size parameter breaks the UI)
+      - exit ssh
+      - reboot the machine 
+
+ 12. Media VM...
 
 ## Ansible Steps
 
