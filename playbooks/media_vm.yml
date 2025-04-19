@@ -27,3 +27,5 @@
     ciuser: "{{ vm_defaults.ciuser }}"
     net_bridge: "{{ vm_defaults.net_bridge }}"
     ssh_key: "{{ vm_defaults.ssh_key }}"
+    cloud_image_filename: jammy-server-cloudimg-amd64.img
+    cloud_image_url: "https://cloud-images.ubuntu.com/jammy/current/{{ cloud_image_filename }}"

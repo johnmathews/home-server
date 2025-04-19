@@ -16,16 +16,6 @@
   delegate_to: localhost  # ← was: pve
   become: false
 
-# - name: Debug - print 'VM info'
-#   debug:
-#     var: vm_info
-#   delegate_to: localhost
-
-# - name: Debug - print 'vm_info.name'
-#   debug:
-#     msg: "{{ vm_info.proxmox_vms | selectattr('name', 'defined') | map(attribute='name') | list }}"
-#   delegate_to: localhost
-
 - name: Debug - evaluate 'vm_name' var is defined but VM hasn't been made yet.
   debug:
     msg: >-
@@ -67,12 +57,6 @@
   delegate_to: localhost
   become: false
 
-- name: Check if image for VM is already on Proxmox 
-  ansible.builtin.stat:
-    path: "/var/lib/vz/images/{{ cloud_image_vmid }}/vm-{{ cloud_image_vmid }}-disk-0.raw"
-  register: disk_stat
-  delegate_to: pve
-
 - name: Get all VMs on node
   community.general.proxmox_vm_info:
     api_user: root@pam
@@ -82,16 +66,6 @@
   register: all_vm_info
   delegate_to: localhost
   become: false
-
-# - name: Debug vm_name
-#   debug:
-#     var: vm_name
-#   delegate_to: localhost
-
-# - name: Debug list of VM names
-#   debug:
-#     msg: "{{ all_vm_info.proxmox_vms | map(attribute='name') | list }}"
-#   delegate_to: localhost
 
 - name: Extract VMID of media VM
   set_fact:
@@ -105,6 +79,38 @@
       }}
   when: vm_name is defined
   delegate_to: localhost
+
+# - name: Check if image for VM is already on Proxmox 
+#   ansible.builtin.stat:
+#     path: "/var/lib/vz/images/{{ media_vm_id }}/vm-{{ media_vm_id }}-disk-0.raw"
+#   register: disk_stat
+#   delegate_to: pve
+#
+- name: Check if VM disk already exists
+  ansible.builtin.stat:
+    path: "/var/lib/vz/images/{{ media_vm_id }}/vm-{{ media_vm_id }}-disk-0.raw"
+  register: disk_stat
+  delegate_to: pve
+
+- name: Ensure cloud image directory exists
+  file:
+    path: "/var/lib/vz/template/qemu"
+    state: directory
+  delegate_to: pve
+
+- name: Check if cloud image exists on Proxmox
+  ansible.builtin.stat:
+    path: "/var/lib/vz/template/qemu/{{ cloud_image_filename }}"
+  register: cloud_image_stat
+  delegate_to: pve
+
+- name: Download Ubuntu cloud image if missing
+  ansible.builtin.get_url:
+    url: "https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img"
+    dest: "/var/lib/vz/template/qemu/{{ cloud_image_filename }}"
+    mode: '0644'
+  delegate_to: pve
+  when: not cloud_image_stat.stat.exists
 
 - name: Import raw disk into Proxmox VM
   community.general.proxmox_disk:
@@ -122,7 +128,7 @@
   become: false
 
 - name: Get VM config from Proxmox
-  ansible.builtin.command: qm config {{ cloud_image_vmid }}
+  ansible.builtin.command: qm config {{ media_vm_id }}
   register: vm_config_output
   changed_when: false
   delegate_to: pve
@@ -147,11 +153,11 @@
 
 - name: Convert target disk size to MiB
   set_fact:
-    target_disk_mib: "{{ (vm_config.disk_size | regex_replace('G', '') | int) * 1024 }}"
+    target_disk_mib: "{{ ( disk_size | regex_replace('G', '') | int) * 1024 }}"
   delegate_to: localhost
 
 - name: Resize disk if current size is smaller
-  ansible.builtin.command: qm resize {{ cloud_image_vmid }} scsi0 {{ vm_config.disk_size }}
+  ansible.builtin.command: qm resize {{ media_vm_id }} scsi0 {{ disk_size }}
   when: current_disk_mib < target_disk_mib
   delegate_to: pve
 
@@ -161,7 +167,7 @@
     api_password: "{{ vault_proxmox_password }}"
     api_host: "{{ hostvars['pve']['ansible_host'] }}"
     node: "{{ proxmox_node_name }}"
-    vmid: "{{ cloud_image_vmid }}"
+    vmid: "{{ media_vm_id }}"
     name: "{{ vm_config.name }}"
     memory: "{{ vm_config.memory }}"
     cores: "{{ vm_config.cores }}"
@@ -173,7 +179,7 @@
     boot: order=scsi0
     bootdisk: scsi0
     scsi:
-      scsi0: "{{ cloud_image_storage }}:vm-{{ cloud_image_vmid }}-disk-0,format=raw"
+      scsi0: "{{ cloud_image_storage }}:vm-{{ media_vm_id }}-disk-0,format=raw"
 
     ide:
       ide2: local:cloudinit
