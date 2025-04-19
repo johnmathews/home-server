@@ -3,9 +3,8 @@
 
 - name: Set proxmox API facts explicitly
   set_fact:
-    proxmox_api_host: "{{ hostvars['media-vm']['ansible_host'] }}"
+    proxmox_api_host: "{{ ansible_host }}"
     proxmox_node: "{{ proxmox_node_name }}"
-
 
 - name: Check if VM exists
   community.general.proxmox_vm_info:
@@ -14,18 +13,40 @@
     api_host: "{{ hostvars['pve']['ansible_host'] }}"
     node: "{{ proxmox_node_name }}"
   register: vm_info
-  delegate_to: pve
+  delegate_to: localhost  # ← was: pve
+  become: false
+
+# - name: Debug - print 'VM info'
+#   debug:
+#     var: vm_info
+#   delegate_to: localhost
+
+# - name: Debug - print 'vm_info.name'
+#   debug:
+#     msg: "{{ vm_info.proxmox_vms | selectattr('name', 'defined') | map(attribute='name') | list }}"
+#   delegate_to: localhost
+
+- name: Debug - evaluate 'vm_name' var is defined but VM hasn't been made yet.
+  debug:
+    msg: >-
+      {{ 
+        vm_name is defined and
+         vm_info.proxmox_vms is defined and
+         vm_name not in (
+           vm_info.proxmox_vms | selectattr('name', 'defined') | map(attribute='name') | list
+         )
+      }} 
+  delegate_to: localhost
 
 - name: Create VM shell if it does not exist
   community.general.proxmox_kvm:
-    api_user: root@pam
+    api_host: "{{ ansible_host }}"
+    api_user: "{{ ansible_api_user }}"
     api_password: "{{ vault_proxmox_password }}"
-    api_host: "{{ hostvars['pve']['ansible_host'] }}"
     node: "{{ proxmox_node_name }}"
-    vmid: "{{ cloud_image_vmid }}"
-    name: "{{ vm_config.name }}"
-    memory: "{{ vm_config.memory }}"
-    cores: "{{ vm_config.cores }}"
+    name: "{{ vm_name }}"
+    memory: "{{ memory }}"
+    cores: "{{ cores }}"
     ostype: l26
     scsihw: virtio-scsi-pci
     onboot: true
@@ -34,31 +55,71 @@
     ide:
       ide2: local:cloudinit
     ipconfig:
-      ipconfig0: "{{ vm_config.ipconfig0 }}"
+      ipconfig0: "{{ ipconfig0 }}"
     net:
-      net0: "virtio={{ vm_config.mac }},bridge={{ vm_config.net_bridge }}"
-  when: "vm_config.name not in (vm_info.proxmox_vms | map(attribute='name') | list)"
-  delegate_to: pve
+      net0: "virtio={{ mac }},bridge={{ net_bridge }}"
+  when: >
+     vm_name is defined and
+     vm_info.proxmox_vms is defined and
+     vm_name not in (
+       vm_info.proxmox_vms | selectattr('name', 'defined') | map(attribute='name') | list
+     )
+  delegate_to: localhost
+  become: false
 
-- name: Check if VM disk already exists
+- name: Check if image for VM is already on Proxmox 
   ansible.builtin.stat:
     path: "/var/lib/vz/images/{{ cloud_image_vmid }}/vm-{{ cloud_image_vmid }}-disk-0.raw"
   register: disk_stat
   delegate_to: pve
 
-- name: Import raw disk into Proxmox VM
-  community.general.proxmox_disk:
+- name: Get all VMs on node
+  community.general.proxmox_vm_info:
     api_user: root@pam
     api_password: "{{ vault_proxmox_password }}"
     api_host: "{{ hostvars['pve']['ansible_host'] }}"
-    vmid: "{{ cloud_image_vmid }}"
+    node: "{{ proxmox_node_name }}"
+  register: all_vm_info
+  delegate_to: localhost
+  become: false
+
+# - name: Debug vm_name
+#   debug:
+#     var: vm_name
+#   delegate_to: localhost
+
+# - name: Debug list of VM names
+#   debug:
+#     msg: "{{ all_vm_info.proxmox_vms | map(attribute='name') | list }}"
+#   delegate_to: localhost
+
+- name: Extract VMID of media VM
+  set_fact:
+    media_vm_id: >-
+      {{
+        all_vm_info.proxmox_vms |
+        selectattr('name', 'equalto', vm_name) |
+        map(attribute='vmid') |
+        list |
+        first
+      }}
+  when: vm_name is defined
+  delegate_to: localhost
+
+- name: Import raw disk into Proxmox VM
+  community.general.proxmox_disk:
+    api_user: "{{ ansible_api_user }}"
+    api_password: "{{ vault_proxmox_password }}"
+    api_host: "{{ ansible_host }}"
+    vmid: "{{ media_vm_id }}"
     disk: scsi0
     import_from: "/var/lib/vz/template/qemu/{{ cloud_image_filename }}"
     storage: "{{ cloud_image_storage }}"
     format: raw
     state: present
-  delegate_to: pve
+  delegate_to: localhost
   when: not disk_stat.stat.exists
+  become: false
 
 - name: Get VM config from Proxmox
   ansible.builtin.command: qm config {{ cloud_image_vmid }}

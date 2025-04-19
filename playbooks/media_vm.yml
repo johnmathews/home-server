@@ -10,3 +10,20 @@
   roles:
     - role: media_vm
       tags: media_vm
+
+  vars:
+    ansible_host: 192.168.2.214
+    ansible_user: root
+    ansible_api_user: root@pam
+    ansible_ssh_private_key_file: ~/.ssh/id_ed25519
+    email_address: "mthwsjc@gmail.com"
+    proxmox_node_name: proxmox
+    vm_name: media-vm
+    mac: "02:00:00:12:34:56"
+    ipconfig0: "ip=dhcp"
+    cores: 4
+    memory: 8192
+    disk_size: 32G
+    ciuser: "{{ vm_defaults.ciuser }}"
+    net_bridge: "{{ vm_defaults.net_bridge }}"
+    ssh_key: "{{ vm_defaults.ssh_key }}"

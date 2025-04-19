@@ -7,7 +7,7 @@ ANSIBLE := .venv/bin/ansible-playbook
 INVENTORY := -i inventory.ini
 
 # Declare all available commands as .PHONY (always run)
-.PHONY: all site truenas cloud_image media media_provision media_configure help
+.PHONY: all site truenas cloud_image media help
 
 all: site
 
@@ -19,12 +19,6 @@ truenas:
 
 media:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/media_vm.yml $(VAULT)
-
-media-provision:
-	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/media_vm.yml --tags media_provision $(VAULT)
-
-media-configure:
-	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/media_vm.yml --tags media_configure $(VAULT)
 
 requirements:
 	.venv/bin/ansible-galaxy install -r requirements.yml
@@ -50,8 +44,6 @@ help:
 	@echo "  make site             → Run full home server setup"
 	@echo "  make truenas          → Setup TrueNAS VM by provisioning a VM and uploading a TrueNAS ISO"
 	@echo "  make media            → Full Media VM provisioning and config"
-	@echo "  make media-provision  → Only provision Media VM"
-	@echo "  make media-configure  → Only configure Media VM (Docker, services)"
 	@echo "  make check            → Dry run (no changes applied)"
 	@echo "  make lint             → Lint playbooks and roles"
 	@echo "  make clean            → Remove temp files and retry logs"
