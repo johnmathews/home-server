@@ -133,19 +133,35 @@
   changed_when: false
   delegate_to: pve
 
-- name: Extract current disk size
+- name: Extract current disk size tuple
   set_fact:
-    current_disk_size: "{{ (vm_config_output.stdout | regex_search('scsi0:.*size=(\\d+)([GMK])', '\\1 \\2')) | default('0 G') }}"
+    current_disk_size_tuple: "{{ vm_config_output.stdout | regex_findall('scsi0:.*size=(\\d+)([GMK])') }}"
+  delegate_to: localhost
+
+- name: Fail if disk size info was not found
+  fail:
+    msg: "Failed to extract scsi0 disk size from VM config."
+  when: current_disk_size_tuple | length == 0
+  delegate_to: localhost
+
+- name: Set current_disk_size
+  set_fact:
+    current_disk_size: "{{ current_disk_size_tuple[0] }}"
+  delegate_to: localhost
+
+- name: Debug extracted disk parts
+  debug:
+    msg: "Disk size parts: {{ current_disk_size }}"
   delegate_to: localhost
 
 - name: Convert current disk size to MiB
   set_fact:
     current_disk_mib: >-
       {{
-        (current_disk_size.split()[0] | int) *
+        (current_disk_size[0] | int) *
         (
-          1024 if current_disk_size.split()[1] == 'G' else
-          1 if current_disk_size.split()[1] == 'M' else
+          1024 if current_disk_size[1] == 'G' else
+          1 if current_disk_size[1] == 'M' else
           0
         )
       }}
@@ -154,6 +170,15 @@
 - name: Convert target disk size to MiB
   set_fact:
     target_disk_mib: "{{ ( disk_size | regex_replace('G', '') | int) * 1024 }}"
+  delegate_to: localhost
+
+- name: DEBUG Target Disk MiB
+  debug:
+    msg: "target_disk_mib: {{ target_disk_mib }}"
+  delegate_to: localhost
+- name: DEBUG Current Disk MiB
+  debug:
+    msg: "current_disk_mib: {{ current_disk_mib }}"
   delegate_to: localhost
 
 - name: Resize disk if current size is smaller
@@ -168,39 +193,39 @@
     api_host: "{{ hostvars['pve']['ansible_host'] }}"
     node: "{{ proxmox_node_name }}"
     vmid: "{{ media_vm_id }}"
-    name: "{{ vm_config.name }}"
-    memory: "{{ vm_config.memory }}"
-    cores: "{{ vm_config.cores }}"
+    name: "{{ vm_name }}"
+    memory: "{{ memory }}"
+    cores: "{{ cores }}"
     ostype: l26
     scsihw: virtio-scsi-pci
     onboot: true
     state: started
-
     boot: order=scsi0
     bootdisk: scsi0
     scsi:
       scsi0: "{{ cloud_image_storage }}:vm-{{ media_vm_id }}-disk-0,format=raw"
-
     ide:
       ide2: local:cloudinit
     citype: nocloud
-    ciuser: "{{ vm_config.ciuser }}"
+    ciuser: "{{ ciuser }}"
     cipassword: "{{ vault_media_john_password }}"
     sshkeys: "{{ lookup('file', vm_defaults.ssh_key) }}"
     ipconfig:
-      ipconfig0: "{{ vm_config.ipconfig0 }}"
+      ipconfig0: "{{ ipconfig0 }}"
     net:
-      net0: "virtio={{ vm_config.mac }},bridge={{ vm_config.net_bridge }}"
+      net0: "virtio={{ mac }},bridge={{ net_bridge }}"
     serial:
       serial0: socket
     force: true
-  delegate_to: pve
+  delegate_to: localhost
+  become: false 
 
 - name: Wait for SSH to become available on media VM
   wait_for:
-    host: "{{ hostvars['media-vm']['ansible_host'] }}"
+    host: "{{ ansible_host }}"
     port: 22
     delay: 5
     timeout: 120
     state: started
   delegate_to: localhost
+  become: false
