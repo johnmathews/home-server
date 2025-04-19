@@ -48,7 +48,6 @@ here.
 
    ```
 
-
 5. ~~Manually download and place the TrueNAS ISO in `iso-images/`~~
 
 6. Run
@@ -83,7 +82,7 @@ here.
      - DNS search domain: `blank`
      - DNS server IP: `blank` but if you know the Pi-hole IP you could add it
        here. Can update later at `/etc/resolv.conf`
-     - MAC address: `02:00:00:00:00:01`
+     - MAC address: `02:00:00:00:00:00`
      - VLAN: `blank`
      - Tags: `community-script`, `network`, `cloudflare`
      - Verbose mode: `Yes`
@@ -107,7 +106,7 @@ here.
      - Interface MTU Size: `blank`
      - DNS Search Domain: `blank`
      - DNS Server IP: `1.1.1.1`
-     - MAC Address: `02:00:00:00:00:02`
+     - MAC Address: `02:00:00:00:00:01`
      - VLAN: `blank`
      - Tags: `community-script`, `adblock`
      - Verbose Mode: `Yes`
@@ -127,9 +126,10 @@ here.
      - CPU Cores: `2`
      - RAM: `4096MB`
      - Bridge: `vmbr0`
-     - MAC Address: `02:00:00:00:00:03`
+     - MAC Address: `02:00:00:00:00:02`
      - VLAN: `blank`
      - MTU Size: `blank`
+     - Storage pool: `local-zfs` 
 
 10. Run
     [Ubuntu 22.04 VM](https://community-scripts.github.io/ProxmoxVE/scripts?id=ubuntu2204-vm).
@@ -140,35 +140,58 @@ here.
       - Machine Type: `q35`
       - Disk Size: `120GB`
       - Disk Cache: `0 None`
-      - Host Name: `Ubuntu`
+      - Host Name: `project`
       - CPU Model: `Host`
       - CPU Cores: `6`
       - RAM: `8192MB`
       - Bridge: `vmbr0`
-      - MAC Address: `02:00:00:00:00:04`
+      - MAC Address: `02:00:00:00:00:03`
       - VLAN: `blank`
       - MTU Size: `blank`
+      - Storage pool: `local-zfs` 
 
-    Setup Cloud-Init before starting. Set:
-
-    - User (as root)
-    - Password
-    - SSH Public Key
+    - Setup Cloud-Init and then reboot. Set:
+      - User (as root)
+      - Password
+      - SSH Public Key
 
     More info at https://github.com/community-scripts/ProxmoxVE/discussions/272
     about resizing disks, getting SSH to work, installing Docker, etc.
 
- 11. TrueNAS SCALE:
+11. TrueNAS SCALE:
 
-   - Run `make TrueNAS`. This runs an Ansible play
-   - Then in Proxmox start the new TrueNAS VM and install the OS.
-   - Then cleanup:
-      - ssh into proxmox and edit 
+    - Run `make TrueNAS`. This runs an Ansible play
+    - Then in Proxmox start the new TrueNAS VM and install the OS.
+    - Then cleanup:
+      - ssh into proxmox and edit `/etc/pve/qemu-server/104.conf`
       - remove the line starting `ide2` (the size parameter breaks the UI)
       - exit ssh
-      - reboot the machine 
+      - reboot the machine
 
- 12. Media VM...
+12.  Media VM - Provision
+    [Ubuntu 22.04 VM](https://community-scripts.github.io/ProxmoxVE/scripts?id=ubuntu2204-vm).
+    This VM will host the media apps running in docker containers.
+
+    - Advanced Settings:
+      - VMID: `105`
+      - Machine Type: `q35`
+      - Disk Size: `32GB`
+      - Disk Cache: `0 None`
+      - Host Name: `media`
+      - CPU Model: `Host`
+      - CPU Cores: `4`
+      - RAM: `8192MB`
+      - Bridge: `vmbr0`
+      - MAC Address: `02:00:00:00:00:05`
+      - VLAN: `blank`
+      - MTU Size: `blank`
+      - Storage Pool: `local-zfs` 
+
+    - In proxmox > 105 (media) > Cloud-Init and set User, Password, SSH public key etc. 
+    - Update reserved IP on router if necessary and use correct IP address in next Ansible configuration step. 
+
+13. Media VM - Setup
+   - Run `make media` 
 
 ## Ansible Steps
 

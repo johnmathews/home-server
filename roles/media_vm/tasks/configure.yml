@@ -17,9 +17,9 @@
   import_role:
     name: geerlingguy.docker
 
-- name: Add ubuntu user to docker group
+- name: Add user to docker group
   user:
-    name: ubuntu
+    name: john
     groups: docker
     append: yes
 
@@ -45,3 +45,21 @@
   community.docker.docker_compose_v2:
     project_src: /srv/media
     state: present
+
+- name: List running Docker containers
+  shell: docker ps
+  register: docker_ps_output
+  become: true
+
+- name: Show container list
+  debug:
+    var: docker_ps_output.stdout_lines
+
+- name: Show connection details
+  debug:
+    msg: |
+      Configuration complete!
+      ----------------------------------
+      Host: {{ ansible_host }}
+      User: {{ ansible_user }}
+      Docker group user: {{ ciuser | default('Not defined') }}

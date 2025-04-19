@@ -1,7 +1,5 @@
 # Master playbook: orchestrates all playbooks
 ---
 
-# - import_playbook: proxmox.yml
 - import_playbook: truenas.yml
-- import_playbook: cloud_image.yml
 - import_playbook: media_vm.yml
