@@ -33,6 +33,9 @@ here.
     1. Management Interface is which Ethernet port its going to use. Different
        ports will give different MAC addresses.
     1. Gateway is the URL of the router.
+    1. Go to [login page](https://192.168.2.214:8006)
+
+
 2.  (If reinstalling) Remove old host key from `~/.ssh/known_hosts`
 
 3.  Copy public SSH keys to the host:
@@ -89,6 +92,7 @@ here.
     script:
 
     Reserved IP: `192.168.2.101`
+    [Login](http://192.168.2.101/admin/) 
 
         Advanced Settings:
         - Unprivileged Container
@@ -117,6 +121,7 @@ here.
     script:
 
     Reserved IP: `192.168.2.102`
+    [Login](http://192.168.2.102:8123/onboarding.html)
 
         Advanced Settings:
         - Version: `stable`
@@ -165,6 +170,7 @@ here.
 9.  Provision TrueNAS SCALE VM:
 
     Reserved IP: `192.168.2.104`
+    [Login](http://192.168.2.104/ui/sessions/signin)
 
     - You need to manually download the ISO file and place it in the correct
       directory. TrueNAS require an email address.
@@ -176,6 +182,14 @@ here.
     script. This VM will host the media apps running in docker containers.
 
     Reserved IP: `192.168.2.105`
+    Logins:
+       [Sonarr](http://192.168.2.105:8989/)
+       [Radarr](http://192.168.2.105:7878/)
+       [File Browser](http://192.168.2.105:8081/login?redirect=/files/)
+       [JellyFin](http://192.168.2.105:8096/web/#/wizardstart.html)
+       [qBitTorrent](http://192.168.2.105:8080/)
+       [Bazarr](http://192.168.2.105:8080/)
+       [Jackett](http://192.168.2.105:9117/)
 
         Advanced Settings:
         - VMID: `105`
