@@ -92,6 +92,7 @@ here.
     script:
 
     Reserved IP: `192.168.2.101`
+
     [Login](http://192.168.2.101/admin/) 
 
         Advanced Settings:
@@ -121,6 +122,7 @@ here.
     script:
 
     Reserved IP: `192.168.2.102`
+
     [Login](http://192.168.2.102:8123/onboarding.html)
 
         Advanced Settings:
