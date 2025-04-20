@@ -340,9 +340,6 @@ make clean              # Remove retry/log files
 
 ```
 |-- ansible.cfg
-|-- cloud-images
-|   |-- jammy-server-cloudimg-amd64.img
-|   `-- ubuntu-22.04-cloud.img
 |-- collections
 |   `-- ansible_collections
 |-- group_vars
