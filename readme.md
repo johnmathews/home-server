@@ -70,7 +70,8 @@ here.
 
    Containers reserved IP: `192.168.2.100`
 
-   - Advanced Settings:
+   Advanced Settings:
+
      - Unprivileged Container
      - Root password: `blank`
      - Container id: `100`
