@@ -53,45 +53,43 @@ here.
 6. Run
    [proxmox post install](https://community-scripts.github.io/ProxmoxVE/scripts?id=post-pve-install):
 
-   Advanced Options: 
-
-       - Correct VE Sources: `Y`
-       - Disable PVE enterprise Repo: `Y`
-       - Enable PVE no subscription Repo: `Y`
-       - Correct Ceph package sources: `Y`
-       - Add (disabled) `pvetest` repo: `Y`
-       - Disable subscription nag: `Y`
-       - Disable high availability: `Y`
-       - Update Proxmox VE: `Y`
-       - Reboot Proxmox now? : `Y`
+        Advanced Options: 
+        - Correct VE Sources: `Y`
+        - Disable PVE enterprise Repo: `Y`
+        - Enable PVE no subscription Repo: `Y`
+        - Correct Ceph package sources: `Y`
+        - Add (disabled) `pvetest` repo: `Y`
+        - Disable subscription nag: `Y`
+        - Disable high availability: `Y`
+        - Update Proxmox VE: `Y`
+        - Reboot Proxmox now? : `Y`
 
 7. Run
    [cloudflared LXC script](https://community-scripts.github.io/ProxmoxVE/scripts?id=cloudflared):
 
    Containers reserved IP: `192.168.2.100`
 
-   Advanced Settings:
-
-       - Unprivileged Container
-       - Root password: `blank`
-       - Container id: `100`
-       - Hostname: `cloudflared`
-       - Set disksize: `2GB`
-       - CPU Cores: `1`
-       - Allocate RAM: `512MB`
-       - Bridge: `vmbr0`
-       - Static IPv4 CIDR Address (/24): `dhcp`
-       - APT-cacher IP: `blank`
-       - Disable IPv6: `Yes`
-       - Interface MTU Size: `blank`
-       - DNS search domain: `blank`
-       - DNS server IP: `blank` but if you know the Pi-hole IP you could add it
-       - here. Can update later at `/etc/resolv.conf`
-       - MAC address: `02:00:00:00:01:00`
-       - VLAN: `blank`
-       - Tags: `community-script`, `network`, `cloudflare`
-       - Verbose mode: `Yes`
-       - DNS-over-HTTPS (DoH) Proxy: `No`
+       Advanced Settings: 
+        Unprivileged Container
+        Root password: `blank`
+        Container id: `100`
+        Hostname: `cloudflared`
+        Set disksize: `2GB`
+        CPU Cores: `1`
+        Allocate RAM: `512MB`
+        Bridge: `vmbr0`
+        Static IPv4 CIDR Address (/24): `dhcp`
+        APT-cacher IP: `blank`
+        Disable IPv6: `Yes`
+        Interface MTU Size: `blank`
+        DNS search domain: `blank`
+        DNS server IP: `blank` but if you know the Pi-hole IP you could add it
+        here. Can update later at `/etc/resolv.conf`
+        MAC address: `02:00:00:00:01:00`
+        VLAN: `blank`
+        Tags: `community-script`, `network`, `cloudflare`
+        Verbose mode: `Yes`
+        DNS-over-HTTPS (DoH) Proxy: `No`
 
 8. Run
    [Pi-hole LXC](https://community-scripts.github.io/ProxmoxVE/scripts?id=pihole):
