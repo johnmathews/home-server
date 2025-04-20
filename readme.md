@@ -53,20 +53,21 @@ here.
 6. Run
    [proxmox post install](https://community-scripts.github.io/ProxmoxVE/scripts?id=post-pve-install):
 
-   - Correct VE Sources: `Y`
-   - Disable PVE enterprise Repo: `Y`
-   - Enable PVE no subscription Repo: `Y`
-   - Correct Ceph package sources: `Y`
-   - Add (disabled) `pvetest` repo: `Y`
-   - Disable subscription nag: `Y`
-   - Disable high availability: `Y`
-   - Update Proxmox VE: `Y`
-   - Reboot Proxmox now? : `Y`
+   Advanced Options: 
+       - Correct VE Sources: `Y`
+       - Disable PVE enterprise Repo: `Y`
+       - Enable PVE no subscription Repo: `Y`
+       - Correct Ceph package sources: `Y`
+       - Add (disabled) `pvetest` repo: `Y`
+       - Disable subscription nag: `Y`
+       - Disable high availability: `Y`
+       - Update Proxmox VE: `Y`
+       - Reboot Proxmox now? : `Y`
 
 7. Run
    [cloudflared LXC script](https://community-scripts.github.io/ProxmoxVE/scripts?id=cloudflared):
 
-   Reserved IP: `192.168.2.100`
+   Containers reserved IP: `192.168.2.100`
 
    - Advanced Settings:
      - Unprivileged Container
