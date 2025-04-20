@@ -224,7 +224,7 @@ make site
 
 ## 🛠 Tooling
 
-- Provisioning is driven by `ansible-playbook`s and structured with a Makefile.
+- Provisioning is driven by Ansible Playbooks and structured with a Makefile.
 - Project structure is modular and separated by playbooks per service.
 - Linting and CI-style checks are included for reliability.
 
@@ -242,10 +242,6 @@ make clean              # Remove retry/log files
 ```
 
 ---
-
-## Manual steps instead of running `make site`
-
--
 
 ## 🧭 VM & Container Provisioning Workflow
 
@@ -323,7 +319,80 @@ make clean              # Remove retry/log files
 ## 🗂 Project Structure
 
 ```
+|-- ansible.cfg
+|-- cloud-images
+|   |-- jammy-server-cloudimg-amd64.img
+|   `-- ubuntu-22.04-cloud.img
+|-- collections
+|   `-- ansible_collections
+|-- group_vars
+|   `-- all
+|       |-- main.yml
+|       `-- vault.yml
+|-- host_vars
+|   `-- pve.yml
+|-- inventory.ini
+|-- iso-images
+|   `-- TrueNAS-SCALE-24.10.2.1.iso
+|-- makefile
+|-- playbooks
+|   |-- media_vm.yml
+|   |-- site.yml
+|   `-- truenas.yml
+|-- readme.md
+|-- requirements.txt
+|-- requirements.yml
+`-- roles
+    |-- geerlingguy.docker
+    |   |-- LICENSE
+    |   |-- README.md
+    |   |-- defaults
+    |   |   `-- main.yml
+    |   |-- handlers
+    |   |   `-- main.yml
+    |   |-- meta
+    |   |   `-- main.yml
+    |   |-- molecule
+    |   |   `-- default
+    |   |-- tasks
+    |   |   |-- docker-compose.yml
+    |   |   |-- docker-users.yml
+    |   |   |-- main.yml
+    |   |   |-- setup-Debian.yml
+    |   |   `-- setup-RedHat.yml
+    |   `-- vars
+    |       |-- Alpine.yml
+    |       |-- Archlinux.yml
+    |       |-- Debian.yml
+    |       |-- RedHat.yml
+    |       `-- main.yml
+    |-- geerlingguy.pip
+    |   |-- LICENSE
+    |   |-- README.md
+    |   |-- defaults
+    |   |   `-- main.yml
+    |   |-- meta
+    |   |   `-- main.yml
+    |   |-- molecule
+    |   |   `-- default
+    |   `-- tasks
+    |       `-- main.yml
+    |-- media_vm
+    |   |-- defaults
+    |   |   `-- main.yml
+    |   |-- files
+    |   |   `-- docker-compose.yml
+    |   |-- handlers
+    |   |   `-- main.yml
+    |   |-- tasks
+    |   |   `-- main.yml
+    |   `-- templates
+    |       `-- env.j2
+    `-- truenas_vm
+        `-- tasks
+            `-- main.yml
 
+32 directories, 41 files
 ```
 
 ---
