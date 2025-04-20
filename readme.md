@@ -82,7 +82,7 @@ here.
      - DNS search domain: `blank`
      - DNS server IP: `blank` but if you know the Pi-hole IP you could add it
        here. Can update later at `/etc/resolv.conf`
-     - MAC address: `02:00:00:00:00:00`
+     - MAC address: `02:00:00:00:01:00`
      - VLAN: `blank`
      - Tags: `community-script`, `network`, `cloudflare`
      - Verbose mode: `Yes`
@@ -106,7 +106,7 @@ here.
      - Interface MTU Size: `blank`
      - DNS Search Domain: `blank`
      - DNS Server IP: `1.1.1.1`
-     - MAC Address: `02:00:00:00:00:01`
+     - MAC Address: `02:00:00:00:01:01`
      - VLAN: `blank`
      - Tags: `community-script`, `adblock`
      - Verbose Mode: `Yes`
@@ -126,7 +126,7 @@ here.
      - CPU Cores: `2`
      - RAM: `4096MB`
      - Bridge: `vmbr0`
-     - MAC Address: `02:00:00:00:00:02`
+     - MAC Address: `02:00:00:00:01:02`
      - VLAN: `blank`
      - MTU Size: `blank`
      - Storage pool: `local-zfs` 
@@ -145,7 +145,7 @@ here.
       - CPU Cores: `6`
       - RAM: `8192MB`
       - Bridge: `vmbr0`
-      - MAC Address: `02:00:00:00:00:03`
+      - MAC Address: `02:00:00:00:01:03`
       - VLAN: `blank`
       - MTU Size: `blank`
       - Storage pool: `local-zfs` 
@@ -182,7 +182,7 @@ here.
       - CPU Cores: `4`
       - RAM: `8192MB`
       - Bridge: `vmbr0`
-      - MAC Address: `02:00:00:00:00:05`
+      - MAC Address: `02:00:00:00:01:05`
       - VLAN: `blank`
       - MTU Size: `blank`
       - Storage Pool: `local-zfs` 

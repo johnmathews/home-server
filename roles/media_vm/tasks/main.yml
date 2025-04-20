@@ -1,8 +1,8 @@
 # File: roles/media_vm/tasks/main.yml
 
-- name: Provision cloudflared LXC
-  import_tasks: provision.yml
-  tags: media,media_provision
+# - name: Provision cloudflared LXC
+#   import_tasks: provision.yml
+#   tags: media,media_provision
 
 - name: Configure cloudflared in LXC
   import_tasks: configure.yml
