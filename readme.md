@@ -170,6 +170,7 @@ here.
 9.  Provision TrueNAS SCALE VM:
 
     Reserved IP: `192.168.2.104`
+
     [Login](http://192.168.2.104/ui/sessions/signin)
 
     - You need to manually download the ISO file and place it in the correct
@@ -182,14 +183,15 @@ here.
     script. This VM will host the media apps running in docker containers.
 
     Reserved IP: `192.168.2.105`
+
     Logins:
-       [Sonarr](http://192.168.2.105:8989/)
-       [Radarr](http://192.168.2.105:7878/)
-       [File Browser](http://192.168.2.105:8081/login?redirect=/files/)
-       [JellyFin](http://192.168.2.105:8096/web/#/wizardstart.html)
-       [qBitTorrent](http://192.168.2.105:8080/)
-       [Bazarr](http://192.168.2.105:8080/)
-       [Jackett](http://192.168.2.105:9117/)
+       - [Sonarr](http://192.168.2.105:8989/)
+       - [Radarr](http://192.168.2.105:7878/)
+       - [File Browser](http://192.168.2.105:8081/login?redirect=/files/)
+       - [JellyFin](http://192.168.2.105:8096/web/#/wizardstart.html)
+       - [qBitTorrent](http://192.168.2.105:8080/)
+       - [Bazarr](http://192.168.2.105:8080/)
+       - [Jackett](http://192.168.2.105:9117/)
 
         Advanced Settings:
         - VMID: `105`
