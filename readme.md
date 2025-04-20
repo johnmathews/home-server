@@ -14,6 +14,14 @@ automation (Home Assistant), network security (Pi-hole), and remote access
 Proxmox helper scripts are run manually, the configuration options are listed
 here.
 
+
+## NEXT STEPS
+
+1. setup pi-hole
+1. USB passthrough for zigbee dongle
+1. migrate home-assistant
+1. setup NAS data...
+
 ## Setup
 
 1.  Install Proxmox from USB
@@ -34,7 +42,8 @@ here.
     ```
 
 4.  Run
-    [proxmox post install](https://community-scripts.github.io/ProxmoxVE/scripts?id=post-pve-install) script:
+    [proxmox post install](https://community-scripts.github.io/ProxmoxVE/scripts?id=post-pve-install)
+    script:
 
         Advanced Options:
         - Correct VE Sources: `Y`
@@ -48,7 +57,8 @@ here.
         - Reboot Proxmox now? : `Y`
 
 5.  Run
-    [cloudflared LXC](https://community-scripts.github.io/ProxmoxVE/scripts?id=cloudflared) script:
+    [cloudflared LXC](https://community-scripts.github.io/ProxmoxVE/scripts?id=cloudflared)
+    script:
 
     Containers reserved IP: `192.168.2.100`
 
@@ -75,7 +85,8 @@ here.
          DNS-over-HTTPS (DoH) Proxy: `No`
 
 6.  Run
-    [Pi-hole LXC](https://community-scripts.github.io/ProxmoxVE/scripts?id=pihole) script:
+    [Pi-hole LXC](https://community-scripts.github.io/ProxmoxVE/scripts?id=pihole)
+    script:
 
     Reserved IP: `192.168.2.101`
 
@@ -102,7 +113,8 @@ here.
         - Should Unbound be in Forwarding Mode or Recursive Mode: `Recursive`
 
 7.  Run
-    [Home Assistant VM](https://community-scripts.github.io/ProxmoxVE/scripts?id=haos-vm) script:
+    [Home Assistant VM](https://community-scripts.github.io/ProxmoxVE/scripts?id=haos-vm)
+    script:
 
     Reserved IP: `192.168.2.102`
 
@@ -121,9 +133,9 @@ here.
         - MTU Size: `blank`
         - Storage pool: `local-zfs`
 
-8.  Setup `Project VM` using 
-    [Ubuntu VM](https://community-scripts.github.io/ProxmoxVE/scripts?id=ubuntu2204-vm) script.
-    This will be the VM to run data engineering projects:
+8.  Setup `Project VM` using
+    [Ubuntu VM](https://community-scripts.github.io/ProxmoxVE/scripts?id=ubuntu2204-vm)
+    script. This will be the VM to run data engineering projects:
 
     Reserved IP: `192.168.2.103`
 
@@ -154,17 +166,14 @@ here.
 
     Reserved IP: `192.168.2.104`
 
+    - You need to manually download the ISO file and place it in the correct
+      directory. TrueNAS require an email address.
     - Run `make TrueNAS`. This runs an Ansible play
-    - Then in Proxmox start the new TrueNAS VM and install the OS.
-    - Then cleanup:
-      - ssh into proxmox and edit `/etc/pve/qemu-server/104.conf`
-      - remove the line starting `ide2` (the size parameter breaks the UI)
-      - exit ssh
-      - reboot the machine
+    - In Proxmox, start the new TrueNAS VM and install the OS.
 
 10. Provision the Media VM using
-    [Ubuntu 22.04 VM](https://community-scripts.github.io/ProxmoxVE/scripts?id=ubuntu2204-vm) script.
-    This VM will host the media apps running in docker containers.
+    [Ubuntu 22.04 VM](https://community-scripts.github.io/ProxmoxVE/scripts?id=ubuntu2204-vm)
+    script. This VM will host the media apps running in docker containers.
 
     Reserved IP: `192.168.2.105`
 
@@ -193,13 +202,6 @@ here.
 11. Media VM - Setup
 
 - Run `make media`
-
-## NEXT STEPS
-
-1. setup pi-hole
-1. USB passthrough for zigbee dongle
-1. migrate home-assistant
-1. setup NAS data...
 
 ## Ansible Steps
 
