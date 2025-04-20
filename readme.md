@@ -53,7 +53,7 @@ here.
 6. Run
    [proxmox post install](https://community-scripts.github.io/ProxmoxVE/scripts?id=post-pve-install):
 
-   - Advanced Options: 
+   Advanced Options: 
 
        - Correct VE Sources: `Y`
        - Disable PVE enterprise Repo: `Y`
