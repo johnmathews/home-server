@@ -33,25 +33,7 @@ here.
    ssh-copy-id -i ~/.ssh/id_ed25519.pub root@192.168.2.214
    ```
 
-4. [This might not be necessary] Add `images` to first block in
-   `/etc/pve/storage.cfg`, on the Proxmox host:
-
-   ```cfg
-   dir: local
-           path /var/lib/vz
-           content iso,vztmpl,backup,images
-
-   zfspool: local-zfs
-           pool rpool/data
-           sparse
-           content images,rootdir
-
-   ```
-
-5. ~~Manually download and place the TrueNAS ISO in `iso-images/`~~
-
-6. Run
-   [proxmox post install](https://community-scripts.github.io/ProxmoxVE/scripts?id=post-pve-install):
+4. Run [proxmox post install](https://community-scripts.github.io/ProxmoxVE/scripts?id=post-pve-install):
 
         Advanced Options: 
         - Correct VE Sources: `Y`
