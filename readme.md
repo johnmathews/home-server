@@ -207,6 +207,13 @@ here.
 13. Media VM - Setup
    - Run `make media` 
 
+## NEXT STEPS
+
+1. setup pi-hole
+1. USB passthrough for zigbee dongle
+2. migrate home-assistant
+1. setup NAS data...
+
 ## Ansible Steps
 
 ```sh
@@ -219,8 +226,7 @@ uv venv
 source .venv/bin/activate
 
 # Install Python + Ansible dependencies
-uv pip install -r requirements.txt
-ansible-galaxy install -r requirements.yml
+make requirements
 
 # Run lint and dry-run to validate everything
 make ci
@@ -231,22 +237,18 @@ make site
 
 ## 🛠 Tooling
 
-- Provisioning is driven by `ansible-playbook` and structured with a Makefile
-- Project structure is modular and separated by playbooks per service
-- Linting and CI-style checks are included for reliability
+- Provisioning is driven by `ansible-playbook`s and structured with a Makefile.
+- Project structure is modular and separated by playbooks per service.
+- Linting and CI-style checks are included for reliability.
 
 ### Makefile Targets
 
 ```sh
+make requirements       # Install Ansible requirements
+make check              # Dry-run of full site.yml
 make site               # Run full home server provisioning
 make media              # Provision and configure Media VM
-make media_provision    # Only provision Media VM (no Docker)
-make media_configure    # Configure services inside Media VM
-make cloudflared        # Setup Cloudflare Tunnel LXC
-make proxmox            # Configure base Proxmox OS setup
 make truenas            # Create TrueNAS VM
-make cloud_image        # Upload Ubuntu cloud-init image
-make check              # Dry-run of full site.yml
 make lint               # Lint all playbooks and roles
 make ci                 # Run lint + check for validation
 make clean              # Remove retry/log files
@@ -317,21 +319,6 @@ make clean              # Remove retry/log files
 
 ---
 
-## Current Status
-
-| Task                                | Status      |
-| ----------------------------------- | ----------- |
-| Proxmox base setup                  | Done        |
-| Upload cloud image role             | Done        |
-| Media VM provisioning via Ansible   | Done        |
-| TrueNAS VM created                  | Done        |
-| Services installed via Docker stack | In progress |
-| Pi-hole container setup             | Pending     |
-| Cloudflare Tunnel container         | In progress |
-| Backup strategy implemented         | Pending     |
-
----
-
 ## 🌐 Networking Overview
 
 | Device             | Interface | Speed            |
@@ -349,42 +336,6 @@ make clean              # Remove retry/log files
 ## 🗂 Project Structure
 
 ```
-.
-├── ansible.cfg
-├── makefile
-├── inventory.ini
-├── requirements.txt
-├── requirements.yml
-├── group_vars/
-│   └── all/
-│       ├── main.yml
-│       └── vault.yml
-├── host_vars/
-│   ├── pve.yml
-│   ├── media-vm.yml
-│   └── cloudflared.yml
-├── playbooks/
-│   ├── site.yml            # Master playbook
-│   ├── proxmox.yml
-│   ├── media_vm.yml
-│   ├── cloudflared.yml
-│   ├── truenas.yml
-│   └── cloud_image.yml
-└── roles/
-    ├── common/
-    ├── media_vm/
-    │   ├── tasks/{main,provision,configure}.yml
-    │   ├── templates/env.j2
-    │   └── files/docker-compose.yml
-    ├── cloudflared_lxc/
-    │   ├── tasks/{main,provision,configure}.yml
-    │   └── templates/config.yml.j2
-    ├── truenas_vm/
-    ├── upload_cloud_image/
-    ├── upload_iso/
-    ├── postfix/
-    ├── pve-repos/
-    └── zram/
 ```
 
 ---

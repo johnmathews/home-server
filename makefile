@@ -21,7 +21,7 @@ media:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/media_vm.yml $(VAULT)
 
 requirements:
-	.venv/bin/ansible-galaxy install -r requirements.yml
+	.venv/bin/ansible-galaxy install -r requirements.yml && uv pip install -r requirements.txt
 
 # ───────────── Quality Checks ─────────────
 check:

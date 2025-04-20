@@ -1,9 +1,75 @@
 # File: roles/media_vm/tasks/main.yml
 
-# - name: Provision cloudflared LXC
-#   import_tasks: provision.yml
-#   tags: media,media_provision
+---
 
-- name: Configure cloudflared in LXC
-  import_tasks: configure.yml
-  tags: media,media_configure
+- name: Ensure play runs only on the media VM
+  ansible.builtin.assert:
+    that:
+      - inventory_hostname == "media-vm"
+      - ansible_hostname == "media"
+      - ansible_host == "192.168.2.105"
+    fail_msg: >
+      This playbook must run on media (192.168.2.105). Got: inventory_hostname={{ inventory_hostname }}, ansible_host={{ ansible_host }}
+
+- name: Gather facts for media-vm
+  ansible.builtin.setup: {}
+
+- name: Ensure broken package state is fixed
+  ansible.builtin.command: apt --fix-broken install -y
+  changed_when: false  # Optional: suppresses 'changed' output unless something is actually fixed
+
+- name: Perform dist upgrade
+  ansible.builtin.apt:
+    upgrade: dist
+    update_cache: true
+
+- name: Install Docker using official role
+  import_role:
+    name: geerlingguy.docker
+
+- name: Add user to docker group
+  user:
+    name: john
+    groups: docker
+    append: yes
+
+- name: Create media stack base directory
+  file:
+    path: /srv/media
+    state: directory
+    mode: '0755'
+
+- name: Copy docker-compose.yml
+  copy:
+    src: docker-compose.yml
+    dest: /srv/media/docker-compose.yml
+    mode: '0644'
+
+- name: Create environment file from template
+  template:
+    src: env.j2
+    dest: /srv/media/.env
+    mode: '0600'
+
+- name: Start media stack containers
+  community.docker.docker_compose_v2:
+    project_src: /srv/media
+    state: present
+
+- name: List running Docker containers
+  shell: docker ps
+  register: docker_ps_output
+  become: true
+
+- name: Show container list
+  debug:
+    var: docker_ps_output.stdout_lines
+
+- name: Show connection details
+  debug:
+    msg: |
+      Configuration complete!
+      ----------------------------------
+      Host: {{ ansible_host }}
+      User: {{ ansible_user }}
+      Docker group user: {{ ciuser | default('Not defined') }}

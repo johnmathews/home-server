@@ -1,3 +1,0 @@
-# host_vars/media-vm.yml
-
-# variables in host_vars files have high precedence and override defaults/main.yaml and group_vars .yml files.
