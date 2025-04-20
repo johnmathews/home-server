@@ -93,7 +93,7 @@ here.
 
     Reserved IP: `192.168.2.101`
 
-    [Login](http://192.168.2.101/admin/) 
+    [Local Login](http://192.168.2.101/admin/)
 
         Advanced Settings:
         - Unprivileged Container
@@ -123,7 +123,7 @@ here.
 
     Reserved IP: `192.168.2.102`
 
-    [Login](http://192.168.2.102:8123/onboarding.html)
+    [Local Login](http://192.168.2.102:8123/onboarding.html)
 
         Advanced Settings:
         - Version: `stable`
@@ -173,7 +173,7 @@ here.
 
     Reserved IP: `192.168.2.104`
 
-    [Login](http://192.168.2.104/ui/sessions/signin)
+    [Local Login](http://192.168.2.104/ui/sessions/signin)
 
     - You need to manually download the ISO file and place it in the correct
       directory. TrueNAS require an email address.
@@ -186,7 +186,7 @@ here.
 
     Reserved IP: `192.168.2.105`
 
-    Logins:
+    Local logins:
        - [Sonarr](http://192.168.2.105:8989/)
        - [Radarr](http://192.168.2.105:7878/)
        - [File Browser](http://192.168.2.105:8081/login?redirect=/files/)
@@ -363,40 +363,6 @@ make clean              # Remove retry/log files
 |-- requirements.txt
 |-- requirements.yml
 `-- roles
-    |-- geerlingguy.docker
-    |   |-- LICENSE
-    |   |-- README.md
-    |   |-- defaults
-    |   |   `-- main.yml
-    |   |-- handlers
-    |   |   `-- main.yml
-    |   |-- meta
-    |   |   `-- main.yml
-    |   |-- molecule
-    |   |   `-- default
-    |   |-- tasks
-    |   |   |-- docker-compose.yml
-    |   |   |-- docker-users.yml
-    |   |   |-- main.yml
-    |   |   |-- setup-Debian.yml
-    |   |   `-- setup-RedHat.yml
-    |   `-- vars
-    |       |-- Alpine.yml
-    |       |-- Archlinux.yml
-    |       |-- Debian.yml
-    |       |-- RedHat.yml
-    |       `-- main.yml
-    |-- geerlingguy.pip
-    |   |-- LICENSE
-    |   |-- README.md
-    |   |-- defaults
-    |   |   `-- main.yml
-    |   |-- meta
-    |   |   `-- main.yml
-    |   |-- molecule
-    |   |   `-- default
-    |   `-- tasks
-    |       `-- main.yml
     |-- media_vm
     |   |-- defaults
     |   |   `-- main.yml
@@ -411,8 +377,6 @@ make clean              # Remove retry/log files
     `-- truenas_vm
         `-- tasks
             `-- main.yml
-
-32 directories, 41 files
 ```
 
 ---
