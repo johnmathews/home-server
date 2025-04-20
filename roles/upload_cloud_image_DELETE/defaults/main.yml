@@ -1,9 +1,0 @@
-# upload_cloud_image/defaults/main.yml
-
-cloud_image_url: https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img
-
-cloud_image_dir: "{{ playbook_dir }}/cloud-images"
-cloud_image_base_filename: "jammy-server-cloudimg-amd64.img"
-cloud_image_filename: "jammy-server-cloudimg-amd64.raw"
-
-proxmox_api_host: "{{ hostvars['pve']['ansible_host'] }}"

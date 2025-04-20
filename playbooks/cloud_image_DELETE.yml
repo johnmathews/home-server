@@ -1,7 +1,0 @@
-- name: Upload Cloud Image
-  hosts: proxmox
-  gather_facts: false
-
-  roles:
-    - role: upload_cloud_image
-      tags: cloud_image
