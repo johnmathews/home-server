@@ -66,6 +66,8 @@ here.
 7. Run
    [cloudflared LXC script](https://community-scripts.github.io/ProxmoxVE/scripts?id=cloudflared):
 
+   Reserved IP: `192.168.2.100`
+
    - Advanced Settings:
      - Unprivileged Container
      - Root password: `blank`
@@ -90,6 +92,8 @@ here.
 
 8. Run
    [Pi-hole LXC](https://community-scripts.github.io/ProxmoxVE/scripts?id=pihole):
+
+   Reserved IP: `192.168.2.101`
 
    - Advanced Settings:
      - Unprivileged Container
@@ -116,6 +120,8 @@ here.
 9. Run
    [Home Assistant VM](https://community-scripts.github.io/ProxmoxVE/scripts?id=haos-vm):
 
+   Reserved IP: `192.168.2.102`
+
    - Advanced Settings:
      - Version: `stable`
      - Virtual Machine ID: `102`
@@ -134,6 +140,8 @@ here.
 10. Run
     [Ubuntu 22.04 VM](https://community-scripts.github.io/ProxmoxVE/scripts?id=ubuntu2204-vm).
     This will be the VM to run data engineering projects:
+
+    Reserved IP: `192.168.2.103`
 
     - Advanced Settings:
       - VMID: `103`
@@ -160,6 +168,8 @@ here.
 
 11. TrueNAS SCALE:
 
+    Reserved IP: `192.168.2.104`
+
     - Run `make TrueNAS`. This runs an Ansible play
     - Then in Proxmox start the new TrueNAS VM and install the OS.
     - Then cleanup:
@@ -171,6 +181,8 @@ here.
 12.  Media VM - Provision
     [Ubuntu 22.04 VM](https://community-scripts.github.io/ProxmoxVE/scripts?id=ubuntu2204-vm).
     This VM will host the media apps running in docker containers.
+
+    Reserved IP: `192.168.2.105`
 
     - Advanced Settings:
       - VMID: `105`
@@ -187,8 +199,10 @@ here.
       - MTU Size: `blank`
       - Storage Pool: `local-zfs` 
 
-    - In proxmox > 105 (media) > Cloud-Init and set User, Password, SSH public key etc. 
-    - Update reserved IP on router if necessary and use correct IP address in next Ansible configuration step. 
+    - Make sure that in cloud-init the `IP config` isnt blank:
+      - IPv4: `DHCP`
+    - In proxmox > 105 (media) > Cloud-Init and set User, Password, SSH public key etc.
+    - Update reserved IP on router if necessary and use correct IP address in next Ansible configuration step.
 
 13. Media VM - Setup
    - Run `make media` 
