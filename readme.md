@@ -137,8 +137,8 @@ here.
      - MTU Size: `blank`
      - Storage pool: `local-zfs` 
 
-10. Run
-    [Ubuntu 22.04 VM](https://community-scripts.github.io/ProxmoxVE/scripts?id=ubuntu2204-vm).
+10. Setup
+    [Project VM](https://community-scripts.github.io/ProxmoxVE/scripts?id=ubuntu2204-vm).
     This will be the VM to run data engineering projects:
 
     Reserved IP: `192.168.2.103`
@@ -166,7 +166,7 @@ here.
     More info at https://github.com/community-scripts/ProxmoxVE/discussions/272
     about resizing disks, getting SSH to work, installing Docker, etc.
 
-11. TrueNAS SCALE:
+11. Provision TrueNAS SCALE VM:
 
     Reserved IP: `192.168.2.104`
 
@@ -178,7 +178,7 @@ here.
       - exit ssh
       - reboot the machine
 
-12.  Media VM - Provision
+12. Provision the Media VM
     [Ubuntu 22.04 VM](https://community-scripts.github.io/ProxmoxVE/scripts?id=ubuntu2204-vm).
     This VM will host the media apps running in docker containers.
 
