@@ -117,6 +117,13 @@ here.
         - Add unbound: `Yes`
         - Should Unbound be in Forwarding Mode or Recursive Mode: `Recursive`
 
+    Set the Pi-holes DNS Settings to use Unbound only: 
+       - Settings > DNS > Upstream DNS Servers
+       - Uncheck all options except
+       - Custom DNS servers: `127.0.0.1#5335` 
+    After setup, set your router to resolve DNS using the Pi-hole IP. 
+
+
 7.  Run
     [Home Assistant VM](https://community-scripts.github.io/ProxmoxVE/scripts?id=haos-vm)
     script:
