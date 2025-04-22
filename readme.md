@@ -17,10 +17,8 @@ here.
 
 ## NEXT STEPS
 
-1. setup pi-hole
-1. USB passthrough for zigbee dongle
-1. migrate home-assistant
 1. setup NAS data...
+1. monitoring - know if services are available, get key metrics easily, monitor disk space and memory.
 
 ## Setup
 
