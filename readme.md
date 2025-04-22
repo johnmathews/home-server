@@ -68,9 +68,9 @@ here.
          Root password: `blank`
          Container id: `100`
          Hostname: `cloudflared`
-         Set disksize: `2GB`
+         Disksize: `2GB`
          CPU Cores: `1`
-         Allocate RAM: `512MB`
+         RAM: `512MB`
          Bridge: `vmbr0`
          Static IPv4 CIDR Address (/24): `dhcp`
          APT-cacher IP: `blank`

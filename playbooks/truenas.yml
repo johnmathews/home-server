@@ -11,7 +11,7 @@
     cores: 4
     memory: 12288
     disk_size: 128
-    disk_storage: local
+    disk_storage: local-zfs
     iso_storage: local
     iso_filename: TrueNAS-SCALE-24.10.2.1.iso
 
