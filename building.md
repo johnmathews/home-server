@@ -23,9 +23,9 @@
   `-f` flag adds info about file systems.
 
 ### Zpool Quota, Reservation.
-* zpool quota = maximum space the VM can use
-* zpool reservation = minimum space the VM will ever have access to, even if/when other VMs on the disk grow.
-* zpool reservation cannot be larger than zpool quota.
+* **zpool quota** = maximum space the VM can use
+* **zpool reservation** = minimum space the VM will ever have access to, even if/when other VMs on the disk grow.
+* **zpool reservation** cannot be larger than zpool quota.
 
 * `zfs list` - show all datasets
 * `zfs get quota,reservation rpool/data/vm-105-disk-1` - get current info about a dataset
