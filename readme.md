@@ -85,6 +85,10 @@ here.
          Verbose mode: `Yes`
          DNS-over-HTTPS (DoH) Proxy: `No`
 
+    - Set ZFS reserved space and volsize (maximum possible size):
+        - `zfs set refreservation=XXG rpool/data/vm-XXX-disk-1`
+        - `zfs set volsize=XXG rpool/data/vm-XXX-disk-1`
+
 6.  Run
     [Pi-hole LXC](https://community-scripts.github.io/ProxmoxVE/scripts?id=pihole)
     script:
@@ -115,6 +119,9 @@ here.
         - Add unbound: `Yes`
         - Should Unbound be in Forwarding Mode or Recursive Mode: `Recursive`
 
+    - Set ZFS reserved space and volsize (maximum possible size):
+        - `zfs set refreservation=XXG rpool/data/vm-XXX-disk-1`
+        - `zfs set volsize=XXG rpool/data/vm-XXX-disk-1`
     Set the Pi-holes DNS Settings to use Unbound only: 
        - Settings > DNS > Upstream DNS Servers
        - Uncheck all options except
@@ -145,6 +152,10 @@ here.
         - MTU Size: `blank`
         - Storage pool: `local-zfs`
 
+    - Set ZFS reserved space and volsize (maximum possible size):
+        - `zfs set refreservation=XXG rpool/data/vm-XXX-disk-1`
+        - `zfs set volsize=XXG rpool/data/vm-XXX-disk-1`
+
 8.  Setup `Project VM` using
     [Ubuntu VM](https://community-scripts.github.io/ProxmoxVE/scripts?id=ubuntu2204-vm)
     script. This will be the VM to run data engineering projects:
@@ -170,6 +181,9 @@ here.
       - User (as root)
       - Password
       - SSH Public Key
+    - Set ZFS reserved space and volsize (maximum possible size):
+        - `zfs set refreservation=120G rpool/data/vm-XXX-disk-1`
+        - `zfs set volsize=120G rpool/data/vm-XXX-disk-1`
 
     More info at https://github.com/community-scripts/ProxmoxVE/discussions/272
     about resizing disks, getting SSH to work, installing Docker, etc.
@@ -184,6 +198,10 @@ here.
       directory. TrueNAS require an email address.
     - Run `make TrueNAS`. This runs an Ansible play
     - In Proxmox, start the new TrueNAS VM and install the OS.
+
+    - Set zfs reserved space and volsize (maximum possible size):
+        - `zfs set refreservation=128G rpool/data/vm-XXX-disk-1`
+        - `zfs set volsize=128G rpool/data/vm-XXX-disk-1`
 
 10. Provision the Media VM using
     [Ubuntu 22.04 VM](https://community-scripts.github.io/ProxmoxVE/scripts?id=ubuntu2204-vm)
@@ -219,6 +237,9 @@ here.
       - IPv4: `DHCP`
     - In Proxmox > 105 (media) > Cloud-Init and set User, Password, SSH public
       key etc.
+    - Set ZFS reserved space and volsize (maximum possible size):
+        - `zfs set refreservation=32G rpool/data/vm-105-disk-1`
+        - `zfs set volsize=32G rpool/data/vm-105-disk-1`
     - Update reserved IP on router if necessary and use correct IP address in
       next Ansible configuration step.
 

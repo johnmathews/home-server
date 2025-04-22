@@ -33,7 +33,7 @@ Each VM should have a quota and reservation equal to the OS disk space.
   if/when other VMs on the disk grow.
 - **zpool reservation** cannot be larger than zpool quota.
 
-- `zfs list` - show all ZFS entities
+- `zfs list -t vol` - show all ZFS volumes
 
 ##### For Datasets
 - `zfs get quota,reservation rpool/data/vm-105-disk-1` - get current info about
