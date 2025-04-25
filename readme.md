@@ -14,15 +14,16 @@ automation (Home Assistant), network security (Pi-hole), and remote access
 Proxmox helper scripts are run manually, the configuration options are listed
 here.
 
-
 ## NEXT STEPS
 
 1. setup NAS data...
-1. monitoring - know if services are available, get key metrics easily, monitor disk space and memory.
+1. monitoring - know if services are available, get key metrics easily, monitor
+   disk space and memory.
 
 ## Setup
 
 1.  Install Proxmox from USB
+
     1. Remove and reinsert the drive when the installer is searching and not
        finding.
     1. Use the M.2 Drive
@@ -32,7 +33,6 @@ here.
        ports will give different MAC addresses.
     1. Gateway is the URL of the router.
     1. Go to [login page](https://192.168.2.214:8006)
-
 
 2.  (If reinstalling) Remove old host key from `~/.ssh/known_hosts`
 
@@ -86,8 +86,8 @@ here.
          DNS-over-HTTPS (DoH) Proxy: `No`
 
     - Set ZFS reserved space and volsize (maximum possible size):
-        - `zfs set refreservation=XXG rpool/data/vm-XXX-disk-1`
-        - `zfs set volsize=XXG rpool/data/vm-XXX-disk-1`
+      - `zfs set refreservation=XXG rpool/data/vm-XXX-disk-1`
+      - `zfs set volsize=XXG rpool/data/vm-XXX-disk-1`
 
 6.  Run
     [Pi-hole LXC](https://community-scripts.github.io/ProxmoxVE/scripts?id=pihole)
@@ -119,15 +119,14 @@ here.
         - Add unbound: `Yes`
         - Should Unbound be in Forwarding Mode or Recursive Mode: `Recursive`
 
-    - Set ZFS reserved space and volsize (maximum possible size):
-        - `zfs set refreservation=XXG rpool/data/vm-XXX-disk-1`
-        - `zfs set volsize=XXG rpool/data/vm-XXX-disk-1`
-    Set the Pi-holes DNS Settings to use Unbound only: 
-       - Settings > DNS > Upstream DNS Servers
-       - Uncheck all options except
-       - Custom DNS servers: `127.0.0.1#5335` 
-    After setup, set your router to resolve DNS using the Pi-hole IP. 
-
+    - Set ZFS reserved space and volsize (maximum possible size): -
+      `zfs set refreservation=XXG rpool/data/vm-XXX-disk-1` -
+      `zfs set volsize=XXG rpool/data/vm-XXX-disk-1` Set the Pi-holes DNS
+      Settings to use Unbound only:
+      - Settings > DNS > Upstream DNS Servers
+      - Uncheck all options except
+      - Custom DNS servers: `127.0.0.1#5335` After setup, set your router to
+        resolve DNS using the Pi-hole IP.
 
 7.  Run
     [Home Assistant VM](https://community-scripts.github.io/ProxmoxVE/scripts?id=haos-vm)
@@ -153,8 +152,8 @@ here.
         - Storage pool: `local-zfs`
 
     - Set ZFS reserved space and volsize (maximum possible size):
-        - `zfs set refreservation=XXG rpool/data/vm-XXX-disk-1`
-        - `zfs set volsize=XXG rpool/data/vm-XXX-disk-1`
+      - `zfs set refreservation=XXG rpool/data/vm-XXX-disk-1`
+      - `zfs set volsize=XXG rpool/data/vm-XXX-disk-1`
 
 8.  Setup `Project VM` using
     [Ubuntu VM](https://community-scripts.github.io/ProxmoxVE/scripts?id=ubuntu2204-vm)
@@ -182,8 +181,8 @@ here.
       - Password
       - SSH Public Key
     - Set ZFS reserved space and volsize (maximum possible size):
-        - `zfs set refreservation=120G rpool/data/vm-XXX-disk-1`
-        - `zfs set volsize=120G rpool/data/vm-XXX-disk-1`
+      - `zfs set refreservation=120G rpool/data/vm-XXX-disk-1`
+      - `zfs set volsize=120G rpool/data/vm-XXX-disk-1`
 
     More info at https://github.com/community-scripts/ProxmoxVE/discussions/272
     about resizing disks, getting SSH to work, installing Docker, etc.
@@ -200,8 +199,8 @@ here.
     - In Proxmox, start the new TrueNAS VM and install the OS.
 
     - Set zfs reserved space and volsize (maximum possible size):
-        - `zfs set refreservation=128G rpool/data/vm-XXX-disk-1`
-        - `zfs set volsize=128G rpool/data/vm-XXX-disk-1`
+      - `zfs set refreservation=128G rpool/data/vm-XXX-disk-1`
+      - `zfs set volsize=128G rpool/data/vm-XXX-disk-1`
 
 10. Provision the Media VM using
     [Ubuntu 22.04 VM](https://community-scripts.github.io/ProxmoxVE/scripts?id=ubuntu2204-vm)
@@ -210,13 +209,15 @@ here.
     Reserved IP: `192.168.2.105`
 
     Local logins:
-       - [Sonarr](http://192.168.2.105:8989/)
-       - [Radarr](http://192.168.2.105:7878/)
-       - [File Browser](http://192.168.2.105:8081/login?redirect=/files/)
-       - [JellyFin](http://192.168.2.105:8096/web/#/wizardstart.html)
-       - [qBitTorrent](http://192.168.2.105:8080/)
-       - [Bazarr](http://192.168.2.105:8080/)
-       - [Jackett](http://192.168.2.105:9117/)
+
+    - [Sonarr](http://192.168.2.105:8989/)
+    - [Radarr](http://192.168.2.105:7878/)
+    - [File Browser](http://192.168.2.105:8081/login?redirect=/files/)
+    - [JellyFin](http://192.168.2.105:8096/web/#/wizardstart.html)
+    - [qBitTorrent](http://192.168.2.105:8080/)
+    - [Bazarr](http://192.168.2.105:8080/)
+    - [Jackett](http://192.168.2.105:9117/)
+
 
         Advanced Settings:
         - VMID: `105`
@@ -238,14 +239,45 @@ here.
     - In Proxmox > 105 (media) > Cloud-Init and set User, Password, SSH public
       key etc.
     - Set ZFS reserved space and volsize (maximum possible size):
-        - `zfs set refreservation=32G rpool/data/vm-105-disk-1`
-        - `zfs set volsize=32G rpool/data/vm-105-disk-1`
+      - `zfs set refreservation=32G rpool/data/vm-105-disk-1`
+      - `zfs set volsize=32G rpool/data/vm-105-disk-1`
     - Update reserved IP on router if necessary and use correct IP address in
       next Ansible configuration step.
 
 11. Media VM - Setup
 
 - Run `make media`
+
+12. Infra VM - Setup using
+    [Ubuntu 22.04 VM](https://community-scripts.github.io/ProxmoxVE/scripts?id=ubuntu2204-vm)
+    script. This VM will host the monitoring and dashboard applications.
+
+    Reserved IP: `192.168.2.105`
+
+        Advanced Settings:
+         VMID: `106`
+         Machine Type: `q35`
+         Disk Size: `16GB`
+         Disk Cache: `0 None`
+         Host Name: `infra`
+         CPU Model: `Host`
+         CPU Cores: `2`
+         RAM: `2048MB`
+         Bridge: `vmbr0`
+         MAC Address: `02:00:00:00:01:06`
+         VLAN: `blank`
+         MTU Size: `blank`
+         Storage Pool: `local-zfs`
+
+    - Make sure that in cloud-init the `IP config` isn't blank:
+      - IPv4: `DHCP`
+    - In Proxmox > 106 (infra) > Cloud-Init and set User, Password, SSH public
+      key etc.
+    - Set ZFS reserved space and volsize (maximum possible size):
+      - `zfs set refreservation=16G rpool/data/vm-106-disk-1`
+      - `zfs set volsize=16G rpool/data/vm-106-disk-1`
+    - Update reserved IP on router if necessary and use the correct IP address
+      in Ansible configuration step.
 
 ## Ansible Steps
 
