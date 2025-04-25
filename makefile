@@ -20,6 +20,9 @@ truenas:
 media:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/media_vm.yml $(VAULT)
 
+infra:
+	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/infra_vm.yml $(VAULT)
+
 requirements:
 	.venv/bin/ansible-galaxy install -r requirements.yml && uv pip install -r requirements.txt
 
@@ -43,7 +46,8 @@ help:
 	@echo ""
 	@echo "  make site             → Run full home server setup"
 	@echo "  make truenas          → Setup TrueNAS VM by provisioning a VM and uploading a TrueNAS ISO"
-	@echo "  make media            → Full Media VM provisioning and config"
+	@echo "  make media            → Full Media VM config"
+	@echo "  make infra            → Full Infra VM config"
 	@echo "  make check            → Dry run (no changes applied)"
 	@echo "  make lint             → Lint playbooks and roles"
 	@echo "  make clean            → Remove temp files and retry logs"
