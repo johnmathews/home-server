@@ -1,0 +1,69 @@
+version: '3.9'
+services:
+  homarr:
+    image: ghcr.io/ajnart/homarr:latest
+    ports:
+      - "7575:7575"
+    volumes:
+      - homarr_data:/app/data
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana-oss
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - prometheus_data:/prometheus
+    restart: unless-stopped
+
+  node-exporter:
+    image: prom/node-exporter
+    ports:
+      - "9100:9100"
+    restart: unless-stopped
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+  uptime-kuma:
+    image: louislam/uptime-kuma
+    ports:
+      - "3001:3001"
+    volumes:
+      - uptime_kuma:/app/data
+    restart: unless-stopped
+
+  dozzle:
+    image: amir20/dozzle:latest
+    ports:
+      - "9999:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+
+  portainer:
+    image: portainer/portainer-ce
+    ports:
+      - "9000:9000"
+    volumes:
+      - portainer_data:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+
+volumes:
+  homarr_data:
+  grafana_data:
+  prometheus_data:
+  uptime_kuma:
+  portainer_data:
