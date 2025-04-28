@@ -14,12 +14,6 @@ automation (Home Assistant), network security (Pi-hole), and remote access
 Proxmox helper scripts are run manually, the configuration options are listed
 here.
 
-## NEXT STEPS
-
-1. setup NAS data...
-1. monitoring - know if services are available, get key metrics easily, monitor
-   disk space and memory.
-
 ## Setup
 
 1.  Install Proxmox from USB
@@ -300,7 +294,7 @@ make ci
 make site
 ```
 
-## Power saving steps:
+## Tuning and maintenance:
 
 Reduce power consumption. Save money...
 
@@ -312,6 +306,9 @@ Reduce power consumption. Save money...
    `[default] performance powersave powersupersave`. Run
    `echo powersave > /sys/module/pcie_aspm/parameters/policy` and then PCIe
    devices will use less power when they're not in use.
+
+3. To upgrade the OS, run `do-release-upgrade` from the console, not over SSH.
+
 
 ## 🛠 Tooling
 
