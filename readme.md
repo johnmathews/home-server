@@ -218,21 +218,21 @@ here.
     - [Bazarr](http://192.168.2.105:8080/)
     - [Jackett](http://192.168.2.105:9117/)
 
+      Advanced Settings:
 
-        Advanced Settings:
-        - VMID: `105`
-        - Machine Type: `q35`
-        - Disk Size: `32GB`
-        - Disk Cache: `0 None`
-        - Host Name: `media`
-        - CPU Model: `Host`
-        - CPU Cores: `4`
-        - RAM: `8192MB`
-        - Bridge: `vmbr0`
-        - MAC Address: `02:00:00:00:01:05`
-        - VLAN: `blank`
-        - MTU Size: `blank`
-        - Storage Pool: `local-zfs`
+      - VMID: `105`
+      - Machine Type: `q35`
+      - Disk Size: `32GB`
+      - Disk Cache: `0 None`
+      - Host Name: `media`
+      - CPU Model: `Host`
+      - CPU Cores: `4`
+      - RAM: `8192MB`
+      - Bridge: `vmbr0`
+      - MAC Address: `02:00:00:00:01:05`
+      - VLAN: `blank`
+      - MTU Size: `blank`
+      - Storage Pool: `local-zfs`
 
     - Make sure that in cloud-init the `IP config` isn't blank:
       - IPv4: `DHCP`
@@ -279,8 +279,6 @@ here.
 
 13. Infra VM configuration - run `make infra`.
 
-14. Run `powertop --calibrate`. This will take up to 20 minutes and after you can run `powertop --auto-tune`.
-
 ## Ansible Steps
 
 ```sh
@@ -301,6 +299,19 @@ make ci
 # Provision everything (safe to rerun)
 make site
 ```
+
+## Power saving steps:
+
+Reduce power consumption. Save money...
+
+1. Run `powertop --calibrate`. This will take up to 20 minutes and after you can
+   run `powertop --auto-tune`. Then look in the `tunables` section and change
+   anything that is `bad` to `good`.
+
+2. Run `cat /sys/module/pcie_aspm/parameters/policy` and you should see:
+   `[default] performance powersave powersupersave`. Run
+   `echo powersave > /sys/module/pcie_aspm/parameters/policy` and then PCIe
+   devices will use less power when they're not in use.
 
 ## 🛠 Tooling
 
