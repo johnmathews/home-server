@@ -1,0 +1,27 @@
+# prometheus.yml
+---
+
+global:
+  scrape_interval: 15s  # default interval for scraping targets
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']
+
+  - job_name: 'home_assistant'
+    metrics_path: /api/prometheus
+    scheme: http
+    authorization:
+      type: Bearer
+      credentials: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJlYTUyODA5YTBhOGI0ZjgzYmQ0NTE2NGVkODhhN2FjYiIsImlhdCI6MTc0NTc4NDI3MCwiZXhwIjoyMDYxMTQ0MjcwfQ.v1AAHYln8_2iPgv9646awV6uNVoIOPYFJ5iQhO6_IRA"
+    static_configs:
+      - targets: ['192.168.2.102:8123']

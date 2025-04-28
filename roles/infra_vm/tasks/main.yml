@@ -55,3 +55,19 @@
   command: docker compose up -d
   args:
     chdir: "{{ docker_compose_dir }}"
+
+- name: Create Prometheus config directory
+  file:
+    path: "{{ docker_compose_dir }}/prometheus"
+    state: directory
+    owner: "{{ docker_user }}"
+    group: docker
+    mode: '0755'
+
+- name: Template Prometheus config
+  template:
+    src: prometheus/prometheus.yml.j2
+    dest: "{{ docker_compose_dir }}/prometheus/prometheus.yml"
+    owner: "{{ docker_user }}"
+    group: docker
+    mode: '0644'

@@ -244,9 +244,7 @@ here.
     - Update reserved IP on router if necessary and use correct IP address in
       next Ansible configuration step.
 
-11. Media VM - Setup
-
-- Run `make media`
+11. Media VM setup - run `make media`.
 
 12. Infra VM - Setup using
     [Ubuntu 22.04 VM](https://community-scripts.github.io/ProxmoxVE/scripts?id=ubuntu2204-vm)
@@ -278,6 +276,10 @@ here.
       - `zfs set volsize=16G rpool/data/vm-106-disk-1`
     - Update reserved IP on router if necessary and use the correct IP address
       in Ansible configuration step.
+
+13. Infra VM configuration - run `make infra`.
+
+14. Run `powertop --calibrate`. This will take up to 20 minutes and after you can run `powertop --auto-tune`.
 
 ## Ansible Steps
 
