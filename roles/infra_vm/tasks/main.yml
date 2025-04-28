@@ -10,6 +10,36 @@
     state: present
     update_cache: yes
 
+- name: Install Python 3 and pip
+  apt:
+    name:
+      - python3
+      - python3-pip
+      - python-is-python3
+    state: present
+
+- name: Install pipx
+  apt:
+    name: pipx
+    state: present
+
+- name: Ensure pipx binary path is available
+  shell: |
+    pipx ensurepath
+  args:
+    executable: /bin/bash
+  environment:
+    PATH: "{{ ansible_env.PATH }}:/home/{{ docker_user }}/.local/bin"
+  become_user: "{{ docker_user }}"
+
+- name: Install uv using pipx
+  become: true
+  become_user: "{{ docker_user }}"
+  shell: |
+    pipx install uv
+  environment:
+    PATH: "{{ ansible_env.PATH }}:/home/{{ docker_user }}/.local/bin"
+
 - name: Add Docker GPG key
   apt_key:
     url: https://download.docker.com/linux/ubuntu/gpg
