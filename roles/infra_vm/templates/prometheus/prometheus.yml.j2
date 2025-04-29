@@ -25,3 +25,7 @@ scrape_configs:
       credentials: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJlYTUyODA5YTBhOGI0ZjgzYmQ0NTE2NGVkODhhN2FjYiIsImlhdCI6MTc0NTc4NDI3MCwiZXhwIjoyMDYxMTQ0MjcwfQ.v1AAHYln8_2iPgv9646awV6uNVoIOPYFJ5iQhO6_IRA"
     static_configs:
       - targets: ['192.168.2.102:8123']
+
+  - job_name: 'unbound'
+    static_configs:
+      - targets: ['192.168.2.111:9167']

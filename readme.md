@@ -18,11 +18,11 @@ here.
 
 1.  Install Proxmox from USB
 
-    1. Remove and reinsert the drive when the installer is searching and not
-       finding.
-    1. Use the M.2 Drive
-    1. Use ZFS (Raid0)
-    1. Server name is Proxmox
+    1. Remove and reinsert the drive after the installer starts. It will say its
+       looking for something.
+    1. Install operating systems on the M.2 Drive.
+    1. Use ZFS (Raid0).
+    1. Server name is Proxmox.
     1. Management Interface is which Ethernet port its going to use. Different
        ports will give different MAC addresses.
     1. Gateway is the URL of the router.
@@ -123,6 +123,12 @@ here.
         resolve DNS using the Pi-hole IP.
 
 7.  Run
+    [adguard][https://community-scripts.github.io/ProxmoxVE/scripts?id=adguard]
+    maybe.
+
+    Settings are generally the same as for pihole..
+
+8.  Run
     [Home Assistant VM](https://community-scripts.github.io/ProxmoxVE/scripts?id=haos-vm)
     script:
 
@@ -149,7 +155,7 @@ here.
       - `zfs set refreservation=XXG rpool/data/vm-XXX-disk-1`
       - `zfs set volsize=XXG rpool/data/vm-XXX-disk-1`
 
-8.  Setup `Project VM` using
+9.  Setup `Project VM` using
     [Ubuntu VM](https://community-scripts.github.io/ProxmoxVE/scripts?id=ubuntu2204-vm)
     script. This will be the VM to run data engineering projects:
 
@@ -181,7 +187,7 @@ here.
     More info at https://github.com/community-scripts/ProxmoxVE/discussions/272
     about resizing disks, getting SSH to work, installing Docker, etc.
 
-9.  Provision TrueNAS SCALE VM:
+10. Provision TrueNAS SCALE VM:
 
     Reserved IP: `192.168.2.104`
 
@@ -196,11 +202,16 @@ here.
       - `zfs set refreservation=128G rpool/data/vm-XXX-disk-1`
       - `zfs set volsize=128G rpool/data/vm-XXX-disk-1`
 
-10. Provision the Media VM using
+11. Provision the Media VM using
     [Ubuntu 22.04 VM](https://community-scripts.github.io/ProxmoxVE/scripts?id=ubuntu2204-vm)
     script. This VM will host the media apps running in docker containers.
 
     Reserved IP: `192.168.2.105`
+
+    For `qBittorrent` the username and password doesnt work. Before you login,
+    ssh into the VM and run `docker logs qbittorrent`. Here you will see a
+    temporary username and password you can use to login to the web UI and
+    create a username and password.
 
     Local logins:
 
@@ -238,9 +249,9 @@ here.
     - Update reserved IP on router if necessary and use correct IP address in
       next Ansible configuration step.
 
-11. Media VM setup - run `make media`.
+12. Media VM setup - run `make media`.
 
-12. Infra VM - Setup using
+13. Infra VM - Setup using
     [Ubuntu 22.04 VM](https://community-scripts.github.io/ProxmoxVE/scripts?id=ubuntu2204-vm)
     script. This VM will host the monitoring and dashboard applications.
 
@@ -271,7 +282,7 @@ here.
     - Update reserved IP on router if necessary and use the correct IP address
       in Ansible configuration step.
 
-13. Infra VM configuration - run `make infra`.
+14. Infra VM configuration - run `make infra`.
 
 ## Ansible Steps
 
@@ -308,7 +319,6 @@ Reduce power consumption. Save money...
    devices will use less power when they're not in use.
 
 3. To upgrade the OS, run `do-release-upgrade` from the console, not over SSH.
-
 
 ## 🛠 Tooling
 
