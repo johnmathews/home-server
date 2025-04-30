@@ -213,6 +213,11 @@ here.
     temporary username and password you can use to login to the web UI and
     create a username and password.
 
+    For `homarr` to use the Proxmox integration, you need to create an API user
+    and then enter the secret in the format `api@pve!<group>=<secret>`. You cant
+    just enter the secret. Follow homarr documentation about how to create the
+    Proxmox user, group and api token.
+
     Local logins:
 
     - [Sonarr](http://192.168.2.105:8989/)
