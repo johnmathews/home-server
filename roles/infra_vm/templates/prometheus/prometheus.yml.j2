@@ -1,5 +1,5 @@
 # vim: ft=yaml
-# prometheus.yml
+# prometheus.yml.j2
 ---
 
 global:
@@ -45,3 +45,4 @@ scrape_configs:
   - job_name: 'smartctl'
     static_configs:
       - targets: ['192.168.2.214:9633']
+

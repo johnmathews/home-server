@@ -7,3 +7,26 @@
 
 - name: Set up Node exporter
   import_tasks: node_exporter.yml
+
+
+  # this is needed for the smartctl_exporter
+- name: Check for GNU tar when running tasks locally
+  when: inventory_hostname == 'localhost' or delegate_to is defined and delegate_to == 'localhost'
+  block:
+    - name: Check if GNU tar (gtar) is available
+      command: which gtar
+      register: gnu_tar_check
+      failed_when: gnu_tar_check.rc != 0
+      changed_when: false
+
+    - name: Warn if GNU tar not found in PATH
+      fail:
+        msg: |
+          GNU tar (gtar) is required for this role to work locally.
+          Install it using: brew install gnu-tar
+          And add to your PATH: export PATH="/opt/homebrew/opt/gnu-tar/libexec/gnubin:$PATH"
+      when: gnu_tar_check.rc != 0
+
+- name: Install Prometheus Smartctl Exporter
+  import_role:
+    name: prometheus.prometheus.smartctl_exporter
