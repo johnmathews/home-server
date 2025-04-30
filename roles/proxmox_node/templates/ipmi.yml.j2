@@ -5,7 +5,6 @@ modules:
   default:
     user: admin
     pass: "{{ vault_proxmox_bmc_password }}"
-    driver: freeipmi
     collectors:
       - bmc
       - chassis

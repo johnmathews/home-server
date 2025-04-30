@@ -31,14 +31,14 @@ scrape_configs:
     static_configs:
       - targets: ['192.168.2.111:9167']
 
-  - job_name: 'proxmos-ipmi'
+  - job_name: 'proxmox-ipmi'
     metrics_path: /metrics
     static_configs:
       - targets: ['192.168.2.214:9290']
         labels:
           instance: proxmox
 
-  - job_name: 'proxmos-node'
+  - job_name: 'proxmox-node'
     static_configs:
       - targets: ['192.168.2.214:9100']
 
