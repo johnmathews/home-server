@@ -80,6 +80,7 @@
     owner: "{{ docker_user }}"
     group: docker
     mode: '0644'
+  notify: Apply updated Docker Compose stack
 
 - name: Launch containers
   command: docker compose up -d
@@ -101,8 +102,4 @@
     owner: "{{ docker_user }}"
     group: docker
     mode: '0644'
-
-- name: Restart Prometheus container
-  command: docker compose restart prometheus
-  args:
-    chdir: "{{ docker_compose_dir }}"
+  notify: Restart Prometheus container

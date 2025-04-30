@@ -1,0 +1,18 @@
+# infra_vm/handlers/main.yml:
+
+---
+
+- name: Apply updated Docker Compose stack
+  command: docker compose up -d
+  args:
+    chdir: "{{ docker_compose_dir }}"
+
+- name: Restart Prometheus container
+  command: docker compose restart prometheus
+  args:
+    chdir: "{{ docker_compose_dir }}"
+
+- name: Restart ipmi_exporter
+  systemd:
+    name: ipmi_exporter
+    state: restarted

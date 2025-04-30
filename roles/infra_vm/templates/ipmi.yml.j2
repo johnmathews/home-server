@@ -1,0 +1,17 @@
+# vim: ft=yaml
+# infra_vm/templates/ipmi.yml.j2
+
+---
+
+modules:
+  default:
+    collectors:
+      - bmc
+      - chassis
+      - ipmi
+      - dcmi
+
+targets:
+  - name: local
+    driver: freeipmi
+
