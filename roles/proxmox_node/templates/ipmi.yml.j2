@@ -1,16 +1,13 @@
 # vim: ft=yaml
 # proxmox_node/templates/ipmi.yml.j2
 
----
-
 modules:
   default:
+    user: admin
+    pass: "{{ vault_proxmox_bmc_password }}"
+    driver: freeipmi
     collectors:
       - bmc
       - chassis
       - ipmi
       - dcmi
-
-targets:
-  - name: local
-    driver: freeipmi

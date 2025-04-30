@@ -1,3 +1,7 @@
 ipmi_exporter_version: "1.10.0"
 ipmi_exporter_install_dir: "/opt/ipmi_exporter"
 ipmi_exporter_listen_port: 9290
+
+node_exporter_version: "1.9.1"
+node_exporter_install_dir: "/opt/node_exporter"
+node_exporter_listen_port: 9100

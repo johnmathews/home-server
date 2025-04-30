@@ -1,0 +1,68 @@
+# proxmox_node/tasks/ipmi_exporter.yml
+
+---
+
+- name: Ensure IPMI exporter directory exists
+  file:
+    path: "{{ ipmi_exporter_install_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Download IPMI exporter binary
+  get_url:
+    url: "https://github.com/prometheus-community/ipmi_exporter/releases/download/v{{ ipmi_exporter_version }}/ipmi_exporter-{{ ipmi_exporter_version }}.linux-amd64.tar.gz"
+    dest: "/tmp/ipmi_exporter.tar.gz"
+    mode: '0644'
+
+- name: Extract IPMI exporter binary
+  unarchive:
+    src: "/tmp/ipmi_exporter.tar.gz"
+    dest: "{{ ipmi_exporter_install_dir }}"
+    remote_src: yes
+    creates: "{{ ipmi_exporter_install_dir }}/ipmi_exporter-{{ ipmi_exporter_version }}.linux-amd64/ipmi_exporter"
+
+- name: Create symlink to stable binary path
+  file:
+    src: "{{ ipmi_exporter_install_dir }}/ipmi_exporter-{{ ipmi_exporter_version }}.linux-amd64/ipmi_exporter"
+    dest: "{{ ipmi_exporter_install_dir }}/ipmi_exporter"
+    state: link
+    force: yes
+
+- name: Deploy IPMI exporter config
+  template:
+    src: ipmi.yml.j2
+    dest: "{{ ipmi_exporter_install_dir }}/ipmi.yml"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart ipmi_exporter
+
+- name: Create ipmi_exporter systemd unit
+  copy:
+    dest: /etc/systemd/system/ipmi_exporter.service
+    owner: root
+    group: root
+    mode: '0644'
+    content: |
+      [Unit]
+      Description=Prometheus IPMI Exporter
+      After=network.target
+
+      [Service]
+      ExecStart={{ ipmi_exporter_install_dir }}/ipmi_exporter --config.file={{ ipmi_exporter_install_dir }}/ipmi.yml --web.listen-address=":{{ ipmi_exporter_listen_port }}"
+      User=root
+      Restart=always
+
+      [Install]
+      WantedBy=multi-user.target
+  notify:
+    - Reload systemd
+    - Restart ipmi_exporter
+
+- name: Ensure ipmi_exporter is enabled and running
+  systemd:
+    name: ipmi_exporter
+    enabled: yes
+    state: started
