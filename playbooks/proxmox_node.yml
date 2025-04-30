@@ -1,0 +1,9 @@
+# playbooks/proxmox_node.yml
+
+---
+
+- name: Proxmox node
+  hosts: proxmox
+  become: true
+  roles:
+    - proxmox_node

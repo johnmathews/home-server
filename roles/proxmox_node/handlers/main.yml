@@ -1,0 +1,8 @@
+# proxmox_node/handlers/main.yml
+
+---
+
+- name: Restart ipmi_exporter
+  systemd:
+    name: ipmi_exporter
+    state: restarted

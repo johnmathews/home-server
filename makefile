@@ -14,6 +14,9 @@ all: site
 site:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/site.yml $(VAULT)
 
+proxmox:
+	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/proxmox_node.yml $(VAULT)
+
 truenas:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/truenas.yml $(VAULT)
 
@@ -42,9 +45,10 @@ ci: lint check
 # ───────────── Help Message ───────────────
 help:
 	@echo ""
-	@echo "🚀 Available make commands:"
+	@echo "Available make commands:"
 	@echo ""
 	@echo "  make site             → Run full home server setup"
+	@echo "  make proxmox          → Setup the proxmox node, doesnt setup authentication"
 	@echo "  make truenas          → Setup TrueNAS VM by provisioning a VM and uploading a TrueNAS ISO"
 	@echo "  make media            → Full Media VM config"
 	@echo "  make infra            → Full Infra VM config"
