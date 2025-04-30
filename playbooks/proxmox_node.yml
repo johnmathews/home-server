@@ -6,4 +6,14 @@
   hosts: proxmox
   become: true
   roles:
-    - proxmox_node
+    - role: proxmox_node
+    - role: prometheus.prometheus.smartctl_exporter
+      vars:
+        smartctl_exporter_web_listen_address: ":9633"
+        # run `lsblk` to see what devices you have
+        smartctl_exporter_devices:
+          - /dev/sda
+          - /dev/sdb
+          - /dev/nvme0n1
+        smartctl_exporter_config_dir: /etc/smartctl_exporter
+        smartctl_exporter_binary_install_dir: /usr/local/bin

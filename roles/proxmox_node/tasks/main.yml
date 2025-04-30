@@ -7,6 +7,3 @@
 
 - name: Set up Node exporter
   import_tasks: node_exporter.yml
-
-
-

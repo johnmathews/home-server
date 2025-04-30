@@ -3,9 +3,10 @@
 collections:
   - name: community.general
     version: ">=7.4.7" 
-  - name: community.proxmox
+  # - name: community.proxmox
+  - name: prometheus.prometheus
 
 roles:
   - name: geerlingguy.pip
   - name: geerlingguy.docker
-  - name: bellackn.homelab
+  # - name: bellackn.homelab
