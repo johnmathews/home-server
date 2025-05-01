@@ -13,7 +13,7 @@ To check-in or check up on the services, ssh into the LXC and then:
 
      You should see:
 
-     ;; ANSWER SECTION: www.example.com. 3600 IN A 93.184.216.34
+    `;; ANSWER SECTION: www.example.com. 3600 IN A 93.184.216.34`
 
 3. Test DNSSEC validation:
 
