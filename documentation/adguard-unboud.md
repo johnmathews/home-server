@@ -17,3 +17,7 @@ To check-in or check up on the services, ssh into the LXC and then:
 
      You should see `status: SERVFAIL` if its working correctly. If it returns an
      IP then DNSSEC is not being enforced.
+
+4. Get some stats: `unbound-control stats_noreset`
+   - look for `total.num.queries`, `total.num.cachehits`, `total.num.cachemiss`
+   - if `time.up` is low (its in seconds) then cache hits will be low.
