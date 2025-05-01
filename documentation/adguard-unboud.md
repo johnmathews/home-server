@@ -6,21 +6,18 @@ AdGuard uses Unbound to resolve DNS recursively.
 
 To check-in or check up on the services, ssh into the LXC and then:
 
-1. `systemctl status unbound`
-2. Test DNS resolution:
+1. Check that unbound is running: `systemctl status unbound`
 
-    `dig @127.0.0.1 -p 5335 www.example.com`.
+1. Check cache is working: `unbound-control stats_noreset | grep cache`
 
-     You should see:
+2. Test DNS resolution: `dig @127.0.0.1 -p 5335 www.example.com`.
 
-    `;; ANSWER SECTION: www.example.com. 3600 IN A 93.184.216.34`
+   You should see: `;; ANSWER SECTION: www.example.com. 3600 IN A 93.184.216.34`
 
-3. Test DNSSEC validation:
+3. Test DNSSEC validation: `dig @127.0.0.1 -p 5335 dnssec-failed.org`
 
-    `dig @127.0.0.1 -p 5335 dnssec-failed.org`
-
-     You should see `status: SERVFAIL` if its working correctly. If it returns an
-     IP then DNSSEC is not being enforced.
+   You should see `status: SERVFAIL` if its working correctly. If it returns an
+   IP then DNSSEC is not being enforced.
 
 4. Get some stats: `unbound-control stats_noreset`
    - look for `total.num.queries`, `total.num.cachehits`, `total.num.cachemiss`
