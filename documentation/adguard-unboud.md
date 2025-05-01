@@ -28,7 +28,6 @@ To check-in or check up on the services, ssh into the LXC and then:
 
 ## Unbound
 
-### 📘 What Unbound Does
 
 1. Recursive DNS Resolution
 
@@ -42,7 +41,6 @@ This gives you:
 	•	Less dependence on third parties
 	•	More control over DNS behavior
 
-⸻
 
 2. DNSSEC Validation
 
@@ -50,7 +48,6 @@ If DNSSEC is enabled (as it now is in your setup), Unbound:
 	•	Verifies that DNS responses are digitally signed
 	•	Rejects tampered or spoofed data
 
-⸻
 
 3. Caching
 
@@ -59,7 +56,6 @@ Unbound stores DNS responses locally:
 	•	Greatly reduces latency and upstream traffic
 	•	You can tune cache TTLs and size
 
-⸻
 
 4. Hardened DNS Behavior
 
