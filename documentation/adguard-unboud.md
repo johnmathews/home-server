@@ -1,4 +1,4 @@
-# AdGuard
+# AdGuard + Unbound
 
 To check-in or check up on the services, ssh into the LXC and then:
 
