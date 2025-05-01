@@ -44,9 +44,11 @@ To check-in or check up on the services, ssh into the LXC and then:
 
 2. DNSSEC Validation
 
-    If DNSSEC is enabled (as it now is in your setup), Unbound:
-	- Verifies that DNS responses are digitally signed
-	- Rejects tampered or spoofed data
+    DNSSEC is enabled. 
+
+    When DNSSEC is enabled:
+	- Unbound verifies that DNS responses are digitally signed
+	- Unbound rejects tampered or spoofed data
 
 
 3. Caching
