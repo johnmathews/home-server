@@ -16,3 +16,9 @@
     name: ipmi_exporter
     state: restarted
     enabled: yes
+
+- name: Restart pve_exporter
+  systemd:
+    name: pve_exporter
+    state: restarted
+    enabled: yes

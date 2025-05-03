@@ -1,0 +1,70 @@
+# proxmox_node/tasks/pve_exporter.yml
+
+---
+
+- name: Ensure curl is installed
+  apt:
+    name: curl
+    state: present
+
+- name: Install uv (if not already present)
+  shell: |
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+  args:
+    creates: /root/.cargo/bin/uv
+
+- name: Symlink uv to /usr/local/bin
+  file:
+    src: /root/.local/bin/uv
+    dest: /usr/local/bin/uv
+    state: link
+    force: yes
+
+- name: Add uv bin to shell profile
+  lineinfile:
+    path: /root/.profile
+    line: 'export PATH="$HOME/.cargo/bin:$PATH"'
+    create: yes
+
+- name: Create virtualenv using uv
+  command: /root/.local/bin/uv venv --python=python3 {{ pve_exporter_install_dir }}/venv
+  args:
+    creates: "{{ pve_exporter_install_dir }}/venv"
+  environment:
+    UV_CACHE_DIR: /root/.cache/uv
+
+
+- name: Install prometheus-pve-exporter via uv into venv
+  command: >
+    /usr/local/bin/uv pip install --python {{ pve_exporter_install_dir }}/venv/bin/python
+    prometheus-pve-exporter=={{ pve_exporter_version }}
+
+- name: Create systemd service for pve_exporter
+  copy:
+    dest: /etc/systemd/system/pve_exporter.service
+    owner: root
+    group: root
+    mode: '0644'
+    content: |
+      [Unit]
+      Description=Prometheus Proxmox VE Exporter (uv-managed)
+      After=network.target
+
+      [Service]
+      ExecStart={{ pve_exporter_install_dir }}/venv/bin/pve_exporter --web.listen-address=":{{ pve_exporter_listen_port }}"
+      Environment="PVE_USER={{ proxmox_api_user }}"
+      Environment="PVE_PASSWORD={{ vault_proxmox_api_password }}"
+      Environment="PVE_VERIFY_SSL=false"
+      Restart=always
+
+      [Install]
+      WantedBy=multi-user.target
+  notify:
+    - Reload systemd
+    - Restart pve_exporter
+
+- name: Ensure pve_exporter is enabled and running
+  systemd:
+    name: pve_exporter
+    state: started
+    enabled: yes

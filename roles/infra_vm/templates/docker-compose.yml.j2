@@ -1,3 +1,7 @@
+# vim: ft=yaml
+
+---
+
 version: '3.9'
 services:
   homarr:
@@ -14,6 +18,7 @@ services:
       - "3000:3000"
     volumes:
       - grafana_data:/var/lib/grafana
+      - "{{ docker_compose_dir }}/custom/grafana.ini:/etc/grafana/grafana.ini:ro"
     restart: unless-stopped
 
   prometheus:

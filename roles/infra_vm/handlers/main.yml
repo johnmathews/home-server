@@ -1,9 +1,14 @@
-# infra_vm/handlers/main.yml:
+# infra_vm/handlers/main.yml
 
 ---
 
 - name: Apply updated Docker Compose stack
   command: docker compose up -d
+  args:
+    chdir: "{{ docker_compose_dir }}"
+
+- name: Restart Grafana container
+  command: docker compose restart grafana
   args:
     chdir: "{{ docker_compose_dir }}"
 

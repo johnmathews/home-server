@@ -73,6 +73,23 @@
     group: docker
     mode: '0755'
 
+- name: Ensure grafana custom config directory exists
+  file:
+    path: "{{ docker_compose_dir }}/custom"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Deploy custom grafana.ini
+  template:
+    src: grafana/grafana.ini.j2
+    dest: "{{ docker_compose_dir }}/custom/grafana.ini"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart Grafana container
+
 - name: Template Docker Compose file
   template:
     src: docker-compose.yml.j2
@@ -81,6 +98,7 @@
     group: docker
     mode: '0644'
   notify: Apply updated Docker Compose stack
+
 
 - name: Launch containers
   command: docker compose up -d

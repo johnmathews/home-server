@@ -8,8 +8,11 @@
 - name: Set up Node exporter
   import_tasks: node_exporter.yml
 
+- name: Set up Proxmox exporter
+  import_tasks: pve_exporter.yml
 
-  # this is needed for the smartctl_exporter
+  # Run this before the imported Smartctl exporter role
+  # we need GNU Tar running on the local ansible host
 - name: Check for GNU tar when running tasks locally
   when: inventory_hostname == 'localhost' or delegate_to is defined and delegate_to == 'localhost'
   block:
