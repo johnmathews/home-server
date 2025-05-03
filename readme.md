@@ -367,6 +367,12 @@ Reduce power consumption. Save money...
 - Project structure is modular and separated by playbooks per service.
 - Linting and CI-style checks are included for reliability.
 
+## Colors and themes
+
+From [PVEDiscordDark](https://github.com/Weilbyte/PVEDiscordDark) repo:
+    - `wget https://raw.githubusercontent.com/Weilbyte/PVEDiscordDark/master/PVEDiscordDark.sh`
+    - `bash PVEDiscordDark.sh install`
+
 ### Makefile Targets
 
 ```sh
