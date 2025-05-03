@@ -291,34 +291,39 @@ here.
 
 ## Proxmox Backup Server (PBS)
 
-1. Run the
-   [helper script](https://community-scripts.github.io/ProxmoxVE/scripts?id=proxmox-backup-server)
-   to set it up.
+1.  Run the
+    [helper script](https://community-scripts.github.io/ProxmoxVE/scripts?id=proxmox-backup-server)
+    to set it up.
 
-        Advanced Settings:
-         Priviliged Container: Y 
-         VMID: `300`
-         Hostname: `proxmox-backup-server` 
-         Disk Size: `10GB` 
-         CPU Cores: `2`
-         RAM: `2048MB`
-         Bridge: `vmbr0`
-         Static IPv4 CIDR Address: `dhcp`
-         APT-cacher IP: `blank`
-         Disable IPv6: `Yes`
-         Interface MTU Size: `blank`
-         DNS search domain: `blank`
-         DNS server IP: `blank` 
-         MAC Address: `02:00:00:00:03:00`
-         VLAN: `blank`
-         Custom Tags: `community-script;backup` 
-         Enable Root SSH Access: `Yes` 
-         SSH Authorized Key for Root: ... 
-         Enable verbose mode: `Yes` (this only refers to the verbosity of the install script)
+         Advanced Settings:
+          Priviliged Container: Y
+          VMID: `300`
+          Hostname: `proxmox-backup-server`
+          Disk Size: `10GB`
+          CPU Cores: `2`
+          RAM: `2048MB`
+          Bridge: `vmbr0`
+          Static IPv4 CIDR Address: `dhcp`
+          APT-cacher IP: `blank`
+          Disable IPv6: `Yes`
+          Interface MTU Size: `blank`
+          DNS search domain: `blank`
+          DNS server IP: `blank`
+          MAC Address: `02:00:00:00:03:00`
+          VLAN: `blank`
+          Custom Tags: `community-script;backup`
+          Enable Root SSH Access: `Yes`
+          SSH Authorized Key for Root: ...
+          Enable verbose mode: `Yes` (this only refers to the verbosity of the install script)
 
- Then run the post install
-   [helper script](https://community-scripts.github.io/ProxmoxVE/scripts?id=post-pbs-install)
-   to set up an LXC.
+2.  Then run the post install
+    [helper script](https://community-scripts.github.io/ProxmoxVE/scripts?id=post-pbs-install)
+    to set up an LXC.
+
+    - Run it from a shell on the PBS LXC. 
+    - Answer `yes` to just about everything, like when you installed Proxmox.
+    - Then assign it a static IP address and connect on port 8007.
+    - Then reboot.
 
 ## Ansible Steps
 
