@@ -341,6 +341,8 @@ here.
     - Then assign it a static IP address and connect on port 8007.
     - Then reboot.
 
+15. Add [File Browser](https://community-scripts.github.io/ProxmoxVE/scripts?id=filebrowser) to PVE host.
+
 ## Ansible Steps
 
 ```sh
@@ -362,6 +364,11 @@ make ci
 make site
 ```
 
+## Colors and themes
+
+From [PVEThemes](https://github.com/Happyrobot33/PVEThemes) repo:
+    - `git clone https://github.com/Happyrobot33/PVEThemes && cd PVEThemes && chmod +x install.sh && ./install.sh`
+
 ## Tuning and maintenance:
 
 Reduce power consumption. Save money...
@@ -377,17 +384,6 @@ Reduce power consumption. Save money...
 
 3. To upgrade the OS, run `do-release-upgrade` from the console, not over SSH.
 
-## 🛠 Tooling
-
-- Provisioning is driven by Ansible Playbooks and structured with a Makefile.
-- Project structure is modular and separated by playbooks per service.
-- Linting and CI-style checks are included for reliability.
-
-## Colors and themes
-
-From [PVEThemes](https://github.com/Happyrobot33/PVEThemes) repo:
-    - `git clone https://github.com/Happyrobot33/PVEThemes && cd PVEThemes && chmod +x install.sh && ./install.sh`
-
 ### Makefile Targets
 
 ```sh
@@ -401,41 +397,7 @@ make ci                 # Run lint + check for validation
 make clean              # Remove retry/log files
 ```
 
----
-
-## 🧭 VM & Container Provisioning Workflow
-
-1. **Base Proxmox Setup**  
-   Configure SSH, ZRAM, Postfix, disable enterprise repo
-
-2. **Image Preparation**  
-   Upload Ubuntu cloud image using `upload_cloud_image` role
-
-3. **VMs**
-
-   - `media_vm`: Ubuntu server w/ cloud-init, Docker + media stack
-   - `truenas_vm`: TrueNAS VM with raw disk passthrough
-
-4. **LXC Containers**
-
-   - `cloudflared_lxc`: Cloudflare Tunnel container (LXC)
-   - Pi-hole: Unprivileged LXC (not yet implemented)
-
-5. **Service Configuration**
-
-   - Docker stack in `media_vm`: Jellyfin, Sonarr, Radarr, qBittorrent
-   - Home Assistant (planned): HAOS image with USB passthrough
-
-6. **Storage**
-
-   - TrueNAS manages ZFS pools (mirrored vdevs)
-   - Snapshots & replication to backup drives
-
-7. **Backups**
-   - Optional PBS VM
-   - Proxmox + TrueNAS-based snapshot + dedup backups
-
----
+--
 
 ## 🎯 Objectives, Priorities & Tradeoffs
 
