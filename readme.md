@@ -1,5 +1,21 @@
 # Home Server Provisioning with Ansible
 
+
+ 1. [Setup](#setup)
+ 2. [Proxmox Backup Server (PBS)](#proxmox-backup-server-(pbs))
+ 3. [Ansible Steps](#ansible-steps)
+ 4. [Tuning and maintenance:](#tuning-and-maintenance:)
+ 5. [🛠 Tooling](#🛠-tooling)
+ 6. [Colors and themes](#colors-and-themes)
+    * [Makefile Targets](#makefile-targets)
+ 7. [🧭 VM & Container Provisioning Workflow](#🧭-vm-&-container-provisioning-workflow)
+ 8. [🎯 Objectives, Priorities & Tradeoffs](#🎯-objectives,-priorities-&-tradeoffs)
+    * [Main Goals](#main-goals)
+    * [Priorities](#priorities)
+    * [Tradeoffs](#tradeoffs)
+ 9. [🌐 Networking Overview](#🌐-networking-overview)
+10. [🗂 Project Structure](#🗂-project-structure)
+
 This project is about setting up my home server. It contains the commands and
 Ansible playbooks used to provision a home server based on Proxmox.
 
@@ -297,7 +313,7 @@ here.
 
          Advanced Settings:
           Priviliged Container: Y
-          VMID: `300`
+          VMID: `200`
           Hostname: `proxmox-backup-server`
           Disk Size: `10GB`
           CPU Cores: `2`
@@ -309,7 +325,7 @@ here.
           Interface MTU Size: `blank`
           DNS search domain: `blank`
           DNS server IP: `blank`
-          MAC Address: `02:00:00:00:03:00`
+          MAC Address: `02:00:00:00:02:00`
           VLAN: `blank`
           Custom Tags: `community-script;backup`
           Enable Root SSH Access: `Yes`
@@ -369,9 +385,8 @@ Reduce power consumption. Save money...
 
 ## Colors and themes
 
-From [PVEDiscordDark](https://github.com/Weilbyte/PVEDiscordDark) repo:
-    - `wget https://raw.githubusercontent.com/Weilbyte/PVEDiscordDark/master/PVEDiscordDark.sh`
-    - `bash PVEDiscordDark.sh install`
+From [PVEThemes](https://github.com/Happyrobot33/PVEThemes) repo:
+    - `git clone https://github.com/Happyrobot33/PVEThemes && cd PVEThemes && chmod +x install.sh && ./install.sh`
 
 ### Makefile Targets
 
