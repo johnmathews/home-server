@@ -349,11 +349,11 @@ not to set fan RPM directly.
 
 3.  Notes on the setup of the backup jobs:
 
-    The server is backed up to a `pbs` datastore. `proxmox ui` > `datacenter` >
+    The server is backed up to a `pbs` data store. `proxmox ui` > `datacenter` >
     `storage` > `pbs`
 
     In `proxmox UI > datacenter > backup` you see the scheduled job that backs
-    up all VMs and LXCs to the pbs datastore.
+    up all VMs and LXCs to the pbs data store.
 
     In `proxmox backup server UI > datastore > backups > content` you see what
     has been backed up.
