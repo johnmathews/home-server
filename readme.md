@@ -30,6 +30,8 @@ automation (Home Assistant), network security (Pi-hole), and remote access
 Proxmox helper scripts are run manually, the configuration options are listed
 here.
 
+The motherboard uses the Redfish API. You can use it to change fan profiles, but not to set fan RPM directly.
+
 ## Setup
 
 1.  Install Proxmox from USB
@@ -364,6 +366,15 @@ make ci
 make site
 ```
 
+## Proxmox Backup Server
+
+- The server is backed up to a `pbs` datastore.
+- `proxmox ui` > `datacenter` > `storage` > `pbs`
+
+In `proxmox UI > datacenter > backup` you see the scheduled job that backs up all VMs and LXCs to the pbs datastore. 
+
+In `proxmox backup server UI > datastore > backups > content` you see what has been backed up.
+
 ## Colors and themes
 
 From [PVEThemes](https://github.com/Happyrobot33/PVEThemes) repo:
@@ -398,84 +409,3 @@ make clean              # Remove retry/log files
 ```
 
 --
-
-## 🎯 Objectives, Priorities & Tradeoffs
-
-### Main Goals
-
-- Reliable and extensible home server
-- Power-efficient (20% draw at idle)
-- VM + container support
-- Repeatable provisioning with Ansible
-
-### Priorities
-
-- Flexibility: Modular VMs & services
-- Simplicity: Separation of concerns
-- Efficiency: Low idle power draw
-- Storage resilience: ZFS + snapshots
-
-### Tradeoffs
-
-- No GPU (initially) → CPU transcoding
-- TrueNAS runs in VM, not bare metal
-- Editing via Wi-Fi limits throughput
-- External access via Cloudflare Tunnel (not NGINX)
-
----
-
-## 🌐 Networking Overview
-
-| Device             | Interface | Speed            |
-| ------------------ | --------- | ---------------- |
-| Home Server        | Ethernet  | 1 Gbps           |
-| MacBook Pro M2 Max | Wi-Fi     | ~120–140 Mbps    |
-| ISP Connection     | Fiber     | 100 Mbps up/down |
-
-- Server is wired to home router
-- Clients (MacBook, phones) access via Wi-Fi
-- Cloudflare Tunnel for remote access without port forwarding
-
----
-
-## 🗂 Project Structure
-
-```
-|-- ansible.cfg
-|-- collections
-|   `-- ansible_collections
-|-- group_vars
-|   `-- all
-|       |-- main.yml
-|       `-- vault.yml
-|-- host_vars
-|   `-- pve.yml
-|-- inventory.ini
-|-- iso-images
-|   `-- TrueNAS-SCALE-24.10.2.1.iso
-|-- makefile
-|-- playbooks
-|   |-- media_vm.yml
-|   |-- site.yml
-|   `-- truenas.yml
-|-- readme.md
-|-- requirements.txt
-|-- requirements.yml
-`-- roles
-    |-- media_vm
-    |   |-- defaults
-    |   |   `-- main.yml
-    |   |-- files
-    |   |   `-- docker-compose.yml
-    |   |-- handlers
-    |   |   `-- main.yml
-    |   |-- tasks
-    |   |   `-- main.yml
-    |   `-- templates
-    |       `-- env.j2
-    `-- truenas_vm
-        `-- tasks
-            `-- main.yml
-```
-
----
