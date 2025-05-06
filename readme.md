@@ -307,6 +307,8 @@ The motherboard uses the Redfish API. You can use it to change fan profiles, but
 
 14. Infra VM configuration - run `make infra`.
 
+15. Add [File Browser](https://community-scripts.github.io/ProxmoxVE/scripts?id=filebrowser) to PVE host.
+
 ## Proxmox Backup Server (PBS)
 
 1.  Run the
@@ -352,7 +354,6 @@ In `proxmox UI > datacenter > backup` you see the scheduled job that backs up al
 
 In `proxmox backup server UI > datastore > backups > content` you see what has been backed up.
 
-15. Add [File Browser](https://community-scripts.github.io/ProxmoxVE/scripts?id=filebrowser) to PVE host.
 
 ## Ansible Steps
 
