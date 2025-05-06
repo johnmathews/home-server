@@ -1,19 +1,18 @@
 # Home Server Provisioning with Ansible
 
-
- 1. [Setup](#setup)
- 2. [Proxmox Backup Server (PBS)](#proxmox-backup-server-(pbs))
- 3. [Ansible Steps](#ansible-steps)
- 4. [Tuning and maintenance:](#tuning-and-maintenance:)
- 5. [🛠 Tooling](#🛠-tooling)
- 6. [Colors and themes](#colors-and-themes)
-    * [Makefile Targets](#makefile-targets)
- 7. [🧭 VM & Container Provisioning Workflow](#🧭-vm-&-container-provisioning-workflow)
- 8. [🎯 Objectives, Priorities & Tradeoffs](#🎯-objectives,-priorities-&-tradeoffs)
-    * [Main Goals](#main-goals)
-    * [Priorities](#priorities)
-    * [Tradeoffs](#tradeoffs)
- 9. [🌐 Networking Overview](#🌐-networking-overview)
+1.  [Setup](#setup)
+2.  [Proxmox Backup Server (PBS)](<#proxmox-backup-server-(pbs)>)
+3.  [Ansible Steps](#ansible-steps)
+4.  [Tuning and maintenance:](#tuning-and-maintenance:)
+5.  [🛠 Tooling](#🛠-tooling)
+6.  [Colors and themes](#colors-and-themes)
+    - [Makefile Targets](#makefile-targets)
+7.  [🧭 VM & Container Provisioning Workflow](#🧭-vm-&-container-provisioning-workflow)
+8.  [🎯 Objectives, Priorities & Tradeoffs](#🎯-objectives,-priorities-&-tradeoffs)
+    - [Main Goals](#main-goals)
+    - [Priorities](#priorities)
+    - [Tradeoffs](#tradeoffs)
+9.  [🌐 Networking Overview](#🌐-networking-overview)
 10. [🗂 Project Structure](#🗂-project-structure)
 
 This project is about setting up my home server. It contains the commands and
@@ -30,7 +29,8 @@ automation (Home Assistant), network security (Pi-hole), and remote access
 Proxmox helper scripts are run manually, the configuration options are listed
 here.
 
-The motherboard uses the Redfish API. You can use it to change fan profiles, but not to set fan RPM directly.
+The motherboard uses the Redfish API. You can use it to change fan profiles, but
+not to set fan RPM directly.
 
 ## Setup
 
@@ -307,7 +307,9 @@ The motherboard uses the Redfish API. You can use it to change fan profiles, but
 
 14. Infra VM configuration - run `make infra`.
 
-15. Add [File Browser](https://community-scripts.github.io/ProxmoxVE/scripts?id=filebrowser) to PVE host.
+15. Add
+    [File Browser](https://community-scripts.github.io/ProxmoxVE/scripts?id=filebrowser)
+    to PVE host.
 
 ## Proxmox Backup Server (PBS)
 
@@ -340,20 +342,21 @@ The motherboard uses the Redfish API. You can use it to change fan profiles, but
     [helper script](https://community-scripts.github.io/ProxmoxVE/scripts?id=post-pbs-install)
     to set up an LXC.
 
-    - Run it from a shell on the PBS LXC. 
+    - Run it from a shell on the PBS LXC.
     - Answer `yes` to just about everything, like when you installed Proxmox.
     - Then assign it a static IP address and connect on port 8007.
     - Then reboot.
 
-3. Notes on the setup of the backup jobs:
+3.  Notes on the setup of the backup jobs:
 
-The server is backed up to a `pbs` datastore.
-`proxmox ui` > `datacenter` > `storage` > `pbs`
+    The server is backed up to a `pbs` datastore. `proxmox ui` > `datacenter` >
+    `storage` > `pbs`
 
-In `proxmox UI > datacenter > backup` you see the scheduled job that backs up all VMs and LXCs to the pbs datastore. 
+    In `proxmox UI > datacenter > backup` you see the scheduled job that backs
+    up all VMs and LXCs to the pbs datastore.
 
-In `proxmox backup server UI > datastore > backups > content` you see what has been backed up.
-
+    In `proxmox backup server UI > datastore > backups > content` you see what
+    has been backed up.
 
 ## Ansible Steps
 
@@ -378,8 +381,8 @@ make site
 
 ## Colors and themes
 
-From [PVEThemes](https://github.com/Happyrobot33/PVEThemes) repo:
-    - `git clone https://github.com/Happyrobot33/PVEThemes && cd PVEThemes && chmod +x install.sh && ./install.sh`
+From [PVEThemes](https://github.com/Happyrobot33/PVEThemes) repo: -
+`git clone https://github.com/Happyrobot33/PVEThemes && cd PVEThemes && chmod +x install.sh && ./install.sh`
 
 ## Tuning and maintenance:
 
