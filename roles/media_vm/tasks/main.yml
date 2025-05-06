@@ -23,6 +23,17 @@
     upgrade: dist
     update_cache: true
 
+- name: Install SMB client and mount utilities
+  ansible.builtin.apt:
+    name:
+      - cifs-utils    # needed for mounting SMB shares via fstab or manually
+      - smbclient     # optional, for testing shares via CLI
+    state: present
+    update_cache: true
+
+- import_tasks: mount-smb.yml
+  tags: [mount, smb]
+
 - name: Install Docker using official role
   import_role:
     name: geerlingguy.docker
@@ -47,7 +58,7 @@
 
 - name: Create environment file from template
   template:
-    src: env.j2
+    src: .env.j2
     dest: /srv/media/.env
     mode: '0600'
 

@@ -274,7 +274,11 @@ not to set fan RPM directly.
 
 12. Media VM setup - run `make media`.
 
-13. Infra VM - Setup using
+**You will need to set up TrueNAS before running this playbook.** This is
+because media_vm needs to mount some datasets as SMB shares, and the SMB
+shares must exist in order to be able to connect to them
+
+ Infra VM - Setup using
     [Ubuntu 22.04 VM](https://community-scripts.github.io/ProxmoxVE/scripts?id=ubuntu2204-vm)
     script. This VM will host the monitoring and dashboard applications.
 

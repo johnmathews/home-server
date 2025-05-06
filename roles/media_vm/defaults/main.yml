@@ -33,7 +33,7 @@ media_stack_users:
   jellyfin:
     username: john
   qbittorrent:
-    username: john
+    username: admin
   sonarr:
     username: john
   radarr:
@@ -44,3 +44,14 @@ media_stack_users:
     username: john
   filebrowser:
     username: john
+
+
+smb_server: 192.168.2.104
+smb_media_vm_username: media_vm
+smb_shares:
+  - name: tv
+    target: /srv/media/library/tv
+  - name: movies
+    target: /srv/media/library/movies
+  - name: downloads
+    target: /srv/media/downloads

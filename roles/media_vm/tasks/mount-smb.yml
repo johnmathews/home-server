@@ -1,0 +1,40 @@
+# File: roles/media_vm/tasks/mount-smb.yml
+
+---
+
+- name: Ensure mount targets exist
+  ansible.builtin.file:
+    path: "{{ item.target }}"
+    state: directory
+    owner: john
+    group: john
+    mode: '0755'
+  loop: "{{ smb_shares }}"
+
+- name: Create SMB credentials file
+  ansible.builtin.copy:
+    dest: /etc/smb-media-credentials
+    content: |
+      username={{ smb_media_vm_username }}
+      password={{ vault_smb_media_vm_password }}
+    owner: root
+    group: root
+    mode: '0600'
+
+- name: Ensure fstab entries exist
+  ansible.builtin.lineinfile:
+    path: /etc/fstab
+    line: "//{{ smb_server }}/{{ item.name }} {{ item.target }} cifs credentials=/etc/smb-media-credentials,vers=3.0,uid=1000,gid=1000 0 0"
+    state: present
+    create: yes
+  loop: "{{ smb_shares }}"
+
+- name: Mount all SMB shares
+  ansible.builtin.mount:
+    path: "{{ item.target }}"
+    src: "//{{ smb_server }}/{{ item.name }}"
+    fstype: cifs
+    opts: credentials=/etc/smb-media-credentials,vers=3.0,uid=1000,gid=1000
+    state: mounted
+  loop: "{{ smb_shares }}"
+
