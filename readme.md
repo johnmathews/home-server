@@ -343,6 +343,15 @@ The motherboard uses the Redfish API. You can use it to change fan profiles, but
     - Then assign it a static IP address and connect on port 8007.
     - Then reboot.
 
+3. Notes on the setup of the backup jobs:
+
+The server is backed up to a `pbs` datastore.
+`proxmox ui` > `datacenter` > `storage` > `pbs`
+
+In `proxmox UI > datacenter > backup` you see the scheduled job that backs up all VMs and LXCs to the pbs datastore. 
+
+In `proxmox backup server UI > datastore > backups > content` you see what has been backed up.
+
 15. Add [File Browser](https://community-scripts.github.io/ProxmoxVE/scripts?id=filebrowser) to PVE host.
 
 ## Ansible Steps
@@ -365,15 +374,6 @@ make ci
 # Provision everything (safe to rerun)
 make site
 ```
-
-## Proxmox Backup Server
-
-- The server is backed up to a `pbs` datastore.
-- `proxmox ui` > `datacenter` > `storage` > `pbs`
-
-In `proxmox UI > datacenter > backup` you see the scheduled job that backs up all VMs and LXCs to the pbs datastore. 
-
-In `proxmox backup server UI > datastore > backups > content` you see what has been backed up.
 
 ## Colors and themes
 
