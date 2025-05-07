@@ -26,39 +26,39 @@ services:
       - WEBUI_PASSWORD=${QBITTORRENT_PASSWORD}
     volumes:
       - ${CONFIG_DIR}/qbittorrent:/config
-      - ${DOWNLOAD_DIR}:/downloads
+      - ${DOWNLOAD_DIR}/downloads:/downloads
     restart: unless-stopped
 
   sonarr:
     image: linuxserver/sonarr
     container_name: sonarr
-    user: "${PUID}:${PGID}"  
-    ports:
-      - "8989:8989"
+    user: "${PUID}:${PGID}"
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
     volumes:
       - ${CONFIG_DIR}/sonarr:/config
-      - ${MEDIA_DIR}/tv:/tv
       - ${DOWNLOAD_DIR}:/downloads
+      - ${MEDIA_DIR}/tv:/tv
+    ports:
+      - "8989:8989"
     restart: unless-stopped
 
   radarr:
     image: linuxserver/radarr
     container_name: radarr
-    user: "${PUID}:${PGID}"  
-    ports:
-      - "7878:7878"
+    user: "${PUID}:${PGID}"
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
     volumes:
       - ${CONFIG_DIR}/radarr:/config
-      - ${MEDIA_DIR}/movies:/movies
       - ${DOWNLOAD_DIR}:/downloads
+      - ${MEDIA_DIR}/movies:/movies
+    ports:
+      - "7878:7878"
     restart: unless-stopped
 
   bazarr:

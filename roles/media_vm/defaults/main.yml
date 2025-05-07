@@ -2,8 +2,8 @@
 
 # defaults/main.yml has the lowest priority. host_vars/media-vm.yml has highest priority.
 
-# reset_qbittorrent_config: true
-reset_qbittorrent_config: false
+reset_qbittorrent_config: true
+# reset_qbittorrent_config: false
 
 PUID: 3002
 PGID: 3002
@@ -22,6 +22,7 @@ cloud_image_base_filename: "jammy-server-cloudimg-amd64.img"
 cloud_image_filename: "jammy-server-cloudimg-amd64.raw"
 
 proxmox_api_host: "{{ hostvars['pve']['ansible_host'] }}"
+
 
 
 media_stack_user: john

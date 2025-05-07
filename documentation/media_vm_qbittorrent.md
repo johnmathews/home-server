@@ -14,6 +14,10 @@ password.
 
 There are some tasks and a template to try to fix this but it doesn't work, yet.
 
+For now, if you need to, you can run:
+`docker logs qbittorrent 2>&1 | grep -i password`
+
+
 ### SMB shares
 
 The media files are stored on disks attached to the NAS not on the media VM.
@@ -24,3 +28,4 @@ relevant datasets.
 `PUID` and `GUID` are set as variables in `roles/media_vm/defaults/main.yml` and
 must match the user id in TrueNAS of a user that has access to the relevant
 datasets.
+
