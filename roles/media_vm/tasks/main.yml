@@ -118,22 +118,15 @@
     - /srv/media/.env
     - /srv/media/docker-compose.yml
 
-
-# 10. Ensure .env contains correct PUID/PGID
-- name: Ensure correct PUID in .env
-  ansible.builtin.lineinfile:
-    path: /srv/media/.env
-    regexp: "^PUID="
-    line: "PUID=3002"
-  notify: Restart qbittorrent
-
-- name: Ensure PGID is correct in .env
-  ansible.builtin.lineinfile:
-    path: /srv/media/.env
-    regexp: "^PGID="
-    line: "PGID=3002"
-  notify: Restart qbittorrent
-
+- name: Pre-seed qBittorrent.conf if missing and not resetting
+  ansible.builtin.template:
+    src: qBittorrent.conf.j2
+    dest: "{{ media_stack_data_dir }}/qbittorrent/qBittorrent.conf"
+    owner: "{{ qbittorrent_uid }}"
+    group: "{{ qbittorrent_gid }}"
+    mode: '0644'
+    force: false  # Do not overwrite if already exists
+  when: not reset_qbittorrent_config | default(false)
 
 # 11. Start Docker stack (only after config + paths are ready)
 - name: Start media stack containers
@@ -156,6 +149,28 @@
   failed_when: qbittorrent_write_test.rc != 0
   changed_when: false
 
+- name: Check if qBittorrent config file exists inside container
+  ansible.builtin.command: docker exec qbittorrent test -f /config/qBittorrent/qBittorrent.conf
+  register: qbittorrent_conf_present
+  failed_when: false
+  changed_when: false
+
+- name: Sanity check qbittorrent WebUI config inside container
+  ansible.builtin.command: >
+    docker exec qbittorrent grep -q "^WebUI\\\\Username={{ media_stack_users.qbittorrent.username }}" /config/qBittorrent/qBittorrent.conf
+  when: qbittorrent_conf_present.rc == 0
+  register: qbittorrent_username_check
+  changed_when: false
+  failed_when: qbittorrent_username_check.rc != 0
+
+- name: Sanity check qbittorrent WebUI password hash
+  ansible.builtin.command: >
+    docker exec qbittorrent grep -q "^WebUI\\\\Password_ha1={{ vault_qbittorrent_admin_password_hash }}" /config/qBittorrent/qBittorrent.conf
+  when: qbittorrent_conf_present.rc == 0
+  register: qbittorrent_password_check
+  changed_when: false
+  failed_when: qbittorrent_password_check.rc != 0
+
 # 13. Debug and status reporting
 - name: List running Docker containers
   shell: docker ps
@@ -174,4 +189,3 @@
       Host: {{ ansible_host }}
       User: {{ ansible_user }}
       Docker group user: {{ ciuser | default('Not defined') }}
-

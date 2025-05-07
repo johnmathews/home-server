@@ -1,0 +1,10 @@
+# roles/media_vm/templates/qBittorrent.conf.j2
+# This file will be written to /srv/media/config/qbittorrent/qBittorrent.conf
+# Only if it doesn't already exist and reset_qbittorrent_config is false.
+
+[Preferences]
+WebUI\Username={{ media_stack_users.qbittorrent.username }}
+WebUI\Password_ha1=@ByteArray({{ qbittorrent_password_hash }})
+WebUI\CSRFProtection=false
+WebUI\HostHeaderValidation=false
+

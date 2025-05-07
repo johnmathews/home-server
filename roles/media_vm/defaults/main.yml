@@ -2,10 +2,17 @@
 
 # defaults/main.yml has the lowest priority. host_vars/media-vm.yml has highest priority.
 
-reset_qbittorrent_config: true
+# reset_qbittorrent_config: true
+reset_qbittorrent_config: false
 
 PUID: 3002
 PGID: 3002
+
+qbittorrent_uid: 3002
+qbittorrent_gid: 3002
+
+qbittorrent_password_hash: "8xY3VacpmFtxpFqGrsjyEhc8eGrFSFGJ3gK2JT5MB0E="
+
 TZ: Europe/Amsterdam
 
 cloud_image_url: https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img
