@@ -17,7 +17,7 @@ site:
 proxmox:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/proxmox_node.yml $(VAULT)
 
-truenas:
+nas:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/truenas.yml $(VAULT)
 
 media:
@@ -49,7 +49,7 @@ help:
 	@echo ""
 	@echo "  make site             → Run full home server setup"
 	@echo "  make proxmox          → Setup the proxmox node, doesnt setup authentication"
-	@echo "  make truenas          → Setup TrueNAS VM by provisioning a VM and uploading a TrueNAS ISO"
+	@echo "  make nas          → Setup TrueNAS VM by provisioning a VM and uploading a TrueNAS ISO"
 	@echo "  make media            → Full Media VM config"
 	@echo "  make infra            → Full Infra VM config"
 	@echo "  make check            → Dry run (no changes applied)"

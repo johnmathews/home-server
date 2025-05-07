@@ -24,7 +24,7 @@
 - name: Ensure fstab entries exist
   ansible.builtin.lineinfile:
     path: /etc/fstab
-    line: "//{{ smb_server }}/{{ item.name }} {{ item.target }} cifs credentials=/etc/smb-media-credentials,vers=3.0,uid=1000,gid=1000 0 0"
+    line: "//{{ smb_server }}/{{ item.name }} {{ item.target }} cifs credentials=/etc/smb-media-credentials,vers=3.0,uid=3002,gid=3002 0 0"
     state: present
     create: yes
   loop: "{{ smb_shares }}"
@@ -34,7 +34,7 @@
     path: "{{ item.target }}"
     src: "//{{ smb_server }}/{{ item.name }}"
     fstype: cifs
-    opts: credentials=/etc/smb-media-credentials,vers=3.0,uid=1000,gid=1000
+    opts: credentials=/etc/smb-media-credentials,vers=3.0,uid=3002,gid=3002
     state: mounted
   loop: "{{ smb_shares }}"
 

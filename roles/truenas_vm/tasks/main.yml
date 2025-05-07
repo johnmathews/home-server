@@ -134,3 +134,6 @@
   when: truenas_installed | default(false)
   delegate_to: localhost
   become: false
+
+
+- import_tasks: node_exporter.yml

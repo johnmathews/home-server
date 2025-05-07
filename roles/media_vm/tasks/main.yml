@@ -2,6 +2,8 @@
 
 ---
 
+
+# 1. Playbook safety and environment setup
 - name: Ensure play runs only on the media VM
   ansible.builtin.assert:
     that:
@@ -14,6 +16,8 @@
 - name: Gather facts for media-vm
   ansible.builtin.setup: {}
 
+
+# 2. OS package updates
 - name: Ensure broken package state is fixed
   ansible.builtin.command: apt --fix-broken install -y
   changed_when: false  # Optional: suppresses 'changed' output unless something is actually fixed
@@ -23,6 +27,7 @@
     upgrade: dist
     update_cache: true
 
+# 3. Install required packages
 - name: Install SMB client and mount utilities
   ansible.builtin.apt:
     name:
@@ -30,9 +35,6 @@
       - smbclient     # optional, for testing shares via CLI
     state: present
     update_cache: true
-
-- import_tasks: mount-smb.yml
-  tags: [mount, smb]
 
 - name: Install Docker using official role
   import_role:
@@ -44,29 +46,117 @@
     groups: docker
     append: yes
 
+# 4. Create necessary directories
+- import_tasks: mount-smb.yml
+  tags: [mount, smb]
+
 - name: Create media stack base directory
   file:
     path: /srv/media
     state: directory
     mode: '0755'
 
+# 6. Apply base directory ownership early
+- name: Ensure all media paths are owned by john
+  ansible.builtin.file:
+    path: "{{ item }}"
+    recurse: true
+    owner: john
+    group: john
+  loop:
+    - /srv/media
+    - /srv/media/config
+    - /srv/media/downloads
+    - /srv/media/library
+
+# 7. Handle qBittorrent config prep **before container starts**
+- name: Remove broken qbittorrent config directory (if needed)
+  file:
+    path: "{{ media_stack_data_dir }}/qbittorrent"
+    state: absent
+  when: reset_qbittorrent_config | default(false)
+
+- name: Re-create qbittorrent config directory
+  file:
+    path: "{{ media_stack_data_dir }}/qbittorrent"
+    state: directory
+    owner: "{{ media_stack_user }}"
+    group: "{{ media_stack_user }}"
+    mode: '0755'
+
+# 8. Fix permissions specifically for UID 3002 (container user)
+- name: Ensure qbittorrent config path has correct ownership
+  ansible.builtin.file:
+    path: /srv/media/config/qbittorrent
+    state: directory
+    recurse: yes
+    owner: "3002"
+    group: "3002"
+    mode: "0755"
+
+# 9. Copy environment and compose files
 - name: Copy docker-compose.yml
   copy:
     src: docker-compose.yml
     dest: /srv/media/docker-compose.yml
     mode: '0644'
+  notify: Restart media stack
 
 - name: Create environment file from template
   template:
     src: .env.j2
     dest: /srv/media/.env
     mode: '0600'
+  notify: Restart media stack
 
+- name: Ensure .env and docker-compose.yml are owned by "john"
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: john
+    group: john
+  loop:
+    - /srv/media/.env
+    - /srv/media/docker-compose.yml
+
+
+# 10. Ensure .env contains correct PUID/PGID
+- name: Ensure correct PUID in .env
+  ansible.builtin.lineinfile:
+    path: /srv/media/.env
+    regexp: "^PUID="
+    line: "PUID=3002"
+  notify: Restart qbittorrent
+
+- name: Ensure PGID is correct in .env
+  ansible.builtin.lineinfile:
+    path: /srv/media/.env
+    regexp: "^PGID="
+    line: "PGID=3002"
+  notify: Restart qbittorrent
+
+
+# 11. Start Docker stack (only after config + paths are ready)
 - name: Start media stack containers
   community.docker.docker_compose_v2:
     project_src: /srv/media
     state: present
+    recreate: auto
+  become: false
 
+# 12. Health checks
+- name: Test write access for download path
+  ansible.builtin.command: test -w /srv/media/downloads
+  register: download_write_test
+  failed_when: download_write_test.rc != 0
+  changed_when: false
+
+- name: Test file write inside qbittorrent container
+  ansible.builtin.command: docker exec qbittorrent touch /downloads/ansible-test-write
+  register: qbittorrent_write_test
+  failed_when: qbittorrent_write_test.rc != 0
+  changed_when: false
+
+# 13. Debug and status reporting
 - name: List running Docker containers
   shell: docker ps
   register: docker_ps_output
@@ -84,3 +174,4 @@
       Host: {{ ansible_host }}
       User: {{ ansible_user }}
       Docker group user: {{ ciuser | default('Not defined') }}
+

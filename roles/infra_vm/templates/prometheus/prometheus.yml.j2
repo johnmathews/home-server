@@ -11,15 +11,11 @@ scrape_configs:
     static_configs:
       - targets: ['localhost:9090']
 
-  # - job_name: 'infra-vm-node-exporter'
-  #   static_configs:
-  #     - targets: ['192.168.2.106:9100']
-
   - job_name: 'cadvisor'
     static_configs:
       - targets: ['cadvisor:8080']
 
-  - job_name: 'home_assistant'
+  - job_name: 'home-assistant'
     metrics_path: /api/prometheus
     scheme: http
     authorization:
@@ -43,11 +39,11 @@ scrape_configs:
     static_configs:
       - targets: ['192.168.2.214:9100']
 
-  - job_name: 'smartctl'
+  - job_name: 'proxmox-smartctl'
     static_configs:
       - targets: ['192.168.2.214:9633']
 
-  - job_name: 'pve_exporter'
+  - job_name: 'pve-exporter'
     metrics_path: /pve
     params:
       module: [default]
@@ -56,6 +52,14 @@ scrape_configs:
     static_configs:
       - targets: ['192.168.2.214:9221']
 
-  - job_name: 'pve_exporter_internal'
+  - job_name: 'pve-exporter-internal'
     static_configs:
       - targets: ['192.168.2.214:9221']
+
+  - job_name: 'truenas-node-exporter'
+    static_configs:
+      - targets: ['192.168.2.104:9100']
+
+  - job_name: 'truenas-smrtctl-exporter'
+    static_configs:
+      - targets: ['192.168.2.104:9100']

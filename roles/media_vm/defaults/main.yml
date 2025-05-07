@@ -2,8 +2,10 @@
 
 # defaults/main.yml has the lowest priority. host_vars/media-vm.yml has highest priority.
 
-PUID: 1000
-PGID: 1000
+reset_qbittorrent_config: true
+
+PUID: 3002
+PGID: 3002
 TZ: Europe/Amsterdam
 
 cloud_image_url: https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img
@@ -17,8 +19,8 @@ proxmox_api_host: "{{ hostvars['pve']['ansible_host'] }}"
 
 media_stack_user: john
 media_stack_group: media
-media_stack_base_dir: /opt/media-stack
-media_stack_data_dir: /opt/media-stack/config
+media_stack_base_dir: /srv/media
+media_stack_data_dir: /srv/media/config
 
 media_stack_services:
   jellyfin_port: 8096

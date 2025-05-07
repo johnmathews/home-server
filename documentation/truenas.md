@@ -14,13 +14,17 @@ The idea is that this gives TrueNAS full control of the HDDs.
 - use `scsi<NUMBER>` flag to mount the drives directly to the TrueNAS VM:
 
   ```
-  qm set 104 -scsi2 /dev/disk/by-id/ata-WDC_WD10EZRX-00A8LB0_WD-WMC1U7453146
-  qm set 104 -scsi3 /dev/disk/by-id/ata-ST3000DM007-1WY10G_ZFN19YRG
+  # tank pool - 8TB Seagate Ironwolf, mirrored vdev 
+  qm set 104 -scsi1 /dev/disk/by-id/ata-ST8000VN004-3CP101_WWZ5TZSF,backup=0
+  qm set 104 -scsi2 /dev/disk/by-id/ata-ST8000VN004-3CP101_WWZ5AS90,backup=0
+
+  # Backup pool - 3TB Seagate Barracuda
+  qm set 104 -scsi3 /dev/disk/by-id/ata-ST3000DM007-1WY10G_ZFN19YRG,backup=0
   ```
 
 ## Remove disks from TrueNAS
 
-1. In TrueNAS, export the datapool associated with the disk and make sure
+1. In TrueNAS, export the data pool associated with the disk and make sure
    nothing is using the disk, like shares, data protection services, etc.
 
 2. In the Proxmox UI go to the TrueNAS VM > Hardware section and remove the disk
