@@ -12,8 +12,10 @@ services:
 
   qbittorrent:
     image: linuxserver/qbittorrent
-    user: "${PUID}:${PGID}"  
     container_name: qbittorrent
+    # user: "${PUID}:${PGID}"  
+    security_opt:
+      - no-new-privileges:true
     ports:
       - "8080:8080"
       - "6881:6881"
@@ -26,9 +28,8 @@ services:
       - WEBUI_PASSWORD=${QBITTORRENT_PASSWORD}
     volumes:
       - ${CONFIG_DIR}/qbittorrent:/config
-      - ${DOWNLOAD_DIR}/downloads:/downloads
-      - ${MEDIA_DIR}/movies:/movies
-      - ${MEDIA_DIR}/tv:/tv
+      - ${DOWNLOAD_DIR}:/downloads
+      - ${MEDIA_DIR}:/media
     restart: unless-stopped
 
   sonarr:
@@ -41,9 +42,8 @@ services:
       - TZ=${TZ}
     volumes:
       - ${CONFIG_DIR}/sonarr:/config
-      - ${DOWNLOAD_DIR}/downloads:/downloads
-      - ${MEDIA_DIR}/movies:/movies
-      - ${MEDIA_DIR}/tv:/tv
+      - ${DOWNLOAD_DIR}:/downloads
+      - ${MEDIA_DIR}:/media
     ports:
       - "8989:8989"
     restart: unless-stopped
@@ -58,9 +58,8 @@ services:
       - TZ=${TZ}
     volumes:
       - ${CONFIG_DIR}/radarr:/config
-      - ${DOWNLOAD_DIR}/downloads:/downloads
-      - ${MEDIA_DIR}/movies:/movies
-      - ${MEDIA_DIR}/tv:/tv
+      - ${DOWNLOAD_DIR}:/downloads
+      - ${MEDIA_DIR}:/media
     ports:
       - "7878:7878"
     restart: unless-stopped
@@ -77,9 +76,8 @@ services:
       - TZ=${TZ}
     volumes:
       - ${CONFIG_DIR}/jackett:/config
-      - ${DOWNLOAD_DIR}/downloads:/downloads
-      - ${MEDIA_DIR}/movies:/movies
-      - ${MEDIA_DIR}/tv:/tv
+      - ${DOWNLOAD_DIR}:/downloads
+      - ${MEDIA_DIR}:/media
     restart: unless-stopped
 
   bazarr:
@@ -94,8 +92,7 @@ services:
       - TZ=${TZ}
     volumes:
       - ${CONFIG_DIR}/bazarr:/config
-      - ${MEDIA_DIR}/movies:/movies
-      - ${MEDIA_DIR}/tv:/tv
+      - ${MEDIA_DIR}:/media
     restart: unless-stopped
 
   watchtower:
@@ -112,9 +109,7 @@ services:
     ports:
       - "8081:80"
     volumes:
-      - ${MEDIA_DIR}:/srv
       - ${CONFIG_DIR}/filebrowser:/config
-      - ${DOWNLOAD_DIR}/downloads:/downloads
-      - ${MEDIA_DIR}/movies:/movies
-      - ${MEDIA_DIR}/tv:/tv
+      - ${DOWNLOAD_DIR}:/downloads
+      - ${MEDIA_DIR}:/media
     restart: unless-stopped

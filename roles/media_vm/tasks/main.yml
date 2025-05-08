@@ -182,6 +182,21 @@
     msg: "docker-compose.yml not found in /srv/media"
   when: not compose_file.stat.exists
 
+- name: Ensure download subdirectories exist
+  file:
+    path: "/srv/media/downloads/{{ item }}"
+    state: directory
+    owner: "{{ media_user }}"
+    group: "{{ media_group }}"
+    mode: "0755"
+  loop:
+    - qbittorrent
+    - sonarr
+    - radarr
+  vars:
+    media_user: john
+    media_group: john
+
 # 11. Start Docker stack (only after config + paths are ready)
 - name: Start media stack containers
   community.docker.docker_compose_v2:
@@ -216,7 +231,7 @@
   changed_when: false
   when:
     - not reset_qbittorrent_config
-    - qbittorrent_config_exists.stat.exists
+    - qbittorrent_config_exists.rc == 0
 
 - name: Debug qBittorrent config file presence
   debug:
@@ -252,7 +267,23 @@
   failed_when: "'radarr' not in radarr_running.stdout"
   changed_when: false
 
+- name: Check shared volume mounts in media containers
+  shell: |
+    docker exec {{ item }} test -w /downloads && echo "/downloads: OK" || echo "/downloads: MISSING or not writable"
+    docker exec {{ item }} test -w /media && echo "/media: OK" || echo "/media: MISSING or not writable"
+  with_items:
+    - radarr
+    - sonarr
+    - qbittorrent
+    - jackett
+    - bazarr
+    - filebrowser
+  register: mount_check_results
 
+- name: Show mount check results
+  debug:
+    msg: "{{ item.stdout_lines }}"
+  loop: "{{ mount_check_results.results }}"
 
 
 

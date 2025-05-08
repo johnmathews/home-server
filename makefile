@@ -26,6 +26,9 @@ media:
 infra:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/infra_vm.yml $(VAULT)
 
+lint-paths:
+	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/validate-paths.yml $(VAULT)
+
 requirements:
 	.venv/bin/ansible-galaxy install -r requirements.yml && uv pip install -r requirements.txt
 
