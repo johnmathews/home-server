@@ -3,7 +3,7 @@
 # defaults/main.yml has the lowest priority. host_vars/media-vm.yml has highest priority.
 
 # Changing this will require you to `cd /src/media && docker compose logs qbittorrent` 
-# to get the new temp passowrd. Then in qBittorrent set the old passowrd again
+# to get the new temp password. Then in qBittorrent set the old password again
 reset_qbittorrent_config: false
 
 PUID: 3002
@@ -12,7 +12,7 @@ PGID: 3002
 qbittorrent_uid: 3002
 qbittorrent_gid: 3002
 
-qbittorrent_password_hash: "8xY3VacpmFtxpFqGrsjyEhc8eGrFSFGJ3gK2JT5MB0E="
+qbittorrent_password_hash: 16c5e9c9b842bd6bf78aafa66643304e0cfe2586
 
 TZ: Europe/Amsterdam
 
@@ -24,11 +24,9 @@ cloud_image_filename: "jammy-server-cloudimg-amd64.raw"
 
 proxmox_api_host: "{{ hostvars['pve']['ansible_host'] }}"
 
-
-
 media_stack_user: john
 media_stack_group: media
-media_stack_base_dir: /srv/media
+media_stack_mount_dir: /mnt/media
 media_stack_config_dir: /srv/media/config
 
 media_stack_services:
@@ -38,7 +36,6 @@ media_stack_services:
   radarr_port: 7878
   jackett_port: 9117
   bazarr_port: 6767
-
 
 media_stack_users:
   jellyfin:
@@ -56,13 +53,12 @@ media_stack_users:
   filebrowser:
     username: john
 
-
 smb_server: 192.168.2.104
 smb_media_vm_username: media_vm
 smb_shares:
   - name: tv
-    target: /srv/media/library/tv
+    target: /mnt/media/library/tv
   - name: movies
-    target: /srv/media/library/movies
+    target: /mnt/media/library/movies
   - name: downloads
-    target: /srv/media/downloads
+    target: /mnt/media/downloads

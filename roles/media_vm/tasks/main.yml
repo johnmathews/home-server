@@ -45,6 +45,7 @@
     name: john
     groups: docker
     append: yes
+  become: true
 
 # 4. Create necessary directories
 - import_tasks: mount-smb.yml
@@ -52,7 +53,7 @@
 
 - name: Create media stack base directory
   file:
-    path: /srv/media
+    path: "{{ media_stack_config_dir | dirname }}"
     state: directory
     mode: '0755'
 
@@ -63,10 +64,9 @@
     state: directory
     mode: '0755'
   loop:
-    - /srv/media
-    - /srv/media/config
-    - /srv/media/downloads
-    - /srv/media/library
+    - "{{ media_stack_config_dir }}"
+    - "{{ media_stack_mount_dir }}/downloads"
+    - "{{ media_stack_mount_dir }}/library"
 
 - name: Set ownership of all media paths to john
   ansible.builtin.file:
@@ -75,10 +75,10 @@
     owner: john
     group: john
   loop:
-    - /srv/media
-    - /srv/media/config
-    - /srv/media/downloads
-    - /srv/media/library
+    - "{{ media_stack_config_dir | dirname }}"
+    - "{{ media_stack_config_dir }}"
+    - "{{ media_stack_mount_dir }}/downloads"
+    - "{{ media_stack_mount_dir }}/library"
 
 # 7. Handle qBittorrent config prep **before container starts**
 - name: Remove broken qbittorrent config directory (if needed)
@@ -182,20 +182,20 @@
     msg: "docker-compose.yml not found in /srv/media"
   when: not compose_file.stat.exists
 
-- name: Ensure download subdirectories exist
-  file:
-    path: "/srv/media/downloads/{{ item }}"
-    state: directory
-    owner: "{{ media_user }}"
-    group: "{{ media_group }}"
-    mode: "0755"
+- name: Ensure mounted media directories exist
+  stat:
+    path: "{{ item }}"
   loop:
-    - qbittorrent
-    - sonarr
-    - radarr
-  vars:
-    media_user: john
-    media_group: john
+    - "{{ media_stack_mount_dir }}/downloads"
+    - "{{ media_stack_mount_dir }}/library/tv"
+    - "{{ media_stack_mount_dir }}/library/movies"
+  register: mounted_dirs
+
+- name: Fail if any mounted media paths are missing
+  fail:
+    msg: "Missing required SMB mount: {{ item.stat.path }}"
+  when: not item.stat.exists
+  loop: "{{ mounted_dirs.results }}"
 
 # 11. Start Docker stack (only after config + paths are ready)
 - name: Start media stack containers
