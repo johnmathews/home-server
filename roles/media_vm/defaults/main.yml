@@ -28,7 +28,7 @@ proxmox_api_host: "{{ hostvars['pve']['ansible_host'] }}"
 media_stack_user: john
 media_stack_group: media
 media_stack_base_dir: /srv/media
-media_stack_data_dir: /srv/media/config
+media_stack_config_dir: /srv/media/config
 
 media_stack_services:
   jellyfin_port: 8096

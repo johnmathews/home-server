@@ -83,13 +83,13 @@
 # 7. Handle qBittorrent config prep **before container starts**
 - name: Remove broken qbittorrent config directory (if needed)
   file:
-    path: "{{ media_stack_data_dir }}/qbittorrent"
+    path: "{{ media_stack_config_dir }}/qbittorrent"
     state: absent
   when: reset_qbittorrent_config | default(false)
 
 - name: Re-create qbittorrent config directory
   file:
-    path: "{{ media_stack_data_dir }}/qbittorrent"
+    path: "{{ media_stack_config_dir }}/qbittorrent"
     state: directory
     owner: "{{ media_stack_user }}"
     group: "{{ media_stack_user }}"
@@ -132,34 +132,45 @@
 - name: Pre-seed qBittorrent.conf if missing and not resetting
   ansible.builtin.template:
     src: qBittorrent.conf.j2
-    dest: "{{ media_stack_data_dir }}/qbittorrent/qBittorrent.conf"
+    dest: "{{ media_stack_config_dir }}/qbittorrent/qBittorrent.conf"
     owner: "{{ qbittorrent_uid }}"
     group: "{{ qbittorrent_gid }}"
     mode: '0644'
     force: false  # Do not overwrite if already exists
   when: not reset_qbittorrent_config | default(false)
 
-
 - name: Ensure Radarr config directory has correct UID/GID
   ansible.builtin.file:
-    path: "{{ media_stack_data_dir }}/radarr"
+    path: "{{ media_stack_config_dir }}/radarr"
     state: directory
     recurse: true
     owner: "{{ qbittorrent_uid }}"
     group: "{{ qbittorrent_gid }}"
     mode: '0755'
-
-
-
 
 - name: Ensure Sonarr config directory has correct UID/GID
   ansible.builtin.file:
-    path: "{{ media_stack_data_dir }}/sonarr"
+    path: "{{ media_stack_config_dir }}/sonarr"
     state: directory
     recurse: true
     owner: "{{ qbittorrent_uid }}"
     group: "{{ qbittorrent_gid }}"
     mode: '0755'
+
+- name: Ensure Jackett config directory exists
+  ansible.builtin.file:
+    path: "{{ media_stack_config_dir }}/jackett"
+    state: directory
+    recurse: true
+    owner: "{{ qbittorrent_uid }}"
+    group: "{{ qbittorrent_gid }}"
+    mode: '0755'
+
+- name: Test write to Jackett config path
+  command: docker exec jackett touch /config/ansible-test-write
+  register: jackett_config_test
+  failed_when: jackett_config_test.rc != 0
+  changed_when: false
 
 - name: Check if docker-compose.yml exists
   stat:

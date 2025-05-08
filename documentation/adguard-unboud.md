@@ -4,7 +4,9 @@ The router uses AdGuard as its DNS resolver.
 
 AdGuard uses Unbound to resolve DNS recursively. 
 
-To check-in or check up on the services, ssh into the LXC and then:
+## System check-up
+
+SSH into the LXC and then:
 
 1. Check that unbound is running: `systemctl status unbound`
 

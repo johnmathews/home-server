@@ -27,6 +27,8 @@ services:
     volumes:
       - ${CONFIG_DIR}/qbittorrent:/config
       - ${DOWNLOAD_DIR}/downloads:/downloads
+      - ${MEDIA_DIR}/movies:/movies
+      - ${MEDIA_DIR}/tv:/tv
     restart: unless-stopped
 
   sonarr:
@@ -39,7 +41,8 @@ services:
       - TZ=${TZ}
     volumes:
       - ${CONFIG_DIR}/sonarr:/config
-      - ${DOWNLOAD_DIR}:/downloads
+      - ${DOWNLOAD_DIR}/downloads:/downloads
+      - ${MEDIA_DIR}/movies:/movies
       - ${MEDIA_DIR}/tv:/tv
     ports:
       - "8989:8989"
@@ -55,26 +58,11 @@ services:
       - TZ=${TZ}
     volumes:
       - ${CONFIG_DIR}/radarr:/config
-      - ${DOWNLOAD_DIR}:/downloads
+      - ${DOWNLOAD_DIR}/downloads:/downloads
       - ${MEDIA_DIR}/movies:/movies
+      - ${MEDIA_DIR}/tv:/tv
     ports:
       - "7878:7878"
-    restart: unless-stopped
-
-  bazarr:
-    image: linuxserver/bazarr
-    container_name: bazarr
-    user: "${PUID}:${PGID}"  
-    ports:
-      - "6767:6767"
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-    volumes:
-      - ${CONFIG_DIR}/bazarr:/config
-      - ${MEDIA_DIR}/tv:/tv
-      - ${MEDIA_DIR}/movies:/movies
     restart: unless-stopped
 
   jackett:
@@ -89,7 +77,25 @@ services:
       - TZ=${TZ}
     volumes:
       - ${CONFIG_DIR}/jackett:/config
-      - ${DOWNLOAD_DIR}:/downloads
+      - ${DOWNLOAD_DIR}/downloads:/downloads
+      - ${MEDIA_DIR}/movies:/movies
+      - ${MEDIA_DIR}/tv:/tv
+    restart: unless-stopped
+
+  bazarr:
+    image: linuxserver/bazarr
+    container_name: bazarr
+    user: "${PUID}:${PGID}"  
+    ports:
+      - "6767:6767"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${CONFIG_DIR}/bazarr:/config
+      - ${MEDIA_DIR}/movies:/movies
+      - ${MEDIA_DIR}/tv:/tv
     restart: unless-stopped
 
   watchtower:
@@ -108,4 +114,7 @@ services:
     volumes:
       - ${MEDIA_DIR}:/srv
       - ${CONFIG_DIR}/filebrowser:/config
+      - ${DOWNLOAD_DIR}/downloads:/downloads
+      - ${MEDIA_DIR}/movies:/movies
+      - ${MEDIA_DIR}/tv:/tv
     restart: unless-stopped
