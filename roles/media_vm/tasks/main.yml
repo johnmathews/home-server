@@ -186,14 +186,14 @@
   stat:
     path: "{{ item }}"
   loop:
-    - "{{ media_stack_mount_dir }}/downloads"
+    - "{{ media_stack_mount_dir }}/library/downloads"
     - "{{ media_stack_mount_dir }}/library/tv"
     - "{{ media_stack_mount_dir }}/library/movies"
   register: mounted_dirs
 
 - name: Fail if any mounted media paths are missing
   fail:
-    msg: "Missing required SMB mount: {{ item.stat.path }}"
+    msg: "Missing required SMB mount: {{ item.item }}"
   when: not item.stat.exists
   loop: "{{ mounted_dirs.results }}"
 

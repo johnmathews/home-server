@@ -30,9 +30,13 @@ services:
       - WEBUI_USERNAME=${QBITTORRENT_USERNAME}
       - WEBUI_PASSWORD=${QBITTORRENT_PASSWORD}
     volumes:
+      # /srv/media/config 
       - ${CONFIG_DIR}/qbittorrent:/config
+      # /mnt/media/library/downloads 
       - ${DOWNLOAD_DIR}:/downloads
+      # /mnt/media/library
       - ${MEDIA_DIR}:/media
+
     restart: unless-stopped
 
   sonarr:

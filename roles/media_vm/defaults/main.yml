@@ -4,13 +4,13 @@
 
 # Changing this will require you to `cd /src/media && docker compose logs qbittorrent` 
 # to get the new temp password. Then in qBittorrent set the old password again
-reset_qbittorrent_config: false
+reset_qbittorrent_config: true
 
-PUID: 3002
-PGID: 3002
+PUID: 1000
+PGID: 1000
 
-qbittorrent_uid: 3002
-qbittorrent_gid: 3002
+qbittorrent_uid: 1000
+qbittorrent_gid: 1000
 
 qbittorrent_password_hash: 16c5e9c9b842bd6bf78aafa66643304e0cfe2586
 
@@ -27,6 +27,7 @@ proxmox_api_host: "{{ hostvars['pve']['ansible_host'] }}"
 media_stack_user: john
 media_stack_group: media
 media_stack_mount_dir: /mnt/media
+media_stack_base_dir: /srv/media
 media_stack_config_dir: /srv/media/config
 
 media_stack_services:
@@ -56,9 +57,11 @@ media_stack_users:
 smb_server: 192.168.2.104
 smb_media_vm_username: media_vm
 smb_shares:
-  - name: tv
-    target: /mnt/media/library/tv
-  - name: movies
-    target: /mnt/media/library/movies
-  - name: downloads
-    target: /mnt/media/downloads
+  - name: library 
+    target: /mnt/media/library
+  # - name: downloads
+  #   target: /mnt/media/library/downloads
+  # - name: movies
+  #   target: /mnt/media/library/movies
+  # - name: tv
+  #   target: /mnt/media/library/tv

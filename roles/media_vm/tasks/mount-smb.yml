@@ -29,6 +29,7 @@
     state: present
   loop: "{{ smb_shares }}"
 
+  # src corresponds to a name in the trueNAS SMB shares menu.
 - name: Mount all SMB shares
   mount:
     path: "/mnt/media/{{ item.name }}"
