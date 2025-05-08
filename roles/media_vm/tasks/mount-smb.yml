@@ -1,18 +1,18 @@
-# File: roles/media_vm/tasks/mount-smb.yml
+# roles/media_vm/tasks/mount-smb.yml
 
 ---
 
-- name: Ensure mount targets exist
-  ansible.builtin.file:
-    path: "{{ item.target }}"
+- name: Create mount points for SMB shares
+  file:
+    path: "/mnt/media/{{ item.name }}"
     state: directory
-    owner: john
-    group: john
+    owner: root
+    group: root
     mode: '0755'
   loop: "{{ smb_shares }}"
 
 - name: Create SMB credentials file
-  ansible.builtin.copy:
+  copy:
     dest: /etc/smb-media-credentials
     content: |
       username={{ smb_media_vm_username }}
@@ -21,20 +21,19 @@
     group: root
     mode: '0600'
 
-- name: Ensure fstab entries exist
-  ansible.builtin.lineinfile:
+- name: Ensure /etc/fstab entries for SMB shares
+  lineinfile:
     path: /etc/fstab
-    line: "//{{ smb_server }}/{{ item.name }} {{ item.target }} cifs credentials=/etc/smb-media-credentials,vers=3.0,uid=3002,gid=3002 0 0"
-    state: present
+    line: "//{{ smb_server }}/{{ item.name }} /mnt/media/{{ item.name }} cifs credentials=/etc/smb-media-credentials,vers=3.0,uid=3002,gid=3002,file_mode=0664,dir_mode=0775 0 0"
     create: yes
+    state: present
   loop: "{{ smb_shares }}"
 
 - name: Mount all SMB shares
-  ansible.builtin.mount:
-    path: "{{ item.target }}"
+  mount:
+    path: "/mnt/media/{{ item.name }}"
     src: "//{{ smb_server }}/{{ item.name }}"
     fstype: cifs
-    opts: credentials=/etc/smb-media-credentials,vers=3.0,uid=3002,gid=3002
+    opts: credentials=/etc/smb-media-credentials,vers=3.0,uid=3002,gid=3002,file_mode=0664,dir_mode=0775
     state: mounted
   loop: "{{ smb_shares }}"
-

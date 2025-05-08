@@ -1,3 +1,7 @@
+# docker-compose.yml (abstracted variables + host-mounted SMB shares)
+
+---
+
 services:
   jellyfin:
     image: jellyfin/jellyfin
@@ -13,7 +17,6 @@ services:
   qbittorrent:
     image: linuxserver/qbittorrent
     container_name: qbittorrent
-    # user: "${PUID}:${PGID}"  
     security_opt:
       - no-new-privileges:true
     ports:
@@ -67,7 +70,7 @@ services:
   jackett:
     image: linuxserver/jackett
     container_name: jackett
-    user: "${PUID}:${PGID}"  
+    user: "${PUID}:${PGID}"
     ports:
       - "9117:9117"
     environment:
@@ -83,7 +86,7 @@ services:
   bazarr:
     image: linuxserver/bazarr
     container_name: bazarr
-    user: "${PUID}:${PGID}"  
+    user: "${PUID}:${PGID}"
     ports:
       - "6767:6767"
     environment:
