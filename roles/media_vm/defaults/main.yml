@@ -4,7 +4,7 @@
 
 # Changing this will require you to `cd /src/media && docker compose logs qbittorrent` 
 # to get the new temp password. Then in qBittorrent set the old password again
-reset_qbittorrent_config: true
+reset_qbittorrent_config: false
 
 
 TZ: Europe/Amsterdam
