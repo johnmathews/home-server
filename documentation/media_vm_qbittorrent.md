@@ -4,19 +4,12 @@
 
 ### Logging in
 
-Auth is awkward for this.
+Auth will work as long as you dont change the password or user. User should be
+`admin`. The template config file contains the correct hash for the current
+password. The template config file is a copy of a working config file.
 
-The default username is `admin`.
-
-It will probably generate its own password the first time. `ssh` into the media
-vm and `docker compose logs qbittorrent`. The logs will contain the temporary
-password.
-
-There are some tasks and a template to try to fix this but it doesn't work, yet.
-
-For now, if you need to, you can run:
-`docker logs qbittorrent 2>&1 | grep -i password`
-
+If auth breaks, you can `ssh` into the media vm and
+`docker compose logs qbittorrent`. The logs will contain the temporary password.
 
 ### SMB shares
 
@@ -28,4 +21,3 @@ relevant datasets.
 `PUID` and `GUID` are set as variables in `roles/media_vm/defaults/main.yml` and
 must match the user id in TrueNAS of a user that has access to the relevant
 datasets.
-

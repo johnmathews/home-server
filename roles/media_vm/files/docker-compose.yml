@@ -7,6 +7,10 @@ services:
     image: jellyfin/jellyfin
     container_name: jellyfin
     network_mode: bridge
+    user: "${PUID}:${PGID}"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
     ports:
       - "8096:8096"
     volumes:
@@ -31,7 +35,7 @@ services:
       - WEBUI_PASSWORD=${QBITTORRENT_PASSWORD}
     volumes:
       # /srv/media/config 
-      - ${CONFIG_DIR}/qbittorrent:/config
+      - ${CONFIG_DIR}:/config
       # /mnt/media/library/downloads 
       - ${DOWNLOAD_DIR}:/downloads
       # /mnt/media/library
@@ -74,9 +78,9 @@ services:
   jackett:
     image: linuxserver/jackett
     container_name: jackett
-    user: "${PUID}:${PGID}"
     ports:
       - "9117:9117"
+    user: "${PUID}:${PGID}"
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -90,9 +94,9 @@ services:
   bazarr:
     image: linuxserver/bazarr
     container_name: bazarr
-    user: "${PUID}:${PGID}"
     ports:
       - "6767:6767"
+    user: "${PUID}:${PGID}"
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -109,12 +113,18 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     command: --cleanup --interval 86400
     restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
 
   filebrowser:
     image: filebrowser/filebrowser
     container_name: filebrowser
     ports:
       - "8081:80"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
     volumes:
       - ${CONFIG_DIR}/filebrowser:/config
       - ${DOWNLOAD_DIR}:/downloads

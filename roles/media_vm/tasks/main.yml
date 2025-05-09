@@ -58,52 +58,48 @@
     mode: '0755'
 
 # 6. Apply base directory ownership early
-- name: Ensure required media directories exist
+- name: Ensure required directories exist with correct ownership
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
+    recurse: true
+    owner: "{{ media_stack_user }}"
+    group: "{{ media_stack_group }}"
     mode: '0755'
   loop:
     - "{{ media_stack_config_dir }}"
-    - "{{ media_stack_mount_dir }}/downloads"
     - "{{ media_stack_mount_dir }}/library"
+    - "{{ media_stack_config_dir | dirname }}"
 
-- name: Set ownership of all media paths to john
-  ansible.builtin.file:
+- name: Set ownership of config and mount dirs
+  file:
     path: "{{ item }}"
     recurse: true
-    owner: john
-    group: john
+    owner: "{{ media_stack_user }}"
+    group: "{{ media_stack_group }}"
   loop:
-    - "{{ media_stack_config_dir | dirname }}"
-    - "{{ media_stack_config_dir }}"
-    - "{{ media_stack_mount_dir }}/downloads"
-    - "{{ media_stack_mount_dir }}/library"
+    - /srv/media/config
+    - /mnt/media/library
 
-# 7. Handle qBittorrent config prep **before container starts**
-- name: Remove broken qbittorrent config directory (if needed)
-  file:
-    path: "{{ media_stack_config_dir }}/qbittorrent"
-    state: absent
-  when: reset_qbittorrent_config | default(false)
-
+# 7. Handle qBittorrent config prep before container starts
 - name: Re-create qbittorrent config directory
   file:
-    path: "{{ media_stack_config_dir }}/qbittorrent"
+    path: "{{ media_stack_config_dir }}/qBittorrent"
     state: directory
     owner: "{{ media_stack_user }}"
     group: "{{ media_stack_user }}"
     mode: '0755'
+  when: reset_qbittorrent_config | default(false)
 
-# 8. Fix permissions specifically for UID 3002 (container user)
-- name: Ensure qbittorrent config path has correct ownership
-  ansible.builtin.file:
-    path: /srv/media/config/qbittorrent
-    state: directory
-    recurse: yes
+- name: Pre-seed qBittorrent.conf if missing and not resetting
+  ansible.builtin.template:
+    src: qBittorrent.conf.j2
+    dest: "{{ media_stack_config_dir }}/qBittorrent/qBittorrent.conf"
     owner: "{{ qbittorrent_uid }}"
     group: "{{ qbittorrent_gid }}"
-    mode: "0755"
+    mode: '0644'
+    force: false  # Do not overwrite if already exists
+  when: reset_qbittorrent_config | default(false)
 
 # 9. Copy environment and compose files
 - name: Copy docker-compose.yml
@@ -123,21 +119,11 @@
 - name: Ensure .env and docker-compose.yml are owned by "john"
   ansible.builtin.file:
     path: "{{ item }}"
-    owner: john
-    group: john
+    owner: "{{ media_stack_user }}"
+    group: "{{ media_stack_user }}"
   loop:
     - /srv/media/.env
     - /srv/media/docker-compose.yml
-
-- name: Pre-seed qBittorrent.conf if missing and not resetting
-  ansible.builtin.template:
-    src: qBittorrent.conf.j2
-    dest: "{{ media_stack_config_dir }}/qbittorrent/qBittorrent.conf"
-    owner: "{{ qbittorrent_uid }}"
-    group: "{{ qbittorrent_gid }}"
-    mode: '0644'
-    force: false  # Do not overwrite if already exists
-  when: not reset_qbittorrent_config | default(false)
 
 - name: Ensure Radarr config directory has correct UID/GID
   ansible.builtin.file:
@@ -165,13 +151,6 @@
     owner: "{{ qbittorrent_uid }}"
     group: "{{ qbittorrent_gid }}"
     mode: '0755'
-
-- name: Test write to Jackett config path
-  command: docker exec jackett touch /config/ansible-test-write
-  register: jackett_config_test
-  failed_when: jackett_config_test.rc != 0
-  changed_when: false
-
 - name: Check if docker-compose.yml exists
   stat:
     path: /srv/media/docker-compose.yml
@@ -204,105 +183,3 @@
     state: present
     recreate: auto
   become: false
-
-# 12. Health checks
-- name: Test write access for download path
-  ansible.builtin.command: test -w /srv/media/downloads
-  register: download_write_test
-  failed_when: download_write_test.rc != 0
-  changed_when: false
-
-- name: Test file write inside qbittorrent container
-  ansible.builtin.command: docker exec qbittorrent touch /downloads/ansible-test-write
-  register: qbittorrent_write_test
-  failed_when: qbittorrent_write_test.rc != 0
-  changed_when: false
-
-- name: Check if qBittorrent config file exists inside container
-  command: docker exec qbittorrent test -f /config/qBittorrent/qBittorrent.conf
-  register: qbittorrent_config_exists
-  ignore_errors: true
-  changed_when: false
-
-- name: Sanity check qbittorrent WebUI config inside container
-  command: docker exec qbittorrent grep -q "^WebUI\\\\Username={{ media_stack_users.qbittorrent.username }}" /config/qBittorrent/qBittorrent.conf
-  register: qb_sanity_check
-  failed_when: qb_sanity_check.rc != 0 and qb_sanity_check.rc != 1
-  changed_when: false
-  when:
-    - not reset_qbittorrent_config
-    - qbittorrent_config_exists.rc == 0
-
-- name: Debug qBittorrent config file presence
-  debug:
-    msg: "qBittorrent config present? {{ qbittorrent_config_exists.stat.exists | default(false) }}"
-
-
-- name: Test write to Sonarr config path
-  command: docker exec sonarr touch /config/ansible-test-write
-  register: sonarr_config_test
-  failed_when: sonarr_config_test.rc != 0
-  changed_when: false
-
-- name: Confirm Sonarr is running
-  shell: >
-    {% raw %}docker ps --filter name=sonarr --filter status=running --format '{{.Names}}'{% endraw %}
-  register: sonarr_running
-  failed_when: "'sonarr' not in sonarr_running.stdout"
-  changed_when: false
-
-
-
-
-- name: Test write to Radarr config path
-  command: docker exec radarr touch /config/ansible-test-write
-  register: radarr_config_test
-  failed_when: radarr_config_test.rc != 0
-  changed_when: false
-
-- name: Confirm Radarr is running
-  shell: >
-    {% raw %}docker ps --filter name=radarr --filter status=running --format '{{.Names}}'{% endraw %}
-  register: radarr_running
-  failed_when: "'radarr' not in radarr_running.stdout"
-  changed_when: false
-
-- name: Check shared volume mounts in media containers
-  shell: |
-    docker exec {{ item }} test -w /downloads && echo "/downloads: OK" || echo "/downloads: MISSING or not writable"
-    docker exec {{ item }} test -w /media && echo "/media: OK" || echo "/media: MISSING or not writable"
-  with_items:
-    - radarr
-    - sonarr
-    - qbittorrent
-    - jackett
-    - bazarr
-    - filebrowser
-  register: mount_check_results
-
-- name: Show mount check results
-  debug:
-    msg: "{{ item.stdout_lines }}"
-  loop: "{{ mount_check_results.results }}"
-
-
-
-
-# 13. Debug and status reporting
-- name: List running Docker containers
-  shell: docker ps
-  register: docker_ps_output
-  become: true
-
-- name: Show container list
-  debug:
-    var: docker_ps_output.stdout_lines
-
-- name: Show connection details
-  debug:
-    msg: |
-      Configuration complete!
-      ----------------------------------
-      Host: {{ ansible_host }}
-      User: {{ ansible_user }}
-      Docker group user: {{ ciuser | default('Not defined') }}
