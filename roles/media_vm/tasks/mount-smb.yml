@@ -24,7 +24,8 @@
 - name: Ensure /etc/fstab entries for SMB shares
   lineinfile:
     path: /etc/fstab
-    line: "//{{ smb_server }}/{{ item.name }} /mnt/media/{{ item.name }} cifs credentials=/etc/smb-media-credentials,vers=3.0,uid=3002,gid=3002,file_mode=0664,dir_mode=0775 0 0"
+    # line: "//{{ smb_server }}/{{ item.name }} /mnt/media/{{ item.name }} cifs credentials=/etc/smb-media-credentials,vers=3.0,uid=3002,gid=3002,file_mode=0664,dir_mode=0775 0 0"
+    line: "//{{ smb_server }}/{{ item.name }} /mnt/media/{{ item.name }} cifs credentials=/etc/smb-media-credentials,vers=3.0,uid={{ qbittorrent_uid }},gid={{ qbittorrent_gid }},file_mode=0664,dir_mode=0775 0 0"
     create: yes
     state: present
   loop: "{{ smb_shares }}"
@@ -35,6 +36,7 @@
     path: "/mnt/media/{{ item.name }}"
     src: "//{{ smb_server }}/{{ item.name }}"
     fstype: cifs
-    opts: credentials=/etc/smb-media-credentials,vers=3.0,uid=3002,gid=3002,file_mode=0664,dir_mode=0775
+    # opts: credentials=/etc/smb-media-credentials,vers=3.0,uid=3002,gid=3002,file_mode=0664,dir_mode=0775
+    opts: credentials=/etc/smb-media-credentials,vers=3.0,uid={{ qbittorrent_uid }},gid={{ qbittorrent_gid }},file_mode=0664,dir_mode=0775
     state: mounted
   loop: "{{ smb_shares }}"

@@ -4,7 +4,7 @@
 
 services:
   jellyfin:
-    image: jellyfin/jellyfin
+    image: jellyfin/jellyfin:latest
     container_name: jellyfin
     network_mode: bridge
     user: "${PUID}:${PGID}"
@@ -16,6 +16,8 @@ services:
     volumes:
       - ${CONFIG_DIR}/jellyfin:/config
       - ${MEDIA_DIR}:/media
+      - ${DOWNLOAD_DIR}:/downloads
+      - ${CONFIG_DIR}/jellyfin/cache:/cache
     restart: unless-stopped
 
   qbittorrent:
