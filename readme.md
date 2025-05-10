@@ -419,7 +419,7 @@ make clean              # Remove retry/log files
 
 ## iGPU setup
 
-It doesnt load the driver automatically at the moment.
+Proxmox doesn't load the driver automatically at the moment.
 
 These steps _should_ make the driver load automatically, but it doesn't:
 - edit the GRUB file at `/etc/default/grub` so that there is a line like this: 
@@ -451,7 +451,7 @@ To load the driver for the iGPU:
 
     modprobe amdgpu
 
-The solution:
+### The solution:
 
 Create a systemd unit that runs `modprobe amdgpu` after the system has finished booting:
 
