@@ -32,6 +32,66 @@ here.
 The motherboard uses the Redfish API. You can use it to change fan profiles, but
 not to set fan RPM directly.
 
+## iGPU setup
+
+Proxmox doesn't load the driver automatically at the moment.
+
+These steps _should_ make the driver load automatically, but it doesn't:
+- edit the GRUB file at `/etc/default/grub` so that there is a line like this: 
+
+       GRUB_CMDLINE_LINUX_DEFAULT="quiet amd_iommu=on iommu=pt amdgpu.force_init=1 video=efifb:off modprobe.blacklist=ast,simpledrm"
+
+- Then run these commands, or check that the files have this state:
+
+       echo "blacklist ast" > /etc/modprobe.d/blacklist-ast.conf
+       echo "amdgpu" > /etc/modules-load.d/amdgpu.conf
+       echo "options amdgpu force_probe=1636" > /etc/modprobe.d/amdgpu.conf
+       echo "amdgpu" >> /etc/initramfs-tools/modules
+       update-initramfs -u
+       update-grub
+       proxmox-boot-tool refresh
+
+Then reboot: 
+
+    reboot
+
+However, after rebooting, if you run this command, you can see that the iGPU is recognised but a driver is not loaded:
+
+    lzs /dev/dri && printf "\n\n" &&  \
+    lspci -k -nn -d 1002: && printf "\n\n" && \
+    vainfo && printf "\n\n" && \
+    ls -l /boot/initrd.img-$(uname -r) 
+
+To load the driver for the iGPU:
+
+    modprobe amdgpu
+
+### The solution:
+
+Create a systemd unit that runs `modprobe amdgpu` after the system has finished booting:
+
+Create `/etc/systemd/system/load-amdgpu.service` with this content:
+
+```
+[Unit]
+Description=Force load AMDGPU kernel module
+After=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/sbin/modprobe amdgpu
+
+[Install]
+WantedBy=multi-user.target
+``` 
+
+```
+systemctl daemon-reexec
+
+systemctl daemon-reload
+systemctl enable load-amdgpu.service
+```
+
 ## Setup
 
 1.  Install Proxmox from USB
@@ -416,63 +476,3 @@ make ci                 # Run lint + check for validation
 make clean              # Remove retry/log files
 ```
 
-
-## iGPU setup
-
-Proxmox doesn't load the driver automatically at the moment.
-
-These steps _should_ make the driver load automatically, but it doesn't:
-- edit the GRUB file at `/etc/default/grub` so that there is a line like this: 
-
-       GRUB_CMDLINE_LINUX_DEFAULT="quiet amd_iommu=on iommu=pt amdgpu.force_init=1 video=efifb:off modprobe.blacklist=ast,simpledrm"
-
-- Then run these commands, or check that the files have this state:
-
-       echo "blacklist ast" > /etc/modprobe.d/blacklist-ast.conf
-       echo "amdgpu" > /etc/modules-load.d/amdgpu.conf
-       echo "options amdgpu force_probe=1636" > /etc/modprobe.d/amdgpu.conf
-       echo "amdgpu" >> /etc/initramfs-tools/modules
-       update-initramfs -u
-       update-grub
-       proxmox-boot-tool refresh
-
-Then reboot: 
-
-    reboot
-
-However, after rebooting, if you run this command, you can see that the iGPU is recognised but a driver is not loaded:
-
-    lzs /dev/dri && printf "\n\n" &&  \
-    lspci -k -nn -d 1002: && printf "\n\n" && \
-    vainfo && printf "\n\n" && \
-    ls -l /boot/initrd.img-$(uname -r) 
-
-To load the driver for the iGPU:
-
-    modprobe amdgpu
-
-### The solution:
-
-Create a systemd unit that runs `modprobe amdgpu` after the system has finished booting:
-
-Create `/etc/systemd/system/load-amdgpu.service` with this content:
-
-```
-[Unit]
-Description=Force load AMDGPU kernel module
-After=multi-user.target
-
-[Service]
-Type=oneshot
-ExecStart=/sbin/modprobe amdgpu
-
-[Install]
-WantedBy=multi-user.target
-``` 
-
-```
-systemctl daemon-reexec
-
-systemctl daemon-reload
-systemctl enable load-amdgpu.service
-```
