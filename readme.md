@@ -18,13 +18,6 @@
 This project is about setting up my home server. It contains the commands and
 Ansible playbooks used to provision a home server based on Proxmox.
 
-To load the driver for the iGPU, `ssh pve` and: Default driver state:
-  - `echo "" && echo "BEFORE"  && ls /dev/dri && echo "" &&  lspci -k -nn -d 1002: && echo "vainfo:" && vainfo`
-
-To load the driver for the iGPU:
-  - `modprobe amdgpu`
-  - `echo "" && echo "AFTER" && dmesg | grep drm && echo "" && modprobe amdgpu  && ls /dev/dri && echo "" && echo "" && vainfo &&  lspci -k -nn -d 1002: && lsmod | grep amdgpu `
-
 [Proxmox helper scripts](https://community-scripts.github.io/ProxmoxVE/) are
 used.
 
@@ -422,5 +415,35 @@ make lint               # Lint all playbooks and roles
 make ci                 # Run lint + check for validation
 make clean              # Remove retry/log files
 ```
+
+
+## iGPU setup
+
+It doesnt load the driver automatically at the moment.
+
+These steps _should_ make the driver load automatically, but it doesn't:
+- edit the GRUB file at `/etc/default/grub`: 
+   - `GRUB_CMDLINE_LINUX_DEFAULT="quiet amd_iommu=on iommu=pt amdgpu.force_init=1 video=efifb:off modprobe.blacklist=ast,simpledrm"`
+
+- `echo "amdgpu" > /etc/modules-load.d/amdgpu.conf`
+- `echo "options amdgpu force_probe=1636" > /etc/modprobe.d/amdgpu.conf`
+- `echo "amdgpu force_probe=1636" > /etc/modprobe.d/amdgpu.conf`
+- `echo "options amdgpu force_probe=1636" > /etc/modprobe.d/amdgpu-force.conf`
+
+- `echo "blacklist ast" > /etc/modprobe.d/blacklist-ast.conf`
+- `update-initramfs -u`
+- `update-grub`
+- `proxmox-boot-tool refresh`
+- then reboot
+
+However, after rebooting, if you run this command, you can see that afer rebooting, the iGPU is recognised but a driver is not loaded:
+  - `echo "" && echo "BEFORE"  && ls /dev/dri && echo "" &&  lspci -k -nn -d 1002: && echo "vainfo:" && vainfo`
+
+To load the driver for the iGPU:
+  - `modprobe amdgpu`
+
+Then to see that a driver is associated with the iGPU run:
+  - `echo "" && echo "AFTER" && dmesg | grep drm && echo "" && modprobe amdgpu  && ls /dev/dri && echo "" && echo "" && vainfo &&  lspci -k -nn -d 1002: && lsmod | grep amdgpu `
+
 
 --
