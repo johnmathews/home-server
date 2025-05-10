@@ -442,13 +442,16 @@ Then reboot:
        reboot
 
 However, after rebooting, if you run this command, you can see that afer rebooting, the iGPU is recognised but a driver is not loaded:
-  - `echo "" && echo "BEFORE"  && ls /dev/dri && echo "" &&  lspci -k -nn -d 1002: && echo "vainfo:" && vainfo`
+
+       echo "" && echo "BEFORE"  && ls /dev/dri && echo "" &&  lspci -k -nn -d 1002: && echo "vainfo:" && vainfo
 
 To load the driver for the iGPU:
-  - `modprobe amdgpu`
+
+       modprobe amdgpu
 
 Then to see that a driver is associated with the iGPU run:
-  - `echo "" && echo "AFTER" && dmesg | grep drm && echo "" && modprobe amdgpu  && ls /dev/dri && echo "" && echo "" && vainfo &&  lspci -k -nn -d 1002: && lsmod | grep amdgpu `
+
+       echo "" && echo "AFTER" && dmesg | grep drm && echo "" && modprobe amdgpu  && ls /dev/dri && echo "" && echo "" && vainfo &&  lspci -k -nn -d 1002: && lsmod | grep amdgpu
 
 
 --
