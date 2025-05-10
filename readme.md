@@ -1,19 +1,14 @@
 # Home Server Provisioning with Ansible
 
-1.  [Setup](#setup)
-2.  [Proxmox Backup Server (PBS)](<#proxmox-backup-server-(pbs)>)
-3.  [Ansible Steps](#ansible-steps)
-4.  [Tuning and maintenance:](#tuning-and-maintenance:)
-5.  [🛠 Tooling](#🛠-tooling)
-6.  [Colors and themes](#colors-and-themes)
-    - [Makefile Targets](#makefile-targets)
-7.  [🧭 VM & Container Provisioning Workflow](#🧭-vm-&-container-provisioning-workflow)
-8.  [🎯 Objectives, Priorities & Tradeoffs](#🎯-objectives,-priorities-&-tradeoffs)
-    - [Main Goals](#main-goals)
-    - [Priorities](#priorities)
-    - [Tradeoffs](#tradeoffs)
-9.  [🌐 Networking Overview](#🌐-networking-overview)
-10. [🗂 Project Structure](#🗂-project-structure)
+
+1. [iGPU setup](#igpu-setup)
+   * [The solution:](#the-solution:)
+2. [Setup](#setup)
+3. [Proxmox Backup Server (PBS)](#proxmox-backup-server-(pbs))
+4. [Ansible Steps](#ansible-steps)
+5. [Colors and themes](#colors-and-themes)
+6. [Tuning and maintenance:](#tuning-and-maintenance:)
+   * [Makefile Targets](#makefile-targets)
 
 This project is about setting up my home server. It contains the commands and
 Ansible playbooks used to provision a home server based on Proxmox.
