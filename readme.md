@@ -451,7 +451,7 @@ To load the driver for the iGPU:
 
 Then to see that a driver is associated with the iGPU run:
 
-       echo "" && echo "AFTER" && dmesg | grep drm && echo "" && modprobe amdgpu  && ls /dev/dri && echo "" && echo "" && vainfo &&  lspci -k -nn -d 1002: && lsmod | grep amdgpu
+       echo "" && echo "AFTER" && dmesg | grep drm && echo ""  && ls /dev/dri && echo "" && echo "" && vainfo &&  lspci -k -nn -d 1002: && lsmod | grep amdgpu
 
 
 --
