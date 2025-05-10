@@ -428,11 +428,9 @@ These steps _should_ make the driver load automatically, but it doesn't:
 
 - Then run these commands, or check that the files have this state:
 
+       echo "blacklist ast" > /etc/modprobe.d/blacklist-ast.conf
        echo "amdgpu" > /etc/modules-load.d/amdgpu.conf
        echo "options amdgpu force_probe=1636" > /etc/modprobe.d/amdgpu.conf
-       echo "amdgpu force_probe=1636" > /etc/modprobe.d/amdgpu.conf
-       echo "options amdgpu force_probe=1636" > /etc/modprobe.d/amdgpu-force.conf
-       echo "blacklist ast" > /etc/modprobe.d/blacklist-ast.conf
        update-initramfs -u
        update-grub
        proxmox-boot-tool refresh
