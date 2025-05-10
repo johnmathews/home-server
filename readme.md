@@ -422,19 +422,21 @@ make clean              # Remove retry/log files
 It doesnt load the driver automatically at the moment.
 
 These steps _should_ make the driver load automatically, but it doesn't:
-- edit the GRUB file at `/etc/default/grub`: 
+- edit the GRUB file at `/etc/default/grub` so that there is a line like this: 
    - `GRUB_CMDLINE_LINUX_DEFAULT="quiet amd_iommu=on iommu=pt amdgpu.force_init=1 video=efifb:off modprobe.blacklist=ast,simpledrm"`
 
-- `echo "amdgpu" > /etc/modules-load.d/amdgpu.conf`
-- `echo "options amdgpu force_probe=1636" > /etc/modprobe.d/amdgpu.conf`
-- `echo "amdgpu force_probe=1636" > /etc/modprobe.d/amdgpu.conf`
-- `echo "options amdgpu force_probe=1636" > /etc/modprobe.d/amdgpu-force.conf`
+- Then run these commands, or check that the files have this state:
 
-- `echo "blacklist ast" > /etc/modprobe.d/blacklist-ast.conf`
-- `update-initramfs -u`
-- `update-grub`
-- `proxmox-boot-tool refresh`
-- then reboot
+   `echo "amdgpu" > /etc/modules-load.d/amdgpu.conf`
+   `echo "options amdgpu force_probe=1636" > /etc/modprobe.d/amdgpu.conf`
+   `echo "amdgpu force_probe=1636" > /etc/modprobe.d/amdgpu.conf`
+   `echo "options amdgpu force_probe=1636" > /etc/modprobe.d/amdgpu-force.conf`
+   `echo "blacklist ast" > /etc/modprobe.d/blacklist-ast.conf`
+   `update-initramfs -u`
+   `update-grub`
+   `proxmox-boot-tool refresh`
+
+- Then reboot: `reboot`
 
 However, after rebooting, if you run this command, you can see that afer rebooting, the iGPU is recognised but a driver is not loaded:
   - `echo "" && echo "BEFORE"  && ls /dev/dri && echo "" &&  lspci -k -nn -d 1002: && echo "vainfo:" && vainfo`
