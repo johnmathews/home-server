@@ -450,3 +450,29 @@ However, after rebooting, if you run this command, you can see that the iGPU is 
 To load the driver for the iGPU:
 
     modprobe amdgpu
+
+The solution:
+
+Create a systemd unit that runs `modprobe amdgpu` after the system has finished booting:
+
+Create `/etc/systemd/system/load-amdgpu.service` with this content:
+
+```
+[Unit]
+Description=Force load AMDGPU kernel module
+After=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/sbin/modprobe amdgpu
+
+[Install]
+WantedBy=multi-user.target
+``` 
+
+```
+systemctl daemon-reexec
+
+systemctl daemon-reload
+systemctl enable load-amdgpu.service
+```
