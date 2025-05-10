@@ -427,7 +427,6 @@ These steps _should_ make the driver load automatically, but it doesn't:
 
 - Then run these commands, or check that the files have this state:
 
-       ```
        echo "amdgpu" > /etc/modules-load.d/amdgpu.conf
        echo "options amdgpu force_probe=1636" > /etc/modprobe.d/amdgpu.conf
        echo "amdgpu force_probe=1636" > /etc/modprobe.d/amdgpu.conf
@@ -436,9 +435,8 @@ These steps _should_ make the driver load automatically, but it doesn't:
        update-initramfs -u
        update-grub
        proxmox-boot-tool refresh
-       ```
 
-- Then reboot: `reboot`
+ Then reboot: `reboot`
 
 However, after rebooting, if you run this command, you can see that afer rebooting, the iGPU is recognised but a driver is not loaded:
   - `echo "" && echo "BEFORE"  && ls /dev/dri && echo "" &&  lspci -k -nn -d 1002: && echo "vainfo:" && vainfo`
