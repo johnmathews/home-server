@@ -424,13 +424,13 @@ It doesnt load the driver automatically at the moment.
 These steps _should_ make the driver load automatically, but it doesn't:
 - edit the GRUB file at `/etc/default/grub` so that there is a line like this: 
 
-       GRUB_CMDLINE_LINUX_DEFAULT="quiet amd_iommu=on iommu=pt amdgpu.force_init=1 video=efifb:off modprobe.blacklist=ast,simpledrm"
+       GRUB_CMDLINE_LINUX_DEFAULT="quiet amd_iommu=on iommu=pt"
 
 - Then run these commands, or check that the files have this state:
 
        echo "blacklist ast" > /etc/modprobe.d/blacklist-ast.conf
        echo "amdgpu" > /etc/modules-load.d/amdgpu.conf
-       echo "options amdgpu force_probe=1636" > /etc/modprobe.d/amdgpu.conf
+       echo "amdgpu" >> /etc/initramfs-tools/modules
        update-initramfs -u
        update-grub
        proxmox-boot-tool refresh
@@ -443,10 +443,18 @@ However, after rebooting, if you run this command, you can see that the iGPU is 
 
     ls /dev/dri && printf "\n\n" &&  \
     lspci -k -nn -d 1002: && printf "\n\n" && \
-    vainfo
+    vainfo && printf "\n\n" && \
+    ls -l /boot/initrd.img-$(uname -r) 
 
 To load the driver for the iGPU:
 
     modprobe amdgpu
 
+os kernel thing:
+6.8.12.9-pve
+
+old versions:
+
+GRUB_CMDLINE_LINUX_DEFAULT="quiet amd_iommu=on iommu=pt amdgpu.force_init=1 video=efifb:off modprobe.blacklist=ast,simpledrm"
+echo "options amdgpu force_probe=1636" > /etc/modprobe.d/amdgpu.conf
 -
