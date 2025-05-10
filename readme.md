@@ -18,6 +18,13 @@
 This project is about setting up my home server. It contains the commands and
 Ansible playbooks used to provision a home server based on Proxmox.
 
+To load the driver for the iGPU, `ssh pve` and: Default driver state:
+  - `echo "" && echo "BEFORE"  && ls /dev/dri && echo "" &&  lspci -k -nn -d 1002: && echo "vainfo:" && vainfo`
+
+To load the driver for the iGPU:
+  - `modprobe amdgpu`
+  - `echo "" && echo "AFTER" && dmesg | grep drm && echo "" && modprobe amdgpu  && ls /dev/dri && echo "" && echo "" && vainfo &&  lspci -k -nn -d 1002: && lsmod | grep amdgpu `
+
 [Proxmox helper scripts](https://community-scripts.github.io/ProxmoxVE/) are
 used.
 
@@ -275,12 +282,12 @@ not to set fan RPM directly.
 12. Media VM setup - run `make media`.
 
 **You will need to set up TrueNAS before running this playbook.** This is
-because media_vm needs to mount some datasets as SMB shares, and the SMB
-shares must exist in order to be able to connect to them
+because media_vm needs to mount some datasets as SMB shares, and the SMB shares
+must exist in order to be able to connect to them
 
- Infra VM - Setup using
-    [Ubuntu 22.04 VM](https://community-scripts.github.io/ProxmoxVE/scripts?id=ubuntu2204-vm)
-    script. This VM will host the monitoring and dashboard applications.
+Infra VM - Setup using
+[Ubuntu 22.04 VM](https://community-scripts.github.io/ProxmoxVE/scripts?id=ubuntu2204-vm)
+script. This VM will host the monitoring and dashboard applications.
 
     Reserved IP: `192.168.2.105`
 

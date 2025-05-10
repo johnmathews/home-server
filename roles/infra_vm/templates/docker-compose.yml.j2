@@ -1,14 +1,15 @@
 # vim: ft=yaml
+# infra_vm/templates/docker-compose.yml
 
 ---
 
 services:
   homarr:
-    image: ghcr.io/ajnart/homarr:latest
+    image: ghcr.io/ajnart/homarr
     ports:
       - "7575:7575"
     volumes:
-      - homarr_data:/app/data
+      - /opt/infra_stack/homarr/data:/app/data:/app/data
     restart: unless-stopped
 
   grafana:
@@ -50,7 +51,7 @@ services:
     restart: unless-stopped
 
   dozzle:
-    image: amir20/dozzle:latest
+    image: amir20/dozzle
     ports:
       - "9999:8080"
     volumes:

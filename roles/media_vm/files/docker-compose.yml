@@ -13,6 +13,8 @@ services:
       - PGID=${PGID}
     ports:
       - "8096:8096"
+    devices:
+      - /dev/dri:/dev/dri
     volumes:
       - ${CONFIG_DIR}/jellyfin:/config
       - ${MEDIA_DIR}:/media
