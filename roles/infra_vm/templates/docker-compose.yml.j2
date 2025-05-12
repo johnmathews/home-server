@@ -9,7 +9,7 @@ services:
     ports:
       - "7575:7575"
     volumes:
-      - /opt/infra_stack/homarr/data:/app/data:/app/data
+      - /opt/infra_stack/homarr/data:/app/data
     restart: unless-stopped
 
   grafana:
@@ -17,7 +17,8 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - grafana_data:/var/lib/grafana
+      - /opt/infra_stack/grafana/data:/var/lib/grafana
+      # - grafana_data:/var/lib/grafana
       - "{{ docker_compose_dir }}/custom/grafana.ini:/etc/grafana/grafana.ini:ro"
     restart: unless-stopped
 
@@ -26,7 +27,8 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - prometheus_data:/prometheus
+      - /opt/infra_stack/prometheus/data:/prometheus
+      # - prometheus_data:/prometheus
       - ./prometheus:/etc/prometheus:ro
     restart: unless-stopped
 
@@ -47,7 +49,8 @@ services:
     ports:
       - "3001:3001"
     volumes:
-      - uptime_kuma:/app/data
+      - /opt/infra_stack/uptime_kuma/data:/app/data
+      # - uptime_kuma:/app/data
     restart: unless-stopped
 
   dozzle:
@@ -63,13 +66,7 @@ services:
     ports:
       - "9000:9000"
     volumes:
-      - portainer_data:/data
+      - /opt/infra_stack/portainer/data:/data
+      # - portainer_data:/data
       - /var/run/docker.sock:/var/run/docker.sock
     restart: unless-stopped
-
-volumes:
-  homarr_data:
-  grafana_data:
-  prometheus_data:
-  uptime_kuma:
-  portainer_data:

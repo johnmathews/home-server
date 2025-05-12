@@ -1,14 +1,13 @@
 # Home Server Provisioning with Ansible
 
-
 1. [iGPU setup](#igpu-setup)
-   * [The solution:](#the-solution:)
+   - [The solution:](#the-solution:)
 2. [Setup](#setup)
-3. [Proxmox Backup Server (PBS)](#proxmox-backup-server-(pbs))
+3. [Proxmox Backup Server (PBS)](<#proxmox-backup-server-(pbs)>)
 4. [Ansible Steps](#ansible-steps)
 5. [Colors and themes](#colors-and-themes)
 6. [Tuning and maintenance:](#tuning-and-maintenance:)
-   * [Makefile Targets](#makefile-targets)
+   - [Makefile Targets](#makefile-targets)
 
 This project is about setting up my home server. It contains the commands and
 Ansible playbooks used to provision a home server based on Proxmox.
@@ -25,67 +24,30 @@ Proxmox helper scripts are run manually, the configuration options are listed
 here.
 
 The motherboard uses the Redfish API. You can use it to change fan profiles, but
-not to set fan RPM directly.
+not to set fan RPM directly. Probably best to attach the fans to an ESP32 board
+that has temperature probes, and make it log metrics via Home Assistant.
 
 ## iGPU setup
 
-Proxmox doesn't load the driver automatically at the moment.
+In BIOS, go Advanced > NBIO Common Options >
 
-These steps _should_ make the driver load automatically, but it doesn't:
-- edit the GRUB file at `/etc/default/grub` so that there is a line like this: 
+- IOMMU: enabled
+- PCIe ARI Support: enabled
+- PCIe ARI Enumeration: enabled
+- GFX Configuration: UMA specified
+- UMA frame buffer size: 2Gj
+- GPU Host translation cache: Auto Advanced > PCI subsystem settings >
+- Above 4G decoding: enabled
+- Re-size BAR support: disabled
 
-       GRUB_CMDLINE_LINUX_DEFAULT="quiet amd_iommu=on iommu=pt amdgpu.force_init=1 video=efifb:off modprobe.blacklist=ast,simpledrm"
+This doesn't work because I cant extract the ROM file from the iGPU in Proxmox
+and then load it in the VM. A different OS image might have it already. This is
+the only blocker - I can set passthrough and assign it to the VM. but the VM
+cannot bind the iGPU to a driver, i think. Therefore, for now, run jellyfin in
+docker in Proxmox itself.
 
-- Then run these commands, or check that the files have this state:
-
-       echo "blacklist ast" > /etc/modprobe.d/blacklist-ast.conf
-       echo "amdgpu" > /etc/modules-load.d/amdgpu.conf
-       echo "options amdgpu force_probe=1636" > /etc/modprobe.d/amdgpu.conf
-       echo "amdgpu" >> /etc/initramfs-tools/modules
-       update-initramfs -u
-       update-grub
-       proxmox-boot-tool refresh
-
-Then reboot: 
-
-    reboot
-
-However, after rebooting, if you run this command, you can see that the iGPU is recognised but a driver is not loaded:
-
-    lzs /dev/dri && printf "\n\n" &&  \
-    lspci -k -nn -d 1002: && printf "\n\n" && \
-    vainfo && printf "\n\n" && \
-    ls -l /boot/initrd.img-$(uname -r) 
-
-To load the driver for the iGPU:
-
-    modprobe amdgpu
-
-### The solution:
-
-Create a systemd unit that runs `modprobe amdgpu` after the system has finished booting:
-
-Create `/etc/systemd/system/load-amdgpu.service` with this content:
-
-```
-[Unit]
-Description=Force load AMDGPU kernel module
-After=multi-user.target
-
-[Service]
-Type=oneshot
-ExecStart=/sbin/modprobe amdgpu
-
-[Install]
-WantedBy=multi-user.target
-``` 
-
-```
-systemctl daemon-reexec
-
-systemctl daemon-reload
-systemctl enable load-amdgpu.service
-```
+You can run `lspci -k -nn -d 1002:` in proxmox to see that the iGPU is
+recognised and a driver is attached to it.
 
 ## Setup
 
@@ -470,4 +432,3 @@ make lint               # Lint all playbooks and roles
 make ci                 # Run lint + check for validation
 make clean              # Remove retry/log files
 ```
-
