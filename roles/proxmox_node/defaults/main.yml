@@ -18,11 +18,9 @@ pve_exporter_version: "3.5.3"
 pve_exporter_install_dir: "/opt/pve_exporter"
 pve_exporter_listen_port: 9221
 
-
 proxmox_api_user: "api@pve"
 
-
-smb_proxmox_username: proxmox_node
+smb_proxmox_username: proxmox_smb_user
 smb_server: 192.168.2.104
 smb_share_name: library
 smb_share_target: /mnt/media/library
