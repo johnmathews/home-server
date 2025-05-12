@@ -1,0 +1,114 @@
+# tasks/docker-jellyfin.yml
+
+---
+
+- name: Ensure apt cache is updated
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Install Docker dependencies
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
+    state: present
+
+- name: Add Docker’s official GPG key
+  apt_key:
+    url: https://download.docker.com/linux/debian/gpg
+    state: present
+
+- name: Add Docker repository
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable
+    state: present
+    filename: docker
+
+- name: Install Docker
+  apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+    state: latest
+
+- name: Enable and start Docker service
+  systemd:
+    name: docker
+    enabled: yes
+    state: started
+
+- name: Create required Jellyfin directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  loop:
+    - /srv/jellyfin/config
+    - /srv/jellyfin/cache
+    - {{ smb_share_path }}
+
+- name: Install Docker Compose plugin
+  apt:
+    name: docker-compose-plugin
+    state: present
+
+- name: Ensure Jellyfin Docker Compose directory exists
+  file:
+    path: /srv/jellyfin
+    state: directory
+
+- name: Deploy Jellyfin docker-compose.yml
+  copy:
+    src: docker-compose.yml
+    dest: /srv/jellyfin/docker-compose.yml
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Install CIFS utilities
+  apt:
+    name: cifs-utils
+    state: present
+
+- name: Create SMB credentials file
+  copy:
+    dest: /root/.smbcredentials
+    content: |
+      username={{ smb_proxmox_username }}
+      password={{ vault_smb_proxmox_password }}
+    owner: root
+    group: root
+    mode: '0600'
+
+- name: Mount SMB share
+  mount:
+    path: {{ smb_share_path }}
+    src: "//{{ smb_server }}/{{ smb_share_name }}"
+    fstype: cifs
+    opts: credentials=/root/.smbcredentials,iocharset=utf8,noperm,nofail,vers=3.0
+    state: mounted
+
+
+- name: Verify that SMB share is successfully mounted
+  command: mountpoint -q  {{ smb_share_path }}
+  register: smb_mount_check
+  changed_when: false
+  failed_when: smb_mount_check.rc != 0
+
+- name: Persist SMB mount in /etc/fstab
+  lineinfile:
+    path: /etc/fstab
+    line: "//{{ smb_server }}/{{ smb_share_name }} {{ smb_share_path }} cifs credentials=/root/.smbcredentials,iocharset=utf8,noperm,nofail,vers=3.0 0 0"
+    state: present
+    create: yes
+
+- name: Start Jellyfin using Docker Compose
+  community.docker.docker_compose:
+    project_src: /srv/jellyfin

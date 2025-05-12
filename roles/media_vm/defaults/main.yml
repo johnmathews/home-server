@@ -9,11 +9,6 @@ reset_qbittorrent_config: false
 
 TZ: Europe/Amsterdam
 
-# cloud_image_url: https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img
-# cloud_image_dir: "{{ playbook_dir }}/cloud-images"
-# cloud_image_base_filename: "jammy-server-cloudimg-amd64.img"
-# cloud_image_filename: "jammy-server-cloudimg-amd64.raw"
-
 proxmox_api_host: "{{ hostvars['pve']['ansible_host'] }}"
 
 media_stack_mount_dir: /mnt/media
@@ -26,8 +21,6 @@ media_stack_group: john
 
 qbittorrent_uid: 1001
 qbittorrent_gid: 1001
-# qbittorrent_uid: "{{ lookup('ansible.builtin.pipe', 'id -u ' + media_stack_user) }}"
-# qbittorrent_gid: "{{ lookup('ansible.builtin.pipe', 'id -g ' + media_stack_user) }}"
 
 qbittorrent_password_hash: 16c5e9c9b842bd6bf78aafa66643304e0cfe2586
 

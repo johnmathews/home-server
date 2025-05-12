@@ -2,15 +2,19 @@
 # infra_vm/templates/docker-compose.yml
 
 ---
-
 services:
+
   homarr:
-    image: ghcr.io/ajnart/homarr
-    ports:
-      - "7575:7575"
-    volumes:
-      - /opt/infra_stack/homarr/data:/app/data
+    container_name: homarr
+    image: ghcr.io/homarr-labs/homarr:latest
     restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /opt/infra_stack/homarr/data:/appdata
+    environment:
+      - SECRET_ENCRYPTION_KEY=a7a77967880087c2a669cdea49b4f8866c18105bfa11a71ff61f16d003a36898
+    ports:
+      - '7575:7575'
 
   grafana:
     image: grafana/grafana-oss
@@ -18,7 +22,6 @@ services:
       - "3000:3000"
     volumes:
       - /opt/infra_stack/grafana/data:/var/lib/grafana
-      # - grafana_data:/var/lib/grafana
       - "{{ docker_compose_dir }}/custom/grafana.ini:/etc/grafana/grafana.ini:ro"
     restart: unless-stopped
 
@@ -28,7 +31,6 @@ services:
       - "9090:9090"
     volumes:
       - /opt/infra_stack/prometheus/data:/prometheus
-      # - prometheus_data:/prometheus
       - ./prometheus:/etc/prometheus:ro
     restart: unless-stopped
 
@@ -50,7 +52,6 @@ services:
       - "3001:3001"
     volumes:
       - /opt/infra_stack/uptime_kuma/data:/app/data
-      # - uptime_kuma:/app/data
     restart: unless-stopped
 
   dozzle:
@@ -67,6 +68,5 @@ services:
       - "9000:9000"
     volumes:
       - /opt/infra_stack/portainer/data:/data
-      # - portainer_data:/data
       - /var/run/docker.sock:/var/run/docker.sock
     restart: unless-stopped

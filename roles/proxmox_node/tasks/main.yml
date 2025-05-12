@@ -33,3 +33,6 @@
 - name: Install Prometheus Smartctl Exporter
   import_role:
     name: prometheus.prometheus.smartctl_exporter
+
+- name: Install Docker and deploy Jellyfin
+  import_tasks: docker-jellyfin.yml

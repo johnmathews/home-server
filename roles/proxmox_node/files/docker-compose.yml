@@ -1,0 +1,32 @@
+# proxmox_node/files/docker-compose.yml
+
+---
+
+services:
+  jellyfin:
+    image: jellyfin/jellyfin:10.10.7
+    container_name: jellyfin
+    restart: unless-stopped
+    ports:
+      - "8096:8096"
+    environment:
+      - TZ=Europe/Amsterdam
+      - JELLYFIN_PublishedServerUrl=http://localhost:8096
+    devices:
+      - /dev/dri:/dev/dri
+    volumes:
+      - ./config:/config
+      - ./cache:/cache
+      - /srv/media/library:/library
+    privileged: true
+
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Amsterdam
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_POLL_INTERVAL=86400  # Check every 24 hours
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
