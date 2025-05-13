@@ -17,16 +17,23 @@
       - lsb-release
     state: present
 
-- name: Add Docker’s official GPG key
-  apt_key:
-    url: https://download.docker.com/linux/debian/gpg
-    state: present
+- name: Ensure keyring directory exists
+  file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
 
-- name: Add Docker repository
+- name: Download Docker GPG key (Bookworm-compatible)
+  get_url:
+    url: https://download.docker.com/linux/debian/gpg
+    dest: /etc/apt/keyrings/docker.asc
+    mode: '0644'
+
+- name: Add Docker apt repository
   apt_repository:
-    repo: deb [arch=amd64] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable
-    state: present
+    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
     filename: docker
+    state: present
 
 - name: Install Docker
   apt:
@@ -52,7 +59,7 @@
   loop:
     - /srv/jellyfin/config
     - /srv/jellyfin/cache
-    - {{ smb_share_path }}
+    - "{{ smb_share_path }}"
 
 - name: Install Docker Compose plugin
   apt:
@@ -89,7 +96,7 @@
 
 - name: Mount SMB share
   mount:
-    path: {{ smb_share_path }}
+    path: "{{ smb_share_path }}"
     src: "//{{ smb_server }}/{{ smb_share_name }}"
     fstype: cifs
     opts: credentials=/root/.smbcredentials,iocharset=utf8,noperm,nofail,vers=3.0
@@ -97,7 +104,7 @@
 
 
 - name: Verify that SMB share is successfully mounted
-  command: mountpoint -q  {{ smb_share_path }}
+  command: "mountpoint -q  {{ smb_share_path }}"
   register: smb_mount_check
   changed_when: false
   failed_when: smb_mount_check.rc != 0
@@ -105,10 +112,10 @@
 - name: Persist SMB mount in /etc/fstab
   lineinfile:
     path: /etc/fstab
-    line: "//{{ smb_server }}/{{ smb_share_name }} {{ smb_share_path }} cifs credentials=/root/.smbcredentials,iocharset=utf8,noperm,nofail,vers=3.0 0 0"
+    line: //{{ smb_server }}/{{ smb_share_name }} {{ smb_share_path }} cifs credentials=/root/.smbcredentials,iocharset=utf8,noperm,nofail,vers=3.0 0 0
     state: present
     create: yes
 
 - name: Start Jellyfin using Docker Compose
-  community.docker.docker_compose:
+  community.docker.docker_compose_v2:
     project_src: /srv/jellyfin

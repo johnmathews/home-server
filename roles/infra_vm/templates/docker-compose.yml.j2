@@ -3,18 +3,31 @@
 
 ---
 services:
-
-  homarr:
-    container_name: homarr
-    image: ghcr.io/homarr-labs/homarr:latest
-    restart: unless-stopped
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /opt/infra_stack/homarr/data:/appdata
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
     environment:
-      - SECRET_ENCRYPTION_KEY=a7a77967880087c2a669cdea49b4f8866c18105bfa11a71ff61f16d003a36898
+      HOMEPAGE_ALLOWED_HOSTS: gethomepage.dev,192.168.2.106:3002 # required, may need port. See gethomepage.dev/installation/#homepage_allowed_hosts
+      PUID: 1000 # optional
+      PGID: 1000 # optional
     ports:
-      - '7575:7575'
+      - 3002:3000
+    volumes:
+      - /opt/infra_stack/homepage/config:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    restart: unless-stopped
+
+  # homarr:
+  #   container_name: homarr
+  #   image: ghcr.io/homarr-labs/homarr:latest
+  #   restart: unless-stopped
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #     - /opt/infra_stack/homarr/data:/appdata
+  #   environment:
+  #     - SECRET_ENCRYPTION_KEY=a7a77967880087c2a669cdea49b4f8866c18105bfa11a71ff61f16d003a36898
+  #   ports:
+  #     - '7575:7575'
 
   grafana:
     image: grafana/grafana-oss
