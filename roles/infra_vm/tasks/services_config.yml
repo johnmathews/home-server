@@ -19,13 +19,13 @@
     group: "{{ docker_user }}"
     mode: '0755'
 
-- name: Copy homepage config files to infra VM
+- name: Upload homepage config files to infra VM
   copy:
     src: "{{ item }}"
     dest: "/opt/infra_stack/homepage/config/{{ item | basename }}"
-    owner: "{{ docker_user }}"
-    group: "{{ docker_user }}"
+    owner: "{{docker_user }}"
+    group: "{{docker_user }}"
     mode: '0644'
   with_fileglob:
-    - "infra_vm/files/homepage_config/*"
-  delegate_to: localhost
+    - "files/homepage_config/*"
+  become: false
