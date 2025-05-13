@@ -1,0 +1,31 @@
+# infra_vm/tasks/services_config.yml
+
+---
+
+- name: Template Prometheus config
+  template:
+    src: prometheus/prometheus.yml.j2
+    dest: "{{ docker_compose_dir }}/prometheus/prometheus.yml"
+    owner: "{{ docker_user }}"
+    group: docker
+    mode: '0644'
+  notify: Restart Prometheus container
+
+- name: Ensure homepage config directory exists
+  file:
+    path: /opt/infra_stack/homepage/config
+    state: directory
+    owner: "{{ docker_user }}"
+    group: "{{ docker_user }}"
+    mode: '0755'
+
+- name: Copy homepage config files to infra VM
+  copy:
+    src: "{{ item }}"
+    dest: "/opt/infra_stack/homepage/config/{{ item | basename }}"
+    owner: "{{ docker_user }}"
+    group: "{{ docker_user }}"
+    mode: '0644'
+  with_fileglob:
+    - "infra_vm/files/homepage_config/*"
+  delegate_to: localhost
