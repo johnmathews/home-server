@@ -15,12 +15,10 @@ services:
     devices:
       - /dev/dri:/dev/dri
     volumes:
-      - ./config:/config
-      - ./cache:/cache
+      - /srv/jellyfin/appdata:/config
       - /srv/media/library:/library
+      - /srv/jellyfin/cache:/cache
     privileged: true
-    tmpfs:
-      - /cache:exec,size=1g
 
   watchtower:
     image: containrrr/watchtower
