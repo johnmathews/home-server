@@ -19,6 +19,8 @@ services:
       - ./cache:/cache
       - /srv/media/library:/library
     privileged: true
+    tmpfs:
+      - /cache:exec,size=1g
 
   watchtower:
     image: containrrr/watchtower
