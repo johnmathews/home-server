@@ -1,7 +1,10 @@
 # Makefile - Ansible shortcuts for home server setup
 
 # Set defaults
-VAULT ?= --ask-vault-pass
+
+# VAULT ?= --ask-vault-pass
+VAULT ?= --vault-password-file=.vault_pass.txt
+
 PLAYBOOK_DIR := playbooks
 ANSIBLE := .venv/bin/ansible-playbook
 INVENTORY := -i inventory.ini

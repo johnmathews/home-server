@@ -1,2 +1,9 @@
 /* keep */
 
+.card {
+  background-color: #ffffff !important;
+}
+
+.card * {
+  color: #000000 !important;
+}
