@@ -4,14 +4,38 @@
 # For configuration options and examples, please see:
 # https://gethomepage.dev/configs/services/
 
-- My First Group:
+- Media:
     - My First Service:
         href: http://localhost/
         description: Homepage is awesome
 
+    - Sonarr:
+        href: http://media.local:8989
+        description: TV Series Manager
+        icon: sonarr
+
+    - Radarr:
+        href: http://192.168.2.105:7878/
+        description: TV Series Manager
+        icon: radarr
+        widget:
+          url: http://192.168.2.105:7878/
+          key: c2a6f9c2f77d4cd3ac028dfb21fd62f1
+          fields: [wanted, queue, diskspace]
+
     - My second Service:
         href: http://localhost/
         description: Homepage is awesome
+        widgets:
+           - type: tautulli
+             url: http://172.16.1.1:8181
+             key: aabbccddeeffgghhiijjkkllmmnnoo
+           - type: uptimekuma
+             url: http://172.16.1.2:8080
+             slug: aaaaaaabbbbb
+
+
+
     - My third Service:
         href: http://localhost/
         description: Homepage is awesome
@@ -22,18 +46,8 @@
         href: http://localhost/
         description: Homepage is awesome
 
-- My Second Group:
+- Infra:
     - My Second Service:
         href: http://localhost/
         description: Homepage is the best
-
-- My Third Group:
-    - My Third Service:
-        href: http://localhost/
-        description: Homepage is 😎
-
-- My Fourth Group:
-    - My Fourth Service:
-        href: http://localhost/
-        description: desc
 
