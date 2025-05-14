@@ -7,7 +7,7 @@ services:
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
     environment:
-      HOMEPAGE_ALLOWED_HOSTS: gethomepage.dev,192.168.2.106:3002 # required, may need port. See gethomepage.dev/installation/#homepage_allowed_hosts
+      HOMEPAGE_ALLOWED_HOSTS: home.itsa.pizza,192.168.2.106:3002 # required, may need port. See gethomepage.dev/installation/#homepage_allowed_hosts
       PUID: 1000 # optional
       PGID: 1000 # optional
     ports:
