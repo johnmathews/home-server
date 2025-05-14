@@ -1,16 +1,10 @@
-# infra_vm/files/homepage_config/widets.yaml
-
 ---
-
 # For configuration options and examples, please see:
 # https://gethomepage.dev/configs/info-widgets/
-
 - resources:
     cpu: true
     memory: true
     disk: /
-
 - search:
     provider: duckduckgo
     target: _blank
-

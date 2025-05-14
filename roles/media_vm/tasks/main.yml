@@ -24,8 +24,9 @@
 
 - name: Perform dist upgrade
   ansible.builtin.apt:
-    upgrade: dist
+    upgrade: safe
     update_cache: true
+    cache_valid_time: 3600
 
 # 3. Install required packages
 - name: Install SMB client and mount utilities

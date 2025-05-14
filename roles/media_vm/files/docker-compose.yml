@@ -3,6 +3,16 @@
 ---
 
 services:
+  jellyseerr:
+    image: fallenbagel/jellyseerr:latest
+    container_name: jellyseerr
+    ports:
+      - 5055:5055
+    environment:
+      - LOG_LEVEL=info
+    volumes:
+      - ${CONFIG_DIR}/jellyseer:/app/config
+    restart: unless-stopped
 
   qbittorrent:
     image: linuxserver/qbittorrent
