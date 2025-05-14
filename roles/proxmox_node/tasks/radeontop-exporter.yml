@@ -1,0 +1,32 @@
+# proxmox_node/tasks/radeontop_exporter.py
+
+--- 
+
+- name: Ensure textfile collector directory exists
+  file:
+    path: /var/lib/node_exporter/textfile_collector
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Copy radeontop exporter script
+  copy:
+    src: radeontop_exporter.py
+    dest: /usr/local/bin/radeontop_exporter.py
+    mode: '0755'
+    owner: root
+    group: root
+
+- name: Ensure radeontop is installed
+  apt:
+    name: radeontop
+    state: present
+    update_cache: yes
+
+- name: Add cron job to run radeontop_exporter.py every minute
+  cron:
+    name: "Export radeontop metrics for Prometheus"
+    user: root
+    job: "/usr/local/bin/radeontop_exporter.py"
+    minute: "*/1"
