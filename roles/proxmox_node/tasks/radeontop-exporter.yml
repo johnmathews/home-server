@@ -1,6 +1,14 @@
-# proxmox_node/tasks/radeontop_exporter.py
+# proxmox_node/tasks/radeontop-exporter.py
 
---- 
+---
+
+- name: Ensure Python 3 is installed
+  apt:
+    name:
+      - python3
+      - python3-venv
+    state: present
+    update_cache: yes
 
 - name: Ensure textfile collector directory exists
   file:
@@ -12,8 +20,8 @@
 
 - name: Copy radeontop exporter script
   copy:
-    src: radeontop_exporter.py
-    dest: /usr/local/bin/radeontop_exporter.py
+    src: radeontop-exporter.py
+    dest: /usr/local/bin/radeontop-exporter.py
     mode: '0755'
     owner: root
     group: root
@@ -24,9 +32,22 @@
     state: present
     update_cache: yes
 
-- name: Add cron job to run radeontop_exporter.py every minute
-  cron:
-    name: "Export radeontop metrics for Prometheus"
-    user: root
-    job: "/usr/local/bin/radeontop_exporter.py"
-    minute: "*/1"
+- name: Ensure systemd service unit for radeontop-exporter
+  template:
+    src: radeontop-exporter.service.j2
+    dest: /etc/systemd/system/radeontop-exporter.service
+    mode: '0644'
+  notify: Reload systemd
+
+- name: Ensure systemd timer unit for radeontop-exporter
+  template:
+    src: radeontop-exporter.timer.j2
+    dest: /etc/systemd/system/radeontop-exporter.timer
+    mode: '0644'
+  notify: Reload systemd
+
+- name: Enable and start radeontop-exporter timer
+  systemd:
+    name: radeontop-exporter.timer
+    enabled: true
+    state: started

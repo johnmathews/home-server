@@ -1,0 +1,6 @@
+[Unit]
+Description=Export radeontop metrics for Prometheus
+
+[Service]
+Type=oneshot
+ExecStart={{ radeontop_exporter_path }}

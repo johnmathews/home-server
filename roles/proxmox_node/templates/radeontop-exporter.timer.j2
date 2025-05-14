@@ -1,0 +1,11 @@
+[Unit]
+Description=Run radeontop-exporter every 15 seconds
+
+[Timer]
+OnBootSec=15s
+OnUnitActiveSec=15s
+AccuracySec=1s
+Unit=radeontop-exporter.service
+
+[Install]
+WantedBy=timers.target

@@ -4,12 +4,15 @@
 
 - name: Set up IPMI exporter
   import_tasks: ipmi_exporter.yml
+  tags: [metrics]
 
 - name: Set up Node exporter
   import_tasks: node_exporter.yml
+  tags: [metrics]
 
 - name: Set up Proxmox exporter
   import_tasks: pve_exporter.yml
+  tags: [metrics]
 
   # Run this before the imported Smartctl exporter role
   # we need GNU Tar running on the local ansible host
@@ -29,10 +32,18 @@
           Install it using: brew install gnu-tar
           And add to your PATH: export PATH="/opt/homebrew/opt/gnu-tar/libexec/gnubin:$PATH"
       when: gnu_tar_check.rc != 0
+  tags: [metrics]
 
 - name: Install Prometheus Smartctl Exporter
   import_role:
     name: prometheus.prometheus.smartctl_exporter
+  tags: [metrics]
 
 - name: Install Docker and deploy Jellyfin
   import_tasks: docker-jellyfin.yml
+  tags: [media]
+
+
+- name: Install radeontop metrics exporter
+  import_tasks: radeontop-exporter.yml
+  tags: [metrics, media, radeontop]

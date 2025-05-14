@@ -42,7 +42,10 @@
       After=network.target
 
       [Service]
-      ExecStart={{ node_exporter_install_dir }}/node_exporter --web.listen-address=":{{ node_exporter_listen_port }}"
+      ExecStart={{ node_exporter_install_dir }}/node_exporter \
+        --web.listen-address=:{{ node_exporter_listen_port }} \
+        --collector.textfile \
+        --collector.textfile.directory=/var/lib/node_exporter/textfile_collector
       User=nobody
       Restart=always
 

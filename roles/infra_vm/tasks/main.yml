@@ -115,7 +115,6 @@
     group: docker
     mode: '0755'
 
-
 - name: Include config tasks for docker services (prometheus and homepage)
   import_tasks: services_config.yml
   tags: [config]
