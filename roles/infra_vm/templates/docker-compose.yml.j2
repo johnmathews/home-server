@@ -17,18 +17,6 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     restart: unless-stopped
 
-  # homarr:
-  #   container_name: homarr
-  #   image: ghcr.io/homarr-labs/homarr:latest
-  #   restart: unless-stopped
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #     - /opt/infra_stack/homarr/data:/appdata
-  #   environment:
-  #     - SECRET_ENCRYPTION_KEY=a7a77967880087c2a669cdea49b4f8866c18105bfa11a71ff61f16d003a36898
-  #   ports:
-  #     - '7575:7575'
-
   grafana:
     image: grafana/grafana-oss
     ports:

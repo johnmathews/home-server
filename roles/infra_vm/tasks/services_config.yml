@@ -28,4 +28,4 @@
     mode: '0644'
   with_fileglob:
     - "files/homepage_config/*"
-  become: false
+  become: true
