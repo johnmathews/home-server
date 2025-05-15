@@ -8,18 +8,23 @@
     - Jellyfin:
         href: http://192.168.2.214:8096
         ping: http://192.168.2.214:8096
+        siteMonitor: http://192.168.2.214:8096
         description: TV app 
         icon: jellyfin
+        server: my-server
+        container: my-container
 
     - Jellyseerr:
         href: http://192.168.2.105:5055/
         ping: http://192.168.2.105:5055/
+        siteMonitor: http://192.168.2.105:5055/
         description: TV
         icon: jellyseerr
 
     - Sonarr:
         href: http://192.168.2.105:8989/
         ping: http://192.168.2.105:8989/
+        siteMonitor: http://192.168.2.105:8989/
         description: TV Series Manager
         icon: sonarr
 
@@ -36,102 +41,119 @@
 
     - Jackett:
         href: http://192.168.2.105:9117
-        ping: http://192.168.2.105:7878
+        ping: http://192.168.2.105:9117
+        siteMonitor: http://192.168.2.105:9117
         description: Indexer Manager
         icon: jackett
 
     - qBittorrent:
         href: http://192.168.2.105:8080/
-        ping: http://192.168.2.105:7878
+        ping: http://192.168.2.105:8080/
+        siteMonitor: http://192.168.2.105:8080/
         description: Downloader
         icon: qBittorrent
 
     - Bazarr:
         href: http://192.168.2.105:6767
-        ping: http://192.168.2.105:7878
+        ping: http://192.168.2.105:6767
+        siteMonitor: http://192.168.2.105:6767
         description: Subtitles
         icon: bazarr
 
 - Infra:
     - Grafana:
         href: http://192.168.2.106:3000
-        ping: http://192.168.2.105:7878
+        ping: http://192.168.2.106:3000
+        siteMonitor: http://192.168.2.106:3000
         description: Charts
         icon: grafana
 
     - Prometheus:
         href: http://192.168.2.106:9090
-        ping: http://192.168.2.105:7878
+        ping: http://192.168.2.106:9090
+        siteMonitor: http://192.168.2.106:9090
         description: Metrics Collector
         icon: prometheus
 
     - Node Exporter:
         href: http://192.168.2.106:9100
-        ping: http://192.168.2.105:7878
+        ping: http://192.168.2.106:9100
+        siteMonitor: http://192.168.2.106:9100
         description: Node Exporter
         icon: node exporter
 
     - cAdvisor:
         href: http://192.168.2.106:8080
-        ping: http://192.168.2.105:7878
+        ping: http://192.168.2.106:8080
+        siteMonitor: http://192.168.2.106:8080
         description: container metrics
         icon: cAdvisor
 
     - Uptime Kuma:
         href: http://192.168.2.106:3001
-        ping: http://192.168.2.105:7878
+        ping: http://192.168.2.106:3001
+        siteMonitor: http://192.168.2.106:3001
         description: monitoring
         icon: uptimeKuma
 
     - Dozzle:
         href: http://192.168.2.106:9999
-        ping: http://192.168.2.105:7878
+        ping: http://192.168.2.106:9999
+        siteMonitor: http://192.168.2.106:9999
         description: containers
         icon: dozzle
 
     - Portainer:
         href: http://192.168.2.106:9000
-        ping: http://192.168.2.105:7878
+        ping: http://192.168.2.106:9000
+        siteMonitor: http://192.168.2.106:9000
         description: containers
         icon: portainer
 
     - Router:
         href: http://192.168.2.254/
-        ping: http://192.168.2.105:7878
+        ping: http://192.168.2.254/
+        siteMonitor: http://192.168.2.254/
         icon: router
 
     - AdGuard:
         href: http://192.168.2.111
         ping: http://192.168.2.111
+        siteMonitor: http://192.168.2.111
         description: host
         icon: adguard
 
     - TrueNAS:
         href: http://192.168.2.104
         ping: http://192.168.2.104
+        siteMonitor: http://192.168.2.104
         description: nas
         icon: truenas
 
     - Proxmox:
         href: https://192.168.2.214:8006
         ping: https://192.168.2.214:8006
+        siteMonitor: https://192.168.2.214:8006
         description: host
         icon: proxmox
 
     - PBS:
         href: https://192.168.2.200:8007
         ping: https://192.168.2.200:8007
+        siteMonitor: https://192.168.2.200:8007
         description: backup
         icon: proxmox
 
     - MegaRAC SP-X:
         href: https://192.168.2.213
         ping: https://192.168.2.213
+        siteMonitor: https://192.168.2.213
         description: hardware
         icon: server
 
     - Home Assistant:
         href: http://192.168.2.102:8123
         ping: http://192.168.2.102:8123
+        siteMonitor: http://192.168.2.102:8123
         description: home automation
         icon: home-assistant
