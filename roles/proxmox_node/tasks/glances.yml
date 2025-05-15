@@ -23,11 +23,22 @@
   args:
     creates: /opt/glances-venv/pyvenv.cfg
 
-- name: Install Glances in the virtualenv using uv
+- name: Get Python major.minor version in Glances venv
+  command: /opt/glances-venv/bin/python -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')"
+  register: glances_python_version
+  changed_when: false
+
+- name: Install Glances and dependencies in virtualenv using uv
   command: >
-    uv pip install --python /opt/glances-venv/bin/python glances
+    uv pip install --python /opt/glances-venv/bin/python 'glances[all]' fastapi uvicorn jinja2
   args:
     creates: /opt/glances-venv/bin/glances
+
+- name: Ensure jinja2 is installed in Glances venv
+  command: >
+    uv pip install --python /opt/glances-venv/bin/python jinja2
+  args:
+    creates: "/opt/glances-venv/lib/python{{ glances_python_version.stdout }}/site-packages/jinja2"
 
 - name: Create Glances systemd service
   copy:
@@ -38,7 +49,7 @@
       After=network.target
 
       [Service]
-      ExecStart=/opt/glances-venv/bin/glances -w
+      ExecStart=/opt/glances-venv/bin/glances  -w  --bind 0.0.0.0
       Restart=on-failure
       RestartSec=5
 

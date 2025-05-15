@@ -12,9 +12,8 @@
 
 - glances:
     url: http://192.168.2.214:61208
-    fields: [cpu, memory]
-
-- resources:
-    cpu: true
+    version: 4
+    cpu: true 
     memory: true
-    disk: /
+    uptime: true 
+
