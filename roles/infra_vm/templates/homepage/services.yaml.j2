@@ -142,7 +142,7 @@
         widget:
           type: uptimekuma
           url: http://http://192.168.2.106:3001
-          slug: dashboard
+          slug: monitoring
 
     - Dozzle:
         href: http://192.168.2.106:9999
@@ -187,6 +187,11 @@
         siteMonitor: http://192.168.2.111
         description: host
         icon: adguard
+        widget:
+          type: adguard
+          url: http://192.168.2.111
+          username: john
+          password: "{{ vault_adguard_password }}"
 
     - TrueNAS:
         href: http://192.168.2.104
@@ -194,6 +199,14 @@
         siteMonitor: http://192.168.2.104
         description: nas
         icon: truenas
+        widget:
+          type: truenas
+          url: http://192.168.2.104
+          username: truenas_admin
+          password: "{{ vault_truenas_password }}"
+          enablePools: true # optional, defaults to false
+          nasType: scale
+
 
     - Proxmox:
         href: https://192.168.2.214:8006
