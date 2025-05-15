@@ -5,17 +5,27 @@
 # https://gethomepage.dev/configs/services/
 
 - Media:
-    - My First Service:
-        href: http://localhost/
-        description: Homepage is awesome
+    - Jellyfin:
+        href: http://192.168.2.214:8096
+        ping: http://192.168.2.214:8096
+        description: TV app 
+        icon: jellyfin
+
+    - Jellyseerr:
+        href: http://192.168.2.105:5055/
+        ping: http://192.168.2.105:5055/
+        description: TV
+        icon: jellyseerr
 
     - Sonarr:
-        href: http://media.local:8989
+        href: http://192.168.2.105:8989/
+        ping: http://192.168.2.105:8989/
         description: TV Series Manager
         icon: sonarr
 
     - Radarr:
         href: http://192.168.2.105:7878
+        ping: http://192.168.2.105:7878
         description: TV Series Manager
         icon: radarr
         widget:
@@ -24,31 +34,104 @@
           key: c2a6f9c2f77d4cd3ac028dfb21fd62f1
           fields: [wanted, missing, movies, queued]
 
-    - My last Service:
-        href: http://localhost/
-        description: Homepage is awesome
-        widgets:
-           - type: tautulli
-             url: http://172.16.1.1:8181
-             key: aabbccddeeffgghhiijjkkllmmnnoo
-           - type: uptimekuma
-             url: http://172.16.1.2:8080
-             slug: aaaaaaabbbbb
+    - Jackett:
+        href: http://192.168.2.105:9117
+        ping: http://192.168.2.105:7878
+        description: Indexer Manager
+        icon: jackett
 
+    - qBittorrent:
+        href: http://192.168.2.105:8080/
+        ping: http://192.168.2.105:7878
+        description: Downloader
+        icon: qBittorrent
 
-
-    - My third Service:
-        href: http://localhost/
-        description: Homepage is awesome
-    - My fourth Service:
-        href: http://localhost/
-        description: Homepage is awesome
-    - My fifth Service:
-        href: http://localhost/
-        description: Homepage is awesome
+    - Bazarr:
+        href: http://192.168.2.105:6767
+        ping: http://192.168.2.105:7878
+        description: Subtitles
+        icon: bazarr
 
 - Infra:
-    - My Second Service:
-        href: http://localhost/
-        description: Homepage is the best
+    - Grafana:
+        href: http://192.168.2.106:3000
+        ping: http://192.168.2.105:7878
+        description: Charts
+        icon: grafana
 
+    - Prometheus:
+        href: http://192.168.2.106:9090
+        ping: http://192.168.2.105:7878
+        description: Metrics Collector
+        icon: prometheus
+
+    - Node Exporter:
+        href: http://192.168.2.106:9100
+        ping: http://192.168.2.105:7878
+        description: Node Exporter
+        icon: node exporter
+
+    - cAdvisor:
+        href: http://192.168.2.106:8080
+        ping: http://192.168.2.105:7878
+        description: container metrics
+        icon: cAdvisor
+
+    - Uptime Kuma:
+        href: http://192.168.2.106:3001
+        ping: http://192.168.2.105:7878
+        description: monitoring
+        icon: uptimeKuma
+
+    - Dozzle:
+        href: http://192.168.2.106:9999
+        ping: http://192.168.2.105:7878
+        description: containers
+        icon: dozzle
+
+    - Portainer:
+        href: http://192.168.2.106:9000
+        ping: http://192.168.2.105:7878
+        description: containers
+        icon: portainer
+
+    - Router:
+        href: http://192.168.2.254/
+        ping: http://192.168.2.105:7878
+        icon: router
+
+    - AdGuard:
+        href: http://192.168.2.111
+        ping: http://192.168.2.111
+        description: host
+        icon: adguard
+
+    - TrueNAS:
+        href: http://192.168.2.104
+        ping: http://192.168.2.104
+        description: nas
+        icon: truenas
+
+    - Proxmox:
+        href: https://192.168.2.214:8006
+        ping: https://192.168.2.214:8006
+        description: host
+        icon: proxmox
+
+    - PBS:
+        href: https://192.168.2.200:8007
+        ping: https://192.168.2.200:8007
+        description: backup
+        icon: proxmox
+
+    - MegaRAC SP-X:
+        href: https://192.168.2.213
+        ping: https://192.168.2.213
+        description: hardware
+        icon: server
+
+    - Home Assistant:
+        href: http://192.168.2.102:8123
+        ping: http://192.168.2.102:8123
+        description: home automation
+        icon: home-assistant
