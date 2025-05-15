@@ -22,3 +22,8 @@
     name: pve_exporter
     state: restarted
     enabled: yes
+
+- name: Restart Glances
+  systemd:
+    name: glances
+    state: restarted

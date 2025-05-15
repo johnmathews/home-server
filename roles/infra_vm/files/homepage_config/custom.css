@@ -11,6 +11,8 @@
   border-style: solid;
   border-radius: 0.5rem; /* Optional, like rounded-md */
   margin: 0.25rem;
+  margin-bottom: 0.5rem;
+  margin-top: 0.5rem;
 }
 
 .service-block div {
@@ -26,4 +28,8 @@
 .service-name p {
   font-weight: 600;
   font-size: 0.85rem;
+}
+
+[id^="headlessui-"] {
+  margin-bottom: 1.0rem;
 }

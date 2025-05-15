@@ -9,19 +9,37 @@ title: Home Server
 description: Media and Infra Apps
 
 theme: gray # or dark
-
+fullWidth: false
 maxGroupColumns: 8 # default is 4 for services, 6 for bookmarks, max 8
 
+# useEqualHeights: true 
 layout:
-  Media:
+  Media-1:
     style: row
-    columns: 6
+    columns: 4
     widgets:
       - radarr
 
-  Infra:
+  Media-2:
+    initiallyCollapsed: true
     style: row
-    columns: 6
+    columns: 4
+    widgets:
+      - radarr
+
+  Infra-1:
+    style: row
+    columns: 4
+
+  Infra-2:
+    initiallyCollapsed: true
+    style: row
+    columns: 4
+
+  Hardware:
+    initiallyCollapsed: true
+    style: row
+    columns: 2
 
 providers:
   openweathermap: openweathermapapikey

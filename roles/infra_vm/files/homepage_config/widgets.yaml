@@ -5,6 +5,15 @@
 # For configuration options and examples, please see:
 # https://gethomepage.dev/configs/info-widgets/
 
+- datetime:
+    text_size: xl
+    format:
+      timeStyle: short
+
+- glances:
+    url: http://192.168.2.214:61208
+    fields: [cpu, memory]
+
 - resources:
     cpu: true
     memory: true

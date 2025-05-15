@@ -47,3 +47,7 @@
 - name: Install radeontop metrics exporter
   import_tasks: radeontop-exporter.yml
   tags: [metrics, media, radeontop]
+
+- name: Install glances
+  import_tasks: glances.yml
+  tags: [metrics, glances]

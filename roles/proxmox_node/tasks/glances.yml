@@ -1,0 +1,54 @@
+# proxmox_node/tasks/glances.yml
+
+---
+
+- name: Ensure Python build dependencies are installed
+  apt:
+    name:
+      - python3-venv
+      - python3-full
+      - gcc
+      - lm-sensors
+    state: present
+    update_cache: true
+
+- name: Create Glances virtualenv directory
+  file:
+    path: /opt/glances-venv
+    state: directory
+    mode: '0755'
+
+- name: Create a virtual environment using uv
+  command: uv venv /opt/glances-venv
+  args:
+    creates: /opt/glances-venv/pyvenv.cfg
+
+- name: Install Glances in the virtualenv using uv
+  command: >
+    uv pip install --python /opt/glances-venv/bin/python glances
+  args:
+    creates: /opt/glances-venv/bin/glances
+
+- name: Create Glances systemd service
+  copy:
+    dest: /etc/systemd/system/glances.service
+    content: |
+      [Unit]
+      Description=Glances
+      After=network.target
+
+      [Service]
+      ExecStart=/opt/glances-venv/bin/glances -w
+      Restart=on-failure
+      RestartSec=5
+
+      [Install]
+      WantedBy=multi-user.target
+    mode: '0644'
+  notify: Restart Glances
+
+- name: Enable and start Glances
+  systemd:
+    name: glances
+    enabled: true
+    state: started

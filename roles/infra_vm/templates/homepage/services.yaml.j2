@@ -6,7 +6,7 @@
 # For configuration options and examples, please see:
 # https://gethomepage.dev/configs/services/
 
-- Media:
+- Media-1:
     - Jellyfin:
         href: http://192.168.2.214:8096
         ping: http://192.168.2.214:8096
@@ -37,6 +37,19 @@
           url: http://192.168.2.105:5055/
           key: "{{ vault_jellyseer_key }}"
 
+- Media-2:
+    - Radarr:
+        href: http://192.168.2.105:7878
+        ping: http://192.168.2.105:7878
+        siteMonitor: http://192.168.2.105:7878
+        description: Movie Manager
+        icon: radarr
+        widget:
+          type: radarr
+          url: http://192.168.2.105:7878
+          key: "{{ vault_radarr_key }}"
+          fields: [wanted, missing, movies, queued]
+
     - Sonarr:
         href: http://192.168.2.105:8989/
         ping: http://192.168.2.105:8989/
@@ -48,18 +61,6 @@
           url: http://192.168.2.105:8989/
           key: "{{ vault_sonarr_key }}"
           enableQueue: true # optional, defaults to false
-
-    - Radarr:
-        href: http://192.168.2.105:7878
-        ping: http://192.168.2.105:7878
-        siteMonitor: http://192.168.2.105:7878
-        description: TV Series Manager
-        icon: radarr
-        widget:
-          type: radarr
-          url: http://192.168.2.105:7878
-          key: "{{ vault_radarr_key }}"
-          fields: [wanted, missing, movies, queued]
 
     - Jackett:
         href: http://192.168.2.105:9117
@@ -77,7 +78,7 @@
         ping: http://192.168.2.105:8080
         siteMonitor: http://192.168.2.105:8080
         description: Downloader
-        icon: qBittorrent
+        icon: https://cdn.jsdelivr.net/gh/selfhst/icons/svg/qbittorrent.svg
         widget:
           type: qbittorrent
           url: http://192.168.2.105:8080
@@ -96,7 +97,7 @@
           url: http://192.168.2.105:6767
           key: "{{vault_bazarr_key}}"
 
-- Infra:
+- Infra-1:
     - Grafana:
         href: http://192.168.2.106:3000
         ping: http://192.168.2.106:3000
@@ -108,6 +109,58 @@
           url: http://192.168.2.106:3000
           username: "{{ vault_grafana_username }}"
           password: "{{ vault_grafana_password }}"
+
+    - TrueNAS:
+        href: http://192.168.2.104
+        ping: http://192.168.2.104
+        siteMonitor: http://192.168.2.104
+        description: nas
+        icon: truenas
+        widget:
+          type: truenas
+          url: http://192.168.2.104
+          username: truenas_admin
+          password: "{{ vault_truenas_password }}"
+          enablePools: true # optional, defaults to false
+          nasType: scale
+
+    - Home Assistant:
+        href: http://192.168.2.102:8123
+        ping: http://192.168.2.102:8123
+        siteMonitor: http://192.168.2.102:8123
+        description: home automation
+        icon: home-assistant
+        widget:
+          type: homeassistant
+          url: http://192.168.2.102:8123
+          key: "{{ vault_homeassistant_access_token }}"
+          custom:
+            - state: sensor.tech_shelf_power
+              label: server shelf
+
+- Infra-2:
+    - AdGuard:
+        href: http://192.168.2.111
+        ping: http://192.168.2.111
+        siteMonitor: http://192.168.2.111
+        description: host
+        icon: https://cdn.jsdelivr.net/gh/selfhst/icons/svg/adguard-home.svg
+        widget:
+          type: adguard
+          url: http://192.168.2.111
+          username: john
+          password: "{{ vault_adguard_password }}"
+
+    - Uptime Kuma:
+        href: http://192.168.2.106:3001
+        ping: http://192.168.2.106:3001
+        siteMonitor: http://192.168.2.106:3001
+        description: monitoring
+        icon: si-uptimekuma 
+        widget:
+          type: uptimekuma
+          url: http://192.168.2.106:3001
+          slug: monitoring
 
     - Prometheus:
         href: http://192.168.2.106:9090
@@ -131,18 +184,7 @@
         ping: http://192.168.2.106:8080
         siteMonitor: http://192.168.2.106:8080
         description: container metrics
-        icon: cAdvisor
-
-    - Uptime Kuma:
-        href: http://192.168.2.106:3001
-        ping: http://192.168.2.106:3001
-        siteMonitor: http://192.168.2.106:3001
-        description: monitoring
-        icon: uptimekuma
-        widget:
-          type: uptimekuma
-          url: http://192.168.2.106:3001
-          slug: monitoring
+        icon: https://cdn.jsdelivr.net/gh/selfhst/icons/svg/cadvisor.svg
 
     - Dozzle:
         href: http://192.168.2.106:9999
@@ -175,38 +217,8 @@
           env: 3
           key: "{{ vault_portainer_key }}"
 
-    - Router:
-        href: http://192.168.2.254/
-        ping: http://192.168.2.254/
-        siteMonitor: http://192.168.2.254/
-        icon: router
 
-    - AdGuard:
-        href: http://192.168.2.111
-        ping: http://192.168.2.111
-        siteMonitor: http://192.168.2.111
-        description: host
-        icon: adguard
-        widget:
-          type: adguard
-          url: http://192.168.2.111
-          username: john
-          password: "{{ vault_adguard_password }}"
-
-    - TrueNAS:
-        href: http://192.168.2.104
-        ping: http://192.168.2.104
-        siteMonitor: http://192.168.2.104
-        description: nas
-        icon: truenas
-        widget:
-          type: truenas
-          url: http://192.168.2.104
-          username: truenas_admin
-          password: "{{ vault_truenas_password }}"
-          enablePools: true # optional, defaults to false
-          nasType: scale
-
+- Hardware:
     - Proxmox:
         href: https://192.168.2.214:8006
         ping: https://192.168.2.214:8006
@@ -236,18 +248,10 @@
         ping: https://192.168.2.213
         siteMonitor: https://192.168.2.213
         description: hardware
-        icon: server
+        icon: mdi-Server
 
-    - Home Assistant:
-        href: http://192.168.2.102:8123
-        ping: http://192.168.2.102:8123
-        siteMonitor: http://192.168.2.102:8123
-        description: home automation
-        icon: home-assistant
-        widget:
-          type: homeassistant
-          url: http://192.168.2.102:8123
-          key: "{{ vault_homeassistant_access_token }}"
-          custom:
-            - state: sensor.tech_shelf_power
-              label: server shelf
+    - Router:
+        href: http://192.168.2.254/
+        ping: http://192.168.2.254/
+        siteMonitor: http://192.168.2.254/
+        icon: router
