@@ -207,13 +207,17 @@
           enablePools: true # optional, defaults to false
           nasType: scale
 
-
     - Proxmox:
         href: https://192.168.2.214:8006
         ping: https://192.168.2.214:8006
         siteMonitor: https://192.168.2.214:8006
         description: host
         icon: proxmox
+        widget:
+          type: proxmox
+          url: https://192.168.2.214:8006
+          username: "{{ vault_proxmox_api_token_id }}" 
+          password: "{{ vault_proxmox_api_token_secret }}"
 
     - PBS:
         href: https://192.168.2.200:8007
@@ -221,6 +225,11 @@
         siteMonitor: https://192.168.2.200:8007
         description: backup
         icon: proxmox
+        widget:
+          type: proxmoxbackupserver
+          url: https://192.168.2.200:8007
+          username: "{{ vault_proxmox_backup_api_token_id }}" 
+          password: "{{ vault_proxmox_backup_api_token_secret }}"
 
     - MegaRAC SP-X:
         href: https://192.168.2.213
@@ -235,3 +244,10 @@
         siteMonitor: http://192.168.2.102:8123
         description: home automation
         icon: home-assistant
+        widget:
+          type: homeassistant
+          url: http://192.168.2.102:8123
+          key: "{{ vault_homeassistant_access_token }}"
+          custom:
+            - state: sensor.tech_shelf_power
+              label: server shelf
