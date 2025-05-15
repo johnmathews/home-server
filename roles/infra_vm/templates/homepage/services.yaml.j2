@@ -102,7 +102,6 @@
         href: http://192.168.2.106:3000
         ping: http://192.168.2.106:3000
         siteMonitor: http://192.168.2.106:3000
-        description: Charts
         icon: grafana
         widget:
           type: grafana
@@ -114,7 +113,6 @@
         href: http://192.168.2.104
         ping: http://192.168.2.104
         siteMonitor: http://192.168.2.104
-        description: nas
         icon: truenas
         widget:
           type: truenas
@@ -128,7 +126,7 @@
         href: http://192.168.2.102:8123
         ping: http://192.168.2.102:8123
         siteMonitor: http://192.168.2.102:8123
-        description: home automation
+        description: Home automation
         icon: home-assistant
         widget:
           type: homeassistant
@@ -143,7 +141,7 @@
         href: http://192.168.2.111
         ping: http://192.168.2.111
         siteMonitor: http://192.168.2.111
-        description: host
+        description: Ad blocker
         icon: https://cdn.jsdelivr.net/gh/selfhst/icons/svg/adguard-home.svg
         widget:
           type: adguard
@@ -155,7 +153,7 @@
         href: http://192.168.2.106:3001
         ping: http://192.168.2.106:3001
         siteMonitor: http://192.168.2.106:3001
-        description: monitoring
+        description: Monitoring
         icon: si-uptimekuma 
         widget:
           type: uptimekuma
@@ -231,7 +229,7 @@
           username: "{{ vault_proxmox_api_token_id }}" 
           password: "{{ vault_proxmox_api_token_secret }}"
 
-    - PBS:
+    - Proxmox Backup Server:
         href: https://192.168.2.200:8007
         ping: https://192.168.2.200:8007
         siteMonitor: https://192.168.2.200:8007
@@ -243,15 +241,15 @@
           username: "{{ vault_proxmox_backup_api_token_id }}" 
           password: "{{ vault_proxmox_backup_api_token_secret }}"
 
+    - Router:
+        href: http://192.168.2.254/
+        ping: http://192.168.2.254/
+        siteMonitor: http://192.168.2.254/
+        icon: router
+
     - MegaRAC SP-X:
         href: https://192.168.2.213
         ping: https://192.168.2.213
         siteMonitor: https://192.168.2.213
         description: hardware
         icon: mdi-Server
-
-    - Router:
-        href: http://192.168.2.254/
-        ping: http://192.168.2.254/
-        siteMonitor: http://192.168.2.254/
-        icon: router
