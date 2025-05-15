@@ -15,15 +15,16 @@
         icon: sonarr
 
     - Radarr:
-        href: http://192.168.2.105:7878/
+        href: http://192.168.2.105:7878
         description: TV Series Manager
         icon: radarr
         widget:
-          url: http://192.168.2.105:7878/
+          type: radarr
+          url: http://192.168.2.105:7878
           key: c2a6f9c2f77d4cd3ac028dfb21fd62f1
-          fields: [wanted, queue, diskspace]
+          fields: [wanted, missing, movies, queued]
 
-    - My second Service:
+    - My last Service:
         href: http://localhost/
         description: Homepage is awesome
         widgets:

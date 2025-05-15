@@ -1,9 +1,29 @@
 /* keep */
 
-.card {
-  background-color: #ffffff !important;
+#inner_wrapper {
+  background-color: #FFFFFF; 
 }
 
-.card * {
-  color: #000000 !important;
+.service-card {
+  background-color: #FFFFFF; 
+  border-width: 2px;
+  border-color: #000000;
+  border-style: solid;
+  border-radius: 0.5rem; /* Optional, like rounded-md */
+  margin: 0.25rem;
+}
+
+.service-block div {
+  color: #000000; 
+  font-weight: 600;
+}
+
+.service-name {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.service-name p {
+  font-weight: 600;
+  font-size: 0.85rem;
 }

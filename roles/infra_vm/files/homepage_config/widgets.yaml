@@ -10,18 +10,5 @@
     memory: true
     disk: /
 
-- search:
-    provider: duckduckgo
-    target: _blank
-
-
-- radarr:
-    url: http://192.168.2.105:7878/   # Adjust as needed
-    key: c2a6f9c2f77d4cd3ac028dfb21fd62f1
-    fields: [wanted, queue, diskspace]
-
-- health:
-    url: http://192.168.2.105:7878
-    method: GET
 
 
