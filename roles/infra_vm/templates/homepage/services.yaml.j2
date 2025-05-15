@@ -1,6 +1,8 @@
+# vim: ft=yaml
 # infra_vm/files/homepage_config/services.yaml
 
 ---
+
 # For configuration options and examples, please see:
 # https://gethomepage.dev/configs/services/
 
@@ -11,8 +13,18 @@
         siteMonitor: http://192.168.2.214:8096
         description: TV app 
         icon: jellyfin
-        server: my-server
-        container: my-container
+        server: localhost
+        container: dozzle
+        showStats: false
+        widget:
+          type: jellyfin
+          url: http://192.168.2.214:8096
+          key: "{{ vault_jellyfin_key }}"
+          enableBlocks: true # optional, defaults to false
+          enableNowPlaying: false # optional, defaults to true
+          enableUser: true # optional, defaults to false
+          showEpisodeNumber: false # optional, defaults to false
+          expandOneStreamToTwoRows: false # optional, defaults to true
 
     - Jellyseerr:
         href: http://192.168.2.105:5055/
@@ -20,6 +32,10 @@
         siteMonitor: http://192.168.2.105:5055/
         description: TV
         icon: jellyseerr
+        widget:
+          type: jellyseerr
+          url: http://192.168.2.105:5055/
+          key: "{{ vault_jellyseer_key }}"
 
     - Sonarr:
         href: http://192.168.2.105:8989/
@@ -27,16 +43,22 @@
         siteMonitor: http://192.168.2.105:8989/
         description: TV Series Manager
         icon: sonarr
+        widget:
+          type: sonarr
+          url: http://192.168.2.105:8989/
+          key: "{{ vault_sonarr_key }}"
+          enableQueue: true # optional, defaults to false
 
     - Radarr:
         href: http://192.168.2.105:7878
         ping: http://192.168.2.105:7878
+        siteMonitor: http://192.168.2.105:7878
         description: TV Series Manager
         icon: radarr
         widget:
           type: radarr
           url: http://192.168.2.105:7878
-          key: c2a6f9c2f77d4cd3ac028dfb21fd62f1
+          key: "{{ vault_radarr_key }}"
           fields: [wanted, missing, movies, queued]
 
     - Jackett:
@@ -45,13 +67,23 @@
         siteMonitor: http://192.168.2.105:9117
         description: Indexer Manager
         icon: jackett
+        widget:
+          type: jackett
+          url: http://192.168.2.105:9117
+          password: "{{ vault_jackett_password }}"
 
     - qBittorrent:
-        href: http://192.168.2.105:8080/
-        ping: http://192.168.2.105:8080/
-        siteMonitor: http://192.168.2.105:8080/
+        href: http://192.168.2.105:8080
+        ping: http://192.168.2.105:8080
+        siteMonitor: http://192.168.2.105:8080
         description: Downloader
         icon: qBittorrent
+        widget:
+          type: qbittorrent
+          url: http://192.168.2.105:8080
+          username: admin
+          password: "{{ vault_qbittorrent_password }}"
+          enableLeechProgress: false
 
     - Bazarr:
         href: http://192.168.2.105:6767
@@ -59,6 +91,10 @@
         siteMonitor: http://192.168.2.105:6767
         description: Subtitles
         icon: bazarr
+        widget:
+          type: bazarr
+          url: http://192.168.2.105:6767
+          key: "{{vault_bazarr_key}}"
 
 - Infra:
     - Grafana:
@@ -67,6 +103,11 @@
         siteMonitor: http://192.168.2.106:3000
         description: Charts
         icon: grafana
+        widget:
+          type: grafana
+          url: http://192.168.2.106:3000
+          username: "{{ vault_grafana_username }}"
+          password: "{{ vault_grafana_password }}"
 
     - Prometheus:
         href: http://192.168.2.106:9090
@@ -74,6 +115,9 @@
         siteMonitor: http://192.168.2.106:9090
         description: Metrics Collector
         icon: prometheus
+        widget:
+          type: prometheus
+          url: http://192.168.2.106:9090
 
     - Node Exporter:
         href: http://192.168.2.106:9100
@@ -94,7 +138,11 @@
         ping: http://192.168.2.106:3001
         siteMonitor: http://192.168.2.106:3001
         description: monitoring
-        icon: uptimeKuma
+        icon: uptimekuma
+        widget:
+          type: uptimekuma
+          url: http://http://192.168.2.106:3001
+          slug: dashboard
 
     - Dozzle:
         href: http://192.168.2.106:9999
@@ -103,12 +151,29 @@
         description: containers
         icon: dozzle
 
-    - Portainer:
+    - Portainer - Infra:
         href: http://192.168.2.106:9000
         ping: http://192.168.2.106:9000
         siteMonitor: http://192.168.2.106:9000
         description: containers
         icon: portainer
+        widget:
+          type: portainer
+          url: http://192.168.2.106:9000
+          env: 5
+          key: "{{ vault_portainer_key }}"
+
+    - Portainer - Media:
+        href: http://192.168.2.106:9000
+        ping: http://192.168.2.106:9000
+        siteMonitor: http://192.168.2.106:9000
+        description: containers
+        icon: portainer
+        widget:
+          type: portainer
+          url: http://192.168.2.106:9000
+          env: 3
+          key: "{{ vault_portainer_key }}"
 
     - Router:
         href: http://192.168.2.254/

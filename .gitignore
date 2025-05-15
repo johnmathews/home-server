@@ -2,3 +2,4 @@ I.DS_Store
 iso-images/
 cloud-images/
 .vault_pass.txt
+.env

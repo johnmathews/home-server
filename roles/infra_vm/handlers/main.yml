@@ -21,3 +21,9 @@
   systemd:
     name: ipmi_exporter
     state: restarted
+
+- name: Restart homepage container
+  command: docker compose restart homepage 
+  args:
+    chdir: "{{ docker_compose_dir }}"
+

@@ -12,6 +12,8 @@ services:
       PGID: 1000 # optional
     ports:
       - 3002:3000
+    env_file:
+      - /opt/infra_stack/homepage/config/.env
     volumes:
       - /opt/infra_stack/homepage/config:/app/config
       - /var/run/docker.sock:/var/run/docker.sock:ro

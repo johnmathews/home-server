@@ -28,4 +28,33 @@
     mode: '0644'
   with_fileglob:
     - "files/homepage_config/*"
+  register: homepage_config_uploads
   become: true
+
+- name: Template Docker Compose file
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ docker_compose_dir }}/docker-compose.yml"
+    owner: "{{ docker_user }}"
+    group: docker
+    mode: '0644'
+
+- name: Template homepage services.yaml
+  template:
+    src: homepage/services.yaml.j2
+    dest: /opt/infra_stack/homepage/config/services.yaml
+    owner: "{{ docker_user }}"
+    group: "{{ docker_user }}"
+    mode: '0644'
+
+# - name: Restart homepage container
+#   command: docker compose restart homepage 
+#   args:
+#     chdir: "{{ docker_compose_dir }}"
+
+# - name: Trigger handler if .env changed
+#   ansible.builtin.debug:
+#     msg: "Restarting homepage container because .env changed"
+#   when: homepage_env_changed
+#   notify: 
+#     - Restart homepage container
