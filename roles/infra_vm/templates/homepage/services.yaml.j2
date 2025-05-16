@@ -37,6 +37,12 @@
           url: http://192.168.2.105:5055/
           key: "{{ vault_jellyseer_key }}"
 
+    - File Browser:
+        href: http://192.168.2.104:30051
+        ping: http://192.168.2.104:30051
+        siteMonitor: http://192.168.2.104:30051
+        icon: filebrowser
+
 - Media-2:
     - Radarr:
         href: http://192.168.2.105:7878
@@ -49,6 +55,7 @@
           url: http://192.168.2.105:7878
           key: "{{ vault_radarr_key }}"
           fields: [wanted, missing, movies, queued]
+          enableQueue: false
 
     - Sonarr:
         href: http://192.168.2.105:8989/
@@ -60,18 +67,7 @@
           type: sonarr
           url: http://192.168.2.105:8989/
           key: "{{ vault_sonarr_key }}"
-          enableQueue: true # optional, defaults to false
-
-    - Jackett:
-        href: http://192.168.2.105:9117
-        ping: http://192.168.2.105:9117
-        siteMonitor: http://192.168.2.105:9117
-        description: Indexer Manager
-        icon: jackett
-        widget:
-          type: jackett
-          url: http://192.168.2.105:9117
-          password: "{{ vault_jackett_password }}"
+          enableQueue: false
 
     - qBittorrent:
         href: http://192.168.2.105:8080
@@ -85,6 +81,17 @@
           username: admin
           password: "{{ vault_qbittorrent_password }}"
           enableLeechProgress: false
+
+    - Jackett:
+        href: http://192.168.2.105:9117
+        ping: http://192.168.2.105:9117
+        siteMonitor: http://192.168.2.105:9117
+        description: Indexer Manager
+        icon: jackett
+        widget:
+          type: jackett
+          url: http://192.168.2.105:9117
+          password: "{{ vault_jackett_password }}"
 
     - Bazarr:
         href: http://192.168.2.105:6767
@@ -137,6 +144,15 @@
               label: server shelf
 
 - Infra-2:
+    - Traefik:
+        href: http://192.168.2.101:8080
+        ping: http://192.168.2.101:8080
+        siteMonitor: http://192.168.2.101:8080
+        icon: traefik
+        widget:
+          type: traefik
+          url: http://192.168.2.101:8080
+
     - AdGuard:
         href: http://192.168.2.111
         ping: http://192.168.2.111
@@ -170,27 +186,6 @@
           type: prometheus
           url: http://192.168.2.106:9090
 
-    - Node Exporter:
-        href: http://192.168.2.106:9100
-        ping: http://192.168.2.106:9100
-        siteMonitor: http://192.168.2.106:9100
-        description: Node Exporter
-        icon: node exporter
-
-    - cAdvisor:
-        href: http://192.168.2.106:8080
-        ping: http://192.168.2.106:8080
-        siteMonitor: http://192.168.2.106:8080
-        description: container metrics
-        icon: https://cdn.jsdelivr.net/gh/selfhst/icons/svg/cadvisor.svg
-
-    - Dozzle:
-        href: http://192.168.2.106:9999
-        ping: http://192.168.2.106:9999
-        siteMonitor: http://192.168.2.106:9999
-        description: containers
-        icon: dozzle
-
     - Portainer - Infra:
         href: http://192.168.2.106:9000
         ping: http://192.168.2.106:9000
@@ -215,8 +210,29 @@
           env: 3
           key: "{{ vault_portainer_key }}"
 
+    - Node Exporter:
+        href: http://192.168.2.106:9100
+        ping: http://192.168.2.106:9100
+        siteMonitor: http://192.168.2.106:9100
+        description: Node Exporter
+        icon: node exporter
 
-- Hardware:
+    - cAdvisor:
+        href: http://192.168.2.106:8080
+        ping: http://192.168.2.106:8080
+        siteMonitor: http://192.168.2.106:8080
+        description: container metrics
+        icon: https://cdn.jsdelivr.net/gh/selfhst/icons/svg/cadvisor.svg
+
+    - Dozzle:
+        href: http://192.168.2.106:9999
+        ping: http://192.168.2.106:9999
+        siteMonitor: http://192.168.2.106:9999
+        description: containers
+        icon: dozzle
+
+
+- PVE:
     - Proxmox:
         href: https://192.168.2.214:8006
         ping: https://192.168.2.214:8006
@@ -241,6 +257,7 @@
           username: "{{ vault_proxmox_backup_api_token_id }}" 
           password: "{{ vault_proxmox_backup_api_token_secret }}"
 
+- Hardware:
     - Router:
         href: http://192.168.2.254/
         ping: http://192.168.2.254/

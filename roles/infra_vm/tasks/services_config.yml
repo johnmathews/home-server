@@ -46,15 +46,3 @@
     owner: "{{ docker_user }}"
     group: "{{ docker_user }}"
     mode: '0644'
-
-# - name: Restart homepage container
-#   command: docker compose restart homepage 
-#   args:
-#     chdir: "{{ docker_compose_dir }}"
-
-# - name: Trigger handler if .env changed
-#   ansible.builtin.debug:
-#     msg: "Restarting homepage container because .env changed"
-#   when: homepage_env_changed
-#   notify: 
-#     - Restart homepage container
