@@ -27,6 +27,10 @@ The motherboard uses the Redfish API. You can use it to change fan profiles, but
 not to set fan RPM directly. Probably best to attach the fans to an ESP32 board
 that has temperature probes, and make it log metrics via Home Assistant.
 
+## Cloudflared tunnel
+
+Is hosted on the infra VM. Manage it on cloudflare.com
+
 ## iGPU setup
 
 In BIOS, go Advanced > NBIO Common Options >

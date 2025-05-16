@@ -29,6 +29,9 @@ media:
 infra:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/infra_vm.yml $(VAULT) $(TAGS)
 
+traefik:
+	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/traefik_lxc.yml $(VAULT) $(TAGS)
+
 lint-paths:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/validate-paths.yml $(VAULT) $(TAGS)
 
@@ -55,9 +58,10 @@ help:
 	@echo ""
 	@echo "  make site             → Run full home server setup"
 	@echo "  make proxmox          → Setup the proxmox node, doesnt setup authentication"
-	@echo "  make nas          → Setup TrueNAS VM by provisioning a VM and uploading a TrueNAS ISO"
+	@echo "  make nas              → Setup TrueNAS VM by provisioning a VM and uploading a TrueNAS ISO"
 	@echo "  make media            → Full Media VM config"
 	@echo "  make infra            → Full Infra VM config"
+	@echo "  make traefik          → Traefik reverse proxy config"
 	@echo "  make check            → Dry run (no changes applied)"
 	@echo "  make lint             → Lint playbooks and roles"
 	@echo "  make clean            → Remove temp files and retry logs"

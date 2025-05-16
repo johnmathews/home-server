@@ -1,0 +1,28 @@
+# traefik_lxc/tasks/main.yml
+
+---
+
+- name: Ensure /etc/traefik exists
+  file:
+    path: /etc/traefik
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Upload traefik.yaml config
+  copy:
+    src: traefik_config.yaml
+    dest: /etc/traefik/traefik.yaml
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart Traefik
+
+- name: Upload jellyfin dynamic config
+  copy:
+    src: providers.yml
+    dest: /etc/traefik/conf.d/providers.yml
+    owner: root
+    group: root
+    mode: '0644'

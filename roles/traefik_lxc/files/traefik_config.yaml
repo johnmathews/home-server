@@ -1,0 +1,51 @@
+# traefik_lxc/files/traefik_config.yml
+
+---
+
+providers:
+  file:
+    directory: /etc/traefik/conf.d/
+
+entryPoints:
+  traefik:
+    address: ':8080'
+  web:
+    address: ':80'
+  websecure:
+    address: ':443'
+    http:
+      tls:
+        certResolver: letsencrypt
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: "foo@bar.com"
+      storage: /etc/traefik/ssl/acme.json
+      tlsChallenge: {}
+
+api:
+  dashboard: true
+  insecure: true
+
+log:
+  filePath: /var/log/traefik/traefik.log
+  format: json
+  level: INFO
+
+accessLog:
+  filePath: /var/log/traefik/traefik-access.log
+  format: json
+  filters:
+    statusCodes:
+      - "200"
+      - "400-599"
+    retryAttempts: true
+    minDuration: "10ms"
+  bufferingSize: 0
+  fields:
+    headers:
+      defaultMode: drop
+      names:
+        User-Agent: keep
+

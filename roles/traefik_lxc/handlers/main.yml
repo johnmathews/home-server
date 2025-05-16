@@ -1,0 +1,8 @@
+# traefik_lxc/handlers/main.yml
+
+---
+
+- name: Restart Traefik
+  ansible.builtin.service:
+    name: traefik
+    state: restarted
