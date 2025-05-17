@@ -7,9 +7,9 @@ services:
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
     environment:
-      HOMEPAGE_ALLOWED_HOSTS: home.itsa.pizza,192.168.2.106:3002 # required, may need port. See gethomepage.dev/installation/#homepage_allowed_hosts
-      PUID: 1000 # optional
-      PGID: 1000 # optional
+      HOMEPAGE_ALLOWED_HOSTS: 192.168.2.106:3002,home.itsa.pizza,itsa.pizza
+      PUID: 1000
+      PGID: 1000
     ports:
       - 3002:3000
     env_file:
@@ -38,16 +38,34 @@ services:
     restart: unless-stopped
 
   node-exporter:
-    image: prom/node-exporter
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    restart: unless-stopped
     ports:
       - "9100:9100"
-    restart: unless-stopped
+    pid: "host"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--path.rootfs=/rootfs'
+      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($|/)'
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    restart: unless-stopped
     ports:
       - "8080:8080"
-    restart: unless-stopped
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    privileged: true  # required for some metrics
 
   uptime-kuma:
     image: louislam/uptime-kuma

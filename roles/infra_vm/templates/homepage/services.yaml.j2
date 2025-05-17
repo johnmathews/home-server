@@ -8,7 +8,7 @@
 
 - Media-1:
     - Jellyfin:
-        href: http://192.168.2.214:8096
+        href: http://jelly.itsa.pizza
         ping: http://192.168.2.214:8096
         siteMonitor: http://192.168.2.214:8096
         description: TV app 
@@ -27,7 +27,7 @@
           expandOneStreamToTwoRows: false # optional, defaults to true
 
     - Jellyseerr:
-        href: http://192.168.2.105:5055/
+        href: http://seerr.itsa.pizza
         ping: http://192.168.2.105:5055/
         siteMonitor: http://192.168.2.105:5055/
         description: TV
@@ -38,7 +38,7 @@
           key: "{{ vault_jellyseer_key }}"
 
     - File Browser:
-        href: http://192.168.2.104:30051
+        href: http://files.itsa.pizza
         ping: http://192.168.2.104:30051
         siteMonitor: http://192.168.2.104:30051
         icon: filebrowser
@@ -106,7 +106,7 @@
 
 - Infra-1:
     - Grafana:
-        href: http://192.168.2.106:3000
+        href: http://grafana.itsa.pizza
         ping: http://192.168.2.106:3000
         siteMonitor: http://192.168.2.106:3000
         icon: grafana
@@ -117,7 +117,7 @@
           password: "{{ vault_grafana_password }}"
 
     - TrueNAS:
-        href: http://192.168.2.104
+        href: http://nas.itsa.pizza
         ping: http://192.168.2.104
         siteMonitor: http://192.168.2.104
         icon: truenas
@@ -144,15 +144,6 @@
               label: server shelf
 
 - Infra-2:
-    - Traefik:
-        href: http://192.168.2.101:8080
-        ping: http://192.168.2.101:8080
-        siteMonitor: http://192.168.2.101:8080
-        icon: traefik
-        widget:
-          type: traefik
-          url: http://192.168.2.101:8080
-
     - AdGuard:
         href: http://192.168.2.111
         ping: http://192.168.2.111
@@ -166,7 +157,7 @@
           password: "{{ vault_adguard_password }}"
 
     - Uptime Kuma:
-        href: http://192.168.2.106:3001
+        href: https://uptime.itsa.pizza
         ping: http://192.168.2.106:3001
         siteMonitor: http://192.168.2.106:3001
         description: Monitoring
@@ -195,7 +186,7 @@
         widget:
           type: portainer
           url: http://192.168.2.106:9000
-          env: 5
+          env: 3
           key: "{{ vault_portainer_key }}"
 
     - Portainer - Media:
@@ -207,7 +198,7 @@
         widget:
           type: portainer
           url: http://192.168.2.106:9000
-          env: 3
+          env: 5
           key: "{{ vault_portainer_key }}"
 
     - Node Exporter:

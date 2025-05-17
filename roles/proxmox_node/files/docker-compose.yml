@@ -30,3 +30,17 @@ services:
       - WATCHTOWER_POLL_INTERVAL=86400  # Check every 24 hours
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+
+  # node exporter is running outside docker.
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    restart: unless-stopped
+    ports:
+      - "18080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    privileged: true  # required for some metrics
