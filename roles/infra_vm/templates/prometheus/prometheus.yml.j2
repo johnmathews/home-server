@@ -13,7 +13,27 @@ scrape_configs:
 
   - job_name: 'cadvisor'
     static_configs:
-      - targets: ['cadvisor:8080']
+      - targets: ['192.168.2.214:18080']
+        labels:
+          instance: proxmox
+      - targets: ['192.168.2.105:18080']
+        labels:
+          instance: media_vm
+      - targets: ['192.168.2.106:8080']
+        labels:
+          instance: infra_vm
+
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['192.168.2.214:9100']
+        labels:
+          instance: proxmox
+      - targets: ['192.168.2.105:9100']
+        labels:
+          instance: media_vm
+      - targets: ['192.168.2.106:9100']
+        labels:
+          instance: infra_vm
 
   - job_name: 'home-assistant'
     metrics_path: /api/prometheus
@@ -23,10 +43,14 @@ scrape_configs:
       credentials: "{{ vault_home_assistant_token }}"
     static_configs:
       - targets: ['192.168.2.102:8123']
+        labels:
+          instance: home-assistant
 
   - job_name: 'unbound'
     static_configs:
       - targets: ['192.168.2.111:9167']
+        labels:
+          instance: unbound
 
   - job_name: 'proxmox-ipmi'
     metrics_path: /metrics
@@ -35,13 +59,11 @@ scrape_configs:
         labels:
           instance: proxmox
 
-  - job_name: 'proxmox-host-node-exporter'
-    static_configs:
-      - targets: ['192.168.2.214:9100']
-
   - job_name: 'proxmox-smartctl'
     static_configs:
       - targets: ['192.168.2.214:9633']
+        labels:
+          instance: proxmox
 
   - job_name: 'pve-exporter'
     metrics_path: /pve
@@ -51,23 +73,33 @@ scrape_configs:
       node: ['1']
     static_configs:
       - targets: ['192.168.2.214:9221']
+        labels:
+          instance: proxmox
 
   - job_name: 'pve-exporter-internal'
     static_configs:
       - targets: ['192.168.2.214:9221']
+        labels:
+          instance: proxmox
 
   - job_name: 'truenas-node-exporter'
     static_configs:
       - targets: ['192.168.2.104:9100']
+        labels:
+          instance: truenas
 
   - job_name: 'truenas-smrtctl-exporter'
     static_configs:
       - targets: ['192.168.2.104:9100']
+        labels:
+          instance: truenas
 
   - job_name: 'proxmox-textfile'
     metrics_path: /metrics
     static_configs:
       - targets: ['192.168.2.214:9100']
+        labels:
+          instance: proxmox
     relabel_configs:
       - source_labels: [__name__]
         regex: 'radeontop_.*'

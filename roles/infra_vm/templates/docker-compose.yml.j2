@@ -65,7 +65,7 @@ services:
       - /var/run:/var/run:ro
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
-    privileged: true  # required for some metrics
+    privileged: true
 
   uptime-kuma:
     image: louislam/uptime-kuma
