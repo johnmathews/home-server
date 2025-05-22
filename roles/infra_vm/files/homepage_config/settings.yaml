@@ -17,16 +17,11 @@ useEqualHeights: false
 layout:
   Media-1:
     style: row
-    columns: 4
-    widgets:
-      - radarr
-
+    columns: 3
   Media-2:
-    initiallyCollapsed: false
+    initiallyCollapsed: true
     style: row
-    columns: 4
-    widgets:
-      - radarr
+    columns: 2
 
   Infra-1:
     style: row

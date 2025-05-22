@@ -166,9 +166,7 @@
   stat:
     path: "{{ item }}"
   loop:
-    - "{{ media_stack_mount_dir }}/library/downloads"
-    - "{{ media_stack_mount_dir }}/library/tv"
-    - "{{ media_stack_mount_dir }}/library/movies"
+    - "{{ media_stack_mount_dir }}/library"
   register: mounted_dirs
 
 - name: Fail if any mounted media paths are missing

@@ -16,8 +16,9 @@ services:
       - /dev/dri:/dev/dri
     volumes:
       - /srv/jellyfin/appdata:/config
-      - /srv/media/library:/library
       - /srv/jellyfin/cache:/cache
+      - /srv/media/library:/library
+      - /srv/media/media:/media
     privileged: true
 
   watchtower:

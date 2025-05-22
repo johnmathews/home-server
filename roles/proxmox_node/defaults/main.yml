@@ -20,9 +20,15 @@ pve_exporter_listen_port: 9221
 
 proxmox_api_user: "api@pve"
 
+radeontop_exporter_path: /usr/local/bin/radeontop-exporter.py
+
 smb_proxmox_username: proxmox_smb_user
 smb_server: 192.168.2.104
-smb_share_name: library
-smb_share_path: /srv/media/library
 
-radeontop_exporter_path: /usr/local/bin/radeontop-exporter.py
+# smb_share_name: library
+# smb_share_path: /srv/media/library
+smb_shares:
+  - name: library 
+    target: /srv/media/library
+  - name: media 
+    target: /srv/media/media

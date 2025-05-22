@@ -43,7 +43,6 @@
         siteMonitor: http://192.168.2.104:30051
         icon: filebrowser
 
-- Media-2:
     - Radarr:
         href: http://192.168.2.105:7878
         ping: http://192.168.2.105:7878
@@ -82,6 +81,18 @@
           password: "{{ vault_qbittorrent_password }}"
           enableLeechProgress: false
 
+- Media-2:
+    - Prowlarr:
+        href: http://192.168.2.105:9696
+        ping: http://192.168.2.105:9696
+        siteMonitor: http://192.168.2.105:9696
+        description: Indexer Manager
+        icon: prowlarr
+        widget:
+          type: prowlarr
+          url: http://192.168.2.105:9696
+          key: "{{ vault_prowlarr_api_key }}"
+
     - Jackett:
         href: http://192.168.2.105:9117
         ping: http://192.168.2.105:9117
@@ -103,6 +114,20 @@
           type: bazarr
           url: http://192.168.2.105:6767
           key: "{{vault_bazarr_key}}"
+
+    - qBittorrent:
+        href: http://192.168.2.105:8080
+        ping: http://192.168.2.105:8080
+        siteMonitor: http://192.168.2.105:8080
+        description: Downloader
+        icon: https://cdn.jsdelivr.net/gh/selfhst/icons/svg/qbittorrent.svg
+        widget:
+          type: qbittorrent
+          url: http://192.168.2.105:8080
+          username: admin
+          password: "{{ vault_qbittorrent_password }}"
+          enableLeechProgress: true
+
 
 - Infra-1:
     - Grafana:
@@ -201,19 +226,19 @@
           env: 5
           key: "{{ vault_portainer_key }}"
 
-    - Node Exporter:
-        href: http://192.168.2.106:9100
-        ping: http://192.168.2.106:9100
-        siteMonitor: http://192.168.2.106:9100
-        description: Node Exporter
-        icon: node exporter
+    # - Node Exporter:
+    #     href: http://192.168.2.106:9100
+    #     ping: http://192.168.2.106:9100
+    #     siteMonitor: http://192.168.2.106:9100
+    #     description: Node Exporter
+    #     icon: node exporter
 
-    - cAdvisor:
-        href: http://192.168.2.106:8080
-        ping: http://192.168.2.106:8080
-        siteMonitor: http://192.168.2.106:8080
-        description: container metrics
-        icon: https://cdn.jsdelivr.net/gh/selfhst/icons/svg/cadvisor.svg
+    # - cAdvisor:
+    #     href: http://192.168.2.106:8080
+    #     ping: http://192.168.2.106:8080
+    #     siteMonitor: http://192.168.2.106:8080
+    #     description: container metrics
+    #     icon: https://cdn.jsdelivr.net/gh/selfhst/icons/svg/cadvisor.svg
 
     - Dozzle:
         href: http://192.168.2.106:9999

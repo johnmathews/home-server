@@ -3,6 +3,80 @@
 ---
 
 services:
+  gluetun:
+    image: qmcgaw/gluetun
+    container_name: gluetun
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun
+    volumes:
+      - ./gluetun:/gluetun
+    environment:
+      - VPN_TYPE=wireguard
+      # - FIREWALL_OUTBOUND_SUBNETS=192.168.0.0/16
+      - VPN_SERVICE_PROVIDER=${VPN_SERVICE_PROVIDER}
+      - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
+      - WIREGUARD_ADDRESSES=${WIREGUARD_ADDRESSES}
+      - WIREGUARD_PUBLIC_KEY=${WIREGUARD_PUBLIC_KEY}
+      - WIREGUARD_ENDPOINT=${WIREGUARD_ENDPOINT}
+      - TZ=Europe/Amsterdam
+    ports:
+      - 8080:8080 # qBittorrent WebUI
+      - 6881:6881 # BitTorrent port
+      - 6881:6881/udp
+    restart: unless-stopped
+
+  qbittorrent:
+    image: linuxserver/qbittorrent
+    container_name: qbittorrent
+    security_opt:
+      - no-new-privileges:true
+    network_mode: "container:gluetun"
+    depends_on:
+      - gluetun
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - WEBUI_USERNAME=${QBITTORRENT_USERNAME}
+      - WEBUI_PASSWORD=${QBITTORRENT_PASSWORD}
+      # - QBT_WEBUI_PORT=8080
+    volumes:
+      # /srv/media/config 
+      - ${CONFIG_DIR}:/config
+      # /mnt/media/library/downloads 
+      - ${DOWNLOAD_DIR}:/downloads
+      # /mnt/media/library
+      - ${MEDIA_DIR}:/media
+    restart: unless-stopped
+
+  flaresolverr:
+    # DockerHub mirror flaresolverr/flaresolverr:latest
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    environment:
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - LOG_HTML=${LOG_HTML:-false}
+      - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
+      - TZ=${TZ}
+    ports:
+      - "${PORT:-8191}:8191"
+    restart: unless-stopped 
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${CONFIG_DIR}/prowlarr:/config
+    ports:
+      - "9696:9696"
+    restart: unless-stopped
+
   jellyseerr:
     image: fallenbagel/jellyseerr:latest
     container_name: jellyseerr
@@ -14,30 +88,6 @@ services:
       - ${CONFIG_DIR}/jellyseer:/app/config
     restart: unless-stopped
 
-  qbittorrent:
-    image: linuxserver/qbittorrent
-    container_name: qbittorrent
-    security_opt:
-      - no-new-privileges:true
-    ports:
-      - "8080:8080"
-      - "6881:6881"
-      - "6881:6881/udp"
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-      - WEBUI_USERNAME=${QBITTORRENT_USERNAME}
-      - WEBUI_PASSWORD=${QBITTORRENT_PASSWORD}
-    volumes:
-      # /srv/media/config 
-      - ${CONFIG_DIR}:/config
-      # /mnt/media/library/downloads 
-      - ${DOWNLOAD_DIR}:/downloads
-      # /mnt/media/library
-      - ${MEDIA_DIR}:/media
-
-    restart: unless-stopped
 
   sonarr:
     image: linuxserver/sonarr

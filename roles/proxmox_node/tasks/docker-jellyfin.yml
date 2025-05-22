@@ -60,7 +60,16 @@
   loop:
     - /srv/jellyfin/config
     - /srv/jellyfin/cache
-    - "{{ smb_share_path }}"
+
+
+- name: Create required smb share directories
+  file:
+    path: "{{ item.target }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  loop: "{{ smb_shares }}"
 
 - name: Install Docker Compose plugin
   apt:
@@ -97,25 +106,27 @@
 
 - name: Mount SMB share
   mount:
-    path: "{{ smb_share_path }}"
-    src: "//{{ smb_server }}/{{ smb_share_name }}"
+    path: "/srv/media/{{ item.name }}"
+    src: "//{{ smb_server }}/{{ item.name }}"
     fstype: cifs
     opts: credentials=/root/.smbcredentials,iocharset=utf8,noperm,nofail,vers=3.0
     state: mounted
-
+  loop: "{{ smb_shares }}"
 
 - name: Verify that SMB share is successfully mounted
-  command: "mountpoint -q  {{ smb_share_path }}"
+  command: "mountpoint -q  {{ item.target }}"
   register: smb_mount_check
   changed_when: false
   failed_when: smb_mount_check.rc != 0
+  loop: "{{ smb_shares }}"
 
 - name: Persist SMB mount in /etc/fstab
   lineinfile:
     path: /etc/fstab
-    line: //{{ smb_server }}/{{ smb_share_name }} {{ smb_share_path }} cifs credentials=/root/.smbcredentials,iocharset=utf8,noperm,nofail,vers=3.0 0 0
+    line: //{{ smb_server }}/{{ item.name }} /srv/media/{{ item.name }} cifs credentials=/root/.smbcredentials,iocharset=utf8,noperm,nofail,vers=3.0 0 0
     state: present
     create: yes
+  loop: "{{ smb_shares }}"
 
 - name: Start Jellyfin using Docker Compose
   community.docker.docker_compose_v2:
