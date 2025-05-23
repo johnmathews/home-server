@@ -117,6 +117,13 @@
     mode: '0600'
   notify: Restart media stack
 
+- name: Create gluetun config file from template
+  template:
+    src: gluetun_config.toml.j2
+    dest: "{{ media_stack_config_dir }}/gluetun/config.toml"
+    mode: '0600'
+  notify: Restart media stack
+
 - name: Ensure .env and docker-compose.yml are owned by "john"
   ansible.builtin.file:
     path: "{{ item }}"
@@ -124,7 +131,6 @@
     group: "{{ media_stack_user }}"
   loop:
     - /srv/media/.env
-    - /srv/media/docker-compose.yml
 
 - name: Ensure Radarr config directory has correct UID/GID
   ansible.builtin.file:

@@ -93,28 +93,6 @@
           url: http://192.168.2.105:9696
           key: "{{ vault_prowlarr_api_key }}"
 
-    - Jackett:
-        href: http://192.168.2.105:9117
-        ping: http://192.168.2.105:9117
-        siteMonitor: http://192.168.2.105:9117
-        description: Indexer Manager
-        icon: jackett
-        widget:
-          type: jackett
-          url: http://192.168.2.105:9117
-          password: "{{ vault_jackett_password }}"
-
-    - Bazarr:
-        href: http://192.168.2.105:6767
-        ping: http://192.168.2.105:6767
-        siteMonitor: http://192.168.2.105:6767
-        description: Subtitles
-        icon: bazarr
-        widget:
-          type: bazarr
-          url: http://192.168.2.105:6767
-          key: "{{vault_bazarr_key}}"
-
     - qBittorrent:
         href: http://192.168.2.105:8080
         ping: http://192.168.2.105:8080
@@ -128,6 +106,37 @@
           password: "{{ vault_qbittorrent_password }}"
           enableLeechProgress: true
 
+    - Gluetun:
+        href: http://192.168.2.105:8000
+        ping: http://192.168.2.105:8000
+        siteMonitor: http://192.168.2.105:8000
+        description: VPN client
+        icon: gluetun
+        widget:
+          type: gluetun
+          url: http://192.168.2.105:8000
+
+    - Bazarr:
+        href: http://192.168.2.105:6767
+        ping: http://192.168.2.105:6767
+        siteMonitor: http://192.168.2.105:6767
+        description: Subtitles
+        icon: bazarr
+        widget:
+          type: bazarr
+          url: http://192.168.2.105:6767
+          key: "{{vault_bazarr_key}}"
+
+    - Jackett:
+        href: http://192.168.2.105:9117
+        ping: http://192.168.2.105:9117
+        siteMonitor: http://192.168.2.105:9117
+        description: Indexer Manager
+        icon: jackett
+        widget:
+          type: jackett
+          url: http://192.168.2.105:9117
+          password: "{{ vault_jackett_password }}"
 
 - Infra-1:
     - Grafana:

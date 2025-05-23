@@ -1,4 +1,4 @@
-# docker-compose.yml (abstracted variables + host-mounted SMB shares)
+# media_vm/files/docker-compose.yml
 
 ---
 
@@ -10,21 +10,26 @@ services:
       - NET_ADMIN
     devices:
       - /dev/net/tun
-    volumes:
-      - ./gluetun:/gluetun
-    environment:
-      - VPN_TYPE=wireguard
-      # - FIREWALL_OUTBOUND_SUBNETS=192.168.0.0/16
-      - VPN_SERVICE_PROVIDER=${VPN_SERVICE_PROVIDER}
-      - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
-      - WIREGUARD_ADDRESSES=${WIREGUARD_ADDRESSES}
-      - WIREGUARD_PUBLIC_KEY=${WIREGUARD_PUBLIC_KEY}
-      - WIREGUARD_ENDPOINT=${WIREGUARD_ENDPOINT}
-      - TZ=Europe/Amsterdam
     ports:
       - 8080:8080 # qBittorrent WebUI
       - 6881:6881 # BitTorrent port
       - 6881:6881/udp
+      - 3189:3189 # endpoint port
+      - 8000:8000/tcp # control server port
+      # - 8888:8888/tcp # HTTP proxy
+      # - 8388:8388/tcp # Shadowsocks
+      # - 8388:8388/udp # Shadowsocks
+    volumes:
+      - ${CONFIG_DIR}/gluetun:/gluetun
+    environment:
+      - VPN_SERVICE_PROVIDER=${VPN_SERVICE_PROVIDER}
+      - VPN_TYPE=wireguard
+      - WIREGUARD_ENDPOINT=${WIREGUARD_ENDPOINT}
+      - WIREGUARD_PUBLIC_KEY=${WIREGUARD_PUBLIC_KEY}
+      - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
+      - WIREGUARD_ADDRESSES=${WIREGUARD_ADDRESSES}
+      - OWNED_ONLY=yes
+      - TZ=Europe/Amsterdam
     restart: unless-stopped
 
   qbittorrent:
@@ -32,9 +37,7 @@ services:
     container_name: qbittorrent
     security_opt:
       - no-new-privileges:true
-    network_mode: "container:gluetun"
-    depends_on:
-      - gluetun
+    network_mode: "service:gluetun"
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
