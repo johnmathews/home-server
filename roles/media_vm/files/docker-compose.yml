@@ -3,6 +3,21 @@
 ---
 
 services:
+  sabnzbd:
+    image: lscr.io/linuxserver/sabnzbd:latest
+    container_name: sabnzbd
+    environment:
+      - PUID=1000     # Your user ID (run `id -u` on host)
+      - PGID=1000     # Your group ID (run `id -g`)
+      - TZ=Europe/Amsterdam
+    volumes:
+      - ${CONFIG_DIR}/sabnzbd:/config # Persistent settings
+      - ${DOWNLOAD_DIR}:/downloads
+      - ${DOWNLOAD_DIR}/incomplete:/incomplete-downloads # Temp dir for incomplete files
+    ports:
+      - "8081:8080"  # Web UI accessible at http://localhost:8080
+    restart: unless-stopped
+
   gluetun:
     image: qmcgaw/gluetun
     container_name: gluetun
@@ -16,9 +31,9 @@ services:
       - 6881:6881/udp
       - 3189:3189 # endpoint port
       - 8000:8000/tcp # control server port
-      # - 8888:8888/tcp # HTTP proxy
-      # - 8388:8388/tcp # Shadowsocks
-      # - 8388:8388/udp # Shadowsocks
+      - 8888:8888/tcp # HTTP proxy
+      - 8388:8388/tcp # Shadowsocks
+      - 8388:8388/udp # Shadowsocks
     volumes:
       - ${CONFIG_DIR}/gluetun:/gluetun
     environment:

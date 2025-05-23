@@ -35,6 +35,17 @@ scrape_configs:
         labels:
           instance: infra_vm
 
+  - job_name: 'proxmox-textfile'
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['192.168.2.214:9100']
+        labels:
+          instance: proxmox
+    metric_relabel_configs:
+      - source_labels: [__name__]
+        regex: 'radeontop_.*'
+        action: keep
+
   - job_name: 'home-assistant'
     metrics_path: /api/prometheus
     scheme: http
@@ -90,17 +101,6 @@ scrape_configs:
 
   - job_name: 'truenas-smrtctl-exporter'
     static_configs:
-      - targets: ['192.168.2.104:9100']
+      - targets: ['192.168.2.104:9633']
         labels:
           instance: truenas
-
-  - job_name: 'proxmox-textfile'
-    metrics_path: /metrics
-    static_configs:
-      - targets: ['192.168.2.214:9100']
-        labels:
-          instance: proxmox
-    relabel_configs:
-      - source_labels: [__name__]
-        regex: 'radeontop_.*'
-        action: keep

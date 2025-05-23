@@ -107,9 +107,9 @@
           enableLeechProgress: true
 
     - Gluetun:
-        href: http://192.168.2.105:8000
-        ping: http://192.168.2.105:8000
-        siteMonitor: http://192.168.2.105:8000
+        href: http://192.168.2.105:8000/v1/publicip/ip
+        ping: http://192.168.2.105:8000/v1/publicip/ip
+        siteMonitor: http://192.168.2.105:8000/v1/publicip/ip
         description: VPN client
         icon: gluetun
         widget:
@@ -127,16 +127,16 @@
           url: http://192.168.2.105:6767
           key: "{{vault_bazarr_key}}"
 
-    - Jackett:
-        href: http://192.168.2.105:9117
-        ping: http://192.168.2.105:9117
-        siteMonitor: http://192.168.2.105:9117
-        description: Indexer Manager
-        icon: jackett
-        widget:
-          type: jackett
-          url: http://192.168.2.105:9117
-          password: "{{ vault_jackett_password }}"
+    # - Jackett:
+    #     href: http://192.168.2.105:9117
+    #     ping: http://192.168.2.105:9117
+    #     siteMonitor: http://192.168.2.105:9117
+    #     description: Indexer Manager
+    #     icon: jackett
+    #     widget:
+    #       type: jackett
+    #       url: http://192.168.2.105:9117
+    #       password: "{{ vault_jackett_password }}"
 
 - Infra-1:
     - Grafana:
