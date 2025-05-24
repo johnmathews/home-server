@@ -68,6 +68,17 @@
           key: "{{ vault_sonarr_key }}"
           enableQueue: false
 
+    - SABnzbd:
+        href: http://192.168.2.105:8081/
+        ping: http://192.168.2.105:8081/
+        siteMonitor: http://192.168.2.105:8081/
+        description: Usenet download client
+        icon: sabnzbd
+        widget:
+          type: sabnzbd
+          url: http://192.168.2.105:8081/
+          key: "{{ vault_sabnzbd_key }}"
+
     - qBittorrent:
         href: http://192.168.2.105:8080
         ping: http://192.168.2.105:8080
