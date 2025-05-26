@@ -37,11 +37,23 @@
           url: http://192.168.2.105:5055/
           key: "{{ vault_jellyseer_key }}"
 
+
+- Media-2:
     - File Browser:
         href: http://files.itsa.pizza
         ping: http://192.168.2.104:30051
         siteMonitor: http://192.168.2.104:30051
         icon: filebrowser
+
+    - Gluetun:
+        href: http://192.168.2.105:8000/v1/publicip/ip
+        ping: http://192.168.2.105:8000/v1/publicip/ip
+        siteMonitor: http://192.168.2.105:8000/v1/publicip/ip
+        description: VPN client
+        icon: gluetun
+        widget:
+          type: gluetun
+          url: http://192.168.2.105:8000
 
     - Radarr:
         href: http://192.168.2.105:7878
@@ -68,6 +80,39 @@
           key: "{{ vault_sonarr_key }}"
           enableQueue: false
 
+    - Prowlarr:
+        href: http://192.168.2.105:9696
+        ping: http://192.168.2.105:9696
+        siteMonitor: http://192.168.2.105:9696
+        description: Indexer Manager
+        icon: prowlarr
+        widget:
+          type: prowlarr
+          url: http://192.168.2.105:9696
+          key: "{{ vault_prowlarr_api_key }}"
+
+    - Jackett:
+        href: http://192.168.2.105:9117
+        ping: http://192.168.2.105:9117
+        siteMonitor: http://192.168.2.105:9117
+        description: Indexer Manager
+        icon: jackett
+        widget:
+          type: jackett
+          url: http://192.168.2.105:9117
+          password: "{{ vault_jackett_password }}"
+
+    - Bazarr:
+        href: http://192.168.2.105:6767
+        ping: http://192.168.2.105:6767
+        siteMonitor: http://192.168.2.105:6767
+        description: Subtitles
+        icon: bazarr
+        widget:
+          type: bazarr
+          url: http://192.168.2.105:6767
+          key: "{{vault_bazarr_key}}"
+
     - SABnzbd:
         href: http://192.168.2.105:8081/
         ping: http://192.168.2.105:8081/
@@ -90,64 +135,29 @@
           url: http://192.168.2.105:8080
           username: admin
           password: "{{ vault_qbittorrent_password }}"
-          enableLeechProgress: false
-
-- Media-2:
-    - Prowlarr:
-        href: http://192.168.2.105:9696
-        ping: http://192.168.2.105:9696
-        siteMonitor: http://192.168.2.105:9696
-        description: Indexer Manager
-        icon: prowlarr
-        widget:
-          type: prowlarr
-          url: http://192.168.2.105:9696
-          key: "{{ vault_prowlarr_api_key }}"
-
-    - qBittorrent:
-        href: http://192.168.2.105:8080
-        ping: http://192.168.2.105:8080
-        siteMonitor: http://192.168.2.105:8080
-        description: Downloader
-        icon: https://cdn.jsdelivr.net/gh/selfhst/icons/svg/qbittorrent.svg
-        widget:
-          type: qbittorrent
-          url: http://192.168.2.105:8080
-          username: admin
-          password: "{{ vault_qbittorrent_password }}"
           enableLeechProgress: true
 
-    - Gluetun:
-        href: http://192.168.2.105:8000/v1/publicip/ip
-        ping: http://192.168.2.105:8000/v1/publicip/ip
-        siteMonitor: http://192.168.2.105:8000/v1/publicip/ip
-        description: VPN client
-        icon: gluetun
-        widget:
-          type: gluetun
-          url: http://192.168.2.105:8000
+- Usenet:
+    - NZBGeek.info:
+        href: https://nzbgeek.info/dashboard.php
+        ping: https://nzbgeek.info/dashboard.php
+        siteMonitor: https://nzbgeek.info/dashboard.php
+        description: Indexer
+        icon: https://nzbgeek.info/favicon.ico
 
-    - Bazarr:
-        href: http://192.168.2.105:6767
-        ping: http://192.168.2.105:6767
-        siteMonitor: http://192.168.2.105:6767
-        description: Subtitles
-        icon: bazarr
-        widget:
-          type: bazarr
-          url: http://192.168.2.105:6767
-          key: "{{vault_bazarr_key}}"
+    - Usenet.farm:
+        href: https://usenet.farm/members.html
+        ping: https://usenet.farm/members.html
+        siteMonitor: https://usenet.farm/members.html
+        description: Usenet Provider
+        icon: si-swisscows
 
-    # - Jackett:
-    #     href: http://192.168.2.105:9117
-    #     ping: http://192.168.2.105:9117
-    #     siteMonitor: http://192.168.2.105:9117
-    #     description: Indexer Manager
-    #     icon: jackett
-    #     widget:
-    #       type: jackett
-    #       url: http://192.168.2.105:9117
-    #       password: "{{ vault_jackett_password }}"
+    - Usenet Express:
+        href: https://members.usenetexpress.com/bytes-history
+        ping: https://members.usenetexpress.com/member
+        siteMonitor: https://members.usenetexpress.com/member
+        description: Usenet Provider
+        icon: https://usenetexpress.com/favicon.ico
 
 - Infra-1:
     - Grafana:

@@ -22,6 +22,10 @@ layout:
     initiallyCollapsed: true
     style: row
     columns: 2
+  Usenet:
+    initiallyCollapsed: true
+    style: row
+    columns: 4
 
   Infra-1:
     style: row

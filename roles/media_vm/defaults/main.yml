@@ -21,6 +21,8 @@ media_stack_group: john
 
 qbittorrent_uid: 1001
 qbittorrent_gid: 1001
+puid: 1001
+guid: 1001
 
 qbittorrent_password_hash: 16c5e9c9b842bd6bf78aafa66643304e0cfe2586
 
