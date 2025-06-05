@@ -141,7 +141,7 @@ services:
     volumes:
       - ${CONFIG_DIR}/sonarr:/config
       - ${DOWNLOAD_DIR}:/downloads
-      - ${MEDIA_DIR}:/media
+      - ${MEDIA_DIR}:/library
     ports:
       - "8989:8989"
     restart: unless-stopped
@@ -157,26 +157,26 @@ services:
     volumes:
       - ${CONFIG_DIR}/radarr:/config
       - ${DOWNLOAD_DIR}:/downloads
-      - ${MEDIA_DIR}:/media
+      - ${MEDIA_DIR}:/library
     ports:
       - "7878:7878"
     restart: unless-stopped
 
-  jackett:
-    image: linuxserver/jackett
-    container_name: jackett
-    ports:
-      - "9117:9117"
-    user: "${PUID}:${PGID}"
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-    volumes:
-      - ${CONFIG_DIR}/jackett:/config
-      - ${DOWNLOAD_DIR}:/downloads
-      - ${MEDIA_DIR}:/media
-    restart: unless-stopped
+  # jackett:
+  #   image: linuxserver/jackett
+  #   container_name: jackett
+  #   ports:
+  #     - "9117:9117"
+  #   user: "${PUID}:${PGID}"
+  #   environment:
+  #     - PUID=${PUID}
+  #     - PGID=${PGID}
+  #     - TZ=${TZ}
+  #   volumes:
+  #     - ${CONFIG_DIR}/jackett:/config
+  #     - ${DOWNLOAD_DIR}:/downloads
+  #     - ${MEDIA_DIR}:/media
+  #   restart: unless-stopped
 
   bazarr:
     image: linuxserver/bazarr

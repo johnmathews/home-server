@@ -69,8 +69,10 @@
     mode: '0755'
   loop:
     - "{{ media_stack_config_dir }}"
-    - "{{ media_stack_mount_dir }}/library"
+    - "{{ media_stack_mount_dir }}/library/family"
+    - "{{ media_stack_mount_dir }}/library/kids"
     - "{{ media_stack_config_dir | dirname }}"
+  when: item != "/mnt/media/library/downloads/incomplete"
 
 - name: Set ownership of config and mount dirs
   file:
@@ -80,7 +82,9 @@
     group: "{{ media_stack_group }}"
   loop:
     - /srv/media/config
-    - /mnt/media/library
+    - /mnt/media/library/family
+    - /mnt/media/library/kids
+  when: item != "/mnt/media/library/downloads/incomplete"
 
 # 7. Handle qBittorrent config prep before container starts
 - name: Re-create qbittorrent config directory

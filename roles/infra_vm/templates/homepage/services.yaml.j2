@@ -37,24 +37,14 @@
           url: http://192.168.2.105:5055/
           key: "{{ vault_jellyseer_key }}"
 
-
-- Media-2:
     - File Browser:
         href: http://files.itsa.pizza
         ping: http://192.168.2.104:30051
         siteMonitor: http://192.168.2.104:30051
         icon: filebrowser
 
-    - Gluetun:
-        href: http://192.168.2.105:8000/v1/publicip/ip
-        ping: http://192.168.2.105:8000/v1/publicip/ip
-        siteMonitor: http://192.168.2.105:8000/v1/publicip/ip
-        description: VPN client
-        icon: gluetun
-        widget:
-          type: gluetun
-          url: http://192.168.2.105:8000
 
+- Media-2:
     - Radarr:
         href: http://192.168.2.105:7878
         ping: http://192.168.2.105:7878
@@ -80,6 +70,16 @@
           key: "{{ vault_sonarr_key }}"
           enableQueue: false
 
+    - Gluetun:
+        href: http://192.168.2.105:8000/v1/publicip/ip
+        ping: http://192.168.2.105:8000/v1/publicip/ip
+        siteMonitor: http://192.168.2.105:8000/v1/publicip/ip
+        description: VPN client
+        icon: gluetun
+        widget:
+          type: gluetun
+          url: http://192.168.2.105:8000
+
     - Prowlarr:
         href: http://192.168.2.105:9696
         ping: http://192.168.2.105:9696
@@ -91,16 +91,16 @@
           url: http://192.168.2.105:9696
           key: "{{ vault_prowlarr_api_key }}"
 
-    - Jackett:
-        href: http://192.168.2.105:9117
-        ping: http://192.168.2.105:9117
-        siteMonitor: http://192.168.2.105:9117
-        description: Indexer Manager
-        icon: jackett
-        widget:
-          type: jackett
-          url: http://192.168.2.105:9117
-          password: "{{ vault_jackett_password }}"
+    # - Jackett:
+    #     href: http://192.168.2.105:9117
+    #     ping: http://192.168.2.105:9117
+    #     siteMonitor: http://192.168.2.105:9117
+    #     description: Indexer Manager
+    #     icon: jackett
+    #     widget:
+    #       type: jackett
+    #       url: http://192.168.2.105:9117
+    #       password: "{{ vault_jackett_password }}"
 
     - Bazarr:
         href: http://192.168.2.105:6767
@@ -167,6 +167,7 @@
         icon: grafana
         widget:
           type: grafana
+          fields: ["dashboards", "datasources"]
           url: http://192.168.2.106:3000
           username: "{{ vault_grafana_username }}"
           password: "{{ vault_grafana_password }}"
@@ -232,19 +233,7 @@
           type: prometheus
           url: http://192.168.2.106:9090
 
-    - Portainer - Infra:
-        href: http://192.168.2.106:9000
-        ping: http://192.168.2.106:9000
-        siteMonitor: http://192.168.2.106:9000
-        description: containers
-        icon: portainer
-        widget:
-          type: portainer
-          url: http://192.168.2.106:9000
-          env: 3
-          key: "{{ vault_portainer_key }}"
-
-    - Portainer - Media:
+    - Portainer:
         href: http://192.168.2.106:9000
         ping: http://192.168.2.106:9000
         siteMonitor: http://192.168.2.106:9000
@@ -303,6 +292,16 @@
           password: "{{ vault_proxmox_backup_api_token_secret }}"
 
 - Hardware:
+    - MySpeed:
+        href: http://192.168.2.112:5216/
+        ping: http://192.168.2.112:5216/
+        siteMonitor: http://192.168.2.112:5216/
+        description: Network Speed
+        icon: myspeed
+        widget:
+          type: myspeed
+          url: http://192.168.2.112:5216/
+
     - Router:
         href: http://192.168.2.254/
         ping: http://192.168.2.254/
@@ -315,3 +314,4 @@
         siteMonitor: https://192.168.2.213
         description: hardware
         icon: mdi-Server
+

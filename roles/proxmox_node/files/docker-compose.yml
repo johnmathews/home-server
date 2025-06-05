@@ -7,6 +7,8 @@ services:
     image: jellyfin/jellyfin:10.10.7
     container_name: jellyfin
     restart: unless-stopped
+    mem_limit: 8g
+    mem_reservation: 4g
     ports:
       - "8096:8096"
     environment:
@@ -17,8 +19,8 @@ services:
     volumes:
       - /srv/jellyfin/appdata:/config
       - /srv/jellyfin/cache:/cache
-      - /srv/media/library:/library
-      - /srv/media/media:/media
+      - /srv/media/library:/ibrary # kids shows, family movies, etc
+      - /srv/media/media:/media # youtube videos, photography videos
     privileged: true
 
   watchtower:
