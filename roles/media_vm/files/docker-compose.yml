@@ -11,30 +11,75 @@
 ---
 
 services:
-  sabnzbd:
-    image: lscr.io/linuxserver/sabnzbd:latest
-    container_name: sabnzbd
-    depends_on:
-      gluetun:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "wget", "-q0-", "https://ifconfig.me"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+  calibre:
+    image: lscr.io/linuxserver/calibre:latest
+    container_name: calibre
+    security_opt:
+      - seccomp=unconfined
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Amsterdam
+      - PASSWORD=${CALIBRE_PASSWORD}
+      - CLI_ARGS=
+    volumes:
+      - ${CONFIG_DIR}/calibre:/config
+      - /mnt/media/media:/media
+      - /mnt/media/library:/library
+    ports:
+      - "8180:8080"  # GUI
+      - "8181:8081"  # Content server
+    restart: unless-stopped
+
+  calibre-web:
+    image: lscr.io/linuxserver/calibre-web:latest
+    container_name: calibre-web
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Amsterdam
+      - DOCKER_MODS=linuxserver/mods:universal-calibre
+      - OAUTHLIB_RELAX_TOKEN_SCOPE=1
+    volumes:
+      - ${CONFIG_DIR}/calibre-web:/config
+      - /mnt/media/media:/media
+      - /mnt/media/library:/library
+    ports:
+      - "8083:8083"
+    restart: unless-stopped
+
+  sonarr:
+    image: linuxserver/sonarr
+    container_name: sonarr
+    user: "${PUID}:${PGID}"
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
     volumes:
-      - ${CONFIG_DIR}/sabnzbd:/config # Persistent settings
+      - ${CONFIG_DIR}/sonarr:/config
       - ${DOWNLOAD_DIR}:/downloads
-      - ${DOWNLOAD_DIR}/downloads/incomplete:/incomplete-downloads # Temp dir for incomplete files
-      - ${DOWNLOAD_DIR}/downloads/temp:/temp-downloads # Temp dir for incomplete files
-      - ${MEDIA_DIR}:/media
-    network_mode: "service:gluetun"
+      - ${MEDIA_DIR}:/library
+
+    ports:
+      - "8989:8989"
     restart: unless-stopped
 
+  radarr:
+    image: linuxserver/radarr
+    container_name: radarr
+    user: "${PUID}:${PGID}"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${CONFIG_DIR}/radarr:/config
+      - ${DOWNLOAD_DIR}:/downloads
+      - ${MEDIA_DIR}:/library
+    ports:
+      - "7878:7878"
+    restart: unless-stopped
   gluetun:
     image: qmcgaw/gluetun
     container_name: gluetun
@@ -130,54 +175,6 @@ services:
     restart: unless-stopped
 
 
-  sonarr:
-    image: linuxserver/sonarr
-    container_name: sonarr
-    user: "${PUID}:${PGID}"
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-    volumes:
-      - ${CONFIG_DIR}/sonarr:/config
-      - ${DOWNLOAD_DIR}:/downloads
-      - ${MEDIA_DIR}:/library
-    ports:
-      - "8989:8989"
-    restart: unless-stopped
-
-  radarr:
-    image: linuxserver/radarr
-    container_name: radarr
-    user: "${PUID}:${PGID}"
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-    volumes:
-      - ${CONFIG_DIR}/radarr:/config
-      - ${DOWNLOAD_DIR}:/downloads
-      - ${MEDIA_DIR}:/library
-    ports:
-      - "7878:7878"
-    restart: unless-stopped
-
-  # jackett:
-  #   image: linuxserver/jackett
-  #   container_name: jackett
-  #   ports:
-  #     - "9117:9117"
-  #   user: "${PUID}:${PGID}"
-  #   environment:
-  #     - PUID=${PUID}
-  #     - PGID=${PGID}
-  #     - TZ=${TZ}
-  #   volumes:
-  #     - ${CONFIG_DIR}/jackett:/config
-  #     - ${DOWNLOAD_DIR}:/downloads
-  #     - ${MEDIA_DIR}:/media
-  #   restart: unless-stopped
-
   bazarr:
     image: linuxserver/bazarr
     container_name: bazarr
@@ -190,7 +187,7 @@ services:
       - TZ=${TZ}
     volumes:
       - ${CONFIG_DIR}/bazarr:/config
-      - ${MEDIA_DIR}:/media
+      - ${MEDIA_DIR}:/library
     restart: unless-stopped
 
   watchtower:
