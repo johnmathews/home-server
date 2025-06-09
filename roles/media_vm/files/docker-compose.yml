@@ -21,9 +21,10 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
       - PASSWORD=${CALIBRE_PASSWORD}
-      - CLI_ARGS=
+      # - CLI_ARGS=
     volumes:
-      - ${CONFIG_DIR}/calibre:/config
+      - ${CONFIG_DIR}/calibre:/config/calibre
+      - ${CONFIG_DIR}/calibre-web:/config/calibre-web
       - /mnt/media/media:/media
       - /mnt/media/library:/library
     ports:
@@ -41,7 +42,8 @@ services:
       - DOCKER_MODS=linuxserver/mods:universal-calibre
       - OAUTHLIB_RELAX_TOKEN_SCOPE=1
     volumes:
-      - ${CONFIG_DIR}/calibre-web:/config
+      - ${CONFIG_DIR}/calibre:/config/calibre
+      - ${CONFIG_DIR}/calibre-web:/config/calibre-web
       - /mnt/media/media:/media
       - /mnt/media/library:/library
     ports:
