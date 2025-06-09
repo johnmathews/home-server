@@ -17,9 +17,9 @@ services:
     security_opt:
       - seccomp=unconfined
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/Amsterdam
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
       - PASSWORD=${CALIBRE_PASSWORD}
       - CLI_ARGS=
     volumes:
@@ -35,9 +35,9 @@ services:
     image: lscr.io/linuxserver/calibre-web:latest
     container_name: calibre-web
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/Amsterdam
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
       - DOCKER_MODS=linuxserver/mods:universal-calibre
       - OAUTHLIB_RELAX_TOKEN_SCOPE=1
     volumes:
@@ -46,6 +46,21 @@ services:
       - /mnt/media/library:/library
     ports:
       - "8083:8083"
+    restart: unless-stopped
+
+  kavita:
+    image: lscr.io/linuxserver/kavita:latest
+    container_name: kavita
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${CONFIG_DIR}/kavita:/config
+      - /mnt/media/media:/media
+      - /mnt/media/library:/library
+    ports:
+      - 5000:5000
     restart: unless-stopped
 
   sonarr:
@@ -190,17 +205,6 @@ services:
       - ${MEDIA_DIR}:/library
     restart: unless-stopped
 
-  watchtower:
-    image: containrrr/watchtower
-    container_name: watchtower
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    command: --cleanup --interval 86400
-    restart: unless-stopped
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-
   node-exporter:
     image: prom/node-exporter:latest
     container_name: node-exporter
@@ -230,3 +234,15 @@ services:
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
     privileged: true  # required for some metrics
+
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --cleanup --interval 86400
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+
