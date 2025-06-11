@@ -19,10 +19,31 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     restart: unless-stopped
 
+
+  gotify:
+    image: ghcr.io/lukasknuth/gotify-slack-webhook-bundled
+    container_name: gotify
+    environment:
+      - TZ=Europe/Amsterdam
+      - GOTIFY_PLUGINSDIR=/data/plugins
+    ports:
+      - "8090:80"
+    volumes:
+      - /opt/infra_stack/gotify/data:/app/data
+      - /opt/infra_stack/gotify/plugins:/data/plugins
+    restart: unless-stopped
+
   grafana:
     image: grafana/grafana-oss
     ports:
       - "3000:3000"
+    environment:
+      - GF_SERVER_DOMAIN=charts.itsa.pizza
+      - GF_SERVER_ROOT_URL=https://charts.itsa.pizza
+      - GF_SECURITY_COOKIE_SAMESITE=none
+      - GF_SECURITY_COOKIE_SECURE=true
+      - GF_SERVER_SERVE_FROM_SUB_PATH=false
+      - GF_SECURITY_ALLOW_EMBEDDING=true
     volumes:
       - /opt/infra_stack/grafana/data:/var/lib/grafana
       - "{{ docker_compose_dir }}/custom/grafana.ini:/etc/grafana/grafana.ini:ro"
@@ -31,9 +52,6 @@ services:
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
-    # environment:
-    #   PUID: 1000
-    #   PGID: 1000
     ports:
       - "9090:9090"
     volumes:

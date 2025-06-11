@@ -6,7 +6,105 @@
 # For configuration options and examples, please see:
 # https://gethomepage.dev/configs/services/
 
+- Metrics: 
+  # tech shelf power 
+  - "":
+     widget:
+       type: iframe
+       src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/proxmox?orgId=1&timezone=browser%3Fkiosk&refresh=10s&panelId=7&__feature.dashboardSceneSolo
+       referrerPolicy: same-origin
+       allowPolicy: autoplay; fullscreen; gamepad
+       allowFullscreen: true
+       
+  # CPU usage 
+  - "":
+     widget:
+       type: iframe
+       src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/proxmox?orgId=1&timezone=browser%3Fkiosk&refresh=10s&panelId=1&__feature.dashboardSceneSolo
+       referrerPolicy: same-origin
+       allowPolicy: autoplay; fullscreen; gamepad
+       allowFullscreen: true
+
+  # Container CPU usage 
+  - "":
+     widget:
+       type: iframe
+       src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/proxmox?orgId=1&timezone=browser%3Fkiosk&refresh=10s&panelId=10&__feature.dashboardSceneSolo
+       referrerPolicy: same-origin
+       allowPolicy: autoplay; fullscreen; gamepad
+       allowFullscreen: true
+       
+  # # RAM usage 
+  # - "":
+  #    widget:
+  #      type: iframe
+  #      src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/proxmox?orgId=1&timezone=browser%3Fkiosk&refresh=10s&panelId=2&__feature.dashboardSceneSolo
+  #      referrerPolicy: same-origin
+  #      allowPolicy: autoplay; fullscreen; gamepad
+  #      allowFullscreen: true
+
+  # Network I/O  
+  - "":
+     widget:
+       type: iframe
+       src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/proxmox?orgId=1&timezone=browser%3Fkiosk&refresh=10s&panelId=19&__feature.dashboardSceneSolo
+       referrerPolicy: same-origin
+       allowPolicy: autoplay; fullscreen; gamepad
+       allowFullscreen: true
+       
+
+  # RAM per VM/LXC
+  - "":
+     widget:
+       type: iframe
+       src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/proxmox?orgId=1&timezone=browser%3Fkiosk&refresh=10s&panelId=11&__feature.dashboardSceneSolo
+       referrerPolicy: same-origin
+       allowPolicy: autoplay; fullscreen; gamepad
+       allowFullscreen: true
+       
+  # Container Memory 
+  - "":
+     widget:
+       type: iframe
+       src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/proxmox?orgId=1&timezone=browser%3Fkiosk&refresh=10s&panelId=22&__feature.dashboardSceneSolo
+       referrerPolicy: same-origin # optional, no default
+       allowPolicy: autoplay; fullscreen; gamepad # optional, no default
+       allowFullscreen: true # optional, default: true
+
+  - Grafana:
+      href: http://charts.itsa.pizza
+      ping: http://192.168.2.106:3000
+      siteMonitor: http://192.168.2.106:3000
+      icon: grafana
+      widget:
+        type: grafana
+        fields: [""]
+        url: http://192.168.2.106:3000
+        username: "{{ vault_grafana_username }}"
+        password: "{{ vault_grafana_password }}"
+
+# media
 - Media-1:
+
+    - Kavita:
+        href: http://192.168.2.105:5000/home
+        ping: http://192.168.2.105:5000/home
+        siteMonitor: http://192.168.2.105:5000/home
+        description: books
+        icon: kavita
+    - Calibre Server:
+        href: http://192.168.2.105:8180
+        ping: http://192.168.2.105:8180
+        siteMonitor: http://192.168.2.105:8180
+        description: books
+        icon: calibre
+    - Calibre Web:
+        href: http://192.168.2.105:8083/
+        ping: http://192.168.2.105:8083/
+        siteMonitor: http://192.168.2.105:8083/
+        description: books
+        icon: calibre
+
     - Jellyfin:
         href: http://jelly.itsa.pizza
         ping: http://192.168.2.214:8096
@@ -91,17 +189,6 @@
           url: http://192.168.2.105:9696
           key: "{{ vault_prowlarr_api_key }}"
 
-    # - Jackett:
-    #     href: http://192.168.2.105:9117
-    #     ping: http://192.168.2.105:9117
-    #     siteMonitor: http://192.168.2.105:9117
-    #     description: Indexer Manager
-    #     icon: jackett
-    #     widget:
-    #       type: jackett
-    #       url: http://192.168.2.105:9117
-    #       password: "{{ vault_jackett_password }}"
-
     - Bazarr:
         href: http://192.168.2.105:6767
         ping: http://192.168.2.105:6767
@@ -160,8 +247,19 @@
         icon: https://usenetexpress.com/favicon.ico
 
 - Infra-1:
+    - Gotify:
+        href: http://192.168.2.106:8090/#/
+        ping: http://192.168.2.106:8090/#/
+        siteMonitor: http://192.168.2.106:8090/#/
+        icon: gotify
+        widget:
+          type: gotify
+          url: http://192.168.2.106:8090
+          fields: ["apps", "clients", "messages"]
+          key: "{{ vault_gotify_key }}"
+
     - Grafana:
-        href: http://grafana.itsa.pizza
+        href: http://charts.itsa.pizza
         ping: http://192.168.2.106:3000
         siteMonitor: http://192.168.2.106:3000
         icon: grafana

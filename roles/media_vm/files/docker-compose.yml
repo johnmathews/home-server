@@ -1,16 +1,31 @@
 # media_vm/files/docker-compose.yml
 
-
-
-# media_stack_config_dir is `/srv/media/config`
-# media_stack_mount_dir is `/mnt/media`
-
-# CONFIG_DIR={{ media_stack_config_dir }}
-# DOWNLOAD_DIR={{ media_stack_mount_dir }}/library/downloads
-# MEDIA_DIR={{ media_stack_mount_dir }}/library
 ---
 
 services:
+
+  sabnzbd:
+    image: lscr.io/linuxserver/sabnzbd:latest
+    container_name: sabnzbd
+    depends_on:
+      gluetun:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q0-", "https://ifconfig.me"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - /srv/media/config/sabnzbd:/config # Persistent settings
+      - /mnt/media/library/downloads:/downloads
+      - /mnt/media/library:/library
+    network_mode: "service:gluetun"
+    restart: unless-stopped
+
   calibre:
     image: lscr.io/linuxserver/calibre:latest
     container_name: calibre
@@ -23,8 +38,8 @@ services:
       - PASSWORD=${CALIBRE_PASSWORD}
       # - CLI_ARGS=
     volumes:
-      - ${CONFIG_DIR}/calibre:/config/calibre
-      - ${CONFIG_DIR}/calibre-web:/config/calibre-web
+      - /srv/media/config/calibre:/config/calibre
+      - /srv/media/config/calibre-web:/config/calibre-web
       - /mnt/media/media:/media
       - /mnt/media/library:/library
     ports:
@@ -42,8 +57,8 @@ services:
       - DOCKER_MODS=linuxserver/mods:universal-calibre
       - OAUTHLIB_RELAX_TOKEN_SCOPE=1
     volumes:
-      - ${CONFIG_DIR}/calibre:/config/calibre
-      - ${CONFIG_DIR}/calibre-web:/config/calibre-web
+      - /srv/media/config/calibre:/config/calibre
+      - /srv/media/config/calibre-web:/config/calibre-web
       - /mnt/media/media:/media
       - /mnt/media/library:/library
     ports:
@@ -58,7 +73,7 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
     volumes:
-      - ${CONFIG_DIR}/kavita:/config
+      - /srv/media/config/kavita:/config
       - /mnt/media/media:/media
       - /mnt/media/library:/library
     ports:
@@ -74,10 +89,8 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
     volumes:
-      - ${CONFIG_DIR}/sonarr:/config
-      - ${DOWNLOAD_DIR}:/downloads
-      - ${MEDIA_DIR}:/library
-
+      - /srv/media/config/sonarr:/config
+      - /mnt/media/library:/library
     ports:
       - "8989:8989"
     restart: unless-stopped
@@ -91,12 +104,13 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
     volumes:
-      - ${CONFIG_DIR}/radarr:/config
-      - ${DOWNLOAD_DIR}:/downloads
-      - ${MEDIA_DIR}:/library
+      - /srv/media/config/radarr:/config
+      - /mnt/media/library/downloads:/downloads
+      - /mnt/media/library:/library
     ports:
       - "7878:7878"
     restart: unless-stopped
+
   gluetun:
     image: qmcgaw/gluetun
     container_name: gluetun
@@ -115,7 +129,7 @@ services:
       - 8388:8388/tcp # Shadowsocks
       - 8388:8388/udp # Shadowsocks
     volumes:
-      - ${CONFIG_DIR}/gluetun:/gluetun
+      - /srv/media/config/gluetun:/gluetun
     healthcheck:
       test: ["CMD", "wget", "-qO-", "https://ifconfig.me"]
       interval: 60s
@@ -146,12 +160,9 @@ services:
       - WEBUI_USERNAME=${QBITTORRENT_USERNAME}
       - WEBUI_PASSWORD=${QBITTORRENT_PASSWORD}
     volumes:
-      # /srv/media/config 
-      - ${CONFIG_DIR}:/config
-      # /mnt/media/library/downloads 
-      - ${DOWNLOAD_DIR}:/downloads
-      # /mnt/media/library
-      - ${MEDIA_DIR}:/media
+      - /srv/media/config:/config
+      - /mnt/media/library/downloads:/downloads
+      - /mnt/media/library:/media
     restart: unless-stopped
 
   flaresolverr:
@@ -175,7 +186,7 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
     volumes:
-      - ${CONFIG_DIR}/prowlarr:/config
+      - /srv/media/config/prowlarr:/config
     ports:
       - "9696:9696"
     restart: unless-stopped
@@ -188,7 +199,7 @@ services:
     environment:
       - LOG_LEVEL=info
     volumes:
-      - ${CONFIG_DIR}/jellyseer:/app/config
+      - /srv/media/config/jellyseer:/app/config
     restart: unless-stopped
 
 
@@ -203,8 +214,8 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
     volumes:
-      - ${CONFIG_DIR}/bazarr:/config
-      - ${MEDIA_DIR}:/library
+      - /srv/media/config/bazarr:/config
+      - /mnt/media/library:/library
     restart: unless-stopped
 
   node-exporter:

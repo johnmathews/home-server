@@ -15,15 +15,18 @@ fullWidth: false
 useEqualHeights: false 
 
 layout:
+  Metrics:
+    style: row
+    columns: 3
   Media-1:
     style: row
     columns: 3
   Media-2:
-    initiallyCollapsed: true
+    initiallyCollapsed: false
     style: row
     columns: 2
   Usenet:
-    initiallyCollapsed: true
+    initiallyCollapsed: false
     style: row
     columns: 4
 

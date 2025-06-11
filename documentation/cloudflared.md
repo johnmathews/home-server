@@ -15,6 +15,7 @@ This allows services running on the server to be accessed from the internet.
 ## Configuration
 
 config file:
+
 `/etc/cloudflared/config.yaml`
 
 
@@ -22,15 +23,14 @@ config file:
 
 If you make changes to existing routes, you will need to delete the existing DNS records from the cloudflare UI.
 
-Then you can run
+Then you can run this command to make the routes again.
+
 
 ```
 for domain in $(grep hostname: /etc/cloudflared/config.yml | awk '{print $3}'); do
   cloudflared tunnel route dns home-server "$domain"
 done
 ```
-
-to make the routes again.
 
 
 ## Other Commands

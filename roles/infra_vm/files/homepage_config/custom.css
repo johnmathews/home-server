@@ -4,6 +4,13 @@
   background-color: #FFFFFF; 
 }
 
+.service-title:has(.service-name:empty) {
+  display: none;
+  height: 0;
+  padding: 0;
+  overflow: hidden; 
+}
+
 .service-card {
   background-color: #FFFFFF; 
   border-width: 2px;
