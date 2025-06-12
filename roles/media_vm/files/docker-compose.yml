@@ -91,6 +91,9 @@ services:
     volumes:
       - /srv/media/config/sonarr:/config
       - /mnt/media/library:/library
+      - /usr/local/bin:/usr/local/bin
+      # keep this so it understands what sabnzbd sees
+      - /mnt/media/library/downloads:/downloads 
     ports:
       - "8989:8989"
     restart: unless-stopped
@@ -105,8 +108,10 @@ services:
       - TZ=${TZ}
     volumes:
       - /srv/media/config/radarr:/config
-      - /mnt/media/library/downloads:/downloads
       - /mnt/media/library:/library
+      - /usr/local/bin:/usr/local/bin
+      # keep this so it understands what sabnzbd sees
+      - /mnt/media/library/downloads:/downloads
     ports:
       - "7878:7878"
     restart: unless-stopped

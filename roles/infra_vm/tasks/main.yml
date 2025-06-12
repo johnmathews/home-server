@@ -69,7 +69,7 @@
 
 - name: Create Docker Compose directory
   file:
-    path: "{{ docker_compose_dir }}"
+    path: /opt/infra_stack
     state: directory
     owner: "{{ docker_user }}"
     group: docker
@@ -77,7 +77,7 @@
 
 - name: Ensure grafana custom config directory exists
   file:
-    path: "{{ docker_compose_dir }}/custom"
+    path: /opt/infra_stack/custom
     state: directory
     owner: root
     group: root
@@ -86,16 +86,67 @@
 - name: Deploy custom grafana.ini
   template:
     src: grafana/grafana.ini.j2
-    dest: "{{ docker_compose_dir }}/custom/grafana.ini"
+    dest: /opt/infra_stack/custom/grafana.ini
     owner: root
     group: root
     mode: '0644'
   notify: Restart Grafana container
 
+- name: Ensure loki config directory exists
+  file:
+    path: /opt/infra_stack/loki
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Ensure loki config subdirs exist
+  file:
+    path: /opt/infra_stack/loki/{{item}}
+    state: directory
+    owner: 10001
+    group: 10001
+    mode: '0755'
+    recurse: yes
+  loop:
+    - var/compactor
+    - chunks
+    - index
+    - cache
+    - rules
+    - rules-temp
+    - wal
+
+- name: Deploy custom loki config
+  template:
+    src: files/loki/loki-config.yml
+    dest: /opt/infra_stack/loki/loki/loki-config.yml
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart loki container
+
+- name: Ensure promtail config directory exists
+  file:
+    path: /opt/infra_stack/promtail
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Deploy custom promtail config
+  template:
+    src: files/promtail/promtail-config.yml
+    dest: /opt/infra_stack/promtail/promtail-config.yml
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart promtail container
+
 - name: Template Docker Compose file
   template:
     src: docker-compose.yml.j2
-    dest: "{{ docker_compose_dir }}/docker-compose.yml"
+    dest: /opt/infra_stack/docker-compose.yml
     owner: "{{ docker_user }}"
     group: docker
     mode: '0644'
@@ -105,11 +156,11 @@
 - name: Launch containers
   command: docker compose up -d
   args:
-    chdir: "{{ docker_compose_dir }}"
+    chdir: /opt/infra_stack
 
 - name: Create Prometheus config directory
   file:
-    path: "{{ docker_compose_dir }}/prometheus"
+    path: /opt/infra_stack/prometheus
     state: directory
     owner: "{{ docker_user }}"
     group: docker

@@ -1,48 +1,65 @@
 # Cloudflared
 
-The cloudflared service runs in an LXC. The LXC was created using proxmox-community-scripts:
+This LXC container runs the `cloudflared` service, enabling secure remote access
+to services hosted on your Proxmox server via Cloudflare Tunnel.
 
+The container was created using the Proxmox Community Scripts project:
 https://community-scripts.github.io/ProxmoxVE/scripts?id=cloudflared
-
-
-This allows services running on the server to be accessed from the internet.
 
 ## Access
 
-`ssh cloudflared`
+SSH into the container with:
 
+```sh
+ssh cloudflared
+```
 
 ## Configuration
 
-config file:
+Main configuration file:
 
-`/etc/cloudflared/config.yaml`
-
-
-## Updated and changes
-
-If you make changes to existing routes, you will need to delete the existing DNS records from the cloudflare UI.
-
-Then you can run this command to make the routes again.
-
-
+```sh
+/etc/cloudflared/config.yml
 ```
+
+## Updating Configuration
+
+To apply changes to the Cloudflare Tunnel configuration:
+
+```sh
+cloudflared tunnel --config /etc/cloudflared/config.yml ingress validate
+sudo systemctl restart cloudflared
+cloudflared tunnel route dns home-server <subdomain>.itsa.pizza
+```
+
+## Bulk DNS Update Example
+
+Automatically update DNS routes for all configured hostnames:
+
+```sh
 for domain in $(grep hostname: /etc/cloudflared/config.yml | awk '{print $3}'); do
   cloudflared tunnel route dns home-server "$domain"
 done
 ```
 
+## Logging
 
-## Other Commands
-
-`cloudflared tunnel list`
-
-`cloudflared tunnel info <tunnel-name>`
-
-`cloudflared tunnel --config /etc/cloudflared/config.yml ingress validate`
-
-
+```sh
+journalctl -u cloudflared -f
 ```
+
+## Useful Commands
+
+Check configured tunnels:
+
+```sh
+cloudflared tunnel list
+cloudflared tunnel info <tunnel-name>
+```
+
+Manage the systemd service:
+
+```sh
 sudo systemctl restart cloudflared
 sudo systemctl status cloudflared
 ```

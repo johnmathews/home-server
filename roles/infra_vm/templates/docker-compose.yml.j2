@@ -3,13 +3,36 @@
 
 ---
 services:
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    volumes:
+      - /opt/infra_stack/loki/loki:/etc/loki
+      - /opt/infra_stack/loki/data:/loki/data
+      - /opt/infra_stack/loki/var:/var/loki
+    command: -config.file=/etc/loki/loki-config.yml
+    ports:
+      - "3100:3100"
+    restart: unless-stopped
+
+  promtail:
+    image: grafana/promtail:latest
+    container_name: promtail
+    volumes:
+      - /var/log:/var/log
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /opt/infra_stack/promtail:/etc/promtail
+    command: -config.file=/etc/promtail/promtail-config.yml
+    restart: unless-stopped
+
   homepage:
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
     environment:
-      HOMEPAGE_ALLOWED_HOSTS: 192.168.2.106:3002,dash.itsa.pizza,itsa.pizza
       PUID: 1000
       PGID: 1000
+      HOMEPAGE_ALLOWED_HOSTS: 192.168.2.106:3002,dash.itsa.pizza,itsa.pizza
     ports:
       - 3002:3000
     env_file:
@@ -19,18 +42,25 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     restart: unless-stopped
 
-
-  gotify:
-    image: ghcr.io/lukasknuth/gotify-slack-webhook-bundled
-    container_name: gotify
+  ntfy:
+    image: binwiederhier/ntfy
+    container_name: ntfy
+    command:
+      - serve
     environment:
       - TZ=Europe/Amsterdam
-      - GOTIFY_PLUGINSDIR=/data/plugins
-    ports:
-      - "8090:80"
+    user: 1000:1000
     volumes:
-      - /opt/infra_stack/gotify/data:/app/data
-      - /opt/infra_stack/gotify/plugins:/data/plugins
+      - /var/cache/ntfy:/var/cache/ntfy
+      - /etc/ntfy:/etc/ntfy
+    ports:
+      - 8183:80
+    healthcheck: # optional: remember to adapt the host:port to your environment
+        test: ["CMD-SHELL", "wget -q --tries=1 http://localhost:80/v1/health -O - | grep -Eo '\"healthy\"\\s*:\\s*true' || exit 1"]
+        interval: 60s
+        timeout: 10s
+        retries: 3
+        start_period: 40s
     restart: unless-stopped
 
   grafana:
