@@ -4,3 +4,33 @@
 
 # For configuration options and examples, please see:
 # https://gethomepage.dev/configs/bookmarks
+
+- VMs:
+    - Grafana:
+        - abbr: Gr
+          href: http://192.168.2.106:3000
+    - Kavita:
+        - abbr: Ka
+          href: http://192.168.2.105:5000
+    - TrueNAS:
+        - abbr: Tn
+          href: http://192.168.2.104:5000
+
+- HW:
+    - ProxMox:
+        - abbr: Pm 
+          href: http://192.168.2.214:8006
+    - PBS:
+        - abbr: PBS 
+          href: http://192.168.2.200:8007
+    - BMC:
+        - abbr: BMC 
+          href: http://192.168.2.213
+    - Router:
+        - abbr: Router 
+          href: http://192.168.2.254
+
+- "":
+    - "":
+        - abbr: BMC 
+          href: http://192.168.2.213
