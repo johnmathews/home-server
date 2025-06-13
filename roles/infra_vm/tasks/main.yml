@@ -155,12 +155,6 @@
     mode: '0644'
   notify: Apply updated Docker Compose stack
 
-
-- name: Launch containers
-  command: docker compose up -d
-  args:
-    chdir: /opt/infra_stack
-
 - name: Create Prometheus config directory
   file:
     path: /opt/infra_stack/prometheus
@@ -176,6 +170,11 @@
     recurse: yes
     owner: "65534"
     group: "65534"
+
+- name: Launch containers
+  command: docker compose up -d
+  args:
+    chdir: /opt/infra_stack
 
 - name: Include config tasks for docker services (prometheus and homepage)
   import_tasks: services_config.yml
