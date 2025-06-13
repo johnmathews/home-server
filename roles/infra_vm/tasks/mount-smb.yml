@@ -21,12 +21,6 @@
     group: root
     mode: "0600"
 
-- name: Debug credentials file content
-  debug:
-    msg: |
-      username={{ smb_infra_vm_username }}
-      password={{ vault_smb_infra_vm_password }}
-
 - name: Ensure /etc/fstab entries for SMB shares
   lineinfile:
     path: /etc/fstab
