@@ -21,11 +21,16 @@
     group: root
     mode: "0600"
 
-# this makes the smb share mount persist across reboots
+- name: Debug credentials file content
+  debug:
+    msg: |
+      username={{ smb_infra_vm_username }}
+      password={{ vault_smb_infra_vm_password }}
+
 - name: Ensure /etc/fstab entries for SMB shares
   lineinfile:
     path: /etc/fstab
-    line: "//{{ smb_server }}/{{ item.name }} {{ item.target }} cifs credentials=/etc/smbcredentials_truenas_logs,vers=3.0,file_mode=0664,dir_mode=0775 0 0"
+    line: "//{{ smb_server }}/{{ item.name }} {{ item.target }} cifs credentials=/etc/smbcredentials_truenas_logs,vers=3.0,rw,uid=1000,gid=1000 0 0"
     create: yes
     state: present
   loop: "{{ smb_shares }}"
@@ -35,7 +40,6 @@
     path: "{{ item.target }}"
     src: "//{{ smb_server }}/{{ item.name }}"
     fstype: cifs
-    opts: "credentials=/etc/smbcredentials_truenas_logs,iocharset=utf8,rw,vers=3.0,nounix,noserverino,nofail"
+    opts: "credentials=/etc/smbcredentials_truenas_logs,vers=3.0,rw,uid=1000,gid=1000"
     state: mounted
   loop: "{{ smb_shares }}"
-

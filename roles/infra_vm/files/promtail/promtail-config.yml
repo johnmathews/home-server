@@ -46,4 +46,10 @@ scrape_configs:
         labels:
           job: truenas
           host: truenas
-          __path__: /mnt/truenas-logs/*.log
+          __path__: /mnt/truenas/logs/**
+
+    pipeline_stages:
+      - regex:
+          expression: '.*/(?P<filename>[^/]+\.log)$'
+      - labels:
+          filename: filename
