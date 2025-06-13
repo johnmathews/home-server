@@ -75,6 +75,9 @@
     group: docker
     mode: '0755'
 
+- import_tasks: mount-smb.yml
+  tags: [mount, smb]
+
 - name: Ensure grafana custom config directory exists
   file:
     path: /opt/infra_stack/custom

@@ -1,0 +1,41 @@
+# roles/infra_vm/tasks/mount-smb.yml
+
+---
+
+- name: Create mount points for SMB shares
+  file:
+    path: "{{ item.target }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  loop: "{{ smb_shares }}"
+
+- name: Ensure credentials file exists for SMB mount
+  copy:
+    dest: /etc/smbcredentials_truenas_logs
+    content: |
+      username={{ smb_infra_vm_username }}
+      password={{ vault_smb_infra_vm_password }}
+    owner: root
+    group: root
+    mode: "0600"
+
+# this makes the smb share mount persist across reboots
+- name: Ensure /etc/fstab entries for SMB shares
+  lineinfile:
+    path: /etc/fstab
+    line: "//{{ smb_server }}/{{ item.name }} {{ item.target }} cifs credentials=/etc/smbcredentials_truenas_logs,vers=3.0,file_mode=0664,dir_mode=0775 0 0"
+    create: yes
+    state: present
+  loop: "{{ smb_shares }}"
+
+- name: Mount all SMB shares now
+  mount:
+    path: "{{ item.target }}"
+    src: "//{{ smb_server }}/{{ item.name }}"
+    fstype: cifs
+    opts: "credentials=/etc/smbcredentials_truenas_logs,iocharset=utf8,rw,vers=3.0,nounix,noserverino,nofail"
+    state: mounted
+  loop: "{{ smb_shares }}"
+

@@ -5,18 +5,21 @@
 # For configuration options and examples, please see:
 # https://gethomepage.dev/configs/bookmarks
 
-- VMs:
+- Apps:
     - Grafana:
-        - abbr: Gr
+        - abbr: Infra
           href: http://192.168.2.106:3000
+    - Loki:
+        - abbr: Infra
+          href: http://192.168.2.106:3100
     - Kavita:
-        - abbr: Ka
+        - abbr: Media
           href: http://192.168.2.105:5000
     - TrueNAS:
-        - abbr: Tn
+        - abbr: NAS 
           href: http://192.168.2.104:5000
 
-- HW:
+- _Hardware:
     - ProxMox:
         - abbr: Pm 
           href: http://192.168.2.214:8006
@@ -27,10 +30,10 @@
         - abbr: BMC 
           href: http://192.168.2.213
     - Router:
-        - abbr: Router 
+        - abbr:
           href: http://192.168.2.254
 
-- "":
-    - "":
-        - abbr: BMC 
-          href: http://192.168.2.213
+- Docs:
+  - Loki:
+    - abbr: Lo
+      href: https://grafana.com/docs/loki/latest/reference/loki-http-api/
