@@ -47,17 +47,26 @@ scrape_configs:
           job: truenas
           host: truenas
           __path__: /mnt/truenas/logs/**/*.log  # Only .log files, recursive
-
     pipeline_stages:
       - match:
           selector: '{job="truenas"}'
           stages:
+            - multiline:
+                firstline: '^\d{4}-\d{2}-\d{2}'  # e.g., starts with timestamp
+                max_wait_time: 3s
             - drop:
                 expression: '.*[^\x09\x0A\x0D\x20-\x7E].*'
+            - drop:
+                expression: '.*\.gz$'
+            - drop:
+                expression: '.*\.\d+$'
             - regex:
                 expression: '.*/(?P<filename>[^/]+\.log)$'
             - regex:
-                expression: '(?i)(?P<level>INFO|ERROR|WARN|DEBUG)'
+                expression: '(?i)(?P<level>info|error|warn|warning|debug|notice|crit|critical)'
+            - template:
+                source: level
+                template: '{% raw %}{{ .Value | ToLower }}{% endraw %}'
             - labels:
                 filename: filename
                 level: level

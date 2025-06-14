@@ -171,6 +171,30 @@
     owner: "65534"
     group: "65534"
 
+- name: Ensure ntfy cache directory exists with correct ownership
+  file:
+    path: /var/cache/ntfy
+    state: directory
+    owner: "1000"
+    group: "1000"
+    mode: '0755'
+
+- name: Ensure ntfy config directory exists with correct ownership
+  file:
+    path: /etc/ntfy
+    state: directory
+    owner: "1000"
+    group: "1000"
+    mode: '0755'
+
+- name: Recursively fix permissions of existing ntfy cache directory
+  ansible.builtin.command: chown -R 1000:1000 /var/cache/ntfy
+  become: true
+
+- name: Recursively fix permissions of existing ntfy config directory
+  ansible.builtin.command: chown -R 1000:1000 /etc/ntfy
+  become: true
+
 - name: Launch containers
   command: docker compose up -d
   args:
