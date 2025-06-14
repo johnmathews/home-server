@@ -1,0 +1,106 @@
+# roles/key_server/tasks/main.yml
+
+---
+
+- name: Install dependencies
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - software-properties-common
+    state: present
+    update_cache: yes
+
+- name: Install Python 3 and pip
+  apt:
+    name:
+      - python3
+      - python3-pip
+      - python-is-python3
+    state: present
+
+- name: Install pipx
+  apt:
+    name: pipx
+    state: present
+
+- name: Ensure pipx binary path is available
+  shell: |
+    pipx ensurepath
+  args:
+    executable: /bin/bash
+  environment:
+    PATH: "{{ ansible_env.PATH }}:/home/{{ server_user }}/.local/bin"
+  become_user: "{{ server_user }}"
+
+- name: Install uv using pipx
+  become: true
+  become_user: "{{ server_user }}"
+  shell: |
+    pipx install uv
+  environment:
+    PATH: "{{ ansible_env.PATH }}:/home/{{ server_user }}/.local/bin"
+
+- name: Create app directory
+  file:
+    path: /opt/key_server
+    state: directory
+    owner: "{{ server_user }}"
+    group: "{{ server_user }}"
+    mode: '0755'
+
+- name: Upload FastAPI app
+  copy:
+    src: files/key-server-main.py
+    dest: /opt/key_server/main.py
+    owner: "{{ server_user }}"
+    group: "{{ server_user }}"
+    mode: '0644'
+
+- name: Create virtual environment using uv
+  become_user: "{{ server_user }}"
+  shell: |
+    /home/{{ server_user }}/.local/bin/uv venv /opt/key_server/.venv
+  args:
+    creates: /opt/key_server/.venv
+  environment:
+    PATH: "/home/{{ server_user }}/.local/bin:{{ ansible_env.PATH }}"
+
+- name: Install FastAPI and Uvicorn in venv
+  become_user: "{{ server_user }}"
+  shell: |
+    source /opt/key_server/.venv/bin/activate && uv pip install fastapi uvicorn[standard]
+  args:
+    executable: /bin/bash
+  environment:
+    PATH: "/home/{{ server_user }}/.local/bin:{{ ansible_env.PATH }}"
+
+- name: Create systemd service file
+  copy:
+    dest: /etc/systemd/system/key-server.service
+    content: |
+      [Unit]
+      Description=Key Server for TrueNAS
+      After=network.target
+
+      [Service]
+      Type=simple
+      User={{ server_user }}
+      WorkingDirectory=/opt/key_server
+      ExecStart=/opt/key_server/.venv/bin/uvicorn main:app --host 0.0.0.0 --port 8000
+      Restart=always
+
+      [Install]
+      WantedBy=multi-user.target
+    mode: '0644'
+
+- name: Reload systemd daemon
+  systemd:
+    daemon_reload: yes
+
+- name: Enable and start key-server
+  systemd:
+    name: key-server
+    enabled: yes
+    state: started

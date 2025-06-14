@@ -1,0 +1,7 @@
+# roles/key_server/defaults/main.yml
+
+---
+
+server_user: john
+
+truenas_ip: 192.168.2.104 

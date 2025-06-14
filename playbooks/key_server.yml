@@ -3,7 +3,7 @@
 ---
 
 - name: Key Server
-  hosts: key-server
+  hosts: key_server
   gather_facts: true
   become: true
 

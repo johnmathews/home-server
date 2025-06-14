@@ -29,6 +29,9 @@ media:
 infra:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/infra_vm.yml $(VAULT) $(TAGS)
 
+key:
+	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/key_server.yml $(VAULT) $(TAGS)
+
 traefik:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/traefik_lxc.yml $(VAULT) $(TAGS)
 
@@ -61,6 +64,7 @@ help:
 	@echo "  make nas              → Setup TrueNAS VM by provisioning a VM and uploading a TrueNAS ISO"
 	@echo "  make media            → Full Media VM config"
 	@echo "  make infra            → Full Infra VM config"
+	@echo "  make key              → Build key server"
 	@echo "  make traefik          → Traefik reverse proxy config"
 	@echo "  make check            → Dry run (no changes applied)"
 	@echo "  make lint             → Lint playbooks and roles"
