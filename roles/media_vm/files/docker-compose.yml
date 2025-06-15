@@ -258,9 +258,12 @@ services:
     container_name: watchtower
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    command: --cleanup --interval 86400
+    command: --cleanup --interval 21700
     restart: unless-stopped
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
-
+      - WATCHTOWER_NOTIFICATIONS=ntfy
+      - WATCHTOWER_NOTIFICATION_NTFY_TOPIC=watchtower
+      - WATCHTOWER_NOTIFICATION_NTFY_URL=http://ntfy.itsa.pizza
+      - WATCHTOWER_NOTIFICATION_NTFY_TITLE=Container Update

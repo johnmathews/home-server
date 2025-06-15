@@ -121,12 +121,20 @@
     mode: '0600'
   notify: Restart media stack
 
-- name: Create gluetun config file from template
-  template:
-    src: gluetun_config.toml.j2
-    dest: "{{ media_stack_config_dir }}/gluetun/config.toml"
-    mode: '0600'
-  notify: Restart media stack
+# - name: Create gluetun config file from template
+#   template:
+#     src: gluetun_config.toml.j2
+#     dest: "{{ media_stack_config_dir }}/gluetun/config.toml"
+#     mode: '0600'
+#   notify: Restart media stack
+
+# - name: Ensure Gluetun config files are world-readable
+#   ansible.builtin.file:
+#     path: "{{ item }}"
+#     mode: '0644'
+#   loop: 
+#     - "{{ media_stack_config_dir }}/gluetun/config.toml"
+#     - "{{ media_stack_config_dir }}/gluetun/servers.json"
 
 - name: Ensure .env and docker-compose.yml are owned by "john"
   ansible.builtin.file:
