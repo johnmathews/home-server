@@ -13,7 +13,7 @@ services:
     command: -config.file=/etc/loki/loki-config.yml
     ports:
       - "3100:3100"
-    restart: unless-stopped
+    restart: always
 
   promtail:
     image: grafana/promtail:latest
@@ -26,7 +26,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /opt/infra_stack/promtail:/etc/promtail
     command: -config.file=/etc/promtail/promtail-config.yml --config.expand-env
-    restart: unless-stopped
+    restart: always
 
 
   homepage:
@@ -43,7 +43,7 @@ services:
     volumes:
       - /opt/infra_stack/homepage/config:/app/config
       - /var/run/docker.sock:/var/run/docker.sock:ro
-    restart: unless-stopped
+    restart: always
 
   ntfy:
     image: binwiederhier/ntfy
@@ -64,7 +64,7 @@ services:
         timeout: 10s
         retries: 3
         start_period: 40s
-    restart: unless-stopped
+    restart: always
 
 
   grafana:
@@ -82,7 +82,7 @@ services:
     volumes:
       - /opt/infra_stack/grafana/data:/var/lib/grafana
       - "{{ docker_compose_dir }}/custom/grafana.ini:/etc/grafana/grafana.ini:ro"
-    restart: unless-stopped
+    restart: always
 
   prometheus:
     image: prom/prometheus:latest
@@ -92,14 +92,14 @@ services:
     volumes:
       - /opt/infra_stack/prometheus/data:/prometheus
       - ./prometheus:/etc/prometheus:ro
-    restart: unless-stopped
+    restart: always
     labels:
       - "com.centurylinklabs.watchtower.enable=true"  
 
   node-exporter:
     image: prom/node-exporter:latest
     container_name: node-exporter
-    restart: unless-stopped
+    restart: always
     ports:
       - "9100:9100"
     pid: "host"
@@ -116,7 +116,7 @@ services:
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
     container_name: cadvisor
-    restart: unless-stopped
+    restart: always
     ports:
       - "8080:8080"
     volumes:
@@ -133,7 +133,7 @@ services:
       - "3001:3001"
     volumes:
       - /opt/infra_stack/uptime_kuma/data:/app/data
-    restart: unless-stopped
+    restart: always
 
   dozzle:
     image: amir20/dozzle
@@ -142,7 +142,7 @@ services:
       - "9999:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    restart: unless-stopped
+    restart: always
 
   portainer:
     image: portainer/portainer-ce
@@ -152,4 +152,4 @@ services:
     volumes:
       - /opt/infra_stack/portainer/data:/data
       - /var/run/docker.sock:/var/run/docker.sock
-    restart: unless-stopped
+    restart: always

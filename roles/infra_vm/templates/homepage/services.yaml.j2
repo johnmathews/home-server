@@ -34,6 +34,15 @@
        allowPolicy: autoplay; fullscreen; gamepad
        allowFullscreen: true
 
+  # Network I/O  
+  - "":
+     widget:
+       type: iframe
+       src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/proxmox?orgId=1&timezone=browser%kiosk=tv&refresh=10s&panelId=19&__feature.dashboardSceneSolo
+       referrerPolicy: same-origin
+       allowPolicy: autoplay; fullscreen; gamepad
+       allowFullscreen: true
+
   # Total memory usage 
   - "":
      widget:
@@ -61,19 +70,9 @@
        allowPolicy: autoplay; fullscreen; gamepad # optional, no default
        allowFullscreen: true # optional, default: true
 
-  # Network I/O  
-  - "":
-     widget:
-       type: iframe
-       src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/proxmox?orgId=1&timezone=browser%kiosk=tv&refresh=10s&panelId=19&__feature.dashboardSceneSolo
-       referrerPolicy: same-origin
-       allowPolicy: autoplay; fullscreen; gamepad
-       allowFullscreen: true
-       
 
   - Grafana:
-      href: http://charts.itsa.pizza
-      ping: http://192.168.2.106:3000
+      href: https://charts.itsa.pizza
       siteMonitor: http://192.168.2.106:3000
       icon: grafana
       widget:
@@ -88,26 +87,22 @@
 
     - Kavita:
         href: http://192.168.2.105:5000/home
-        ping: http://192.168.2.105:5000/home
         siteMonitor: http://192.168.2.105:5000/home
         description: books
         icon: kavita
     - Calibre Server:
         href: http://192.168.2.105:8180
-        ping: http://192.168.2.105:8180
         siteMonitor: http://192.168.2.105:8180
         description: books
         icon: calibre
     - Calibre Web:
         href: http://192.168.2.105:8083/
-        ping: http://192.168.2.105:8083/
         siteMonitor: http://192.168.2.105:8083/
         description: books
         icon: calibre
 
     - Jellyfin:
         href: http://jelly.itsa.pizza
-        ping: http://192.168.2.214:8096
         siteMonitor: http://192.168.2.214:8096
         description: TV app 
         icon: jellyfin
@@ -126,7 +121,6 @@
 
     - Jellyseerr:
         href: http://seerr.itsa.pizza
-        ping: http://192.168.2.105:5055/
         siteMonitor: http://192.168.2.105:5055/
         description: TV
         icon: jellyseerr
@@ -137,7 +131,6 @@
 
     - File Browser:
         href: http://files.itsa.pizza
-        ping: http://192.168.2.104:30051
         siteMonitor: http://192.168.2.104:30051
         icon: filebrowser
 
@@ -145,7 +138,6 @@
 - Media-2:
     - Radarr:
         href: http://192.168.2.105:7878
-        ping: http://192.168.2.105:7878
         siteMonitor: http://192.168.2.105:7878
         description: Movie Manager
         icon: radarr
@@ -158,7 +150,6 @@
 
     - Sonarr:
         href: http://192.168.2.105:8989/
-        ping: http://192.168.2.105:8989/
         siteMonitor: http://192.168.2.105:8989/
         description: TV Series Manager
         icon: sonarr
@@ -170,7 +161,6 @@
 
     - Gluetun:
         href: http://192.168.2.105:8000/v1/publicip/ip
-        ping: http://192.168.2.105:8000/v1/publicip/ip
         siteMonitor: http://192.168.2.105:8000/v1/publicip/ip
         description: VPN client
         icon: gluetun
@@ -180,7 +170,6 @@
 
     - Prowlarr:
         href: http://192.168.2.105:9696
-        ping: http://192.168.2.105:9696
         siteMonitor: http://192.168.2.105:9696
         description: Indexer Manager
         icon: prowlarr
@@ -191,7 +180,6 @@
 
     - Bazarr:
         href: http://192.168.2.105:6767
-        ping: http://192.168.2.105:6767
         siteMonitor: http://192.168.2.105:6767
         description: Subtitles
         icon: bazarr
@@ -202,7 +190,6 @@
 
     - SABnzbd:
         href: http://192.168.2.105:8081/
-        ping: http://192.168.2.105:8081/
         siteMonitor: http://192.168.2.105:8081/
         description: Usenet download client
         icon: sabnzbd
@@ -213,7 +200,6 @@
 
     - qBittorrent:
         href: http://192.168.2.105:8080
-        ping: http://192.168.2.105:8080
         siteMonitor: http://192.168.2.105:8080
         description: Downloader
         icon: https://cdn.jsdelivr.net/gh/selfhst/icons/svg/qbittorrent.svg
@@ -227,21 +213,18 @@
 - Usenet:
     - NZBGeek.info:
         href: https://nzbgeek.info/dashboard.php
-        ping: https://nzbgeek.info/dashboard.php
         siteMonitor: https://nzbgeek.info/dashboard.php
         description: Indexer
         icon: https://nzbgeek.info/favicon.ico
 
     - Usenet.farm:
         href: https://usenet.farm/members.html
-        ping: https://usenet.farm/members.html
         siteMonitor: https://usenet.farm/members.html
         description: Usenet Provider
         icon: si-swisscows
 
     - Usenet Express:
         href: https://members.usenetexpress.com/bytes-history
-        ping: https://members.usenetexpress.com/member
         siteMonitor: https://members.usenetexpress.com/member
         description: Usenet Provider
         icon: https://usenetexpress.com/favicon.ico
@@ -249,13 +232,11 @@
 - Infra-1:
     - ntfy:
         href: https://ntfy.itsa.pizza/
-        ping: https://ntfy.itsa.pizza/
         siteMonitor: https://ntfy.itsa.pizza/
         icon: ntfy
 
     - Grafana:
-        href: http://charts.itsa.pizza
-        ping: http://192.168.2.106:3000
+        href: https://charts.itsa.pizza
         siteMonitor: http://192.168.2.106:3000
         icon: grafana
         widget:
@@ -267,7 +248,6 @@
 
     - TrueNAS:
         href: http://nas.itsa.pizza
-        ping: http://192.168.2.104
         siteMonitor: http://192.168.2.104
         icon: truenas
         widget:
@@ -280,7 +260,6 @@
 
     - Home Assistant:
         href: http://192.168.2.102:8123
-        ping: http://192.168.2.102:8123
         siteMonitor: http://192.168.2.102:8123
         description: Home automation
         icon: home-assistant
@@ -295,7 +274,6 @@
 - Infra-2:
     - AdGuard:
         href: http://192.168.2.111
-        ping: http://192.168.2.111
         siteMonitor: http://192.168.2.111
         description: Ad blocker
         icon: https://cdn.jsdelivr.net/gh/selfhst/icons/svg/adguard-home.svg
@@ -307,7 +285,6 @@
 
     - Uptime Kuma:
         href: https://uptime.itsa.pizza
-        ping: http://192.168.2.106:3001
         siteMonitor: http://192.168.2.106:3001
         description: Monitoring
         icon: si-uptimekuma 
@@ -318,7 +295,6 @@
 
     - Prometheus:
         href: http://192.168.2.106:9090
-        ping: http://192.168.2.106:9090
         siteMonitor: http://192.168.2.106:9090
         description: Metrics Collector
         icon: prometheus
@@ -328,7 +304,6 @@
 
     - Portainer:
         href: http://192.168.2.106:9000
-        ping: http://192.168.2.106:9000
         siteMonitor: http://192.168.2.106:9000
         description: containers
         icon: portainer
@@ -354,7 +329,6 @@
 
     - Dozzle:
         href: http://192.168.2.106:9999
-        ping: http://192.168.2.106:9999
         siteMonitor: http://192.168.2.106:9999
         description: containers
         icon: dozzle
@@ -362,7 +336,6 @@
 - PVE:
     - Proxmox:
         href: https://192.168.2.214:8006
-        ping: https://192.168.2.214:8006
         siteMonitor: https://192.168.2.214:8006
         description: host
         icon: proxmox
@@ -374,7 +347,6 @@
 
     - Proxmox Backup Server:
         href: https://192.168.2.200:8007
-        ping: https://192.168.2.200:8007
         siteMonitor: https://192.168.2.200:8007
         description: backup
         icon: proxmox
@@ -387,7 +359,6 @@
 - Hardware:
     - MySpeed:
         href: http://192.168.2.112:5216/
-        ping: http://192.168.2.112:5216/
         siteMonitor: http://192.168.2.112:5216/
         description: Network Speed
         icon: myspeed
@@ -397,13 +368,11 @@
 
     - Router:
         href: http://192.168.2.254/
-        ping: http://192.168.2.254/
         siteMonitor: http://192.168.2.254/
         icon: router
 
     - MegaRAC SP-X:
         href: https://192.168.2.213
-        ping: https://192.168.2.213
         siteMonitor: https://192.168.2.213
         description: hardware
         icon: mdi-Server

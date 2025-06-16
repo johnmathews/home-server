@@ -40,3 +40,8 @@
 [id^="headlessui-"] {
   margin-bottom: 1.0rem;
 }
+
+div.service-tag div div {
+  font-size: 14px !important;
+}
+
