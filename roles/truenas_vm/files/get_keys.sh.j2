@@ -1,0 +1,55 @@
+#!/bin/bash
+
+
+# The key server returns a json string that contains key-value pairs 
+# of dataset-key, like
+# {
+#   "tank/backups/my-backup":"KEY_FOR_BACKUP",
+#   "tank/photos":"KEY_FOR_PHOTOS"
+# }
+
+
+KEY_SERVER="{{ vault_key_server_url }}"
+KEY_TOKEN="{{ vault_key_server_token }}"
+POOL="tank"  # Change to your pool name
+DATASET="tank"  # Or the exact dataset if different
+TMP_KEY="/tmp/${POOL}.key"
+
+echo "[+] Fetching key from key server..."
+curl -H "Authorization: Bearer ${KEY_TOKEN}" "${KEY_SERVER}/unlock" -o "$TMP_KEY"
+# this returns a json string with multiple keys.
+# {"tank/media":"KEY_FOR_MEDIA","tank/photos":"KEY_FOR_PHOTOS"}
+
+if [ ! -s "$TMP_KEY" ]; then
+    echo "[-] Failed to fetch key or key is empty"
+    exit 1
+fi
+
+# Ensure jq is available
+if ! command -v jq >/dev/null 2>&1; then
+    echo "[-] jq is required but not installed"
+    exit 1
+fi
+
+# Parse keys and unlock each dataset
+DATASETS=$(jq -r 'keys[]' "$TMP_KEY")
+
+for DATASET in $DATASETS; do
+    KEY=$(jq -r --arg dataset "$DATASET" '.[$dataset]' "$TMP_KEY")
+    if [ -z "$KEY" ] || [ "$KEY" == "null" ]; then
+        echo "[-] No key found for $DATASET"
+        continue
+    fi
+
+    echo "[+] Loading key for $DATASET..."
+    echo "$KEY" | zfs load-key -L file:///dev/stdin "$DATASET"
+    if [ $? -ne 0 ]; then
+        echo "[-] Failed to load key for $DATASET"
+        continue
+    fi
+
+    echo "[+] Mounting $DATASET..."
+    zfs mount "$DATASET"
+done
+
+rm -f "$TMP_KEY"
