@@ -1,0 +1,19 @@
+- name: Upload unlock script
+  template:
+    src: unlock_datasets.sh.j2
+    dest: /usr/local/bin/unlock_datasets.sh
+    mode: '0755'
+
+- name: Create startup task for key unlock
+  shell: |
+    midclt call initshutdown.create '{
+      "type": "SCRIPT",
+      "when": "POSTINIT",
+      "enabled": true,
+      "script": "/usr/local/bin/unlock_datasets.sh",
+      "timeout": 60
+    }'
+  args:
+    executable: /bin/bash
+  register: unlock_task_created
+  changed_when: "'already exists' not in unlock_task_created.stdout"

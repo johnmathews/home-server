@@ -11,9 +11,7 @@
 
 KEY_SERVER="{{ vault_key_server_url }}"
 KEY_TOKEN="{{ vault_key_server_token }}"
-POOL="tank"  # Change to your pool name
-DATASET="tank"  # Or the exact dataset if different
-TMP_KEY="/tmp/${POOL}.key"
+TMP_KEY="/tmp/dataset_keys.json"
 
 echo "[+] Fetching key from key server..."
 curl -H "Authorization: Bearer ${KEY_TOKEN}" "${KEY_SERVER}/unlock" -o "$TMP_KEY"

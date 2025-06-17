@@ -136,4 +136,10 @@
   become: false
 
 
-- import_tasks: node_exporter.yml
+- name: Install node exporter 
+  import_tasks: node_exporter.yml
+  tags: [metrics]
+
+- name: Set up script to unlock datasets using key server 
+  import_tasks: key_server.yml
+  tags: [key]
