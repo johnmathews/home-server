@@ -1,18 +1,20 @@
 # /opt/key_server/main.py
 
+import os
+import json
 from fastapi import FastAPI, Request, HTTPException
 from typing import Dict
 
 app = FastAPI()
 
-SECRET_TOKEN = "supersecrettoken"
+SECRET_TOKEN = "{{ vault_key_server_auth_token }}"
+
+dataset_keys_json_object = json.loads(os.getenv("DATASET_KEYS_JSON"))
 
 @app.get("/unlock", response_model=Dict[str, str])
 async def unlock(request: Request):
     auth = request.headers.get("Authorization", "")
     if auth != f"Bearer {SECRET_TOKEN}":
         raise HTTPException(status_code=403, detail="Unauthorized")
-    return {
-        "tank/media": "KEY_FOR_MEDIA",
-        "tank/photos": "KEY_FOR_PHOTOS"
-    }
+    return dataset_keys_json_object
+

@@ -76,6 +76,13 @@
   environment:
     PATH: "/home/{{ server_user }}/.local/bin:{{ ansible_env.PATH }}"
 
+- name: Set environment variable with dataset keys
+  copy:
+    dest: /opt/key_server/.env
+    content: |
+      DATASET_KEYS_JSON={{ vault_dataset_keys_json | to_json }}
+    mode: "0600"
+
 - name: Create systemd service file
   copy:
     dest: /etc/systemd/system/key-server.service

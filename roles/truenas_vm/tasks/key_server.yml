@@ -1,19 +1,15 @@
-- name: Upload unlock script
+- name: Upload unlock script to TrueNAS
   template:
     src: unlock_datasets.sh.j2
-    dest: /usr/local/bin/unlock_datasets.sh
+    dest: /mnt/tank/apps-config/scripts/get_keys.sh
     mode: '0755'
+    owner: root
+    group: wheel
 
-- name: Create startup task for key unlock
-  shell: |
-    midclt call initshutdown.create '{
-      "type": "SCRIPT",
-      "when": "POSTINIT",
-      "enabled": true,
-      "script": "/usr/local/bin/unlock_datasets.sh",
-      "timeout": 60
-    }'
-  args:
-    executable: /bin/bash
-  register: unlock_task_created
-  changed_when: "'already exists' not in unlock_task_created.stdout"
+- name: Ensure unlock script is executable
+  file:
+    path: /mnt/tank/apps-config/scripts/get_keys.sh
+    mode: '0755'
+    state: file
+    owner: root
+    group: wheel

@@ -1,0 +1,54 @@
+#!/bin/bash
+
+# The key server returns a json string that contains key-value pairs of dataset-key, like
+# {
+#   "tank/media": {
+#     "key": "KEY_FOR_MEDIA",
+#     "mountpoint": "/mnt/media",
+#     "description": "shows and movies"
+#   }
+# }
+
+KEY_SERVER="{{ vault_key_server_url }}"
+KEY_TOKEN="{{ vault_key_server_auth_token }}"
+TMP_KEY_FILE_PATH="/tmp/dataset_keys.json"
+
+echo "[+] Fetching key from key server..."
+curl -H "Authorization: Bearer ${KEY_TOKEN}" "${KEY_SERVER}/unlock" -o "$TMP_KEY_FILE_PATH"
+
+if [ ! -s "$TMP_KEY_FILE_PATH" ]; then
+    echo "[-] Failed to fetch key or key is empty"
+    exit 1
+fi
+
+# Ensure jq is available
+if ! command -v jq >/dev/null 2>&1; then
+    echo "[-] jq is required but not installed"
+    exit 1
+fi
+
+DATASETS=$(jq -r 'keys[]' "$TMP_KEY_FILE_PATH")
+
+for DATASET in $DATASETS; do
+    KEY=$(jq -r --arg dataset "$DATASET" '.[$dataset].key' "$TMP_KEY_FILE_PATH")
+    DESCRIPTION=$(jq -r --arg dataset "$DATASET" '.[$dataset].description // "no description"' "$TMP_KEY_FILE_PATH")
+
+    if [ -z "$KEY" ] || [ "$KEY" == "null" ]; then
+        echo "[-] No key found for $DATASET"
+        continue
+    fi
+
+    echo "[+] Loading key for $DATASET – $DESCRIPTION"
+    echo "$KEY" | zfs load-key -L file:///dev/stdin "$DATASET"
+
+    keystatus=$(zfs get -H -o value keystatus "$DATASET")
+    if [ "$keystatus" != "available" ]; then
+        echo "[-] Unlocking dataset '$DATASET' failed"
+        exit 1
+    fi
+
+    echo "[+] Mounting $DATASET..."
+    zfs mount "$DATASET"
+done
+
+rm -f "$TMP_KEY_FILE_PATH"
