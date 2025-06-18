@@ -16,7 +16,7 @@
   border-width: 2px;
   border-color: #000000;
   border-style: solid;
-  border-radius: 0.5rem; /* Optional, like rounded-md */
+  border-radius: 0.5rem;
   margin: 0.25rem;
   margin-bottom: 0.5rem;
   margin-top: 0.5rem;
@@ -46,3 +46,6 @@ div.service-tag div div {
   font-weight: 600;
 }
 
+#myTab li button {
+  border: 2px solid black !important;
+}

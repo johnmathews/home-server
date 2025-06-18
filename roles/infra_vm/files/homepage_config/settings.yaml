@@ -15,37 +15,49 @@ fullWidth: false
 useEqualHeights: false 
 
 layout:
-  Metrics:
-    style: row
-    columns: 3
-  Media-1:
-    style: row
-    columns: 3
-  Media-2:
-    initiallyCollapsed: false
-    style: row
-    columns: 2
-  Usenet:
-    initiallyCollapsed: false
-    style: row
-    columns: 4
 
   Infra-1:
+    tab: Infra
     style: row
     columns: 4
 
   Infra-2:
+    tab: Infra
     initiallyCollapsed: false
     style: row
     columns: 4
 
   PVE:
+    tab: Infra
     initiallyCollapsed: false
     style: row
     columns: 3
 
   Hardware:
+    tab: Infra
     initiallyCollapsed: false
+    style: row
+    columns: 3
+
+
+  Media-1:
+    tab: Media
+    style: row
+    columns: 3
+  Media-2:
+    tab: Media
+    initiallyCollapsed: false
+    style: row
+    columns: 2
+  Usenet:
+    tab: Media
+    initiallyCollapsed: false
+    style: row
+    columns: 4
+
+
+  Metrics:
+    tab: Metrics
     style: row
     columns: 3
 
