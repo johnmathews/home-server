@@ -19,6 +19,7 @@ exec > >(tee -a "$LOG_FILE") 2>&1
 echo "────────────────────────────────────────────"
 echo "[BOOT] Unlock script started at $(date)"
 echo "────────────────────────────────────────────"
+echo ""
 
 
 KEY_SERVER_URL="{{ vault_key_server_url }}"
@@ -40,6 +41,8 @@ curl -fsSL -H "Authorization: Bearer ${KEY_TOKEN}" "${KEY_SERVER_URL}:${KEY_SERV
 if [ ! -s "$TMP_KEY_FILE_PATH" ]; then
     echo -e "${RED}[ERROR] Failed to fetch key or key is empty${RESET}"
     exit 1
+else
+    echo -e "${CYAN}[OK] Keys retrieved${RESET}"
 fi
 
 # Ensure jq is available
@@ -87,3 +90,4 @@ echo -e "${BLUE}─────────────────────�
 echo -e "${BLUE}[CLEANUP] Removing temporary key file...${RESET}"
 rm -f "$TMP_KEY_FILE_PATH"
 echo -e "${CYAN}  [OK] Done${RESET}"
+echo ""
