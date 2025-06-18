@@ -7,15 +7,6 @@
 # https://gethomepage.dev/configs/services/
 
 - Metrics: 
-  # tech shelf power 
-  # - "":
-  #    widget:
-  #      type: iframe
-  #      src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/proxmox?orgId=1&timezone=browser%kiosk=tv&refresh=10s&panelId=7&__feature.dashboardSceneSolo
-  #      referrerPolicy: same-origin
-  #      allowPolicy: autoplay; fullscreen; gamepad
-  #      allowFullscreen: true
-       
   # CPU usage 
   - "":
      widget:
@@ -312,20 +303,6 @@
           url: http://192.168.2.106:9000
           env: 5
           key: "{{ vault_portainer_key }}"
-
-    # - Node Exporter:
-    #     href: http://192.168.2.106:9100
-    #     ping: http://192.168.2.106:9100
-    #     siteMonitor: http://192.168.2.106:9100
-    #     description: Node Exporter
-    #     icon: node exporter
-
-    # - cAdvisor:
-    #     href: http://192.168.2.106:8080
-    #     ping: http://192.168.2.106:8080
-    #     siteMonitor: http://192.168.2.106:8080
-    #     description: container metrics
-    #     icon: https://cdn.jsdelivr.net/gh/selfhst/icons/svg/cadvisor.svg
 
     - Dozzle:
         href: http://192.168.2.106:9999
