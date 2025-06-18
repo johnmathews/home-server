@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#/mnt/tank/apps-config/scripts/get_keys.sh
+
 # Unlock and mount encrypted ZFS datasets from a remote key server.
 # The key server returns a json string that contains key-value pairs of dataset-key, like
 # {
@@ -9,6 +11,15 @@
 #     "description": "shows and movies"
 #   }
 # }
+
+# Redirect stdout and stderr to a log file
+LOG_FILE="/mnt/tank/apps-config/scripts/get_keys.log"
+exec > >(tee -a "$LOG_FILE") 2>&1
+
+echo "────────────────────────────────────────────"
+echo "[BOOT] Unlock script started at $(date)"
+echo "────────────────────────────────────────────"
+
 
 KEY_SERVER_URL="{{ vault_key_server_url }}"
 KEY_SERVER_PORT="{{ vault_key_server_port }}"
@@ -20,6 +31,7 @@ GREEN="\033[1;32m"
 YELLOW="\033[1;33m"
 RED="\033[1;31m"
 BLUE="\033[1;34m"
+CYAN="\033[1;36m"
 RESET="\033[0m"
 
 echo -e "${BLUE}[INFO] Fetching dataset keys from key server...${RESET}"
@@ -43,7 +55,7 @@ for DATASET in $DATASETS; do
     DESCRIPTION=$(jq -r --arg dataset "$DATASET" '.[$dataset].description // "no description"' "$TMP_KEY_FILE_PATH")
 
     echo -e "${BLUE}────────────────────────────────────────────${RESET}"
-    echo -e "${BLUE}[DATASET] $DATASET — $DESCRIPTION${RESET}"
+    echo -e "${BLUE}[DATASET] $DATASET ($DESCRIPTION${RESET})"
 
     if [ -z "$KEY" ] || [ "$KEY" == "null" ]; then
         echo -e "${YELLOW}[WARN] No key found for $DATASET — skipping${RESET}"
@@ -52,24 +64,26 @@ for DATASET in $DATASETS; do
 
     keystatus=$(sudo zfs get -H -o value keystatus "$DATASET")
     if [ "$keystatus" = "available" ]; then
-        echo -e "${GREEN}[OK] Key already loaded${RESET}"
+        echo -e "${CYAN}  [OK] Key already loaded${RESET}"
     else
         echo -e "${BLUE}[ACTION] Loading key...${RESET}"
         echo "$KEY" | sudo zfs load-key -L file:///dev/stdin "$DATASET" && \
-        echo -e "${GREEN}[OK] Key loaded${RESET}" || \
+        echo -e "${GREEN}  [OK] Key loaded${RESET}" || \
         echo -e "${RED}[ERROR] Failed to load key for $DATASET${RESET}"
     fi
 
     mounted=$(sudo zfs get -H -o value mounted "$DATASET")
     if [ "$mounted" = "yes" ]; then
-        echo -e "${GREEN}[OK] Already mounted${RESET}"
+        echo -e "${CYAN}  [OK] Already mounted${RESET}"
     else
         echo -e "${BLUE}[ACTION] Mounting dataset...${RESET}"
         sudo zfs mount "$DATASET" && \
-        echo -e "${GREEN}[OK] Mounted successfully${RESET}" || \
+        echo -e "${GREEN}  [OK] Mounted successfully${RESET}" || \
         echo -e "${RED}[ERROR] Failed to mount $DATASET${RESET}"
     fi
 done
 
+echo -e "${BLUE}────────────────────────────────────────────${RESET}"
 echo -e "${BLUE}[CLEANUP] Removing temporary key file${RESET}"
 rm -f "$TMP_KEY_FILE_PATH"
+echo -e "${CYAN}[CLEANUP] Done${RESET}"
