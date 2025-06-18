@@ -64,12 +64,12 @@
 
   - Grafana:
       href: https://charts.itsa.pizza
-      siteMonitor: http://192.168.2.106:3000
+      siteMonitor: https://192.168.2.106:3000
       icon: grafana
       widget:
         type: grafana
         fields: [""]
-        url: http://192.168.2.106:3000
+        url: https://192.168.2.106:3000
         username: "{{ vault_grafana_username }}"
         password: "{{ vault_grafana_password }}"
 
@@ -93,7 +93,7 @@
         icon: calibre
 
     - Jellyfin:
-        href: http://jelly.itsa.pizza
+        href: https://jelly.itsa.pizza
         siteMonitor: http://192.168.2.214:8096
         description: TV app 
         icon: jellyfin
@@ -111,7 +111,7 @@
           expandOneStreamToTwoRows: false # optional, defaults to true
 
     - Jellyseerr:
-        href: http://seerr.itsa.pizza
+        href: https://seerr.itsa.pizza
         siteMonitor: http://192.168.2.105:5055/
         description: TV
         icon: jellyseerr
@@ -121,14 +121,14 @@
           key: "{{ vault_jellyseer_key }}"
 
     - File Browser:
-        href: http://files.itsa.pizza
+        href: https://files.itsa.pizza
         siteMonitor: http://192.168.2.104:30051
         icon: filebrowser
 
 
 - Media-2:
     - Radarr:
-        href: http://192.168.2.105:7878
+        href: https://radarr.itsa.pizza
         siteMonitor: http://192.168.2.105:7878
         description: Movie Manager
         icon: radarr
@@ -140,7 +140,7 @@
           enableQueue: false
 
     - Sonarr:
-        href: http://192.168.2.105:8989/
+        href: https://sonarr.itsa.pizza/
         siteMonitor: http://192.168.2.105:8989/
         description: TV Series Manager
         icon: sonarr
@@ -238,7 +238,7 @@
           password: "{{ vault_grafana_password }}"
 
     - TrueNAS:
-        href: http://nas.itsa.pizza
+        href: https://nas.itsa.pizza
         siteMonitor: http://192.168.2.104
         icon: truenas
         widget:
