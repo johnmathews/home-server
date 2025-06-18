@@ -1,0 +1,8 @@
+# roles/key_server/handlers/main.yml
+
+---
+
+- name: Restart key-server service
+  systemd:
+    name: key-server
+    state: restarted

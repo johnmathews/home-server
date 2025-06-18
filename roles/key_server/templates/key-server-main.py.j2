@@ -4,17 +4,25 @@ import os
 import json
 from fastapi import FastAPI, Request, HTTPException
 from typing import Dict
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = FastAPI()
 
 SECRET_TOKEN = "{{ vault_key_server_auth_token }}"
 
-dataset_keys_json_object = json.loads(os.getenv("DATASET_KEYS_JSON"))
-
-@app.get("/unlock", response_model=Dict[str, str])
+@app.get("/unlock", response_model=Dict[str, Dict[str, str]])
 async def unlock(request: Request):
     auth = request.headers.get("Authorization", "")
     if auth != f"Bearer {SECRET_TOKEN}":
         raise HTTPException(status_code=403, detail="Unauthorized")
+
+    try:
+        dataset_keys_json_object = json.loads(os.getenv("DATASET_KEYS_JSON", "{}"))
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=500, detail="Invalid DATASET_KEYS_JSON")
+    
+
     return dataset_keys_json_object
 

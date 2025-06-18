@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# Unlock and mount encrypted ZFS datasets from a remote key server.
 # The key server returns a json string that contains key-value pairs of dataset-key, like
 # {
 #   "tank/media": {
@@ -9,21 +10,29 @@
 #   }
 # }
 
-KEY_SERVER="{{ vault_key_server_url }}"
+KEY_SERVER_URL="{{ vault_key_server_url }}"
+KEY_SERVER_PORT="{{ vault_key_server_port }}"
 KEY_TOKEN="{{ vault_key_server_auth_token }}"
 TMP_KEY_FILE_PATH="/tmp/dataset_keys.json"
 
-echo "[+] Fetching key from key server..."
-curl -H "Authorization: Bearer ${KEY_TOKEN}" "${KEY_SERVER}/unlock" -o "$TMP_KEY_FILE_PATH"
+# Color codes
+GREEN="\033[1;32m"
+YELLOW="\033[1;33m"
+RED="\033[1;31m"
+BLUE="\033[1;34m"
+RESET="\033[0m"
+
+echo -e "${BLUE}[INFO] Fetching dataset keys from key server...${RESET}"
+curl -fsSL -H "Authorization: Bearer ${KEY_TOKEN}" "${KEY_SERVER_URL}:${KEY_SERVER_PORT}/unlock" -o "$TMP_KEY_FILE_PATH"
 
 if [ ! -s "$TMP_KEY_FILE_PATH" ]; then
-    echo "[-] Failed to fetch key or key is empty"
+    echo -e "${RED}[ERROR] Failed to fetch key or key is empty${RESET}"
     exit 1
 fi
 
 # Ensure jq is available
 if ! command -v jq >/dev/null 2>&1; then
-    echo "[-] jq is required but not installed"
+    echo -e "${RED}[ERROR] 'jq' is required but not installed${RESET}"
     exit 1
 fi
 
@@ -33,22 +42,34 @@ for DATASET in $DATASETS; do
     KEY=$(jq -r --arg dataset "$DATASET" '.[$dataset].key' "$TMP_KEY_FILE_PATH")
     DESCRIPTION=$(jq -r --arg dataset "$DATASET" '.[$dataset].description // "no description"' "$TMP_KEY_FILE_PATH")
 
+    echo -e "${BLUE}────────────────────────────────────────────${RESET}"
+    echo -e "${BLUE}[DATASET] $DATASET — $DESCRIPTION${RESET}"
+
     if [ -z "$KEY" ] || [ "$KEY" == "null" ]; then
-        echo "[-] No key found for $DATASET"
+        echo -e "${YELLOW}[WARN] No key found for $DATASET — skipping${RESET}"
         continue
     fi
 
-    echo "[+] Loading key for $DATASET – $DESCRIPTION"
-    echo "$KEY" | zfs load-key -L file:///dev/stdin "$DATASET"
-
-    keystatus=$(zfs get -H -o value keystatus "$DATASET")
-    if [ "$keystatus" != "available" ]; then
-        echo "[-] Unlocking dataset '$DATASET' failed"
-        exit 1
+    keystatus=$(sudo zfs get -H -o value keystatus "$DATASET")
+    if [ "$keystatus" = "available" ]; then
+        echo -e "${GREEN}[OK] Key already loaded${RESET}"
+    else
+        echo -e "${BLUE}[ACTION] Loading key...${RESET}"
+        echo "$KEY" | sudo zfs load-key -L file:///dev/stdin "$DATASET" && \
+        echo -e "${GREEN}[OK] Key loaded${RESET}" || \
+        echo -e "${RED}[ERROR] Failed to load key for $DATASET${RESET}"
     fi
 
-    echo "[+] Mounting $DATASET..."
-    zfs mount "$DATASET"
+    mounted=$(sudo zfs get -H -o value mounted "$DATASET")
+    if [ "$mounted" = "yes" ]; then
+        echo -e "${GREEN}[OK] Already mounted${RESET}"
+    else
+        echo -e "${BLUE}[ACTION] Mounting dataset...${RESET}"
+        sudo zfs mount "$DATASET" && \
+        echo -e "${GREEN}[OK] Mounted successfully${RESET}" || \
+        echo -e "${RED}[ERROR] Failed to mount $DATASET${RESET}"
+    fi
 done
 
+echo -e "${BLUE}[CLEANUP] Removing temporary key file${RESET}"
 rm -f "$TMP_KEY_FILE_PATH"
