@@ -42,7 +42,7 @@ if [ ! -s "$TMP_KEY_FILE_PATH" ]; then
     echo -e "${RED}[ERROR] Failed to fetch key or key is empty${RESET}"
     exit 1
 else
-    echo -e "${CYAN}[OK] Keys retrieved${RESET}"
+    echo -e "${GREEN}  [OK] Keys retrieved${RESET}"
 fi
 
 # Ensure jq is available
@@ -69,25 +69,25 @@ for DATASET in $DATASETS; do
     if [ "$keystatus" = "available" ]; then
         echo -e "${CYAN}  [OK] Key already loaded${RESET}"
     else
-        echo -e "${BLUE}[ACTION] Loading key...${RESET}"
+        echo -e "${BLUE}  [ACTION] Loading key...${RESET}"
         echo "$KEY" | sudo zfs load-key -L file:///dev/stdin "$DATASET" && \
-        echo -e "${GREEN}  [OK] Key loaded${RESET}" || \
-        echo -e "${RED}[ERROR] Failed to load key for $DATASET${RESET}"
+        echo -e "${GREEN}    [OK] Key loaded${RESET}" || \
+        echo -e "${RED}    [ERROR] Failed to load key for $DATASET${RESET}"
     fi
 
     mounted=$(sudo zfs get -H -o value mounted "$DATASET")
     if [ "$mounted" = "yes" ]; then
         echo -e "${CYAN}  [OK] Already mounted${RESET}"
     else
-        echo -e "${BLUE}[ACTION] Mounting dataset...${RESET}"
+        echo -e "${BLUE}  [ACTION] Mounting dataset...${RESET}"
         sudo zfs mount "$DATASET" && \
-        echo -e "${GREEN}  [OK] Mounted successfully${RESET}" || \
-        echo -e "${RED}[ERROR] Failed to mount $DATASET${RESET}"
+        echo -e "${GREEN}    [OK] Mounted successfully${RESET}" || \
+        echo -e "${RED}    [ERROR] Failed to mount $DATASET${RESET}"
     fi
 done
 
 echo -e "${BLUE}────────────────────────────────────────────${RESET}"
 echo -e "${BLUE}[CLEANUP] Removing temporary key file...${RESET}"
 rm -f "$TMP_KEY_FILE_PATH"
-echo -e "${CYAN}  [OK] Done${RESET}"
+echo -e "${GREEN}  [OK] Done${RESET}"
 echo ""
