@@ -14,8 +14,7 @@
   import_tasks: pve_exporter.yml
   tags: [metrics]
 
-  # Run this before the imported Smartctl exporter role
-  # we need GNU Tar running on the local ansible host
+  # Run this before the imported Smartctl exporter role. GNU Tar must be running on the local ansible host
 - name: Check for GNU tar when running tasks locally
   when: inventory_hostname == 'localhost' or delegate_to is defined and delegate_to == 'localhost'
   block:
@@ -39,11 +38,6 @@
     name: prometheus.prometheus.smartctl_exporter
   tags: [metrics]
 
-- name: Install Docker and deploy Jellyfin
-  import_tasks: docker-jellyfin.yml
-  tags: [media]
-
-
 - name: Install radeontop metrics exporter
   import_tasks: radeontop-exporter.yml
   tags: [metrics, media, radeontop]
@@ -51,3 +45,7 @@
 - name: Install glances
   import_tasks: glances.yml
   tags: [metrics, glances]
+
+- name: Install Docker and deploy containerised apps 
+  import_tasks: docker-apps.yml
+  tags: [containers]

@@ -7,13 +7,13 @@
 
 - Apps:
     - Grafana:
-        - abbr: Infra
+        - abbr: I
           href: http://192.168.2.106:3000
     - Loki:
-        - abbr: Infra
+        - abbr: I
           href: http://192.168.2.106:3100
     - Kavita:
-        - abbr: Media
+        - abbr: M
           href: http://192.168.2.105:5000
     - TrueNAS:
         - abbr: NAS 
@@ -37,3 +37,6 @@
   - Loki:
     - abbr: Lo
       href: https://grafana.com/docs/loki/latest/reference/loki-http-api/
+  - Scripts:
+    - abbr: 
+      href: https://community-scripts.github.io/ProxmoxVE/scripts

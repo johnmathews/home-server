@@ -29,6 +29,6 @@ smb_server: 192.168.2.104
 # smb_share_path: /srv/media/library
 smb_shares:
   - name: library 
-    target: /srv/media/library
+    target: /mnt/media/library
   - name: media 
-    target: /srv/media/media
+    target: /mnt/media/media

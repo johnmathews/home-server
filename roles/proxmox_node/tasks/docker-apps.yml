@@ -58,8 +58,8 @@
     group: root
     mode: '0755'
   loop:
-    - /srv/jellyfin/config
-    - /srv/jellyfin/cache
+    - /srv/apps/jellyfin/config
+    - /srv/apps/jellyfin/cache
 
 
 - name: Create required smb share directories
@@ -78,13 +78,21 @@
 
 - name: Ensure Jellyfin Docker Compose directory exists
   file:
-    path: /srv/jellyfin
+    path: /srv/apps
     state: directory
 
 - name: Deploy Jellyfin docker-compose.yml
   copy:
     src: docker-compose.yml
-    dest: /srv/jellyfin/docker-compose.yml
+    dest: /srv/apps/docker-compose.yml
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Deploy .env file template 
+  template:
+    src: templates/.env.j2 
+    dest: /srv/apps/.env
     owner: root
     group: root
     mode: '0644'
@@ -106,7 +114,7 @@
 
 - name: Mount SMB share
   mount:
-    path: "/srv/media/{{ item.name }}"
+    path: "{{ item.target }}"
     src: "//{{ smb_server }}/{{ item.name }}"
     fstype: cifs
     opts: credentials=/root/.smbcredentials,iocharset=utf8,noperm,nofail,vers=3.0
@@ -128,6 +136,6 @@
     create: yes
   loop: "{{ smb_shares }}"
 
-- name: Start Jellyfin using Docker Compose
+- name: Start apps using Docker Compose
   community.docker.docker_compose_v2:
-    project_src: /srv/jellyfin
+    project_src: /srv/apps
