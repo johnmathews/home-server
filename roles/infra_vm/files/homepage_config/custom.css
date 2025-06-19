@@ -45,11 +45,12 @@ div.service-tag div div {
 }
 
 #myTab li button {
-  border: 0px solid black;
+  border: 2px solid black;
 }
 
 [aria-selected="true"] {
-  background-color: #40eb34;
+  background-color: #88e3a1;
+  border: 3px solid #2bab4d !important;
 }
 
 @media (min-width: 1024px) {
