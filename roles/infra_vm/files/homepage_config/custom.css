@@ -47,3 +47,13 @@ div.service-tag div div {
 #myTab li button {
   border: 2px solid black !important;
 }
+
+[aria-selected="true"] {
+  background-color: #e2f4e1;
+}
+
+@media (min-width: 1024px) {
+  #myTab {
+    max-width: 75vw;
+  }
+}
