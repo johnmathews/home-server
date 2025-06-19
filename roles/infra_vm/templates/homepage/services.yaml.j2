@@ -64,12 +64,12 @@
 
   - Grafana:
       href: https://charts.itsa.pizza
-      siteMonitor: https://192.168.2.106:3000
+      siteMonitor: http://192.168.2.106:3000
       icon: grafana
       widget:
         type: grafana
         fields: [""]
-        url: https://192.168.2.106:3000
+        url: http://192.168.2.106:3000
         username: "{{ vault_grafana_username }}"
         password: "{{ vault_grafana_password }}"
 
