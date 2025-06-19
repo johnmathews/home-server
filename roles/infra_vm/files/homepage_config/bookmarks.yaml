@@ -7,27 +7,27 @@
 
 - Apps:
     - Grafana:
-        - abbr: I
+        - abbr:
           href: http://192.168.2.106:3000
     - Loki:
-        - abbr: I
+        - abbr:
           href: http://192.168.2.106:3100
     - Kavita:
-        - abbr: M
+        - abbr:
           href: http://192.168.2.105:5000
     - TrueNAS:
-        - abbr: NAS 
+        - abbr: 
           href: http://192.168.2.104:5000
 
 - _Hardware:
     - ProxMox:
-        - abbr: Pm 
+        - abbr: 
           href: http://192.168.2.214:8006
     - PBS:
-        - abbr: PBS 
+        - abbr:
           href: http://192.168.2.200:8007
     - BMC:
-        - abbr: BMC 
+        - abbr:
           href: http://192.168.2.213
     - Router:
         - abbr:
@@ -35,8 +35,8 @@
 
 - Docs:
   - Loki:
-    - abbr: Lo
+    - abbr:
       href: https://grafana.com/docs/loki/latest/reference/loki-http-api/
-  - Scripts:
+  - Proxmox Scripts:
     - abbr: 
       href: https://community-scripts.github.io/ProxmoxVE/scripts
