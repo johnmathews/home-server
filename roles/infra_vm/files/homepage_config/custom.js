@@ -1,5 +1,5 @@
 // Custom JavaScript for CPU usage highlighting
-(function() {
+(function waitForRevalidate() {
   console.log("Custom JS loaded");
 
   const revalidate = document.getElementById("revalidate");
@@ -11,8 +11,10 @@
 
   const tabList = document.querySelector("#tabs ul");
 
-  if (!tabList) {
+  if (!revalidate || !tabList) {
     console.warn("#tabs ul not found");
+    // Retry next frame
+    requestAnimationFrame(waitForRevalidate);
     return;
   }
 

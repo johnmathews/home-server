@@ -3,13 +3,30 @@
 
 ---
 services:
+  server:
+    image: codeberg.org/forgejo/forgejo:11
+    container_name: forgejo
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+    restart: always
+    networks:
+      - forgejo
+    volumes:
+      - /srv/infra_stack/forgejo/data:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - '3003:3000'
+      - '222:22'
+
   loki:
     image: grafana/loki:latest
     container_name: loki
     volumes:
-      - /opt/infra_stack/loki/loki:/etc/loki
-      - /opt/infra_stack/loki/data:/loki/data
-      - /opt/infra_stack/loki/var:/var/loki
+      - /srv/infra/loki/loki:/etc/loki
+      - /srv/infra/loki/data:/loki/data
+      - /srv/infra/loki/var:/var/loki
     command: -config.file=/etc/loki/loki-config.yml
     ports:
       - "3100:3100"
@@ -24,7 +41,7 @@ services:
       - /mnt/truenas:/mnt/truenas
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock
-      - /opt/infra_stack/promtail:/etc/promtail
+      - /srv/infra/promtail:/etc/promtail
     command: -config.file=/etc/promtail/promtail-config.yml --config.expand-env
     restart: always
 
@@ -39,9 +56,9 @@ services:
     ports:
       - 3002:3000
     env_file:
-      - /opt/infra_stack/homepage/config/.env
+      - /srv/infra/homepage/config/.env
     volumes:
-      - /opt/infra_stack/homepage/config:/app/config
+      - /srv/infra/homepage/config:/app/config
       - /var/run/docker.sock:/var/run/docker.sock:ro
     restart: always
 
@@ -73,6 +90,8 @@ services:
     ports:
       - "3000:3000"
     environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
       - GF_SERVER_DOMAIN=charts.itsa.pizza
       - GF_SERVER_ROOT_URL=https://charts.itsa.pizza
       - GF_SECURITY_COOKIE_SAMESITE=none
@@ -80,8 +99,8 @@ services:
       - GF_SERVER_SERVE_FROM_SUB_PATH=false
       - GF_SECURITY_ALLOW_EMBEDDING=true
     volumes:
-      - /opt/infra_stack/grafana/data:/var/lib/grafana
-      - "{{ docker_compose_dir }}/custom/grafana.ini:/etc/grafana/grafana.ini:ro"
+      - /srv/infra/grafana/data:/var/lib/grafana
+      - "{{ docker_compose_dir }}/grafana/config/grafana.ini:/etc/grafana/grafana.ini:ro"
     restart: always
 
   prometheus:
@@ -90,7 +109,7 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - /opt/infra_stack/prometheus/data:/prometheus
+      - /srv/infra/prometheus/data:/prometheus
       - ./prometheus:/etc/prometheus:ro
     restart: always
     labels:
@@ -132,7 +151,7 @@ services:
     ports:
       - "3001:3001"
     volumes:
-      - /opt/infra_stack/uptime_kuma/data:/app/data
+      - /srv/infra/uptime_kuma/data:/app/data
     restart: always
 
   dozzle:
@@ -150,6 +169,10 @@ services:
     ports:
       - "9000:9000"
     volumes:
-      - /opt/infra_stack/portainer/data:/data
+      - /srv/infra/portainer/data:/data
       - /var/run/docker.sock:/var/run/docker.sock
     restart: always
+
+networks:
+  forgejo:
+    external: false

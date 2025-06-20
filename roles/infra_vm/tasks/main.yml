@@ -70,7 +70,7 @@
 
 - name: Create Docker Compose directory
   file:
-    path: /opt/infra_stack
+    path: /srv/infra
     state: directory
     owner: "{{ docker_user }}"
     group: docker
@@ -81,7 +81,7 @@
 
 - name: Ensure grafana custom config directory exists
   file:
-    path: /opt/infra_stack/custom
+    path: /srv/infra/grafana/config
     state: directory
     owner: root
     group: root
@@ -90,7 +90,7 @@
 - name: Deploy custom grafana.ini
   template:
     src: grafana/grafana.ini.j2
-    dest: /opt/infra_stack/custom/grafana.ini
+    dest: /srv/infra/grafana/config/grafana.ini
     owner: root
     group: root
     mode: '0644'
@@ -98,7 +98,7 @@
 
 - name: Ensure loki config directory exists
   file:
-    path: /opt/infra_stack/loki
+    path: /srv/infra/loki
     state: directory
     owner: root
     group: root
@@ -106,7 +106,7 @@
 
 - name: Ensure loki config subdirs exist
   file:
-    path: /opt/infra_stack/loki/{{item}}
+    path: /srv/infra/loki/{{item}}
     state: directory
     owner: 10001
     group: 10001
@@ -124,7 +124,7 @@
 - name: Deploy custom loki config
   template:
     src: files/loki/loki-config.yml
-    dest: /opt/infra_stack/loki/loki/loki-config.yml
+    dest: /srv/infra/loki/loki/loki-config.yml
     owner: root
     group: root
     mode: '0644'
@@ -132,7 +132,7 @@
 
 - name: Ensure promtail config directory exists
   file:
-    path: /opt/infra_stack/promtail
+    path: /srv/infra/promtail
     state: directory
     owner: root
     group: root
@@ -141,7 +141,7 @@
 - name: Deploy custom promtail config
   template:
     src: files/promtail/promtail-config.yml
-    dest: /opt/infra_stack/promtail/promtail-config.yml
+    dest: /srv/infra/promtail/promtail-config.yml
     owner: root
     group: root
     mode: '0644'
@@ -150,7 +150,7 @@
 - name: Template Docker Compose file
   template:
     src: docker-compose.yml.j2
-    dest: /opt/infra_stack/docker-compose.yml
+    dest: /srv/infra/docker-compose.yml
     owner: "{{ docker_user }}"
     group: docker
     mode: '0644'
@@ -158,7 +158,7 @@
 
 - name: Create Prometheus config directory
   file:
-    path: /opt/infra_stack/prometheus
+    path: /srv/infra/prometheus
     state: directory
     owner: "{{ docker_user }}"
     group: docker
@@ -166,7 +166,7 @@
 
 - name: Ensure Prometheus data directory is owned by UID/GID 65534
   ansible.builtin.file:
-    path: /opt/infra_stack/prometheus/data
+    path: /srv/infra/prometheus/data
     state: directory
     recurse: yes
     owner: "65534"
@@ -199,7 +199,7 @@
 - name: Launch containers
   command: docker compose up -d
   args:
-    chdir: /opt/infra_stack
+    chdir: /srv/infra
 
 - name: Include config tasks for docker services (prometheus and homepage)
   import_tasks: services_config.yml
