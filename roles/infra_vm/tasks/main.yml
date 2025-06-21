@@ -203,13 +203,6 @@
   ansible.builtin.command: chmod 644 /srv/infra/filebrowser/config
   become: true
 
-- name: Set permissions of file browser database directory
-  ansible.builtin.command: chown -R 1000:1000 /srv/infra/filebrowser/config/database
-  become: true
-- name: Set permissions of file browser database directory
-  ansible.builtin.command: chmod 644 /srv/infra/filebrowser/config/database
-  become: true
-
 - name: Launch containers
   command: docker compose up -d
   args:

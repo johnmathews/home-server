@@ -3,6 +3,15 @@
 
 ---
 services:
+  iperf3:
+    image: networkstatic/iperf3
+    container_name: iperf3
+    restart: unless-stopped
+    command: -s
+    ports:
+      - "5201:5201"  # TCP
+      - "5201:5201/udp"  # UDP
+
   filebrowser:
     image: filebrowser/filebrowser:latest
     container_name: filebrowser

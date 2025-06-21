@@ -50,13 +50,13 @@ layout:
     style: row
     columns: 4
 
-  Metrics:
-    tab: Metrics
+  Charts:
+    tab: Charts
     style: row
     columns: 3
 
-  More Metrics:
-    tab: Metrics
+  More Charts:
+    tab: Charts
     style: row
     columns: 2
     initiallyCollapsed: true

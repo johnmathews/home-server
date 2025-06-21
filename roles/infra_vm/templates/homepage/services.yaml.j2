@@ -6,7 +6,7 @@
 # For configuration options and examples, please see:
 # https://gethomepage.dev/configs/services/
 
-- Metrics: 
+- Charts: 
   # CPU usage 
   - "":
      widget:
@@ -51,7 +51,7 @@
        referrerPolicy: same-origin
        allowPolicy: autoplay; fullscreen; gamepad
        allowFullscreen: true
-       
+
   # Container Memory 
   - "":
      widget:
@@ -73,8 +73,7 @@
         username: "{{ vault_grafana_username }}"
         password: "{{ vault_grafana_password }}"
 
-- More Metrics: 
-
+- More Charts: 
   # Power 
   - "":
      widget:
@@ -363,6 +362,12 @@
         siteMonitor: http://192.168.2.106:9999
         description: containers
         icon: dozzle
+
+    - iPerf3:
+        href: http://192.168.2.106:5201
+        siteMonitor: http://192.168.2.106:5201
+        description: wifi speed test
+        icon: iperf3
 
 - NAS:
     - TrueNAS:
