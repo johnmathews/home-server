@@ -13,7 +13,7 @@
 
 - name: Ensure homepage config directory exists
   file:
-    path: /opt/infra_stack/homepage/config
+    path: /srv/infra/homepage/config
     state: directory
     owner: "{{ docker_user }}"
     group: "{{ docker_user }}"
@@ -22,7 +22,7 @@
 - name: Upload homepage config files to infra VM
   copy:
     src: "{{ item }}"
-    dest: "/opt/infra_stack/homepage/config/{{ item | basename }}"
+    dest: "/srv/infra/homepage/config/{{ item | basename }}"
     owner: "{{docker_user }}"
     group: "{{docker_user }}"
     mode: '0644'
@@ -30,6 +30,7 @@
     - "files/homepage_config/*"
   register: homepage_config_uploads
   become: true
+  notify: Restart homepage container
 
 - name: Template Docker Compose file
   template:
@@ -38,11 +39,13 @@
     owner: "{{ docker_user }}"
     group: docker
     mode: '0644'
+  notify: Restart homepage container
 
 - name: Template homepage services.yaml
   template:
     src: homepage/services.yaml.j2
-    dest: /opt/infra_stack/homepage/config/services.yaml
+    dest: /srv/infra/homepage/config/services.yaml
     owner: "{{ docker_user }}"
     group: "{{ docker_user }}"
     mode: '0644'
+  notify: Restart homepage container

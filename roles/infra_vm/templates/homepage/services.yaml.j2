@@ -73,17 +73,53 @@
         username: "{{ vault_grafana_username }}"
         password: "{{ vault_grafana_password }}"
 
+- More Metrics: 
+
+  # Power 
+  - "":
+     widget:
+       type: iframe
+       src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/proxmox?orgId=1&timezone=browser%3Fkiosk&refresh=10s&panelId=7&__feature.dashboardSceneSolo
+       referrerPolicy: same-origin # optional, no default
+       allowPolicy: autoplay; fullscreen; gamepad # optional, no default
+       allowFullscreen: true # optional, default: true
+
+  # Temperatures 
+  - "":
+     widget:
+       type: iframe
+       src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/proxmox?orgId=1&timezone=browser%3Fkiosk&refresh=10s&panelId=4&__feature.dashboardSceneSolo
+       referrerPolicy: same-origin # optional, no default
+       allowPolicy: autoplay; fullscreen; gamepad # optional, no default
+       allowFullscreen: true # optional, default: true
+
+  # Summary Table 
+  - "":
+     widget:
+       type: iframe
+       src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/proxmox?orgId=1&timezone=browser%3Fkiosk&refresh=10s&panelId=18&__feature.dashboardSceneSolo
+       referrerPolicy: same-origin # optional, no default
+       allowPolicy: autoplay; fullscreen; gamepad # optional, no default
+       allowFullscreen: true # optional, default: true
+
+  # Fans 
+  - "":
+     widget:
+       type: iframe
+       src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/proxmox?orgId=1&timezone=browser%3Fkiosk&refresh=10s&panelId=3&__feature.dashboardSceneSolo
+       referrerPolicy: same-origin # optional, no default
+       allowPolicy: autoplay; fullscreen; gamepad # optional, no default
+       allowFullscreen: true # optional, default: true
+
+
 # media
-- Media-1:
+- Media:
 
     - Jellyfin:
         href: https://jelly.itsa.pizza
         siteMonitor: http://192.168.2.214:8096
-        description: TV app 
+        description: Media Server
         icon: jellyfin
-        server: localhost
-        container: dozzle
-        showStats: false
         widget:
           type: jellyfin
           url: http://192.168.2.214:8096
@@ -93,6 +129,20 @@
           enableUser: true # optional, defaults to false
           showEpisodeNumber: false # optional, defaults to false
           expandOneStreamToTwoRows: false # optional, defaults to true
+
+    - Tunarr:
+        href: http://192.168.2.214:8000
+        siteMonitor: http://192.168.2.214:8001
+        description: TV channels 
+        icon: tunarr
+        showStats: false
+
+    - Tunarr chanells:
+        href: http://192.168.2.214:8001
+        siteMonitor: http://192.168.2.214:8001
+        description: TV channels 
+        icon: tunarr
+        showStats: false
 
     - Jellyseerr:
         href: https://seerr.itsa.pizza
@@ -104,16 +154,16 @@
           url: http://192.168.2.105:5055/
           key: "{{ vault_jellyseer_key }}"
 
-    - File Browser:
-        href: https://files.itsa.pizza
-        siteMonitor: http://192.168.2.104:30051
-        icon: filebrowser
-
     - Immich:
         href: http://192.168.2.214:2283
         siteMonitor: http://192.168.2.214:2283
         description: photos 
         icon: immich
+
+    - File Browser:
+        href: http://192.168.2.105:8082
+        siteMonitor: http://192.168.2.105:8082
+        icon: filebrowser
 
     - Kavita:
         href: http://192.168.2.105:5000/home
@@ -131,8 +181,6 @@
         description: books
         icon: calibre
 
-
-- Media-2:
     - Radarr:
         href: https://radarr.itsa.pizza
         siteMonitor: http://192.168.2.105:7878
@@ -226,12 +274,18 @@
         description: Usenet Provider
         icon: https://usenetexpress.com/favicon.ico
 
-- Infra-1:
+- Infra:
 
     - VaultWarden:
         href: https://192.168.2.13:8000
         siteMonitor: https://192.168.2.13:8000
         icon: vaultwarden
+
+    - File Browser:
+        href: http://192.168.2.106:8082
+        siteMonitor: http://192.168.2.106:8082
+        icon: filebrowser
+
 
     - ntfy:
         href: https://ntfy.itsa.pizza/
@@ -249,17 +303,6 @@
           username: "{{ vault_grafana_username }}"
           password: "{{ vault_grafana_password }}"
 
-    - TrueNAS:
-        href: https://nas.itsa.pizza
-        siteMonitor: http://192.168.2.104
-        icon: truenas
-        widget:
-          type: truenas
-          url: http://192.168.2.104
-          username: truenas_admin
-          password: "{{ vault_truenas_password }}"
-          enablePools: true # optional, defaults to false
-          nasType: scale
 
     - Home Assistant:
         href: https://home.itsa.pizza
@@ -274,7 +317,6 @@
             - state: sensor.tech_shelf_power
               label: server shelf
 
-- Infra-2:
     - AdGuard:
         href: http://192.168.2.111
         siteMonitor: http://192.168.2.111
@@ -321,6 +363,26 @@
         siteMonitor: http://192.168.2.106:9999
         description: containers
         icon: dozzle
+
+- NAS:
+    - TrueNAS:
+        href: https://nas.itsa.pizza
+        siteMonitor: http://192.168.2.104
+        icon: truenas
+        widget:
+          type: truenas
+          url: http://192.168.2.104
+          username: truenas_admin
+          password: "{{ vault_truenas_password }}"
+          enablePools: true # optional, defaults to false
+          nasType: scale
+
+    - File Browser (NAS):
+        href: https://files.itsa.pizza
+        siteMonitor: http://192.168.2.104:30051
+        icon: filebrowser
+
+
 
 - PVE:
     - Proxmox:

@@ -16,14 +16,14 @@ useEqualHeights: false
 
 layout:
 
-  Infra-1:
-    tab: Infra
-    style: row
-    columns: 4
-
-  Infra-2:
-    tab: Infra
+  NAS:
+    tab: NAS
     initiallyCollapsed: false
+    style: row
+    columns: 3
+
+  Infra:
+    tab: Infra
     style: row
     columns: 4
 
@@ -40,26 +40,26 @@ layout:
     columns: 3
 
 
-  Media-1:
+  Media:
     tab: Media
     style: row
     columns: 3
-  Media-2:
-    tab: Media
-    initiallyCollapsed: false
-    style: row
-    columns: 2
   Usenet:
     tab: Media
     initiallyCollapsed: false
     style: row
     columns: 4
 
-
   Metrics:
     tab: Metrics
     style: row
     columns: 3
+
+  More Metrics:
+    tab: Metrics
+    style: row
+    columns: 2
+    initiallyCollapsed: true
 
 providers:
   openweathermap: openweathermapapikey

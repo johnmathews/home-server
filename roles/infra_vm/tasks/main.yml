@@ -188,12 +188,26 @@
     group: "1000"
     mode: '0755'
 
-- name: Recursively fix permissions of existing ntfy cache directory
+- name: Set permissions of ntfy cache directory
   ansible.builtin.command: chown -R 1000:1000 /var/cache/ntfy
   become: true
 
-- name: Recursively fix permissions of existing ntfy config directory
+- name: Set permissions of ntfy config directory
   ansible.builtin.command: chown -R 1000:1000 /etc/ntfy
+  become: true
+
+- name: Set permissions of file browser config directory
+  ansible.builtin.command: chown -R 1000:1000 /srv/infra/filebrowser/config
+  become: true
+- name: Set permissions of file browser config directory
+  ansible.builtin.command: chmod 644 /srv/infra/filebrowser/config
+  become: true
+
+- name: Set permissions of file browser database directory
+  ansible.builtin.command: chown -R 1000:1000 /srv/infra/filebrowser/config/database
+  become: true
+- name: Set permissions of file browser database directory
+  ansible.builtin.command: chmod 644 /srv/infra/filebrowser/config/database
   become: true
 
 - name: Launch containers

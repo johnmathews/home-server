@@ -55,7 +55,7 @@
 
 - name: Create media stack base directory
   file:
-    path: "{{ media_stack_config_dir | dirname }}"
+    path: "{{ media_stack_base_dir | dirname }}"
     state: directory
     mode: '0755'
 
@@ -69,10 +69,10 @@
     group: "{{ media_stack_group }}"
     mode: '0755'
   loop:
-    - "{{ media_stack_config_dir }}"
+    - "{{ media_stack_base_dir }}"
     - "{{ media_stack_mount_dir }}/library/family"
     - "{{ media_stack_mount_dir }}/library/kids"
-    - "{{ media_stack_config_dir | dirname }}"
+    - "{{ media_stack_base_dir | dirname }}"
   when: item != "/mnt/media/library/downloads/incomplete"
 
 - name: Set ownership of config and mount dirs
@@ -82,7 +82,7 @@
     owner: "{{ media_stack_user }}"
     group: "{{ media_stack_group }}"
   loop:
-    - /srv/media/config
+    - /srv/media
     - /mnt/media/library/family
     - /mnt/media/library/kids
   when: item != "/mnt/media/library/downloads/incomplete"
@@ -90,7 +90,7 @@
 # 7. Handle qBittorrent config prep before container starts
 - name: Re-create qbittorrent config directory
   file:
-    path: "{{ media_stack_config_dir }}/qBittorrent"
+    path: "{{ media_stack_base_dir }}/qBittorrent"
     state: directory
     owner: "{{ media_stack_user }}"
     group: "{{ media_stack_user }}"
@@ -100,7 +100,7 @@
 - name: Pre-seed qBittorrent.conf if missing and not resetting
   ansible.builtin.template:
     src: qBittorrent.conf.j2
-    dest: "{{ media_stack_config_dir }}/qBittorrent/qBittorrent.conf"
+    dest: "{{ media_stack_base_dir }}/qBittorrent/qBittorrent.conf"
     owner: "{{ qbittorrent_uid }}"
     group: "{{ qbittorrent_gid }}"
     mode: '0644'
@@ -122,21 +122,6 @@
     mode: '0600'
   notify: Restart media stack
 
-# - name: Create gluetun config file from template
-#   template:
-#     src: gluetun_config.toml.j2
-#     dest: "{{ media_stack_config_dir }}/gluetun/config.toml"
-#     mode: '0600'
-#   notify: Restart media stack
-
-# - name: Ensure Gluetun config files are world-readable
-#   ansible.builtin.file:
-#     path: "{{ item }}"
-#     mode: '0644'
-#   loop: 
-#     - "{{ media_stack_config_dir }}/gluetun/config.toml"
-#     - "{{ media_stack_config_dir }}/gluetun/servers.json"
-
 - name: Ensure .env and docker-compose.yml are owned by "john"
   ansible.builtin.file:
     path: "{{ item }}"
@@ -147,7 +132,7 @@
 
 - name: Ensure Radarr config directory has correct UID/GID
   ansible.builtin.file:
-    path: "{{ media_stack_config_dir }}/radarr"
+    path: "{{ media_stack_base_dir }}/radarr"
     state: directory
     recurse: true
     owner: "{{ qbittorrent_uid }}"
@@ -156,7 +141,7 @@
 
 - name: Ensure Sonarr config directory has correct UID/GID
   ansible.builtin.file:
-    path: "{{ media_stack_config_dir }}/sonarr"
+    path: "{{ media_stack_base_dir }}/sonarr"
     state: directory
     recurse: true
     owner: "{{ qbittorrent_uid }}"
@@ -165,7 +150,7 @@
 
 - name: Ensure Jackett config directory exists
   ansible.builtin.file:
-    path: "{{ media_stack_config_dir }}/jackett"
+    path: "{{ media_stack_base_dir }}/jackett"
     state: directory
     recurse: true
     owner: "{{ qbittorrent_uid }}"
@@ -193,6 +178,10 @@
     msg: "Missing required SMB mount: {{ item.item }}"
   when: not item.stat.exists
   loop: "{{ mounted_dirs.results }}"
+
+- name: Set permissions of file browser config directory
+  ansible.builtin.command: chown -R 1000:1000 "{{ media_stack_base_dir }}/filebrowser"
+  become: true
 
 # 11. Start Docker stack (only after config + paths are ready)
 - name: Start media stack containers

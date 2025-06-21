@@ -12,7 +12,7 @@ TZ: Europe/Amsterdam
 proxmox_api_host: "{{ hostvars['pve']['ansible_host'] }}"
 
 media_stack_base_dir: /srv/media
-media_stack_config_dir: /srv/media/config
+# media_stack_config_dir: /srv/media/config # DEPRECATED
 media_stack_mount_dir: /mnt/media
 
 
