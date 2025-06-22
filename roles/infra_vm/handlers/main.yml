@@ -37,3 +37,7 @@
   args:
     chdir: "{{ docker_compose_dir }}"
 
+- name: Restart filebrowser container
+  command: docker compose restart filebrowser
+  args:
+    chdir: "{{ docker_compose_dir }}"

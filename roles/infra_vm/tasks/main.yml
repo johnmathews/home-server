@@ -196,12 +196,41 @@
   ansible.builtin.command: chown -R 1000:1000 /etc/ntfy
   become: true
 
-- name: Set permissions of file browser config directory
-  ansible.builtin.command: chown -R 1000:1000 /srv/infra/filebrowser/config
-  become: true
-- name: Set permissions of file browser config directory
-  ansible.builtin.command: chmod 644 /srv/infra/filebrowser/config
-  become: true
+- name: Ensure filebrowser config directory exists with correct ownership
+  ansible.builtin.file:
+    path: /srv/infra/filebrowser/config
+    state: directory
+    owner: "1000"
+    group: "1000"
+    mode: '0755'
+    recurse: yes
+  notify: Restart filebrowser container
+
+- name: Recursively set permissions on files in filebrowser config directory
+  ansible.builtin.find:
+    paths: /srv/infra/filebrowser/config
+    file_type: file
+  register: filebrowser_files
+
+- name: Set file mode to 0644
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    mode: '0644'
+  loop: "{{ filebrowser_files.files }}"
+  notify: Restart filebrowser container
+
+- name: Recursively set permissions on directories in filebrowser config directory
+  ansible.builtin.find:
+    paths: /srv/infra/filebrowser/config
+    file_type: directory
+  register: filebrowser_dirs
+
+- name: Set directory mode to 0755
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    mode: '0755'
+  loop: "{{ filebrowser_dirs.files }}"
+  notify: Restart filebrowser container
 
 - name: Launch containers
   command: docker compose up -d

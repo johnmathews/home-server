@@ -10,11 +10,12 @@ services:
     ports:
       - "8082:80"
     volumes:
-      - /mnt/media:/media  # Adjust to the path you want to browse
+      - /mnt/media:/srv  # Adjust to the path you want to browse
       - /srv/media/config/filebrowser/config:/config  # Config and database
       - /srv/media/config/filebrowser/config/database:/database  # Config and database
     environment:
       - TZ=Europe/Amsterdam
+      - FB_ROOT=/srv
     restart: unless-stopped
 
   sabnzbd:
