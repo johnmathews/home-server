@@ -21,6 +21,7 @@ services:
     volumes:
       - /mnt:/srv
       - /srv/infra/filebrowser/config:/config
+      - /srv/infra/filebrowser/config/database:/database
     environment:
       - TZ=Europe/Amsterdam
       - FB_ROOT=/srv

@@ -21,9 +21,6 @@ services:
   sabnzbd:
     image: lscr.io/linuxserver/sabnzbd:latest
     container_name: sabnzbd
-    depends_on:
-      gluetun:
-        condition: service_healthy
     healthcheck:
       test: ["CMD", "wget", "-q0-", "https://ifconfig.me"]
       interval: 30s

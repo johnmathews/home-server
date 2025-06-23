@@ -5,10 +5,12 @@ import json
 from fastapi import FastAPI, Request, HTTPException
 from typing import Dict
 from dotenv import load_dotenv
+from prometheus_fastapi_instrumentator import Instrumentator
 
 load_dotenv()
 
 app = FastAPI()
+Instrumentator().instrument(app).expose(app)
 
 SECRET_TOKEN = "{{ vault_key_server_auth_token }}"
 
@@ -26,3 +28,6 @@ async def unlock(request: Request):
 
     return dataset_keys_json_object
 
+@app.get("/health")
+async def health():
+    return {"status": "ok"}

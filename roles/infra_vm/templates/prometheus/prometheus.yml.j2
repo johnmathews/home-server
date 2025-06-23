@@ -55,6 +55,12 @@ scrape_configs:
         labels:
           instance: unbound
 
+  - job_name: 'key-server'
+    static_configs:
+      - targets: ['192.168.2.201:8001']
+        labels:
+          instance: key-server
+
   - job_name: 'proxmox-ipmi'
     metrics_path: /metrics
     static_configs:

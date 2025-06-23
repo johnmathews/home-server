@@ -206,6 +206,14 @@
     recurse: yes
   notify: Restart filebrowser container
 
+- name: Ensure /database dir exists with proper ownership
+  ansible.builtin.file:
+    path: /srv/infra/filebrowser/config/database
+    state: directory
+    owner: "1000"
+    group: "1000"
+    mode: '0755'
+
 - name: Recursively set permissions on files in filebrowser config directory
   ansible.builtin.find:
     paths: /srv/infra/filebrowser/config

@@ -70,7 +70,7 @@
 - name: Install python packages inlcuding FastAPI in venv
   become_user: "{{ server_user }}"
   shell: |
-    source /opt/key_server/.venv/bin/activate && uv pip install fastapi uvicorn[standard] python-dotenv
+    source /opt/key_server/.venv/bin/activate && uv pip install fastapi uvicorn[standard] python-dotenv prometheus-fastapi-instrumentator
   args:
     executable: /bin/bash
   environment:
