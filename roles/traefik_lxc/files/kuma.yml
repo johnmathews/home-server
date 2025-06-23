@@ -1,0 +1,25 @@
+# /etc/traefik/conf.d/kuma.yml
+
+http:
+  routers:
+    kuma:
+      rule: "Host(`192.168.2.106`)"
+      entryPoints:
+        - websecure
+      service: kuma-service
+      tls:
+        certResolver: letsencrypt
+      middlewares:
+        - kuma-headers
+
+  services:
+    kuma-service:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.2.106:3001"
+
+  middlewares:
+    kuma-headers:
+      headers:
+        customResponseHeaders:
+          X-Frame-Options: ""  # <-- this removes the header completely

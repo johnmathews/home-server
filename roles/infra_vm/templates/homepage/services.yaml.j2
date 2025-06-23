@@ -6,6 +6,22 @@
 # For configuration options and examples, please see:
 # https://gethomepage.dev/configs/services/
 
+- Monitoring: 
+  - "":
+     widget:
+       type: iframe
+       src: https://uptime.itsa.pizza/status/monitoring
+       classes: h-screen
+
+  - "":
+     widget:
+       type: iframe
+       src: https://uptime.itsa.pizza/status/apps
+       referrerPolicy: same-origin
+       allowPolicy: autoplay; fullscreen; gamepad
+       allowFullscreen: true
+       classes: h-screen
+
 - Charts: 
   # CPU usage 
   - "":
@@ -60,7 +76,6 @@
        referrerPolicy: same-origin # optional, no default
        allowPolicy: autoplay; fullscreen; gamepad # optional, no default
        allowFullscreen: true # optional, default: true
-
 
   - Grafana:
       href: https://charts.itsa.pizza
@@ -285,6 +300,14 @@
         siteMonitor: http://192.168.2.106:8082
         icon: filebrowser
 
+
+    - traefik:
+        href: http://192.168.2.108:8080/dashboard/#/
+        siteMonitor: http://192.168.2.108:8080/dashboard/#/
+        icon: traefik
+        widget:
+          type: traefik
+          url: http://192.168.2.108:8080
 
     - ntfy:
         href: https://ntfy.itsa.pizza/

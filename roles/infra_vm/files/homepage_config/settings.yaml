@@ -39,11 +39,11 @@ layout:
     style: row
     columns: 3
 
-
   Media:
     tab: Media
     style: row
     columns: 3
+
   Usenet:
     tab: Media
     initiallyCollapsed: false
@@ -60,6 +60,12 @@ layout:
     style: row
     columns: 2
     initiallyCollapsed: true
+
+  Monitoring:
+    tab: Monitoring
+    initiallyCollapsed: false
+    style: row
+    columns: 2
 
 providers:
   openweathermap: openweathermapapikey
