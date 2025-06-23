@@ -14,6 +14,10 @@ Instrumentator().instrument(app).expose(app)
 
 SECRET_TOKEN = "{{ vault_key_server_auth_token }}"
 
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
+
 @app.get("/unlock", response_model=Dict[str, Dict[str, str]])
 async def unlock(request: Request):
     auth = request.headers.get("Authorization", "")
@@ -28,6 +32,3 @@ async def unlock(request: Request):
 
     return dataset_keys_json_object
 
-@app.get("/health")
-async def health():
-    return {"status": "ok"}
