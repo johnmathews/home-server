@@ -12,15 +12,12 @@ TZ: Europe/Amsterdam
 proxmox_api_host: "{{ hostvars['pve']['ansible_host'] }}"
 
 media_stack_base_dir: /srv/media
-# media_stack_config_dir: /srv/media/config # DEPRECATED
 media_stack_mount_dir: /mnt/media
 
 
 media_stack_user: john
 media_stack_group: john
 
-qbittorrent_uid: 1001
-qbittorrent_gid: 1001
 puid: 1001
 guid: 1001
 

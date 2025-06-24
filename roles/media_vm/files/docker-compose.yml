@@ -3,6 +3,24 @@
 ---
 
 services:
+  maintainerr:
+    image: ghcr.io/jorenn92/maintainerr:latest
+    container_name: maintainerr
+    user: ${PUID}:${PGID}
+    environment:
+      - TZ=${TZ}
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - UI_PORT=6246
+      - API_PORT=3001
+      # - BASE_PATH=/maintainerr # uncomment if you're serving maintainerr from a subdirectory
+    volumes:
+      - /srv/media/config/maintainerr/data:/opt/data  # Adjust to the path you want to browse
+    ports:
+      - 6246:6246
+      - 3001:3001
+    restart: unless-stopped
+
   filebrowser:
     image: filebrowser/filebrowser:latest
     container_name: filebrowser

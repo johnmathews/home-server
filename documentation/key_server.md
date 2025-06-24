@@ -11,6 +11,10 @@ The key server is a FastAPI script `key_server/templates/key-server-main.py`.
 
 Bearer token and dataset keys are stored in the Ansible vault.
 
+## Updating keys 
+
+The keys are stored in ansible vault. 
+
 ## Endpoints
 
 It has a single functional endpoint at `/unlock`.

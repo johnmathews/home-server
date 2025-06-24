@@ -101,8 +101,8 @@
   ansible.builtin.template:
     src: qBittorrent.conf.j2
     dest: "{{ media_stack_base_dir }}/qBittorrent/qBittorrent.conf"
-    owner: "{{ qbittorrent_uid }}"
-    group: "{{ qbittorrent_gid }}"
+    owner: "{{ puid }}"
+    group: "{{ guid }}"
     mode: '0644'
     force: false  # Do not overwrite if already exists
   when: reset_qbittorrent_config | default(false)
@@ -135,8 +135,8 @@
     path: "{{ media_stack_base_dir }}/radarr"
     state: directory
     recurse: true
-    owner: "{{ qbittorrent_uid }}"
-    group: "{{ qbittorrent_gid }}"
+    owner: "{{ puid }}"
+    group: "{{ guid }}"
     mode: '0755'
 
 - name: Ensure Sonarr config directory has correct UID/GID
@@ -144,8 +144,8 @@
     path: "{{ media_stack_base_dir }}/sonarr"
     state: directory
     recurse: true
-    owner: "{{ qbittorrent_uid }}"
-    group: "{{ qbittorrent_gid }}"
+    owner: "{{ puid }}"
+    group: "{{ guid }}"
     mode: '0755'
 
 - name: Ensure Jackett config directory exists
@@ -153,9 +153,23 @@
     path: "{{ media_stack_base_dir }}/jackett"
     state: directory
     recurse: true
-    owner: "{{ qbittorrent_uid }}"
-    group: "{{ qbittorrent_gid }}"
+    owner: "{{ puid }}"
+    group: "{{ guid }}"
     mode: '0755'
+- name: Check if docker-compose.yml exists
+  stat:
+    path: /srv/media/docker-compose.yml
+  register: compose_file
+
+- name: Ensure Maintainerr config directory exists
+  ansible.builtin.file:
+    path: "{{ media_stack_base_dir }}/maintainerr"
+    state: directory
+    recurse: true
+    owner: "{{ puid }}"
+    group: "{{ guid }}"
+    mode: '0755'
+
 - name: Check if docker-compose.yml exists
   stat:
     path: /srv/media/docker-compose.yml
