@@ -102,6 +102,15 @@
     name: cifs-utils
     state: present
 
+- name: Ensure SMB mount directories exist
+  ansible.builtin.file:
+    path: "{{ item.target }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  loop: "{{ smb_shares }}"
+
 - name: Create SMB credentials file
   copy:
     dest: /root/.smbcredentials
@@ -112,6 +121,14 @@
     group: root
     mode: '0600'
 
+- name: Persist SMB mount in /etc/fstab
+  ansible.builtin.lineinfile:
+    path: /etc/fstab
+    line: "//{{ smb_server }}/{{ item.name }} {{ item.target }} cifs credentials=/root/.smbcredentials,iocharset=utf8,noperm,nofail,x-systemd.automount,vers=3.0 0 0"
+    state: present
+    create: yes
+  loop: "{{ smb_shares }}"
+
 - name: Mount SMB share
   mount:
     path: "{{ item.target }}"
@@ -119,21 +136,6 @@
     fstype: cifs
     opts: credentials=/root/.smbcredentials,iocharset=utf8,noperm,nofail,vers=3.0
     state: mounted
-  loop: "{{ smb_shares }}"
-
-- name: Verify that SMB share is successfully mounted
-  command: "mountpoint -q  {{ item.target }}"
-  register: smb_mount_check
-  changed_when: false
-  failed_when: smb_mount_check.rc != 0
-  loop: "{{ smb_shares }}"
-
-- name: Persist SMB mount in /etc/fstab
-  lineinfile:
-    path: /etc/fstab
-    line: //{{ smb_server }}/{{ item.name }} /srv/media/{{ item.name }} cifs credentials=/root/.smbcredentials,iocharset=utf8,noperm,nofail,vers=3.0 0 0
-    state: present
-    create: yes
   loop: "{{ smb_shares }}"
 
 - name: Start apps using Docker Compose

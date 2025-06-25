@@ -16,11 +16,16 @@ useEqualHeights: false
 
 layout:
 
-  NAS:
-    tab: NAS
-    initiallyCollapsed: false
+  Media:
+    tab: Media
     style: row
     columns: 3
+
+  Usenet:
+    tab: Media
+    initiallyCollapsed: false
+    style: row
+    columns: 4
 
   Infra:
     tab: Infra
@@ -39,16 +44,11 @@ layout:
     style: row
     columns: 3
 
-  Media:
-    tab: Media
-    style: row
-    columns: 3
-
-  Usenet:
-    tab: Media
+  NAS:
+    tab: NAS
     initiallyCollapsed: false
     style: row
-    columns: 4
+    columns: 3
 
   Charts:
     tab: Charts
