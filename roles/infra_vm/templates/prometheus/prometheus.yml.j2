@@ -55,24 +55,27 @@ scrape_configs:
         labels:
           instance: unbound
 
-  - job_name: 'key-server'
+  - job_name: 'FastAPI'
     static_configs:
       - targets: ['192.168.2.201:8001']
         labels:
           instance: key-server
 
-  - job_name: 'proxmox-ipmi'
+  - job_name: 'ipmi'
     metrics_path: /metrics
     static_configs:
       - targets: ['192.168.2.214:9290']
         labels:
           instance: proxmox
 
-  - job_name: 'proxmox-smartctl'
+  - job_name: 'smart_ctl'
     static_configs:
       - targets: ['192.168.2.214:9633']
         labels:
           instance: proxmox
+      - targets: ['192.168.2.104:9633']
+        labels:
+          instance: truenas
 
   - job_name: 'pve-exporter'
     metrics_path: /pve
@@ -84,15 +87,3 @@ scrape_configs:
       - targets: ['192.168.2.214:9221']
         labels:
           instance: proxmox
-
-  - job_name: 'pve-exporter-internal'
-    static_configs:
-      - targets: ['192.168.2.214:9221']
-        labels:
-          instance: proxmox
-
-  - job_name: 'smrtctl-exporter'
-    static_configs:
-      - targets: ['192.168.2.104:9633']
-        labels:
-          instance: truenas

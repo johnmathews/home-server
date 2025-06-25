@@ -74,19 +74,6 @@
        referrerPolicy: same-origin # optional, no default
        allowPolicy: autoplay; fullscreen; gamepad # optional, no default
        allowFullscreen: true # optional, default: true
-
-  - Grafana:
-      href: https://charts.itsa.pizza
-      siteMonitor: http://192.168.2.106:3000
-      icon: grafana
-      widget:
-        type: grafana
-        fields: [""]
-        url: http://192.168.2.106:3000
-        username: "{{ vault_grafana_username }}"
-        password: "{{ vault_grafana_password }}"
-
-- More Charts: 
   # Power 
   - "":
      widget:
@@ -105,6 +92,28 @@
        allowPolicy: autoplay; fullscreen; gamepad # optional, no default
        allowFullscreen: true # optional, default: true
 
+  # Fans 
+  - "":
+     widget:
+       type: iframe
+       src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/proxmox?orgId=1&timezone=browser%3Fkiosk&refresh=10s&panelId=3&__feature.dashboardSceneSolo
+       referrerPolicy: same-origin # optional, no default
+       allowPolicy: autoplay; fullscreen; gamepad # optional, no default
+       allowFullscreen: true # optional, default: true
+
+  - Grafana:
+      href: https://charts.itsa.pizza
+      siteMonitor: http://192.168.2.106:3000
+      icon: grafana
+      widget:
+        type: grafana
+        fields: [""]
+        url: http://192.168.2.106:3000
+        username: "{{ vault_grafana_username }}"
+        password: "{{ vault_grafana_password }}"
+
+- More Charts: 
+
   # Summary Table 
   - "":
      widget:
@@ -114,14 +123,6 @@
        allowPolicy: autoplay; fullscreen; gamepad # optional, no default
        allowFullscreen: true # optional, default: true
 
-  # Fans 
-  - "":
-     widget:
-       type: iframe
-       src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/proxmox?orgId=1&timezone=browser%3Fkiosk&refresh=10s&panelId=3&__feature.dashboardSceneSolo
-       referrerPolicy: same-origin # optional, no default
-       allowPolicy: autoplay; fullscreen; gamepad # optional, no default
-       allowFullscreen: true # optional, default: true
 
 
 # media

@@ -2,25 +2,7 @@
 
 ---
 
-ipmi_exporter_version: "1.10.0"
-ipmi_exporter_install_dir: "/opt/ipmi_exporter"
-ipmi_exporter_listen_port: 9290
-
-node_exporter_version: "1.9.1"
-node_exporter_install_dir: "/opt/node_exporter"
-node_exporter_listen_port: 9100
-
-smartmon_exporter_version: "0.11.0"
-smartmon_exporter_install_dir: "/opt/smartmon_exporter"
-smartmon_exporter_listen_port: 9633
-
-pve_exporter_version: "3.5.3"
-pve_exporter_install_dir: "/opt/pve_exporter"
-pve_exporter_listen_port: 9221
-
 proxmox_api_user: "api@pve"
-
-radeontop_exporter_path: /usr/local/bin/radeontop-exporter.py
 
 smb_proxmox_username: proxmox_smb_user
 smb_server: 192.168.2.104
@@ -29,3 +11,33 @@ smb_shares:
     target: /mnt/media/library
   - name: media 
     target: /mnt/media/media
+
+# iGPU
+radeontop_exporter_path: /usr/local/bin/radeontop-exporter.py
+
+# ipmi
+ipmi_exporter_version: "1.10.0"
+ipmi_exporter_install_dir: "/opt/ipmi_exporter"
+ipmi_exporter_listen_port: 9290
+
+# node_exporter
+node_exporter_version: "1.9.1"
+node_exporter_install_dir: "/opt/node_exporter"
+node_exporter_listen_port: 9100
+
+#smartmon
+smartmon_exporter_version: "0.11.0"
+smartmon_exporter_install_dir: "/opt/smartmon_exporter"
+smartmon_exporter_listen_port: 9633
+
+# smartctl
+smartctl_exporter_enabled: true
+smartctl_exporter_smartctl_device_include:
+  - /dev/sdi
+smartctl_exporter_smartctl_rescan: "10m"
+smartctl_exporter_smartctl_interval: "30s"
+
+# pve_exporter
+pve_exporter_version: "3.5.3"
+pve_exporter_install_dir: "/opt/pve_exporter"
+pve_exporter_listen_port: 9221
