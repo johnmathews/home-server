@@ -33,7 +33,7 @@
       when: gnu_tar_check.rc != 0
   tags: [metrics]
 
-#smart_ctl smartctl_exporter
+# HDD metrics smart_ctl smartctl_exporter
 - name: Install Prometheus Smartctl Exporter
   import_role:
     name: prometheus.prometheus.smartctl_exporter

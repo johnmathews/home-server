@@ -17,7 +17,7 @@ all: site
 site:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/site.yml $(VAULT) $(TAGS)
 
-proxmox:
+pve:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/proxmox_node.yml $(VAULT) $(TAGS)
 
 nas:
@@ -60,7 +60,7 @@ help:
 	@echo "Available make commands:"
 	@echo ""
 	@echo "  make site             → Run full home server setup"
-	@echo "  make proxmox          → Setup the proxmox node, doesnt setup authentication"
+	@echo "  make pve              → Setup the proxmox node, doesnt setup authentication"
 	@echo "  make nas              → Setup TrueNAS VM by provisioning a VM and uploading a TrueNAS ISO"
 	@echo "  make media            → Full Media VM config"
 	@echo "  make infra            → Full Infra VM config"

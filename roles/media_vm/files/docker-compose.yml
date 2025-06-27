@@ -19,7 +19,7 @@ services:
     ports:
       - 6246:6246
       - 3001:3001
-    restart: unless-stopped
+    restart: always
 
   filebrowser:
     image: filebrowser/filebrowser:latest
@@ -34,7 +34,7 @@ services:
     environment:
       - TZ=Europe/Amsterdam
       - FB_ROOT=/srv
-    restart: unless-stopped
+    restart: always
 
   sabnzbd:
     image: lscr.io/linuxserver/sabnzbd:latest
@@ -53,7 +53,7 @@ services:
       - /mnt/media/library/downloads:/downloads
       - /mnt/media/library:/library
     network_mode: "service:gluetun"
-    restart: unless-stopped
+    restart: always
 
   calibre:
     image: lscr.io/linuxserver/calibre:latest
@@ -74,7 +74,7 @@ services:
     ports:
       - "8180:8080"  # GUI
       - "8181:8081"  # Content server
-    restart: unless-stopped
+    restart: always
 
   calibre-web:
     image: lscr.io/linuxserver/calibre-web:latest
@@ -92,7 +92,7 @@ services:
       - /mnt/media/library:/library
     ports:
       - "8083:8083"
-    restart: unless-stopped
+    restart: always
 
   kavita:
     image: lscr.io/linuxserver/kavita:latest
@@ -107,10 +107,10 @@ services:
       - /mnt/media/library:/library
     ports:
       - 5000:5000
-    restart: unless-stopped
+    restart: always
 
   sonarr:
-    image: linuxserver/sonarr
+    image: linuxserver/sonarr:latest
     container_name: sonarr
     user: "${PUID}:${PGID}"
     environment:
@@ -125,10 +125,10 @@ services:
       - /mnt/media/library/downloads:/downloads 
     ports:
       - "8989:8989"
-    restart: unless-stopped
+    restart: always
 
   radarr:
-    image: linuxserver/radarr
+    image: linuxserver/radarr:latest
     container_name: radarr
     user: "${PUID}:${PGID}"
     environment:
@@ -143,7 +143,7 @@ services:
       - /mnt/media/library/downloads:/downloads
     ports:
       - "7878:7878"
-    restart: unless-stopped
+    restart: always
 
   gluetun:
     image: qmcgaw/gluetun
@@ -179,7 +179,7 @@ services:
       - WIREGUARD_ADDRESSES=${WIREGUARD_ADDRESSES}
       - OWNED_ONLY=yes
       - TZ=Europe/Amsterdam
-    restart: unless-stopped
+    restart: always
 
   qbittorrent:
     image: linuxserver/qbittorrent
@@ -197,7 +197,7 @@ services:
       - /srv/media/config:/config
       - /mnt/media/library/downloads:/downloads
       - /mnt/media/library:/media
-    restart: unless-stopped
+    restart: always
 
   flaresolverr:
     # DockerHub mirror flaresolverr/flaresolverr:latest
@@ -210,7 +210,7 @@ services:
       - TZ=${TZ}
     ports:
       - "${PORT:-8191}:8191"
-    restart: unless-stopped 
+    restart: always 
 
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
@@ -223,7 +223,7 @@ services:
       - /srv/media/config/prowlarr:/config
     ports:
       - "9696:9696"
-    restart: unless-stopped
+    restart: always
 
   jellyseerr:
     image: fallenbagel/jellyseerr:latest
@@ -234,8 +234,18 @@ services:
       - LOG_LEVEL=info
     volumes:
       - /srv/media/config/jellyseer:/app/config
-    restart: unless-stopped
+    restart: always
 
+  jellyseerr-kids:
+    image: fallenbagel/jellyseerr:latest
+    container_name: jellyseerr-kids
+    ports:
+      - 5056:5055
+    environment:
+      - LOG_LEVEL=info
+    volumes:
+      - /srv/media/config/jellyseer-kids:/app/config
+    restart: always
 
   bazarr:
     image: linuxserver/bazarr
@@ -250,12 +260,12 @@ services:
     volumes:
       - /srv/media/config/bazarr:/config
       - /mnt/media/library:/library
-    restart: unless-stopped
+    restart: always
 
   node-exporter:
     image: prom/node-exporter:latest
     container_name: node-exporter
-    restart: unless-stopped
+    restart: always
     ports:
       - "9100:9100"
     pid: "host"
@@ -272,7 +282,7 @@ services:
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
     container_name: cadvisor
-    restart: unless-stopped
+    restart: always
     ports:
       - "18080:8080"
     volumes:
@@ -288,7 +298,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     command: --cleanup --interval 21700
-    restart: unless-stopped
+    restart: always
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
