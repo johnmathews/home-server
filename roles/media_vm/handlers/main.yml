@@ -16,3 +16,8 @@
   args:
     chdir: /srv/media
   listen: Restart qbittorrent
+
+- name: Update containers
+  command: docker compose pull
+  args:
+    chdir: /srv/media

@@ -240,6 +240,11 @@
   loop: "{{ filebrowser_dirs.files }}"
   notify: Restart filebrowser container
 
+- name: Update containers
+  command: docker compose pull
+  args:
+    chdir: /srv/infra
+
 - name: Launch containers
   command: docker compose up -d
   args:

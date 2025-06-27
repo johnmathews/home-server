@@ -113,14 +113,18 @@
     src: docker-compose.yml
     dest: /srv/media/docker-compose.yml
     mode: '0644'
-  notify: Restart media stack
+  notify: 
+    - Update containers
+    - Restart media stack
 
 - name: Create environment file from template
   template:
     src: .env.j2
     dest: /srv/media/.env
     mode: '0600'
-  notify: Restart media stack
+  notify: 
+    - Update containers
+    - Restart media stack
 
 - name: Ensure .env and docker-compose.yml are owned by "john"
   ansible.builtin.file:
@@ -156,10 +160,6 @@
     owner: "{{ puid }}"
     group: "{{ guid }}"
     mode: '0755'
-- name: Check if docker-compose.yml exists
-  stat:
-    path: /srv/media/docker-compose.yml
-  register: compose_file
 
 - name: Ensure Maintainerr config directory exists
   ansible.builtin.file:

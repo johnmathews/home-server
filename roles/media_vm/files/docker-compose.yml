@@ -291,18 +291,3 @@ services:
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
     privileged: true  # required for some metrics
-
-  watchtower:
-    image: containrrr/watchtower
-    container_name: watchtower
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    command: --cleanup --interval 21700
-    restart: always
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - WATCHTOWER_NOTIFICATIONS=ntfy
-      - WATCHTOWER_NOTIFICATION_NTFY_TOPIC=watchtower
-      - WATCHTOWER_NOTIFICATION_NTFY_URL=http://ntfy.itsa.pizza
-      - WATCHTOWER_NOTIFICATION_NTFY_TITLE=Container Update
