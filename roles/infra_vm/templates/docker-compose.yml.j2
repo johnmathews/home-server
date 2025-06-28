@@ -87,7 +87,7 @@ services:
     restart: always
 
   ntfy:
-    image: binwiederhier/ntfy
+    image: binwiederhier/ntfy:latest
     container_name: ntfy
     command:
       - serve
@@ -109,7 +109,7 @@ services:
 
 
   grafana:
-    image: grafana/grafana-oss
+    image: grafana/grafana-oss:latest
     container_name: grafana
     ports:
       - "3000:3000"
@@ -171,7 +171,7 @@ services:
     privileged: true
 
   uptime-kuma:
-    image: louislam/uptime-kuma
+    image: louislam/uptime-kuma:latest
     container_name: uptime-kuma
     ports:
       - "3001:3001"
@@ -182,7 +182,7 @@ services:
     restart: always
 
   dozzle:
-    image: amir20/dozzle
+    image: amir20/dozzle:latest
     container_name: dozzle
     ports:
       - "9999:8080"

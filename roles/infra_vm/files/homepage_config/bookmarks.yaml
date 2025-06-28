@@ -5,21 +5,67 @@
 # For configuration options and examples, please see:
 # https://gethomepage.dev/configs/bookmarks
 
-- Apps:
-    - Grafana:
-        - abbr:
-          href: http://192.168.2.106:3000
-    - Loki:
-        - abbr:
-          href: http://192.168.2.106:3100
+- Media Apps:
+    - Jellyfin:
+        - abbr: 
+          href: http://192.168.2.214:8096
+    - Jellyseer:
+        - abbr: 
+          href: http://192.168.2.105:5055
+    - Jellyseer-kids:
+        - abbr: 
+          href: http://192.168.2.105:5056
+    - Sonarr:
+        - abbr: 
+          href: http://192.168.2.105:8989
+    - Radarr:
+        - abbr: 
+          href: http://192.168.2.105:7878
+    - Sabnzbd:
+        - abbr: 
+          href: http://192.168.2.105:8081
     - Kavita:
         - abbr:
           href: http://192.168.2.105:5000
+    - Immich:
+        - abbr:
+          href: http://192.168.2.214:2283
+    - Tunarr:
+        - abbr:
+          href: http://192.168.2.214:8000
+
+- Infra Apps:
+    - Grafana:
+        - abbr: 
+          href: http://192.168.2.106:3000
+    - Prometheus:
+        - abbr: 
+          href: http://192.168.2.106:9090
+    - Ntfy:
+        - abbr: 
+          href: http://192.168.2.106:8183
+    - Uptime Kuma:
+        - abbr:
+          href: http://192.168.2.106:3001
+    - Loki:
+        - abbr:
+          href: http://192.168.2.106:3100
+
+- Services:
+    - Home Assistant:
+        - abbr: 
+          href: http://192.168.2.102:8123
+    - AdGuard:
+        - abbr: 
+          href: http://192.168.2.111
+    - VaultWarden:
+        - abbr:
+          href: https://192.168.2.13:8000
+
+- Hardware_:
     - TrueNAS:
         - abbr: 
           href: http://192.168.2.104:5000
-
-- _Hardware:
     - ProxMox:
         - abbr: 
           href: http://192.168.2.214:8006

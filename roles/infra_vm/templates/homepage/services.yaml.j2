@@ -148,14 +148,14 @@
         siteMonitor: http://192.168.2.214:8001
         description: TV channels 
         icon: tunarr
-        showStats: false
+        showStats: true
 
     - Tunarr chanells:
         href: http://192.168.2.214:8001
         siteMonitor: http://192.168.2.214:8001
         description: TV channels 
         icon: tunarr
-        showStats: false
+        showStats: true
 
     - Jellyseerr:
         href: https://seerr.itsa.pizza
@@ -165,7 +165,17 @@
         widget:
           type: jellyseerr
           url: http://192.168.2.105:5055/
-          key: "{{ vault_jellyseer_key }}"
+          key: "{{ vault_jellyseerr_key }}"
+
+    - Jellyseerr-kids:
+        href: http://192.168.2.105:5056
+        siteMonitor: http://192.168.2.105:5056
+        description: TV
+        icon: jellyseerr
+        widget:
+          type: jellyseerr
+          url: http://192.168.2.105:5056
+          key: "{{ vault_jellyseerr_kids_key }}"
 
     - Immich:
         href: http://192.168.2.214:2283
