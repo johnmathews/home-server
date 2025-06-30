@@ -41,17 +41,6 @@ services:
       - /mnt/media/media:/media # youtube videos, photography videos
     privileged: true
 
-  watchtower:
-    image: containrrr/watchtower
-    container_name: watchtower
-    restart: unless-stopped
-    environment:
-      - TZ=Europe/Amsterdam
-      - WATCHTOWER_CLEANUP=true
-      - WATCHTOWER_POLL_INTERVAL=86400  # Check every 24 hours
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-
   # node exporter is running outside docker.
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
@@ -69,9 +58,6 @@ services:
   immich-server:
     container_name: immich_server
     image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
-    # extends:
-    #   file: hwaccel.transcoding.yml
-    #   service: cpu # set to one of [nvenc, quicksync, rkmpp, vaapi, vaapi-wsl] for accelerated transcoding
     volumes:
       # Do not edit the next line. If you want to change the media storage location on your system, edit the value of UPLOAD_LOCATION in the .env file
       - ${UPLOAD_LOCATION}:/usr/src/app/upload
@@ -124,6 +110,19 @@ services:
       # Do not edit the next line. If you want to change the database storage location on your system, edit the value of DB_DATA_LOCATION in the .env file
       - ${DB_DATA_LOCATION}:/var/lib/postgresql/data
     restart: always
+
+  immich-cli:
+    container_name: immich_cli
+    image: ghcr.io/immich-app/immich-cli:latest
+    env_file:
+      - .env
+    environment:
+      IMMICH_INSTANCE_URL: https://192.168.2.214:2283
+      IMMICH_API_KEY: "{{ vault_immich_cli_api_key }}"
+    entrypoint: [ "sleep", "infinity" ]  # So you can exec into it and run multiple commands
+    depends_on:
+      - immich-server
+    restart: unless-stopped
 
 volumes:
   model-cache:

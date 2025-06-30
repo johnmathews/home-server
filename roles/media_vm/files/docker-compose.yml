@@ -3,24 +3,6 @@
 ---
 
 services:
-  maintainerr:
-    image: ghcr.io/jorenn92/maintainerr:latest
-    container_name: maintainerr
-    user: ${PUID}:${PGID}
-    environment:
-      - TZ=${TZ}
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - UI_PORT=6246
-      - API_PORT=3001
-      # - BASE_PATH=/maintainerr # uncomment if you're serving maintainerr from a subdirectory
-    volumes:
-      - /srv/media/config/maintainerr/data:/opt/data  # Adjust to the path you want to browse
-    ports:
-      - 6246:6246
-      - 3001:3001
-    restart: always
-
   filebrowser:
     image: filebrowser/filebrowser:latest
     container_name: filebrowser
@@ -55,59 +37,49 @@ services:
     network_mode: "service:gluetun"
     restart: always
 
-  calibre:
-    image: lscr.io/linuxserver/calibre:latest
-    container_name: calibre
-    security_opt:
-      - seccomp=unconfined
+  booklore:
+    image: ghcr.io/adityachandelgit/booklore-app:latest
+    container_name: booklore
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
-      - TZ=${TZ}
-      - PASSWORD=${CALIBRE_PASSWORD}
-      # - CLI_ARGS=
-    volumes:
-      - /srv/media/config/calibre:/config/calibre
-      - /srv/media/config/calibre-web:/config/calibre-web
-      - /mnt/media/media:/media
-      - /mnt/media/library:/library
+      - TZ=Etc/UTC
+      # - DATABASE_URL=jdbc:mariadb://mariadb:3306/booklore # Only modify this if you're familiar with JDBC and your database setup
+      - DATABASE_URL=jdbc:mariadb://booklore-mariadb:3306/booklore
+      - DATABASE_USERNAME=booklore # Must match MYSQL_USER defined in the mariadb container
+      - DATABASE_PASSWORD=your_secure_password # Use a strong password; must match MYSQL_PASSWORD defined in the mariadb container 
+      - SWAGGER_ENABLED=false # Enable or disable Swagger UI (API docs). Set to 'true' to allow access; 'false' to block access (recommended for production).
+    depends_on:
+      booklore-mariadb:
+        condition: service_healthy
     ports:
-      - "8180:8080"  # GUI
-      - "8181:8081"  # Content server
-    restart: always
+      - "6060:6060"
+    volumes:
+      - /srv/media/config/booklore/data:/app/data
+      - /srv/media/config/booklore/books:/books
+      - /mnt/media/library:/library
+      - /mnt/media/media:/media
+    restart: unless-stopped
 
-  calibre-web:
-    image: lscr.io/linuxserver/calibre-web:latest
-    container_name: calibre-web
+  booklore-mariadb:
+    image: lscr.io/linuxserver/mariadb:11.4.5
+    container_name: booklore-mariadb
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
-      - TZ=${TZ}
-      - DOCKER_MODS=linuxserver/mods:universal-calibre
-      - OAUTHLIB_RELAX_TOKEN_SCOPE=1
+      - TZ=Etc/UTC
+      - MYSQL_ROOT_PASSWORD=super_secure_password # Use a strong password for the database's root user, should be different from MYSQL_PASSWORD
+      - MYSQL_DATABASE=booklore
+      - MYSQL_USER=booklore # Must match DATABASE_USERNAME defined in the booklore container
+      - MYSQL_PASSWORD=your_secure_password # Use a strong password; must match DATABASE_PASSWORD defined in the booklore container
     volumes:
-      - /srv/media/config/calibre:/config/calibre
-      - /srv/media/config/calibre-web:/config/calibre-web
-      - /mnt/media/media:/media
-      - /mnt/media/library:/library
-    ports:
-      - "8083:8083"
-    restart: always
-
-  kavita:
-    image: lscr.io/linuxserver/kavita:latest
-    container_name: kavita
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-    volumes:
-      - /srv/media/config/kavita:/config
-      - /mnt/media/media:/media
-      - /mnt/media/library:/library
-    ports:
-      - 5000:5000
-    restart: always
+      - /srv/media/config/booklore/mariadb/config:/config
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mariadb-admin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   sonarr:
     image: linuxserver/sonarr:latest
@@ -121,8 +93,7 @@ services:
       - /srv/media/config/sonarr:/config
       - /mnt/media/library:/library
       - /usr/local/bin:/usr/local/bin
-      # keep this so it understands what sabnzbd sees
-      - /mnt/media/library/downloads:/downloads 
+      - /mnt/media/library/downloads:/downloads # keep this so it understands what sabnzbd sees
     ports:
       - "8989:8989"
     restart: always
@@ -139,8 +110,7 @@ services:
       - /srv/media/config/radarr:/config
       - /mnt/media/library:/library
       - /usr/local/bin:/usr/local/bin
-      # keep this so it understands what sabnzbd sees
-      - /mnt/media/library/downloads:/downloads
+      - /mnt/media/library/downloads:/downloads # keep this so it understands what sabnzbd sees
     ports:
       - "7878:7878"
     restart: always
@@ -293,20 +263,33 @@ services:
     privileged: true  # required for some metrics
 
   paperless-broker:
+    container_name: paperless-broker
+    user: "${PUID}:${PGID}"
     image: docker.io/library/redis:8
     restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
     volumes:
-      - paperless-redisdata:/data
+      - /srv/media/config/paperless/paperless-redisdata:/data
   paperless-db:
+    container_name: paperless-db
+    user: "${PUID}:${PGID}"
     image: docker.io/library/postgres:17
     restart: unless-stopped
     volumes:
-      - paperless-pgdata:/var/lib/postgresql/data
+      - /srv/media/config/paperless/paperless-pgdata:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: paperless
       POSTGRES_USER: paperless
       POSTGRES_PASSWORD: paperless
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
   paperless-webserver:
+    container_name: paperless-webserver
+    user: "${PUID}:${PGID}"
     image: ghcr.io/paperless-ngx/paperless-ngx:latest
     restart: unless-stopped
     depends_on:
@@ -315,17 +298,14 @@ services:
     ports:
       - "8001:8000"
     volumes:
-      - paperless-data:/usr/src/paperless/data
-      - paperless-media:/usr/src/paperless/media
-      - ./export:/usr/src/paperless/export
-      - ./consume:/usr/src/paperless/consume
+      - /srv/media/config/paperless/paperless-data:/usr/src/paperless/data
+      - /srv/media/config/paperless/paperless-media:/usr/src/paperless/media
+      - /srv/media/config/paperless/export:/usr/src/paperless/export
+      - /srv/media/config/paperless/consume:/usr/src/paperless/consume
     env_file: .env
     environment:
       PAPERLESS_REDIS: redis://paperless-broker:6379
       PAPERLESS_DBHOST: paperless-db
-
-volumes:
-  paperless-data:
-  paperless-media:
-  paperless-pgdata:
-  paperless-redisdata:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}

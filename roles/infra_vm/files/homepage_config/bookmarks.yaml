@@ -15,6 +15,9 @@
     - Jellyseer-kids:
         - abbr: 
           href: http://192.168.2.105:5056
+    - Paperless:
+        - abbr:
+          href: http://192.168.2.105:8001
     - Sonarr:
         - abbr: 
           href: http://192.168.2.105:8989
@@ -24,9 +27,9 @@
     - Sabnzbd:
         - abbr: 
           href: http://192.168.2.105:8081
-    - Kavita:
+    - BookLore:
         - abbr:
-          href: http://192.168.2.105:5000
+          href: http://192.168.2.105:6060
     - Immich:
         - abbr:
           href: http://192.168.2.214:2283

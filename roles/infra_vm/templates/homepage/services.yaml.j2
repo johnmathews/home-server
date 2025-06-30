@@ -20,8 +20,8 @@
        classes: h-screen
 
 
-- Charts: 
-  # CPU usage 
+- Charts:
+  # CPU Total
   - "":
      widget:
        type: iframe
@@ -30,11 +30,47 @@
        allowPolicy: autoplay; fullscreen; gamepad
        allowFullscreen: true
 
-  # Container CPU usage 
+  # CPU per Container
+  - "":
+     widget:
+       type: iframe
+       src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/proxmox?orgId=1&timezone=browser%kiosk=tv&refresh=10s&panelId=21&__feature.dashboardSceneSolo
+       referrerPolicy: same-origin
+       allowPolicy: autoplay; fullscreen; gamepad
+       allowFullscreen: true
+
+  # CPU per VM 
   - "":
      widget:
        type: iframe
        src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/proxmox?orgId=1&timezone=browser%kiosk=tv&refresh=10s&panelId=10&__feature.dashboardSceneSolo
+       referrerPolicy: same-origin
+       allowPolicy: autoplay; fullscreen; gamepad
+       allowFullscreen: true
+
+  # Memory Total 
+  - "":
+     widget:
+       type: iframe
+       src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/proxmox?orgId=1&timezone=browser%3Fkiosk&refresh=10s&panelId=2&__feature.dashboardSceneSolo
+       referrerPolicy: same-origin
+       allowPolicy: autoplay; fullscreen; gamepad
+       allowFullscreen: true
+
+  # Memory per Container 
+  - "":
+     widget:
+       type: iframe
+       src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/proxmox?orgId=1&timezone=browser%kiosk=tv&refresh=10s&panelId=22&__feature.dashboardSceneSolo
+       referrerPolicy: same-origin # optional, no default
+       allowPolicy: autoplay; fullscreen; gamepad # optional, no default
+       allowFullscreen: true # optional, default: true
+
+  # Memory per VM/LXC
+  - "":
+     widget:
+       type: iframe
+       src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/proxmox?orgId=1&timezone=browser%kiosk=tv&refresh=10s&panelId=11&__feature.dashboardSceneSolo
        referrerPolicy: same-origin
        allowPolicy: autoplay; fullscreen; gamepad
        allowFullscreen: true
@@ -47,41 +83,6 @@
        referrerPolicy: same-origin
        allowPolicy: autoplay; fullscreen; gamepad
        allowFullscreen: true
-
-  # Total memory usage 
-  - "":
-     widget:
-       type: iframe
-       src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/proxmox?orgId=1&timezone=browser%3Fkiosk&refresh=10s&panelId=2&__feature.dashboardSceneSolo
-       referrerPolicy: same-origin
-       allowPolicy: autoplay; fullscreen; gamepad
-       allowFullscreen: true
-
-  # RAM per VM/LXC
-  - "":
-     widget:
-       type: iframe
-       src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/proxmox?orgId=1&timezone=browser%kiosk=tv&refresh=10s&panelId=11&__feature.dashboardSceneSolo
-       referrerPolicy: same-origin
-       allowPolicy: autoplay; fullscreen; gamepad
-       allowFullscreen: true
-
-  # Container Memory 
-  - "":
-     widget:
-       type: iframe
-       src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/proxmox?orgId=1&timezone=browser%kiosk=tv&refresh=10s&panelId=22&__feature.dashboardSceneSolo
-       referrerPolicy: same-origin # optional, no default
-       allowPolicy: autoplay; fullscreen; gamepad # optional, no default
-       allowFullscreen: true # optional, default: true
-  # Power 
-  - "":
-     widget:
-       type: iframe
-       src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/proxmox?orgId=1&timezone=browser%3Fkiosk&refresh=10s&panelId=7&__feature.dashboardSceneSolo
-       referrerPolicy: same-origin # optional, no default
-       allowPolicy: autoplay; fullscreen; gamepad # optional, no default
-       allowFullscreen: true # optional, default: true
 
   # Temperatures 
   - "":
@@ -100,6 +101,16 @@
        referrerPolicy: same-origin # optional, no default
        allowPolicy: autoplay; fullscreen; gamepad # optional, no default
        allowFullscreen: true # optional, default: true
+
+  # Power 
+  - "":
+     widget:
+       type: iframe
+       src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/proxmox?orgId=1&timezone=browser%3Fkiosk&refresh=10s&panelId=7&__feature.dashboardSceneSolo
+       referrerPolicy: same-origin # optional, no default
+       allowPolicy: autoplay; fullscreen; gamepad # optional, no default
+       allowFullscreen: true # optional, default: true
+
 
   - Grafana:
       href: https://charts.itsa.pizza
@@ -143,6 +154,28 @@
           showEpisodeNumber: false # optional, defaults to false
           expandOneStreamToTwoRows: false # optional, defaults to true
 
+    - Paperless:
+        href: https://paperless.itsa.pizza
+        siteMonitor: http://192.168.2.105:8001
+        description: Document management system
+        icon: paperless
+        showStats: true
+        widget:
+          type: paperlessngx
+          url: http://192.168.2.105:8001
+          key: "{{ vault_paperless_key }}"
+
+    - File Browser:
+        href: http://192.168.2.105:8082
+        siteMonitor: http://192.168.2.105:8082
+        icon: filebrowser
+
+    - BookLore:
+        href: https://booklore.itsa.pizza
+        siteMonitor: http://192.168.2.105:6060
+        description: Books
+        icon: booklore
+
     - Tunarr:
         href: http://192.168.2.214:8000
         siteMonitor: http://192.168.2.214:8001
@@ -182,27 +215,6 @@
         siteMonitor: http://192.168.2.214:2283
         description: photos 
         icon: immich
-
-    - File Browser:
-        href: http://192.168.2.105:8082
-        siteMonitor: http://192.168.2.105:8082
-        icon: filebrowser
-
-    - Kavita:
-        href: http://192.168.2.105:5000/home
-        siteMonitor: http://192.168.2.105:5000/home
-        description: books
-        icon: kavita
-    - Calibre Server:
-        href: http://192.168.2.105:8180
-        siteMonitor: http://192.168.2.105:8180
-        description: books
-        icon: calibre
-    - Calibre Web:
-        href: http://192.168.2.105:8083/
-        siteMonitor: http://192.168.2.105:8083/
-        description: books
-        icon: calibre
 
     - Radarr:
         href: https://radarr.itsa.pizza

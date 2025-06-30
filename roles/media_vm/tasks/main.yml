@@ -90,7 +90,7 @@
 # 7. Handle qBittorrent config prep before container starts
 - name: Re-create qbittorrent config directory
   file:
-    path: "{{ media_stack_base_dir }}/qBittorrent"
+    path: "{{ media_stack_base_dir }}/config/qBittorrent"
     state: directory
     owner: "{{ media_stack_user }}"
     group: "{{ media_stack_user }}"
@@ -100,7 +100,7 @@
 - name: Pre-seed qBittorrent.conf if missing and not resetting
   ansible.builtin.template:
     src: qBittorrent.conf.j2
-    dest: "{{ media_stack_base_dir }}/qBittorrent/qBittorrent.conf"
+    dest: "{{ media_stack_base_dir }}/config/qBittorrent/qBittorrent.conf"
     owner: "{{ puid }}"
     group: "{{ guid }}"
     mode: '0644'
@@ -136,7 +136,7 @@
 
 - name: Ensure Radarr config directory has correct UID/GID
   ansible.builtin.file:
-    path: "{{ media_stack_base_dir }}/radarr"
+    path: "{{ media_stack_base_dir }}/config/radarr"
     state: directory
     recurse: true
     owner: "{{ puid }}"
@@ -145,7 +145,7 @@
 
 - name: Ensure Sonarr config directory has correct UID/GID
   ansible.builtin.file:
-    path: "{{ media_stack_base_dir }}/sonarr"
+    path: "{{ media_stack_base_dir }}/config/sonarr"
     state: directory
     recurse: true
     owner: "{{ puid }}"
@@ -154,7 +154,7 @@
 
 - name: Ensure Jackett config directory exists
   ansible.builtin.file:
-    path: "{{ media_stack_base_dir }}/jackett"
+    path: "{{ media_stack_base_dir }}/config/jackett"
     state: directory
     recurse: true
     owner: "{{ puid }}"
@@ -163,7 +163,7 @@
 
 - name: Ensure Maintainerr config directory exists
   ansible.builtin.file:
-    path: "{{ media_stack_base_dir }}/maintainerr"
+    path: "{{ media_stack_base_dir }}/config/maintainerr"
     state: directory
     recurse: true
     owner: "{{ puid }}"
@@ -194,7 +194,7 @@
   loop: "{{ mounted_dirs.results }}"
 
 - name: Set permissions of file browser config directory
-  ansible.builtin.command: chown -R 1000:1000 "{{ media_stack_base_dir }}/filebrowser"
+  ansible.builtin.command: chown -R 1000:1000 "{{ media_stack_base_dir }}/config/filebrowser"
   become: true
 
 # 11. Start Docker stack (only after config + paths are ready)
