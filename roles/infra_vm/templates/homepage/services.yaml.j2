@@ -154,42 +154,6 @@
           showEpisodeNumber: false # optional, defaults to false
           expandOneStreamToTwoRows: false # optional, defaults to true
 
-    - Paperless:
-        href: https://paperless.itsa.pizza
-        siteMonitor: http://192.168.2.105:8001
-        description: Document management system
-        icon: paperless
-        showStats: true
-        widget:
-          type: paperlessngx
-          url: http://192.168.2.105:8001
-          key: "{{ vault_paperless_key }}"
-
-    - File Browser:
-        href: http://192.168.2.105:8082
-        siteMonitor: http://192.168.2.105:8082
-        icon: filebrowser
-
-    - BookLore:
-        href: https://booklore.itsa.pizza
-        siteMonitor: http://192.168.2.105:6060
-        description: Books
-        icon: booklore
-
-    - Tunarr:
-        href: http://192.168.2.214:8000
-        siteMonitor: http://192.168.2.214:8001
-        description: TV channels 
-        icon: tunarr
-        showStats: true
-
-    - Tunarr chanells:
-        href: http://192.168.2.214:8001
-        siteMonitor: http://192.168.2.214:8001
-        description: TV channels 
-        icon: tunarr
-        showStats: true
-
     - Jellyseerr:
         href: https://seerr.itsa.pizza
         siteMonitor: http://192.168.2.105:5055/
@@ -215,6 +179,42 @@
         siteMonitor: http://192.168.2.214:2283
         description: photos 
         icon: immich
+
+    - File Browser:
+        href: http://192.168.2.105:8082
+        siteMonitor: http://192.168.2.105:8082
+        icon: filebrowser
+
+    - BookLore:
+        href: https://booklore.itsa.pizza
+        siteMonitor: http://192.168.2.105:6060
+        description: Books
+        icon: booklore
+
+    - Paperless:
+        href: https://paperless.itsa.pizza
+        siteMonitor: http://192.168.2.105:8001
+        description: Document management system
+        icon: paperless
+        showStats: true
+        widget:
+          type: paperlessngx
+          url: http://192.168.2.105:8001
+          key: "{{ vault_paperless_key }}"
+
+    - Tunarr:
+        href: http://192.168.2.214:8000
+        siteMonitor: http://192.168.2.214:8001
+        description: TV channels 
+        icon: tunarr
+        showStats: true
+
+    - Tunarr chanells:
+        href: http://192.168.2.214:8001
+        siteMonitor: http://192.168.2.214:8001
+        description: TV channels 
+        icon: tunarr
+        showStats: true
 
     - Radarr:
         href: https://radarr.itsa.pizza

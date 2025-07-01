@@ -11,6 +11,8 @@ smb_shares:
     target: /mnt/media/library
   - name: media 
     target: /mnt/media/media
+  - name: immich 
+    target: /mnt/immich
 
 # iGPU
 radeontop_exporter_path: /usr/local/bin/radeontop-exporter.py

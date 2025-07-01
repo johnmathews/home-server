@@ -61,6 +61,15 @@
     - /srv/apps/jellyfin/config
     - /srv/apps/jellyfin/cache
 
+- name: Create required Immich directory
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  loop:
+    - /srv/apps/immich/postgres
 
 - name: Create required smb share directories
   file:
@@ -76,12 +85,12 @@
     name: docker-compose-plugin
     state: present
 
-- name: Ensure Jellyfin Docker Compose directory exists
+- name: Ensure Docker Compose directory exists
   file:
     path: /srv/apps
     state: directory
 
-- name: Deploy Jellyfin docker-compose.yml
+- name: Deploy docker-compose.yml
   copy:
     src: docker-compose.yml
     dest: /srv/apps/docker-compose.yml

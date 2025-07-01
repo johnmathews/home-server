@@ -152,24 +152,6 @@
     group: "{{ guid }}"
     mode: '0755'
 
-- name: Ensure Jackett config directory exists
-  ansible.builtin.file:
-    path: "{{ media_stack_base_dir }}/config/jackett"
-    state: directory
-    recurse: true
-    owner: "{{ puid }}"
-    group: "{{ guid }}"
-    mode: '0755'
-
-- name: Ensure Maintainerr config directory exists
-  ansible.builtin.file:
-    path: "{{ media_stack_base_dir }}/config/maintainerr"
-    state: directory
-    recurse: true
-    owner: "{{ puid }}"
-    group: "{{ guid }}"
-    mode: '0755'
-
 - name: Check if docker-compose.yml exists
   stat:
     path: /srv/media/docker-compose.yml
