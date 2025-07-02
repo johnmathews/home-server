@@ -1,4 +1,17 @@
-# TrueNAS setup
+# TrueNAS
+
+## Scripts
+
+A script runs each hour to see if any HDDs can be spun down. The script is in
+nas > scripts and is copied manually onto the nas vm.
+
+## Metrics
+
+The state of each HDD is tracked via a custom app. The custom app code is in the
+repo `disk_status_exporter`. Its a FastAPI instance that Prometheus can
+scrape.
+
+## Setup
 
 Use raw disk passthrough rather than letting Proxmox manage the HDDs as part of
 a ZFS pool.
@@ -9,12 +22,13 @@ The idea is that this gives TrueNAS full control of the HDDs.
 
 - `qm list` to get ID of TrueNAS VM. It's `104`.
 
-- use `ls -l /dev/disk/by-id/ | grep -E 'sda|sdb|sdc|sdd'` to get the id of the connected HDDs.
+- use `ls -l /dev/disk/by-id/ | grep -E 'sda|sdb|sdc|sdd'` to get the id of the
+  connected HDDs.
 
 - use `scsi<NUMBER>` flag to mount the drives directly to the TrueNAS VM:
 
   ```
-  # tank pool - 8TB Seagate Ironwolf, mirrored vdev 
+  # tank pool - 8TB Seagate Ironwolf, mirrored vdev
   qm set 104 -scsi1 /dev/disk/by-id/ata-ST8000VN004-3CP101_WWZ5TZSF,backup=0
   qm set 104 -scsi2 /dev/disk/by-id/ata-ST8000VN004-3CP101_WWZ5AS90,backup=0
 
