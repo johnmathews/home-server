@@ -53,3 +53,40 @@
 - name: Install Docker and deploy containerised apps 
   import_tasks: docker-apps.yml
   tags: [containers]
+
+# hdparm service doesnt exist by default. if the systemd service isnt running then the configuration file /etc/hdparm.conf has no effect.
+- name: Ensure hdparm service unit is present and enabled
+  block:
+    - name: Create hdparm systemd unit file
+      copy:
+        dest: /etc/systemd/system/hdparm.service
+        owner: root
+        group: root
+        mode: '0644'
+        content: |
+          [Unit]
+          Description=Apply hdparm settings
+          DefaultDependencies=no
+          After=local-fs.target
+          Before=shutdown.target
+
+          [Service]
+          Type=oneshot
+          ExecStart=/sbin/hdparm -B {{ hdparm_apm }} -S {{ hdparm_spindown }} /dev/disk/by-id/{{ hdparm_disk_id }}
+
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: Reload systemd to pick up hdparm unit
+      command: systemctl daemon-reexec
+      changed_when: false
+
+    - name: Enable hdparm.service
+      systemd:
+        name: hdparm.service
+        enabled: true
+
+    - name: Start hdparm.service
+      systemd:
+        name: hdparm.service
+        state: started

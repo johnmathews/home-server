@@ -124,5 +124,15 @@ services:
       - immich-server
     restart: unless-stopped
 
+  disk-status-exporter:
+    image: ghcr.io/johnmathews/disk_status_exporter:latest
+    container_name: disk_status_exporter
+    restart: always
+    ports:
+      - "9635:9635"
+    volumes:
+      - /dev:/dev:ro
+    privileged: true  # recommended to access /dev/sdX and run smartctl
+
 volumes:
   model-cache:

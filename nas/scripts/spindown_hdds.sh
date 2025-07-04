@@ -6,7 +6,7 @@
 # - its utilisaiton is above threshold for sample_duration
 # then spin down the disk
 
-# saved at /home/truenas_admin/spindown_hdds.sh
+# SAVED AT /home/truenas_admin/spindown_hdds.sh
 # run via a cron job in advanced settings UI.
 
 
