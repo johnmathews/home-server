@@ -106,8 +106,8 @@ scrape_configs:
 
   - job_name: 'disk_power_exporter'
     metrics_path: /metrics
-    scrape_interval: 20s
-    scrape_timeout: 15s
+    scrape_interval: 60s
+    scrape_timeout: 30s
     static_configs:
       - targets: ['192.168.2.104:9635']
         labels:

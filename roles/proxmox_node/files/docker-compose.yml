@@ -111,18 +111,18 @@ services:
       - ${DB_DATA_LOCATION}:/var/lib/postgresql/data
     restart: always
 
-  immich-cli:
-    container_name: immich_cli
-    image: ghcr.io/immich-app/immich-cli:latest
-    env_file:
-      - .env
-    environment:
-      IMMICH_INSTANCE_URL: https://192.168.2.214:2283
-      IMMICH_API_KEY: "{{ vault_immich_cli_api_key }}"
-    entrypoint: [ "sleep", "infinity" ]  # So you can exec into it and run multiple commands
-    depends_on:
-      - immich-server
-    restart: unless-stopped
+  # immich-cli:
+  #   container_name: immich_cli
+  #   image: ghcr.io/immich-app/immich-cli:latest
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     IMMICH_INSTANCE_URL: https://192.168.2.214:2283
+  #     IMMICH_API_KEY: "{{ vault_immich_cli_api_key }}"
+  #   entrypoint: [ "sleep", "infinity" ]  # So you can exec into it and run multiple commands
+  #   depends_on:
+  #     - immich-server
+  #   restart: unless-stopped
 
   disk-status-exporter:
     image: ghcr.io/johnmathews/disk_status_exporter:latest

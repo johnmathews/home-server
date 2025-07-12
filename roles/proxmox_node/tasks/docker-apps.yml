@@ -71,13 +71,19 @@
   loop:
     - /srv/apps/immich/postgres
 
-- name: Create required smb share directories
+- name: Ensure SMB mount directories exist (create if missing)
   file:
     path: "{{ item.target }}"
     state: directory
     owner: root
     group: root
     mode: '0755'
+  loop: "{{ smb_shares }}"
+
+- name: Unmount stale SMB mounts if needed (non-fatal)
+  mount:
+    path: "{{ item.target }}"
+    state: unmounted
   loop: "{{ smb_shares }}"
 
 - name: Install Docker Compose plugin
@@ -111,14 +117,6 @@
     name: cifs-utils
     state: present
 
-- name: Ensure SMB mount directories exist
-  ansible.builtin.file:
-    path: "{{ item.target }}"
-    state: directory
-    owner: root
-    group: root
-    mode: '0755'
-  loop: "{{ smb_shares }}"
 
 - name: Create SMB credentials file
   copy:
@@ -133,12 +131,21 @@
 - name: Persist SMB mount in /etc/fstab
   ansible.builtin.lineinfile:
     path: /etc/fstab
+    regexp: "^//{{ smb_server }}/{{ item.name }}[ \t]+{{ item.target }}[ \t]+cifs"
     line: "//{{ smb_server }}/{{ item.name }} {{ item.target }} cifs credentials=/root/.smbcredentials,iocharset=utf8,noperm,nofail,x-systemd.automount,vers=3.0 0 0"
     state: present
     create: yes
   loop: "{{ smb_shares }}"
 
-- name: Mount SMB share
+- name: Debug SMB credentials file
+  shell: cat /root/.smbcredentials
+  register: smb_creds
+  changed_when: false
+
+- debug:
+    msg: "{{ smb_creds.stdout }}"
+
+- name: Mount SMB shares
   mount:
     path: "{{ item.target }}"
     src: "//{{ smb_server }}/{{ item.name }}"
@@ -146,6 +153,19 @@
     opts: credentials=/root/.smbcredentials,iocharset=utf8,noperm,nofail,vers=3.0
     state: mounted
   loop: "{{ smb_shares }}"
+
+- name: Check if SMB share is mounted
+  command: mountpoint {{ item.target }}
+  loop: "{{ smb_shares }}"
+  register: mount_check_results
+  changed_when: false
+  ignore_errors: true  # prevent Ansible from stopping the play
+
+- name: Fail if any SMB share is not mounted
+  fail:
+    msg: "SMB share '{{ item.item.target }}' is not mounted"
+  loop: "{{ mount_check_results.results }}"
+  when: item.rc != 0
 
 - name: Start apps using Docker Compose
   community.docker.docker_compose_v2:
