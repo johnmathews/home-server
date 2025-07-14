@@ -96,57 +96,6 @@
     mode: '0644'
   notify: Restart Grafana container
 
-- name: Ensure loki config directory exists
-  file:
-    path: /srv/infra/loki
-    state: directory
-    owner: root
-    group: root
-    mode: '0755'
-
-- name: Ensure loki config subdirs exist
-  file:
-    path: /srv/infra/loki/{{item}}
-    state: directory
-    owner: 10001
-    group: 10001
-    mode: '0755'
-    recurse: yes
-  loop:
-    - var/compactor
-    - chunks
-    - index
-    - cache
-    - rules
-    - rules-temp
-    - wal
-
-- name: Deploy custom loki config
-  template:
-    src: files/loki/loki-config.yml
-    dest: /srv/infra/loki/loki/loki-config.yml
-    owner: root
-    group: root
-    mode: '0644'
-  notify: Restart loki container
-
-- name: Ensure promtail config directory exists
-  file:
-    path: /srv/infra/promtail
-    state: directory
-    owner: root
-    group: root
-    mode: '0755'
-
-- name: Deploy custom promtail config
-  template:
-    src: files/promtail/promtail-config.yml
-    dest: /srv/infra/promtail/promtail-config.yml
-    owner: root
-    group: root
-    mode: '0644'
-  notify: Restart promtail container
-
 - name: Template Docker Compose file
   template:
     src: docker-compose.yml.j2

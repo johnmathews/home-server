@@ -50,9 +50,6 @@
     - Uptime Kuma:
         - abbr:
           href: http://192.168.2.106:3001
-    - Loki:
-        - abbr:
-          href: http://192.168.2.106:3100
 
 - Services:
     - Home Assistant:
@@ -83,9 +80,6 @@
           href: http://192.168.2.254
 
 - Docs:
-  - Loki:
-    - abbr:
-      href: https://grafana.com/docs/loki/latest/reference/loki-http-api/
   - Proxmox Scripts:
     - abbr: 
       href: https://community-scripts.github.io/ProxmoxVE/scripts

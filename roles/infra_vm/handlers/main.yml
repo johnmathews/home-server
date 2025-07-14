@@ -7,11 +7,6 @@
   args:
     chdir: "{{ docker_compose_dir }}"
 
-- name: Restart loki container
-  command: docker compose restart loki
-  args:
-    chdir: "{{ docker_compose_dir }}"
-
 - name: Restart promtail container
   command: docker compose restart promtail
   args:

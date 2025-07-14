@@ -5,11 +5,3 @@
     mode: '0755'
     owner: root
     group: wheel
-
-# - name: Ensure unlock script is executable
-#   file:
-#     path: /mnt/tank/apps-config/scripts/get_keys.sh
-#     mode: '0755'
-#     state: file
-#     owner: root
-#     group: wheel

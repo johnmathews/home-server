@@ -44,32 +44,6 @@ services:
   #     - '3003:3000'
   #     - '222:22'
 
-  # loki:
-  #   image: grafana/loki:latest
-  #   container_name: loki
-  #   volumes:
-  #     - /srv/infra/loki/loki:/etc/loki
-  #     - /srv/infra/loki/data:/loki/data
-  #     - /srv/infra/loki/var:/var/loki
-  #   command: -config.file=/etc/loki/loki-config.yml
-  #   ports:
-  #     - "3100:3100"
-  #   restart: always
-
-  # promtail:
-  #   image: grafana/promtail:latest
-  #   container_name: promtail
-  #   privileged: true
-  #   volumes:
-  #     - /var/log:/var/log
-  #     - /mnt/truenas:/mnt/truenas
-  #     - /var/lib/docker/containers:/var/lib/docker/containers:ro
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #     - /srv/infra/promtail:/etc/promtail
-  #   command: -config.file=/etc/promtail/promtail-config.yml --config.expand-env
-  #   restart: always
-
-
   homepage:
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
