@@ -36,10 +36,11 @@
     mode: '0644'
   notify: Restart Traefik
 
-# - name: Upload jellyfin dynamic config
-#   copy:
-#     src: providers.yml
-#     dest: /etc/traefik/conf.d/providers.yml
-#     owner: root
-#     group: root
-#     mode: '0644'
+- name: Upload providers.yml config
+  template:
+    src: files/providers.yml.j2
+    dest: /etc/traefik/conf.d/providers.yaml
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart Traefik
