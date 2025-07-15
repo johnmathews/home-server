@@ -27,15 +27,6 @@
     group: root
     mode: '0755'
 
-- name: Upload kuma.yaml config
-  copy:
-    src: files/kuma.yml
-    dest: /etc/traefik/conf.d/kuma.yaml
-    owner: root
-    group: root
-    mode: '0644'
-  notify: Restart Traefik
-
 - name: Upload providers.yml config
   template:
     src: files/providers.yml.j2

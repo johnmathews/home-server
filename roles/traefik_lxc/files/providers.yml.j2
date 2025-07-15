@@ -1,3 +1,4 @@
+# vim: ft=yaml
 # traefik_lxc/files/providers.yml
 
 ---
@@ -5,31 +6,7 @@
 http:
 
   middlewares:
-    cloudflare-auth:
-      headers:
-        customRequestHeaders:
-          CF-Access-Client-Id: "25b51fd5e014dc9d9a45fa216e8348fe.access"
-          CF-Access-Client-Secret: "{{ vault_cloudflare_access_client_secret }}"
 
   routers:
-    immich:
-      rule: "Host(`immich.itsa.pizza`)"
-      entryPoints: ["websecure"]
-      service: immich-service
-      middlewares:
-        - cloudflare-auth
-      tls:
-        certResolver: yourresolver
 
-  # routers:
-  #   jellyfin:
-  #     rule: "Host(`jellyfin.lan`)"
-  #     entryPoints:
-  #       - web
-  #     service: jellyfin-svc
-
-  # services:
-  #   jellyfin-svc:
-  #     loadBalancer:
-  #       servers:
-  #         - url: "http://192.168.2.214:8096"
+  services:
