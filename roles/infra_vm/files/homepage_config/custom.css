@@ -86,3 +86,7 @@ div.service-tag div div {
 .values-low {
   backgrond-color: red;
 }
+
+.service-description {
+    white-space: pre-wrap;
+}

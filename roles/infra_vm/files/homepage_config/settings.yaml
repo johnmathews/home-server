@@ -67,6 +67,12 @@ layout:
     style: row
     columns: 2
 
+  Notes:
+    tab: Notes
+    initiallyCollapsed: false
+    style: row
+    columns: 6
+
 providers:
   openweathermap: openweathermapapikey
   weatherapi: weatherapiapikey
