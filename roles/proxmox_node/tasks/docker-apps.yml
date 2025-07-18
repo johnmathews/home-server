@@ -131,19 +131,11 @@
 - name: Persist SMB mount in /etc/fstab
   ansible.builtin.lineinfile:
     path: /etc/fstab
-    regexp: "^//{{ smb_server }}/{{ item.name }}[ \t]+{{ item.target }}[ \t]+cifs"
-    line: "//{{ smb_server }}/{{ item.name }} {{ item.target }} cifs credentials=/root/.smbcredentials,iocharset=utf8,noperm,nofail,x-systemd.automount,x-systemd.device-timeout=10,vers=3.0 0 0"
+    regexp: '^//{{ smb_server }}/{{ item.name }}[ \t]+'
+    line: "//{{ smb_server }}/{{ item.name }} {{ item.target }} cifs credentials=/root/.smbcredentials,iocharset=utf8,noperm,nofail,noauto,x-systemd.automount,x-systemd.device-timeout=10,_netdev,vers=3.0 0 0"
     state: present
     create: yes
   loop: "{{ smb_shares }}"
-
-- name: Debug SMB credentials file
-  shell: cat /root/.smbcredentials
-  register: smb_creds
-  changed_when: false
-
-- debug:
-    msg: "{{ smb_creds.stdout }}"
 
 - name: Mount SMB shares
   mount:
