@@ -1,15 +1,15 @@
-# playbooks/traefik_lxc.yml
+# playbooks/jellyfin_lxc.yml
 
 ---
 
-- name: Traefik LXC
-  hosts: traefik_lxc
+- name: Jellyfin LXC
+  hosts: jellyfin_lxc
   gather_facts: true
   become: true
 
   roles:
-    - role: traefik_lxc
-      tags: traefik
+    - role: jellyfin_lxc
+      tags: jellyfin
 
   vars:
     foo: bar
