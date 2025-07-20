@@ -1,0 +1,27 @@
+# playbooks/infra_vm.yml
+
+---
+
+- name: Infra VM
+  hosts: infra-vm
+  gather_facts: true
+  become: true
+
+  roles:
+    - role: infra_vm
+      tags: infra_vm
+
+  vars:
+    proxmox_node_name: proxmox
+    ciuser: "{{ vm_defaults.ciuser }}"
+    ssh_key: "{{ vm_defaults.ssh_key }}"
+
+    ansible_api_user: root@pam
+    ansible_ssh_private_key_file: ~/.ssh/john_macbook
+
+    vm_name: infra
+    vm_id: 106 
+    vm_cloud_init_user: john 
+    vm_cloud_init_mac: 02:00:00:00:01:06 
+    vm_ip_address: 192.168.2.106
+
