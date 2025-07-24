@@ -50,3 +50,31 @@
     opts: credentials=/etc/smb/.smbcredentials,iocharset=utf8,noperm,nofail,vers=3.0
     state: mounted
   loop: "{{ smb_shares }}"
+
+- name: Create base app directories for containers
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+  loop:
+    - /srv/apps/immich/
+    - /srv/apps/immich/postgres
+
+- name: Deploy .env file template 
+  template:
+    src: templates/.env.j2 
+    dest: /srv/apps/.env
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Copy Docker Compose file
+  ansible.builtin.copy:
+    src: docker-compose.yml
+    dest: /srv/apps/docker-compose.yml
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart Docker Compose stack
