@@ -1,0 +1,56 @@
+# jellyfin_lxc/files/docker-compose.yml
+
+---
+
+services:
+  tunarr:
+    image: chrisbenincasa/tunarr:latest-vaapi
+    container_name: tunarr
+    restart: always
+    ports:
+      - "8000:8000"     # Web UI and API
+      - "8001:8001"     # HLS/Stream endpoint
+    environment:
+      - LOG_LEVEL=INFO
+      - TZ=Europe/Amsterdam
+      - TRANSCODER_MODE=vaapi
+    devices:
+      - /dev/dri:/dev/dri
+    volumes:
+      - /srv/apps/tunarr:/config/tunarr
+      - /mnt/media/library:/library  # kids shows, family movies 
+      - /mnt/media/media:/media # youtube videos, photography videos
+
+  jellyfin:
+    image: jellyfin/jellyfin:10.10.7
+    container_name: jellyfin
+    restart: always
+    mem_limit: 8g
+    mem_reservation: 4g
+    ports:
+      - "8096:8096"
+    environment:
+      - TZ=Europe/Amsterdam
+      - JELLYFIN_PublishedServerUrl=http://localhost:8096
+    devices:
+      - /dev/dri:/dev/dri
+    volumes:
+      - /srv/apps/jellyfin/appdata:/config
+      - /srv/apps/jellyfin/cache:/cache
+      - /mnt/media/library:/library # kids shows, family movies, etc
+      - /mnt/media/media:/media # youtube videos, photography videos
+    privileged: true
+
+  # node exporter is running outside docker.
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    restart: always
+    ports:
+      - "18080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    privileged: true  # required for some metrics

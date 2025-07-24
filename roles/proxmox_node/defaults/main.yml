@@ -47,4 +47,4 @@ pve_exporter_listen_port: 9221
 # backup disk set spindown using hdparm service.
 hdparm_disk_id: ata-ST3000DM007-1WY10G_ZFN1TN5X # this is the PBS HDD.
 hdparm_apm: 128
-hdparm_spindown: 720
+hdparm_spindown: 240

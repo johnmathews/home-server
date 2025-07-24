@@ -5,3 +5,5 @@
 - import_playbook: media_vm.yml
 - import_playbook: infra_vm.yml
 - import_playbook: key_server.yml
+- import_playbook: immich_lxc.yml
+- import_playbook: jellyfin_lxc.yml

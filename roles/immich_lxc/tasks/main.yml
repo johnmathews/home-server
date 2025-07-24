@@ -18,7 +18,7 @@
 
 - name: Create SMB credentials file
   ansible.builtin.copy:
-    dest: "/etc/smb/{{ item.name }}.cred"
+    dest: "/etc/smb/.smbcredentials"
     content: |
       username={{ smb_proxmox_username }}
       password={{ vault_smb_proxmox_password }}
@@ -47,6 +47,6 @@
     path: "{{ item.target }}"
     src: "//{{ smb_server }}/{{ item.name }}"
     fstype: cifs
-    opts: credentials=/root/.smbcredentials,iocharset=utf8,noperm,nofail,vers=3.0
+    opts: credentials=/etc/smb/.smbcredentials,iocharset=utf8,noperm,nofail,vers=3.0
     state: mounted
   loop: "{{ smb_shares }}"
