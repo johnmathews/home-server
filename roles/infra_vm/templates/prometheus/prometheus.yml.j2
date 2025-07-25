@@ -26,6 +26,12 @@ scrape_configs:
       - targets: ['192.168.2.106:8080']
         labels:
           instance: infra_vm
+      - targets: ['192.168.2.110:8080']
+        labels:
+          instance: jellyfin_lxc
+      - targets: ['192.168.2.113:8080']
+        labels:
+          instance: immich_lxc
 
   - job_name: 'node-exporter'
     scrape_interval: 15s

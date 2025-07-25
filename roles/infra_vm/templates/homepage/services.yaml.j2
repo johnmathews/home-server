@@ -31,20 +31,20 @@
        allowPolicy: autoplay; fullscreen; gamepad
        allowFullscreen: true
 
-  # CPU per Container
-  - "":
-     widget:
-       type: iframe
-       src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/home-server?orgId=1&timezone=browser%kiosk=tv&refresh=10s&panelId=21&__feature.dashboardSceneSolo
-       referrerPolicy: same-origin
-       allowPolicy: autoplay; fullscreen; gamepad
-       allowFullscreen: true
-
   # CPU per VM 
   - "":
      widget:
        type: iframe
        src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/home-server?orgId=1&timezone=browser%kiosk=tv&refresh=10s&panelId=10&__feature.dashboardSceneSolo
+       referrerPolicy: same-origin
+       allowPolicy: autoplay; fullscreen; gamepad
+       allowFullscreen: true
+
+  # CPU per Container
+  - "":
+     widget:
+       type: iframe
+       src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/home-server?orgId=1&timezone=browser%kiosk=tv&refresh=10s&panelId=21&__feature.dashboardSceneSolo
        referrerPolicy: same-origin
        allowPolicy: autoplay; fullscreen; gamepad
        allowFullscreen: true
@@ -58,15 +58,6 @@
        allowPolicy: autoplay; fullscreen; gamepad
        allowFullscreen: true
 
-  # Memory per Container 
-  - "":
-     widget:
-       type: iframe
-       src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/home-server?orgId=1&timezone=browser%kiosk=tv&refresh=10s&panelId=22&__feature.dashboardSceneSolo
-       referrerPolicy: same-origin # optional, no default
-       allowPolicy: autoplay; fullscreen; gamepad # optional, no default
-       allowFullscreen: true # optional, default: true
-
   # Memory per VM/LXC
   - "":
      widget:
@@ -75,6 +66,15 @@
        referrerPolicy: same-origin
        allowPolicy: autoplay; fullscreen; gamepad
        allowFullscreen: true
+
+  # Memory per Container 
+  - "":
+     widget:
+       type: iframe
+       src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/home-server?orgId=1&timezone=browser%kiosk=tv&refresh=10s&panelId=22&__feature.dashboardSceneSolo
+       referrerPolicy: same-origin # optional, no default
+       allowPolicy: autoplay; fullscreen; gamepad # optional, no default
+       allowFullscreen: true # optional, default: true
 
   # Network I/O  
   - "":
@@ -150,12 +150,12 @@
 
     - Jellyfin:
         href: https://jelly.itsa.pizza
-        siteMonitor: http://192.168.2.214:8096
+        siteMonitor: http://192.168.2.110:8096
         description: Media Server
         icon: jellyfin
         widget:
           type: jellyfin
-          url: http://192.168.2.214:8096
+          url: http://192.168.2.110:8096
           key: "{{ vault_jellyfin_key }}"
           enableBlocks: true # optional, defaults to false
           enableNowPlaying: false # optional, defaults to true
@@ -220,14 +220,14 @@
 
     - Tunarr:
         href: http://tunarr.itsa.pizza
-        siteMonitor: http://192.168.2.214:8001
+        siteMonitor: http://192.168.2.110:8000
         description: TV channels 
         icon: tunarr
         showStats: true
 
     - Tunarr chanells:
-        href: http://192.168.2.214:8001
-        siteMonitor: http://192.168.2.214:8001
+        href: http://192.168.2.110:8001
+        siteMonitor: http://192.168.2.110:8001
         description: TV channels 
         icon: tunarr
         showStats: true
