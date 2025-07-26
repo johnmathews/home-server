@@ -1,0 +1,26 @@
+---
+
+- name: Ensure Atuin is installed
+  ansible.builtin.shell: |
+    curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
+  args:
+    executable: /bin/bash
+  environment:
+    ATUIN_DONT_PRINT_WELCOME: "1"
+  creates: /usr/local/bin/atuin
+
+- name: Ensure Atuin config directory exists
+  ansible.builtin.file:
+    path: "/home/{{ atuin_user }}/.config/atuin"
+    state: directory
+    mode: '0755'
+    owner: "{{ atuin_user }}"
+    group: "{{ atuin_user }}"
+
+- name: Set Atuin sync_address
+  ansible.builtin.template:
+    src: config.toml.j2
+    dest: "/home/{{ atuin_user }}/.config/atuin/config.toml"
+    owner: "{{ atuin_user }}"
+    group: "{{ atuin_user }}"
+    mode: '0644'

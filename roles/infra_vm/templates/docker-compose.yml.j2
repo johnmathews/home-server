@@ -176,6 +176,7 @@ services:
 
   atuin:
     restart: always
+    container_name: atuin
     image: ghcr.io/atuinsh/atuin:v18.7.1
     command: server start
     volumes:
@@ -189,6 +190,7 @@ services:
       RUST_LOG: info,atuin_server=debug
   db:
     image: postgres:14
+    container_name: atuin_database
     restart: unless-stopped
     volumes: # Don't remove permanent storage for index database files!
       - "/srv/infra/atuin/database:/var/lib/postgresql/data/"

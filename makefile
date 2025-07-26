@@ -41,6 +41,9 @@ immich:
 jellyfin:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/jellyfin_lxc.yml $(VAULT) $(TAGS)
 
+atuin:
+	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/atuin.yml $(VAULT) $(TAGS)
+
 lint-paths:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/validate-paths.yml $(VAULT) $(TAGS)
 

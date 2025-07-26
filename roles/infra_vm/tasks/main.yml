@@ -207,3 +207,7 @@
 - name: Include config tasks for docker services (prometheus and homepage)
   import_tasks: services_config.yml
   tags: [config]
+
+- name: Include Atuin setup
+  ansible.builtin.include_role:
+    name: atuin
