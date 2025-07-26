@@ -5,10 +5,13 @@
 providers:
   file:
     directory: /etc/traefik/conf.d/
+    watch: true
 
 entryPoints:
   traefik:
     address: ':8080'
+  atuin:
+    address: ':8888'
   web:
     address: ':80'
   websecure:
@@ -31,7 +34,7 @@ api:
 log:
   filePath: /var/log/traefik/traefik.log
   format: json
-  level: INFO
+  level: DEBUG
 
 accessLog:
   filePath: /var/log/traefik/traefik-access.log

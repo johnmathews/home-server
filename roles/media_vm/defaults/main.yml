@@ -23,6 +23,9 @@ guid: 1001
 
 qbittorrent_password_hash: 16c5e9c9b842bd6bf78aafa66643304e0cfe2586
 
+tubearchivist_host: "http://192.168.2.105:8002"
+ta_username: john
+
 media_stack_services:
   jellyfin_port: 8096
   qbittorrent_port: 8080

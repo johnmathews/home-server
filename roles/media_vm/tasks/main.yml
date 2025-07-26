@@ -85,6 +85,7 @@
     - /srv/media
     - /mnt/media/library/family
     - /mnt/media/library/kids
+    - /mnt/media/library/youtube
   when: item != "/mnt/media/library/downloads/incomplete"
 
 # 7. Handle qBittorrent config prep before container starts
@@ -109,8 +110,8 @@
 
 # 9. Copy environment and compose files
 - name: Copy docker-compose.yml
-  copy:
-    src: docker-compose.yml
+  template:
+    src: templates/docker-compose.yml.j2
     dest: /srv/media/docker-compose.yml
     mode: '0644'
   notify: 

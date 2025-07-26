@@ -10,9 +10,17 @@
     group: root
     mode: '0755'
 
+- name: Ensure /etc/traefik/conf.d/ exists
+  file:
+    path: /etc/traefik/conf.d/
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
 - name: Upload traefik.yaml config
   copy:
-    src: traefik_config.yaml
+    src: files/traefik_config.yaml
     dest: /etc/traefik/traefik.yaml
     owner: root
     group: root
@@ -29,13 +37,13 @@
 
 - name: Upload providers.yml config
   template:
-    src: files/providers.yml.j2
+    src: templates/providers.yml.j2
     dest: /etc/traefik/conf.d/providers.yaml
     owner: root
     group: root
     mode: '0644'
   notify: Restart Traefik
 
-- name: Include Atuin setup
-  ansible.builtin.include_role:
-    name: atuin
+# - name: Include Atuin setup
+#   ansible.builtin.include_role:
+#     name: atuin

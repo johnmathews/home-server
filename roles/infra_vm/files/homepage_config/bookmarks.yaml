@@ -8,7 +8,7 @@
 - Media Apps:
     - Jellyfin:
         - abbr: 
-          href: http://192.168.2.214:8096
+          href: http://192.168.2.110:8096
     - Jellyseer:
         - abbr: 
           href: http://192.168.2.105:5055
@@ -32,7 +32,7 @@
           href: http://192.168.2.105:6060
     - Immich:
         - abbr:
-          href: http://192.168.2.214:2283
+          href: http://192.168.2.113:2283
     - Tunarr:
         - abbr:
           href: http://192.168.2.110:8000

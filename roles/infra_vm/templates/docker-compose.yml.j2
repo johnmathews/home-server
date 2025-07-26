@@ -27,23 +27,6 @@ services:
       - FB_ROOT=/srv
     restart: unless-stopped
 
-  # server:
-  #   image: codeberg.org/forgejo/forgejo:11
-  #   container_name: forgejo
-  #   environment:
-  #     - USER_UID=1000
-  #     - USER_GID=1000
-  #   restart: always
-  #   networks:
-  #     - forgejo
-  #   volumes:
-  #     - /srv/infra_stack/forgejo/data:/data
-  #     - /etc/timezone:/etc/timezone:ro
-  #     - /etc/localtime:/etc/localtime:ro
-  #   ports:
-  #     - '3003:3000'
-  #     - '222:22'
-
   homepage:
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
