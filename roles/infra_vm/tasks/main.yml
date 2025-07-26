@@ -76,8 +76,13 @@
     group: docker
     mode: '0755'
 
-# - import_tasks: mount-smb.yml
-#   tags: [mount, smb]
+- name: Upload .env file from template
+  ansible.builtin.template:
+    src: templates/.env.j2 
+    dest: /srv/infra/.env  
+    owner: "{{ docker_user }}"
+    group: docker 
+    mode: '0600'
 
 - name: Ensure grafana custom config directory exists
   file:
