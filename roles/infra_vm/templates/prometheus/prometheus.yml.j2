@@ -32,6 +32,9 @@ scrape_configs:
       - targets: ['192.168.2.113:18080']
         labels:
           instance: immich_lxc
+      - targets: ['192.168.2.114:18080']
+        labels:
+          instance: tubearchivist_lxc 
 
   - job_name: 'node-exporter'
     scrape_interval: 15s

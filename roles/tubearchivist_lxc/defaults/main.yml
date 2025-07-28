@@ -8,8 +8,12 @@ media_stack_group: john
 puid: 1001
 guid: 1001
 
-smb_proxmox_username: proxmox_smb_user
+tubearchivist_host: "http://192.168.2.114:8002"
+ta_username: john
+
+smb_media_vm_username: media_vm
+
 smb_server: 192.168.2.104
 smb_shares:
-  - name: library 
+  - name: library
     target: /mnt/media/library
