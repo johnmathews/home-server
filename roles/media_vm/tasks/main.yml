@@ -72,6 +72,7 @@
     - "{{ media_stack_base_dir }}"
     - "{{ media_stack_mount_dir }}/library/family"
     - "{{ media_stack_mount_dir }}/library/kids"
+    - "{{ media_stack_mount_dir }}/library/youtube"
     - "{{ media_stack_base_dir | dirname }}"
   when: item != "/mnt/media/library/downloads/incomplete"
 

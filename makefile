@@ -38,6 +38,9 @@ traefik:
 immich:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/immich_lxc.yml $(VAULT) $(TAGS)
 
+tube:
+	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/tubearchivist_lxc.yml $(VAULT) $(TAGS)
+
 jellyfin:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/jellyfin_lxc.yml $(VAULT) $(TAGS)
 

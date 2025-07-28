@@ -1,0 +1,12 @@
+# playbooks/immich_lxc.yml
+
+---
+
+- name: Tubearchivist LXC
+  hosts: tubearchivist_lxc
+  gather_facts: true
+  become: true
+
+  roles:
+    - role: tubearchivist_lxc
+      tags: tubearchivist
