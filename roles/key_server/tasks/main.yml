@@ -120,7 +120,3 @@
     name: key-server
     enabled: yes
     state: started
-
-- name: Include Atuin setup
-  ansible.builtin.include_role:
-    name: atuin

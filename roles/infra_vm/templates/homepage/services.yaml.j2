@@ -163,6 +163,16 @@
           showEpisodeNumber: false # optional, defaults to false
           expandOneStreamToTwoRows: false # optional, defaults to true
 
+    - Tubearchivist:
+        href: https://tube.itsa.pizza
+        siteMonitor: https://tube.itsa.pizza
+        description: Youtube archive
+        icon: tubearchivist
+        widget:
+          type: tubearchivist
+          url: https://tube.itsa.pizza
+          key: "{{ vault_tubearchivist_key }}"
+
     - Jellyseerr:
         href: https://seerr.itsa.pizza
         siteMonitor: http://192.168.2.105:5055/

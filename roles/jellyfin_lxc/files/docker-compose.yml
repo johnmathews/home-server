@@ -39,6 +39,7 @@ services:
       - /srv/apps/jellyfin/cache:/cache
       - /mnt/media/library:/library # kids shows, family movies, etc
       - /mnt/media/media:/media # youtube videos, photography videos
+      - /mnt/youtube:/youtube:ro # tubearchivist must be readonly
     privileged: true
 
   # node exporter is running outside docker.

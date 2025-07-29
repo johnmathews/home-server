@@ -8,4 +8,4 @@
 - name: Update containers
   command: docker compose pull
   args:
-    chdir: /srv/media
+    chdir: /srv/apps

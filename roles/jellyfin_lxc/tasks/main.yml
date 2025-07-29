@@ -71,7 +71,3 @@
     group: root
     mode: '0644'
   notify: Restart Docker Compose stack
-
-- name: Include Atuin setup
-  ansible.builtin.include_role:
-    name: atuin
