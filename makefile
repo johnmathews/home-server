@@ -41,6 +41,9 @@ immich:
 tube:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/tubearchivist_lxc.yml $(VAULT) $(TAGS)
 
+prometheus:
+	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/prometheus_lxc.yml $(VAULT) $(TAGS)
+
 jellyfin:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/jellyfin_lxc.yml $(VAULT) $(TAGS)
 
