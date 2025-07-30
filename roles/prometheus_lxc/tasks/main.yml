@@ -1,0 +1,34 @@
+# roles/jellyfin_lxc/tasks/main.yml
+
+---
+
+- name: Create base app directories for containers
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+  loop:
+    - "{{ docker_compose_dir }}/prometheus"
+
+- name: Template Prometheus config
+  template:
+    src: prometheus/prometheus.yml.j2
+    dest: "{{ docker_compose_dir }}/prometheus/prometheus.yml"
+    owner: "{{ docker_user }}"
+    group: docker
+    mode: '0644'
+  notify: Restart Prometheus container
+
+# Copy environment and compose files
+- name: Copy docker-compose.yml
+  template:
+    src: templates/docker-compose.yml.j2
+    dest: /srv/apps/docker-compose.yml
+    mode: '0644'
+    owner: root
+    group: root
+  notify: 
+    - Update containers
+    - Restart Docker Compose stack

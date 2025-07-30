@@ -1,0 +1,12 @@
+# playbooks/immich_lxc.yml
+
+---
+
+- name: Prometheus LXC
+  hosts: prometheus_lxc
+  gather_facts: true
+  become: true
+
+  roles:
+    - role: prometheus_lxc
+      tags: prometheus
