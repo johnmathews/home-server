@@ -1,18 +1,26 @@
 {
   "extends": [
-    "config:base"
+    "config:recommended"
   ],
-  "docker": {
-    "enabled": true
-  },
   "packageRules": [
     {
-      "matchDatasources": ["docker"],
+      "matchCategories": [
+        "docker"
+      ],
+      "enabled": true
+    },
+    {
+      "matchDatasources": [
+        "docker"
+      ],
       "groupName": "All Docker image updates"
     }
   ],
-  "semanticCommits": true,
+  "semanticCommits": "enabled",
   "semanticCommitScope": "deps",
   "timezone": "Europe/Amsterdam",
-  "schedule": ["after 10pm every weekday", "before 6am every weekday"]
+  "schedule": [
+    "after 10pm every weekday",
+    "before 6am every weekday"
+  ]
 }
