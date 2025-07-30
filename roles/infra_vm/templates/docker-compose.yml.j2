@@ -93,9 +93,12 @@ services:
     volumes:
       - /srv/infra/prometheus/data:/prometheus
       - ./prometheus:/etc/prometheus:ro
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.size=4GB"
+      - "--storage.tsdb.retention.time=30d"
     restart: always
-    labels:
-      - "com.centurylinklabs.watchtower.enable=true"  
 
   node-exporter:
     image: prom/node-exporter:latest

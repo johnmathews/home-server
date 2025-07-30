@@ -1,0 +1,18 @@
+{
+  "extends": [
+    "config:base"
+  ],
+  "docker": {
+    "enabled": true
+  },
+  "packageRules": [
+    {
+      "matchDatasources": ["docker"],
+      "groupName": "All Docker image updates"
+    }
+  ],
+  "semanticCommits": true,
+  "semanticCommitScope": "deps",
+  "timezone": "Europe/Amsterdam",
+  "schedule": ["after 10pm every weekday", "before 6am every weekday"]
+}
