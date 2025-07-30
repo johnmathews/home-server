@@ -91,8 +91,8 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - /srv/infra/prometheus/data:/prometheus
       - ./prometheus:/etc/prometheus:ro
+      - /srv/infra/prometheus/data:/prometheus
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--storage.tsdb.path=/prometheus"
