@@ -7,11 +7,6 @@
   args:
     chdir: "{{ docker_compose_dir }}"
 
-- name: Restart promtail container
-  command: docker compose restart promtail
-  args:
-    chdir: "{{ docker_compose_dir }}"
-
 - name: Restart Grafana container
   command: docker compose restart grafana
   args:

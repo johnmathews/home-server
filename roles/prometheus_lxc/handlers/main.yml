@@ -9,3 +9,9 @@
   ansible.builtin.command: docker compose -f /srv/apps/docker-compose.yml up -d
   args:
     chdir: /srv/apps
+
+- name: Restart Prometheus container
+  command: docker compose restart prometheus
+  args:
+    chdir: "{{ docker_compose_dir }}"
+
