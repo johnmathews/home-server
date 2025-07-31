@@ -189,7 +189,3 @@
     recreate: auto
   become: false
 
-# Extra...
-- name: Include Atuin setup
-  ansible.builtin.include_role:
-    name: atuin

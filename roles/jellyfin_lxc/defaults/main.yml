@@ -11,8 +11,6 @@ smb_shares:
     target: /mnt/media/library
   - name: media 
     target: /mnt/media/media
-  - name: immich 
-    target: /mnt/immich
   - name: youtube 
     target: /mnt/youtube
 
