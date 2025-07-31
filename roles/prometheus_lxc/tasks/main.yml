@@ -12,11 +12,20 @@
   loop:
     - "{{ docker_compose_dir }}/prometheus"
 
+
+- name: Ensure Prometheus data directory is owned by UID/GID 65534
+  ansible.builtin.file:
+    path: "{{ docker_compose_dir }}/prometheus/data"
+    state: directory
+    recurse: yes
+    owner: "65534"
+    group: "65534"
+
 - name: Template Prometheus config
   template:
-    src: prometheus/prometheus.yml.j2
+    src: prometheus.yml.j2
     dest: "{{ docker_compose_dir }}/prometheus/prometheus.yml"
-    owner: "{{ docker_user }}"
+    owner: root
     group: docker
     mode: '0644'
   notify: Restart Prometheus container
