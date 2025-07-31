@@ -173,6 +173,16 @@
           url: https://tube.itsa.pizza
           key: "{{ vault_tubearchivist_key }}"
 
+    - Tubearchivist:
+        href: https://kids-tube.itsa.pizza
+        siteMonitor: https://kids-tube.itsa.pizza
+        description: Kids youtube archive
+        icon: sh-youtube
+        widget:
+          type: tubearchivist
+          url: https://kids-tube.itsa.pizza
+          key: "{{ vault_tubearchivist_kids_key }}"
+
     - Jellyseerr:
         href: https://seerr.itsa.pizza
         siteMonitor: http://192.168.2.105:5055/
