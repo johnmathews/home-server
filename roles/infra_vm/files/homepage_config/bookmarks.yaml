@@ -12,12 +12,15 @@
     - Jellyseer:
         - abbr: 
           href: http://192.168.2.105:5055
-    - Jellyseer-kids:
-        - abbr: 
-          href: http://192.168.2.105:5056
     - Paperless:
         - abbr:
           href: http://192.168.2.105:8001
+    - Tubearchivist:
+        - abbr:
+          href: http://192.168.2.114:8000
+    - Tubearchivist:
+        - abbr:
+          href: http://192.168.2.116:8000
     - Sonarr:
         - abbr: 
           href: http://192.168.2.105:8989
