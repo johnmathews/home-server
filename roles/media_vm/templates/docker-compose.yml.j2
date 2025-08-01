@@ -114,9 +114,9 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
     volumes:
+      - /usr/local/bin:/usr/local/bin
       - /srv/media/config/radarr:/config
       - /mnt/media/library:/library
-      - /usr/local/bin:/usr/local/bin
       - /mnt/media/library/downloads:/downloads # keep this so it understands what sabnzbd sees
     ports:
       - "7878:7878"
