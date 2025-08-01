@@ -35,6 +35,7 @@ services:
     devices:
       - /dev/dri:/dev/dri
     volumes:
+      - /srv/apps/jellyfin/plugins/tubearchivist_metadata:/config/plugins/TubeArchivistMetadataKids_1.3.19.0
       - /srv/apps/jellyfin/appdata:/config
       - /srv/apps/jellyfin/cache:/cache
       - /mnt/media/library:/library # kids shows, family movies, etc
