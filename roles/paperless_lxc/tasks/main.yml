@@ -28,7 +28,7 @@
     mode: '0600'
   notify: 
     - Update containers
-    - Restart media stack
+    - Restart all containers
 
 - name: Copy docker-compose.yml
   template:
@@ -39,4 +39,4 @@
     group: root
   notify: 
     - Update containers
-    - Restart Docker Compose stack
+    - Restart all containers

@@ -47,6 +47,9 @@ tube-kids:
 prometheus:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/prometheus_lxc.yml $(VAULT) $(TAGS)
 
+paperless:
+	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/paperless_lxc.yml $(VAULT) $(TAGS)
+
 jelly:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/jellyfin_lxc.yml $(VAULT) $(TAGS)
 
