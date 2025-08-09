@@ -1,0 +1,12 @@
+# playbooks/immich_lxc.yml
+
+---
+
+- name: Paperless LXC
+  hosts: paperless_lxc
+  gather_facts: true
+  become: true
+
+  roles:
+    - role: paperless_lxc
+      tags: paperless
