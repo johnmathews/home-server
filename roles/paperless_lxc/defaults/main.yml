@@ -19,7 +19,7 @@ paperless_smb_subdirectories:
   - name: paperless-consume
     target: /mnt/paperless/consume
   - name: paperless-export
-    target: /mnt/paperless/import
+    target: /mnt/paperless/export
   - name: paperless-media
     target: /mnt/paperless/media
 
