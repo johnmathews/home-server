@@ -6,3 +6,20 @@ docker_user: john
 
 puid: 1001
 guid: 1001
+pgid: 1001
+
+smb_media_vm_username: media_vm
+
+smb_server: 192.168.2.117
+smb_shares:
+  - name: paperless
+    target: /mnt/paperless
+
+paperless_smb_subdirectories:
+  - name: paperless-consume
+    target: /mnt/paperless/consume
+  - name: paperless-export
+    target: /mnt/paperless/import
+  - name: paperless-media
+    target: /mnt/paperless/media
+

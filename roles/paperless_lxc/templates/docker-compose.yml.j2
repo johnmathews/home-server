@@ -22,21 +22,21 @@ services:
     container_name: paperless-broker
     user: "${PUID}:${PGID}"
     image: docker.io/library/redis:8
-    restart: unless-stopped
+    restart: always
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
     volumes:
-      - /srv/apps/paperless/paperless-redisdata:/data
+      - "{{ docker_compose_dir }}//paperless/redisdata:/data"
 
   paperless-db:
     container_name: paperless-db
     user: "${PUID}:${PGID}"
     image: docker.io/library/postgres:17
-    restart: unless-stopped
+    restart: always
     volumes:
-      - /srv/apps/paperless/paperless-pgdata:/var/lib/postgresql/data
+      - "{{ docker_compose_dir }}/paperless/pgdata:/var/lib/postgresql/data"
     environment:
       POSTGRES_DB: paperless
       POSTGRES_USER: paperless
@@ -47,19 +47,19 @@ services:
 
   paperless-webserver:
     container_name: paperless-webserver
-    user: "${PUID}:${PGID}"
+    # user: "${PUID}:${PGID}"
     image: ghcr.io/paperless-ngx/paperless-ngx:latest
-    restart: unless-stopped
+    restart: always
     depends_on:
       - paperless-db
       - paperless-broker
     ports:
-      - "8001:8000"
+      - "8000:8000"
     volumes:
-      - /srv/apps/paperless/paperless-data:/usr/src/paperless/data
-      - /srv/apps/paperless/paperless-media:/usr/src/paperless/media
-      - /srv/apps/paperless/export:/usr/src/paperless/export
-      - /srv/apps/paperless/consume:/usr/src/paperless/consume
+      - "/mnt/paperless/media:/usr/src/paperless/media"
+      - "/mnt/paperless/export:/usr/src/paperless/export"
+      - "/mnt/paperless/consume:/usr/src/paperless/consume"
+      - "{{ docker_compose_dir }}/paperless/data:/usr/src/paperless/data"
     env_file: .env
     environment:
       PAPERLESS_REDIS: redis://paperless-broker:6379

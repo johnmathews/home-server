@@ -1,42 +1,152 @@
-# roles/jellyfin_lxc/tasks/main.yml
+# roles/paperless_lxc/tasks/main.yml
 
 ---
 
-- name: Create base app directories for containers
+- name: Ensure CIFS client is installed
+  ansible.builtin.apt:
+    name: cifs-utils
+    state: present
+    update_cache: yes
+
+- name: Create directory for SMB credentials
+  ansible.builtin.file:
+    path: /etc/smb
+    state: directory
+    mode: '0750'
+    owner: root
+    group: root
+
+- name: Create SMB credentials file
+  ansible.builtin.copy:
+    dest: /etc/smb/.smbcredentials
+    content: |
+      username={{ smb_media_vm_username }}
+      password={{ vault_smb_media_vm_password }}
+    owner: root
+    group: root
+    mode: '0600'
+
+- name: Create local mountpoints for SMB shares
+  ansible.builtin.file:
+    path: "{{ item.target }}"
+    state: directory
+    mode: '0755'
+  loop: "{{ smb_shares }}"
+
+- name: Ensure SMB shares in fstab with automount and uid/gid mapping
+  ansible.builtin.mount:
+    path: "{{ item.target }}"
+    src: "//{{ smb_server }}/{{ item.name }}"
+    fstype: cifs
+    opts: >-
+      credentials=/etc/smb/.smbcredentials,iocharset=utf8,noperm,nofail,noauto,
+      x-systemd.automount,x-systemd.device-timeout=10,_netdev,vers=3.0,
+      uid={{ puid }},gid={{ pgid }},forceuid,forcegid,file_mode=0664,dir_mode=0775
+    state: present
+  loop: "{{ smb_shares }}"
+
+- name: Reload systemd to pick up automount units
+  ansible.builtin.command: systemctl daemon-reload
+  changed_when: false
+
+- name: Stop any active mounts (best-effort)
+  ansible.builtin.command: umount -l {{ item.target }}
+  register: umount_result
+  changed_when: "'not mounted' not in umount_result.stderr | default('')"
+  failed_when: false
+  loop: "{{ smb_shares }}"
+
+- name: Start and enable automount units (best-effort)
+  ansible.builtin.service:
+    name: "{{ (item.target | regex_replace('^/', '') | regex_replace('/', '-')) + '.automount' }}"
+    state: started
+    enabled: yes
+  loop: "{{ smb_shares }}"
+  failed_when: false
+
+- name: Prime automount by touching path
+  ansible.builtin.command: ls -la {{ item.target }}
+  changed_when: false
+  failed_when: false
+  loop: "{{ smb_shares }}"
+
+# Start automounts only if systemd has generated them (avoids the “service … not found” error)
+- name: Gather service facts
+  ansible.builtin.service_facts:
+
+- name: Start and enable automount units (best-effort)
+  ansible.builtin.service:
+    name: "{{ (item.target | regex_replace('^/', '') | regex_replace('/', '-')) + '.automount' }}"
+    state: started
+    enabled: yes
+  loop: "{{ smb_shares }}"
+  when: >
+    (ansible_facts.services is defined) and
+    (((item.target | regex_replace('^/', '') | regex_replace('/', '-')) + '.automount')
+     in ansible_facts.services)
+
+# --- Local volumes used by your compose file ---
+# {{ docker_compose_dir }}/paperless/data      -> /usr/src/paperless/data
+# {{ docker_compose_dir }}/paperless/pgdata    -> postgres data dir
+# {{ docker_compose_dir }}/paperless/redisdata -> redis data dir
+- name: Ensure local Paperless volumes exist and are owned by puid/pgid
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
-    mode: '0755'
-    owner: root
-    group: root
-  loop:
-    - "{{ docker_compose_dir }}/paperless"
-
-
-- name: Ensure Paperless data directory is owned by UID/GID 65534
-  ansible.builtin.file:
-    path: "{{ docker_compose_dir }}/paperless/data"
-    state: directory
+    owner: "{{ puid }}"
+    group: "{{ pgid }}"
+    mode: '0775'
     recurse: yes
-    owner: "65534"
-    group: "65534"
+  loop:
+    - "{{ docker_compose_dir }}/paperless/data"
+    - "{{ docker_compose_dir }}/paperless/pgdata"
+    - "{{ docker_compose_dir }}/paperless/redisdata"
 
+# --- Directories on the SMB share (automounted at /mnt/paperless) ---
+# Compose maps these:
+#   /mnt/paperless/media   -> /usr/src/paperless/media
+#   /mnt/paperless/export  -> /usr/src/paperless/export
+#   /mnt/paperless/consume -> /usr/src/paperless/consume
+- name: Ensure expected directories exist on the SMB share
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0775'
+  loop:
+    - /mnt/paperless/media
+    - /mnt/paperless/export
+    - /mnt/paperless/consume
+
+# --- Render env & compose; handlers will bounce containers if changed ---
 - name: Create environment file from template
-  template:
+  ansible.builtin.template:
     src: .env.j2
     dest: "{{ docker_compose_dir }}/.env"
     mode: '0600'
-  notify: 
+  notify:
     - Update containers
     - Restart all containers
 
 - name: Copy docker-compose.yml
-  template:
+  ansible.builtin.template:
     src: templates/docker-compose.yml.j2
     dest: "{{ docker_compose_dir }}/docker-compose.yml"
     mode: '0644'
     owner: root
     group: root
-  notify: 
+  notify:
     - Update containers
     - Restart all containers
+
+- name: Ensure local Paperless volumes exist and are owned by puid/pgid
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ puid }}"
+    group: "{{ pgid }}"
+    mode: '0775'
+    recurse: yes
+  loop:
+    - "{{ docker_compose_dir }}/paperless/data"
+    - "{{ docker_compose_dir }}/paperless/pgdata"
+    - "{{ docker_compose_dir }}/paperless/redisdata"
