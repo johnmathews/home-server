@@ -213,17 +213,6 @@ services:
       - /srv/media/config/jellyseer:/app/config
     restart: always
 
-  # jellyseerr-kids:
-  #   image: fallenbagel/jellyseerr:latest
-  #   container_name: jellyseerr-kids
-  #   ports:
-  #     - 5056:5055
-  #   environment:
-  #     - LOG_LEVEL=info
-  #   volumes:
-  #     - /srv/media/config/jellyseer-kids:/app/config
-  #   restart: always
-
   bazarr:
     image: linuxserver/bazarr
     container_name: bazarr
