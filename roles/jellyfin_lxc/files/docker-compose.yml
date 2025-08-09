@@ -31,7 +31,7 @@ services:
       - "8096:8096"
     environment:
       - TZ=Europe/Amsterdam
-      - JELLYFIN_PublishedServerUrl=http://localhost:8096
+      - JELLYFIN_PublishedServerUrl=http://192.168.2.110:8096
     devices:
       - /dev/dri:/dev/dri
     volumes:
@@ -40,8 +40,13 @@ services:
       - /srv/apps/jellyfin/cache:/cache
       - /mnt/media/library:/library # kids shows, family movies, etc
       - /mnt/media/media:/media # youtube videos, photography videos
-      - /mnt/youtube:/youtube:ro # tubearchivist lib must be readonly
-      - /mnt/youtube-kids:/youtube-kids:ro # tubearchivist lib must be readonly
+      - /mnt/youtube:/youtube # tubearchivist lib must be readonly
+      - /mnt/youtube-kids:/youtube-kids # tubearchivist lib must be readonly
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "10"
     privileged: true
 
   # node exporter is running outside docker.
