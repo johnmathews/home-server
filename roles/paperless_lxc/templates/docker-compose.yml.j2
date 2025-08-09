@@ -1,0 +1,69 @@
+# vim: ft=yaml
+# jellyfin_lxc/files/docker-compose.yml
+
+---
+
+services:
+  # node exporter is running outside docker.
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    restart: always
+    ports:
+      - "18080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    privileged: true  # required for some metrics
+
+  paperless-broker:
+    container_name: paperless-broker
+    user: "${PUID}:${PGID}"
+    image: docker.io/library/redis:8
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - /srv/apps/paperless/paperless-redisdata:/data
+
+  paperless-db:
+    container_name: paperless-db
+    user: "${PUID}:${PGID}"
+    image: docker.io/library/postgres:17
+    restart: unless-stopped
+    volumes:
+      - /srv/apps/paperless/paperless-pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: paperless
+      POSTGRES_USER: paperless
+      POSTGRES_PASSWORD: paperless
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+
+  paperless-webserver:
+    container_name: paperless-webserver
+    user: "${PUID}:${PGID}"
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    restart: unless-stopped
+    depends_on:
+      - paperless-db
+      - paperless-broker
+    ports:
+      - "8001:8000"
+    volumes:
+      - /srv/apps/paperless/paperless-data:/usr/src/paperless/data
+      - /srv/apps/paperless/paperless-media:/usr/src/paperless/media
+      - /srv/apps/paperless/export:/usr/src/paperless/export
+      - /srv/apps/paperless/consume:/usr/src/paperless/consume
+    env_file: .env
+    environment:
+      PAPERLESS_REDIS: redis://paperless-broker:6379
+      PAPERLESS_DBHOST: paperless-db
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
