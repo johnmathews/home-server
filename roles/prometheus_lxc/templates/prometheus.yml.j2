@@ -38,6 +38,9 @@ scrape_configs:
       - targets: ['192.168.2.116:18080']
         labels:
           instance: tubearchivist_kids_lxc 
+      - targets: ['192.168.2.117:18080']
+        labels:
+          instance: paperless_lxc 
 
   - job_name: 'node-exporter'
     scrape_interval: 15s

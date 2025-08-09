@@ -56,10 +56,10 @@ services:
     ports:
       - "8000:8000"
     volumes:
+      - "{{ docker_compose_dir }}/paperless/data:/usr/src/paperless/data"
       - "/mnt/paperless/media:/usr/src/paperless/media"
       - "/mnt/paperless/export:/usr/src/paperless/export"
       - "/mnt/paperless/consume:/usr/src/paperless/consume"
-      - "{{ docker_compose_dir }}/paperless/data:/usr/src/paperless/data"
     env_file: .env
     environment:
       PAPERLESS_REDIS: redis://paperless-broker:6379
