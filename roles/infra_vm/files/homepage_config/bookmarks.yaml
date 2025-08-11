@@ -41,15 +41,15 @@
           href: http://192.168.2.110:8000
 
 - Infra Apps:
+    - TrueNAS:
+        - abbr: 
+          href: http://192.168.2.104
     - Grafana:
         - abbr: 
           href: http://192.168.2.106:3000
     - Prometheus:
         - abbr: 
-          href: http://192.168.2.106:9090
-    - Ntfy:
-        - abbr: 
-          href: http://192.168.2.106:8183
+          href: http://192.168.2.115:9090
     - Uptime Kuma:
         - abbr:
           href: http://192.168.2.106:3001
@@ -66,9 +66,6 @@
           href: https://192.168.2.13:8000
 
 - Hardware_:
-    - TrueNAS:
-        - abbr: 
-          href: http://192.168.2.104:5000
     - ProxMox:
         - abbr: 
           href: http://192.168.2.214:8006
