@@ -9,8 +9,9 @@ guid: 1001
 pgid: 1001
 
 smb_media_vm_username: media_vm
+smb_proxmox_username: proxmox_smb_user
 
-smb_server: 192.168.2.117
+smb_server: 192.168.2.104
 smb_shares:
   - name: paperless
     target: /mnt/paperless

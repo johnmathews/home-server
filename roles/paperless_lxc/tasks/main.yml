@@ -2,9 +2,9 @@
 #
 ---
 
-- name: Ensure CIFS client packages are installed
+- name: Ensure cifs-utils is installed
   ansible.builtin.apt:
-    name: [cifs-utils, keyutils]
+    name: cifs-utils
     state: present
     update_cache: yes
 
@@ -16,126 +16,61 @@
     owner: root
     group: root
 
+# - name: Create SMB credentials file
+#   ansible.builtin.copy:
+#     dest: "/etc/smb/.smbcredentials"
+#     content: |
+#       username={{ smb_media_vm_username }}
+#       password={{ vault_smb_media_vm_password }}
+#     owner: root
+#     group: root
+#     mode: '0600'
+
 - name: Create SMB credentials file
   ansible.builtin.copy:
-    dest: /etc/smb/.smbcredentials
+    dest: "/etc/smb/.smbcredentials"
     content: |
-      username={{ smb_media_vm_username }}
-      password={{ vault_smb_media_vm_password }}
-      {% if smb_domain is defined and smb_domain|length > 0 -%}
-      domain={{ smb_domain }}
-      {%- endif %}
+      username={{ smb_proxmox_username }}
+      password={{ vault_smb_proxmox_password }}
     owner: root
     group: root
     mode: '0600'
 
-- name: Create local mountpoints for SMB shares
+- name: Persist SMB mount in /etc/fstab
+  ansible.builtin.lineinfile:
+    path: /etc/fstab
+    regexp: '^//{{ smb_server }}/{{ item.name }}[ \t]+'
+    line: "//{{ smb_server }}/{{ item.name }} {{ item.target }} cifs credentials=/etc/smb/.smbcredentials,iocharset=utf8,noperm,nofail,noauto,x-systemd.automount,x-systemd.device-timeout=10,_netdev,vers=3.0 0 0"
+    state: present
+    create: yes
+  loop: "{{ smb_shares }}"
+
+- name: Create local mount point
   ansible.builtin.file:
     path: "{{ item.target }}"
     state: directory
     mode: '0755'
   loop: "{{ smb_shares }}"
 
-- name: Ensure SMB shares in fstab with systemd automount and uid/gid mapping
-  ansible.builtin.mount:
+- name: Mount SMB shares
+  mount:
     path: "{{ item.target }}"
     src: "//{{ smb_server }}/{{ item.name }}"
     fstype: cifs
-    opts: >-
-      credentials=/etc/smb/.smbcredentials,iocharset=utf8,noperm,nofail,noauto,
-      x-systemd.automount,x-systemd.idle-timeout=60,_netdev,
-      x-systemd.requires=network-online.target,vers=3.1.1,mfsymlinks,noserverino,
-      uid={{ puid }},gid={{ pgid }},forceuid,forcegid,file_mode=0664,dir_mode=0775
-    state: present
+    opts: credentials=/etc/smb/.smbcredentials,iocharset=utf8,noperm,nofail,vers=3.0
+    state: mounted
   loop: "{{ smb_shares }}"
 
-- name: Reload systemd to pick up automount units
-  ansible.builtin.command:
-    argv: [systemctl, daemon-reload]
-  changed_when: false
-
-# Optional: try to enable wait-online if available (avoids race on boot)
-- name: Enable systemd-networkd-wait-online when present (best-effort)
-  ansible.builtin.command:
-    argv: [systemctl, enable, --now, systemd-networkd-wait-online.service]
-  register: wait_online_out
-  changed_when: "'Created symlink' in (wait_online_out.stdout | default('')) or 'Created symlink' in (wait_online_out.stderr | default(''))"
-  failed_when: false
-
-- name: Compute automount unit names
-  ansible.builtin.command:
-    argv: [systemd-escape, -p, --suffix=automount, "{{ item.target }}"]
-  register: escaped_units
-  loop: "{{ smb_shares }}"
-  loop_control:
-    index_var: idx
-  changed_when: false
-
-- name: Start and enable automount units
-  ansible.builtin.service:
-    name: "{{ escaped_units.results[idx].stdout }}"
-    state: started
-    enabled: yes
-  loop: "{{ smb_shares }}"
-  loop_control:
-    index_var: idx
-  failed_when: false
-
-- name: Prime automounts by listing paths (triggers mount)
-  ansible.builtin.command:
-    argv: [ls, -la, "{{ item.target }}"]
-  changed_when: false
-  failed_when: false
-  loop: "{{ smb_shares }}"
-
-- name: Verify SMB mounts are CIFS
-  ansible.builtin.command:
-    argv: [findmnt, -T, "{{ item.target }}", -no, FSTYPE]
-  register: fstype_checks
-  changed_when: false
-  loop: "{{ smb_shares }}"
-
-- name: Assert all SMB mounts are CIFS
-  ansible.builtin.assert:
-    that:
-      - fstype_checks.results | map(attribute='stdout') | list
-        | select('equalto', 'cifs') | list | length == (smb_shares | length)
-    fail_msg: "One or more SMB targets are not mounted as CIFS. Check TrueNAS share, network readiness, or credentials."
-    success_msg: "All SMB targets are mounted as CIFS."
-
-# --- Local volumes used by your compose file ---
-# {{ docker_compose_dir }}/paperless/data      -> /usr/src/paperless/data
-# {{ docker_compose_dir }}/paperless/pgdata    -> postgres data dir
-# {{ docker_compose_dir }}/paperless/redisdata -> redis data dir
-- name: Ensure local Paperless volumes exist and are owned by puid/pgid
+- name: Create base app directories for containers
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
-    owner: "{{ puid }}"
-    group: "{{ pgid }}"
-    mode: '0775'
-    recurse: yes
+    mode: '0755'
+    owner: root
+    group: root
   loop:
-    - "{{ docker_compose_dir }}/paperless/data"
-    - "{{ docker_compose_dir }}/paperless/pgdata"
-    - "{{ docker_compose_dir }}/paperless/redisdata"
+    - /srv/apps/paperless/data
 
-# --- Directories on the SMB share (automounted at /mnt/paperless) ---
-# Compose maps these:
-#   /mnt/paperless/media   -> /usr/src/paperless/media
-#   /mnt/paperless/export  -> /usr/src/paperless/export
-#   /mnt/paperless/consume -> /usr/src/paperless/consume
-- name: Ensure expected directories exist on the SMB share
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: directory
-    mode: '0775'
-  loop:
-    - /mnt/paperless/media
-    - /mnt/paperless/export
-    - /mnt/paperless/consume
-
-# --- Render env & compose; handlers will bounce containers if changed ---
 - name: Create environment file from template
   ansible.builtin.template:
     src: .env.j2

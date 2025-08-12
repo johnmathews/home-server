@@ -1,5 +1,5 @@
 # vim: ft=yaml
-# jellyfin_lxc/files/docker-compose.yml
+# paperless_lxc/files/docker-compose.yml
 
 ---
 
@@ -32,7 +32,6 @@ services:
 
   paperless-db:
     container_name: paperless-db
-    user: "${PUID}:${PGID}"
     image: docker.io/library/postgres:17
     restart: always
     volumes:
