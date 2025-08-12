@@ -163,16 +163,6 @@
           showEpisodeNumber: false # optional, defaults to false
           expandOneStreamToTwoRows: false # optional, defaults to true
 
-    - Tubearchivist:
-        href: https://tube.itsa.pizza
-        siteMonitor: https://tube.itsa.pizza
-        description: Youtube archive
-        icon: sh-youtube
-        widget:
-          type: tubearchivist
-          url: https://tube.itsa.pizza
-          key: "{{ vault_tubearchivist_key }}"
-
     - Kids Tubearchivist:
         href: https://kids-tube.itsa.pizza
         siteMonitor: https://kids-tube.itsa.pizza
@@ -192,16 +182,6 @@
           type: jellyseerr
           url: http://192.168.2.105:5055/
           key: "{{ vault_jellyseerr_key }}"
-
-    # - Jellyseerr-kids:
-    #     href: http://192.168.2.105:5056
-    #     siteMonitor: http://192.168.2.105:5056
-    #     description: TV
-    #     icon: jellyseerr
-    #     widget:
-    #       type: jellyseerr
-    #       url: http://192.168.2.105:5056
-    #       key: "{{ vault_jellyseerr_kids_key }}"
 
     - Immich:
         href: http://immich.itsa.pizza
@@ -357,7 +337,7 @@
     - Usenet.farm:
         description: 15 September approx
     - Usenet Express.info:
-        description: 500GB block. 1 4jblock per account
+        description: 500GB block. 1 block per account
     - NZBGeek.info:
         description: 26 November 10:48
     - Usage Metrics:
