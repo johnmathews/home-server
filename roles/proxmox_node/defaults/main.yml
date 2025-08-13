@@ -6,7 +6,7 @@ proxmox_api_user: "api@pve"
 
 ## no smb shares on proxmox itself because it boots before the trueNAS VM is ready.
 ## all apps that need smb shares now run in LXC containers with boot_order=2
-# smb_proxmox_username: proxmox_host
+# smb_username: smb_user
 # smb_server: 192.168.2.104
 # smb_shares:
 #   - name: library 

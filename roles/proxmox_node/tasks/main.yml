@@ -90,8 +90,3 @@
       systemd:
         name: hdparm.service
         state: started
-
-
-- name: Include Atuin setup
-  ansible.builtin.include_role:
-    name: atuin

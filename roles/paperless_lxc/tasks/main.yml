@@ -30,8 +30,8 @@
   ansible.builtin.copy:
     dest: "/etc/smb/.smbcredentials"
     content: |
-      username={{ smb_proxmox_username }}
-      password={{ vault_smb_proxmox_password }}
+      username={{ smb_username }}
+      password={{ vault_smb_username_password }}
     owner: root
     group: root
     mode: '0600'

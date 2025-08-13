@@ -50,31 +50,31 @@
     enabled: yes
     state: started
 
-- name: Create required Jellyfin directories
-  file:
-    path: "{{ item }}"
-    state: directory
-    owner: root
-    group: root
-    mode: '0755'
-  loop:
-    - /srv/apps/jellyfin/config
-    - /srv/apps/jellyfin/cache
-
-- name: Create required Immich directory
-  file:
-    path: "{{ item }}"
-    state: directory
-    owner: root
-    group: root
-    mode: '0755'
-  loop:
-    - /srv/apps/immich/postgres
-
 - name: Install CIFS utilities
   apt:
     name: cifs-utils
     state: present
+
+# - name: Create required Jellyfin directories
+#   file:
+#     path: "{{ item }}"
+#     state: directory
+#     owner: root
+#     group: root
+#     mode: '0755'
+#   loop:
+#     - /srv/apps/jellyfin/config
+#     - /srv/apps/jellyfin/cache
+
+# - name: Create required Immich directory
+#   file:
+#     path: "{{ item }}"
+#     state: directory
+#     owner: root
+#     group: root
+#     mode: '0755'
+#   loop:
+#     - /srv/apps/immich/postgres
 
 # - name: Ensure SMB mount directories exist (create if missing)
 #   file:
@@ -95,8 +95,8 @@
 #   copy:
 #     dest: /root/.smbcredentials
 #     content: |
-#       username={{ smb_proxmox_username }}
-#       password={{ vault_smb_proxmox_password }}
+#       username={{ smb_username }}
+#       password={{ vault_smb_username_password }}
 #     owner: root
 #     group: root
 #     mode: '0600'
