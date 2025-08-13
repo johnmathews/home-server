@@ -36,7 +36,7 @@
       uid={{ puid }},gid={{ pgid }},
       dir_mode=0775,file_mode=0664,
       iocharset=utf8,cache=none,noserverino,nounix,noperm,nofail,noauto,
-      x-systemd.automount,x-systemd.device-timeout=10,_netdev,vers=3.0 0 0
+      x-systemd.automount,x-systemd.device-timeout=10,_netdev,vers=3.1.1 0 0
     state: present
     create: yes
   loop: "{{ smb_shares }}"
@@ -53,7 +53,7 @@
     path: "{{ item.target }}"
     src: "//{{ smb_server }}/{{ item.name }}"
     fstype: cifs
-    opts: credentials=/etc/smb/.smbcredentials,iocharset=utf8,noperm,nofail,vers=3.0
+    opts: credentials=/etc/smb/.smbcredentials,iocharset=utf8,noperm,nofail,vers=3.1.1
     state: mounted
   loop: "{{ smb_shares }}"
 

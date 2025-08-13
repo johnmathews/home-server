@@ -30,7 +30,7 @@
   ansible.builtin.lineinfile:
     path: /etc/fstab
     regexp: '^//{{ smb_server }}/{{ item.name }}[ \t]+'
-    line: "//{{ smb_server }}/{{ item.name }} {{ item.target }} cifs credentials=/etc/smb/.smbcredentials,iocharset=utf8,noperm,nofail,noauto,x-systemd.automount,x-systemd.device-timeout=10,_netdev,vers=3.0 0 0"
+    line: "//{{ smb_server }}/{{ item.name }} {{ item.target }} cifs credentials=/etc/smb/.smbcredentials,iocharset=utf8,noperm,nofail,noauto,x-systemd.automount,x-systemd.device-timeout=10,_netdev,vers=3.1.1 0 0"
     state: present
     create: yes
   loop: "{{ smb_shares }}"
@@ -47,7 +47,7 @@
     path: "{{ item.target }}"
     src: "//{{ smb_server }}/{{ item.name }}"
     fstype: cifs
-    opts: credentials=/etc/smb/.smbcredentials,iocharset=utf8,noperm,nofail,vers=3.0
+    opts: credentials=/etc/smb/.smbcredentials,iocharset=utf8,noperm,nofail,vers=3.1.1
     state: mounted
   loop: "{{ smb_shares }}"
 
