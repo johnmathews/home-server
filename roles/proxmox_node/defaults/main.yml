@@ -50,3 +50,24 @@ pve_exporter_listen_port: 9221
 hdparm_disk_id: ata-ST3000DM007-1WY10G_ZFN1TN5X # this is the PBS HDD.
 hdparm_apm: 128
 hdparm_spindown: 240
+
+################################
+################################
+### NUT
+nut_shutdown_threshold: 50
+
+nut_ups_name: "ups"
+nut_mode: "standalone"          # standalone / netserver / none
+nut_driver: "usbhid-ups"
+nut_port: "auto"
+nut_desc: "Home Server UPS (CyberPower CP900EPFCLCD)"
+nut_vendorid: "0764"
+nut_productid: "0501"
+nut_pollinterval: 5
+
+# upsmon user (store passwords in vault!)
+nut_admin_user: "admin"
+nut_admin_pass: "{{ vault_nut_admin_pass }}"
+nut_mon_user: "monuser"
+nut_mon_pass: "{{ vault_nut_mon_pass }}"
+nut_mon_role: "master"          # master/slave

@@ -1,0 +1,138 @@
+- name: Install NUT packages
+  ansible.builtin.apt:
+    name:
+      - nut
+      - nut-client
+      - nut-server
+    state: present
+    update_cache: yes
+
+- name: Ensure NUT config dir exists
+  ansible.builtin.file:
+    path: /etc/nut
+    state: directory
+    mode: "0755"
+
+- name: Configure mode (/etc/nut/nut.conf)
+  ansible.builtin.template:
+    src: nut.conf.j2
+    dest: /etc/nut/nut.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - Restart nut-server
+    - Restart nut-monitor
+
+- name: Configure UPS driver (/etc/nut/ups.conf)
+  ansible.builtin.template:
+    src: ups.conf.j2
+    dest: /etc/nut/ups.conf
+    owner: root
+    group: nut
+    mode: "0640"
+  notify:
+    - Restart nut-server
+    - Restart nut-monitor
+
+- name: Configure NUT users (/etc/nut/upsd.users)
+  ansible.builtin.template:
+    src: upsd.users.j2
+    dest: /etc/nut/upsd.users
+    owner: root
+    group: nut
+    mode: "0640"
+  notify:
+    - Restart nut-server
+    - Restart nut-monitor
+
+- name: Configure upsmon (/etc/nut/upsmon.conf)
+  ansible.builtin.template:
+    src: upsmon.conf.j2
+    dest: /etc/nut/upsmon.conf
+    owner: root
+    group: root
+    mode: "0640"
+  notify:
+    - Restart nut-server
+    - Restart nut-monitor
+
+# ---- battery threshold shutdown (systemd timer) ----
+- name: Install battery monitor script
+  ansible.builtin.template:
+    src: ups-battery-monitor.sh.j2
+    dest: /usr/local/sbin/ups-battery-monitor.sh
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Install systemd service for battery monitor
+  ansible.builtin.template:
+    src: ups-battery-monitor.service.j2
+    dest: /etc/systemd/system/ups-battery-monitor.service
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Install systemd timer for battery monitor (every minute)
+  ansible.builtin.template:
+    src: ups-battery-monitor.timer.j2
+    dest: /etc/systemd/system/ups-battery-monitor.timer
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - Systemd daemon-reload
+    - Restart ups-battery-monitor.timer
+
+- name: Configure upsd (/etc/nut/upsd.conf)
+  ansible.builtin.template:
+    src: upsd.conf.j2
+    dest: /etc/nut/upsd.conf
+    owner: root
+    group: nut
+    mode: "0640"
+  notify:
+    - Restart nut-server
+    - Restart nut-monitor
+
+- name: Reload systemd units
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: Enable and start NUT services
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    enabled: true
+    state: started
+  loop:
+    - nut-server
+    - nut-monitor
+
+- name: Enable and start battery monitor timer
+  ansible.builtin.systemd:
+    name: ups-battery-monitor.timer
+    enabled: true
+    state: started
+  notify:
+    - Systemd daemon-reload
+    - Restart ups-battery-monitor.timer
+
+- name: Wait for NUT upsd to listen on 127.0.0.1:3493
+  ansible.builtin.wait_for:
+    host: 127.0.0.1
+    port: 3493
+    timeout: 15
+
+
+# # Optional: quick sanity check (won't change state)
+# - name: Read battery charge via upsc
+#   ansible.builtin.command: "upsc {{ nut_ups_name }}@localhost battery.charge"
+#   register: upsc_batt
+#   changed_when: false
+#   failed_when: upsc_batt.rc != 0
+
+# - name: Debug current battery charge
+#   ansible.builtin.debug:
+#     msg: "UPS battery charge: {{ upsc_batt.stdout | default('unknown') }}%"
+#   when: upsc_batt is defined

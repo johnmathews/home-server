@@ -1,0 +1,8 @@
+[Unit]
+Description=UPS battery threshold monitor
+Wants=nut-server.service nut-monitor.service
+After=nut-server.service nut-monitor.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/ups-battery-monitor.sh
