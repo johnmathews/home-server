@@ -45,7 +45,6 @@ services:
 
   paperless-webserver:
     container_name: paperless-webserver
-    # user: "${PUID}:${PGID}"
     image: ghcr.io/paperless-ngx/paperless-ngx:latest
     restart: always
     depends_on:

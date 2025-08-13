@@ -35,13 +35,31 @@
     create: yes
   loop: "{{ smb_shares }}"
 
-- name: Create local mount point
-  ansible.builtin.file:
-    path: "{{ item.target }}"
+# ensure CIFS tools are present (inside the container)
+- name: Ensure CIFS client packages are installed
+  apt:
+    name: cifs-utils
+    state: present
+  become: true
+  tags: cifs
+
+# create parent dirs first (so nested targets work)
+- name: Create parent mountpoint dirs
+  file:
+    path: "{{ item.target | dirname }}"
     state: directory
-    mode: '0755'
+    mode: "0755"
   loop: "{{ smb_shares }}"
 
+# create the actual mountpoint dirs
+- name: Create mountpoints
+  file:
+    path: "{{ item.target }}"
+    state: directory
+    mode: "0775"
+  loop: "{{ smb_shares }}"
+
+# now mount
 - name: Mount SMB shares
   mount:
     path: "{{ item.target }}"

@@ -27,3 +27,25 @@
   systemd:
     name: glances
     state: restarted
+
+- name: Restart nut-server
+  ansible.builtin.systemd:
+    name: nut-server
+    state: restarted
+    enabled: true
+
+- name: Restart nut-monitor
+  ansible.builtin.systemd:
+    name: nut-monitor
+    state: restarted
+    enabled: true
+
+- name: Systemd daemon-reload
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: Restart ups-battery-monitor.timer
+  ansible.builtin.systemd:
+    name: ups-battery-monitor.timer
+    state: restarted
+    enabled: true
