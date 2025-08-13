@@ -16,16 +16,6 @@
     owner: root
     group: root
 
-# - name: Create SMB credentials file
-#   ansible.builtin.copy:
-#     dest: "/etc/smb/.smbcredentials"
-#     content: |
-#       username={{ smb_media_vm_username }}
-#       password={{ vault_smb_media_vm_password }}
-#     owner: root
-#     group: root
-#     mode: '0600'
-
 - name: Create SMB credentials file
   ansible.builtin.copy:
     dest: "/etc/smb/.smbcredentials"
