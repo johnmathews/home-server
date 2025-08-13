@@ -20,7 +20,6 @@ services:
 
   paperless-broker:
     container_name: paperless-broker
-    user: "${PUID}:${PGID}"
     image: docker.io/library/redis:8
     restart: always
     environment:
@@ -65,4 +64,6 @@ services:
       PAPERLESS_DBHOST: paperless-db
       PUID: ${PUID}
       PGID: ${PGID}
+      USERMAP_UID: ${PUID}
+      USERMAP_GID: ${PGID}
       TZ: ${TZ}

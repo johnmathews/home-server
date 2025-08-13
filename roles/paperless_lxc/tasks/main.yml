@@ -39,8 +39,14 @@
 - name: Persist SMB mount in /etc/fstab
   ansible.builtin.lineinfile:
     path: /etc/fstab
-    regexp: '^//{{ smb_server }}/{{ item.name }}[ \t]+'
-    line: "//{{ smb_server }}/{{ item.name }} {{ item.target }} cifs credentials=/etc/smb/.smbcredentials,iocharset=utf8,noperm,nofail,noauto,x-systemd.automount,x-systemd.device-timeout=10,_netdev,vers=3.0 0 0"
+    regexp: '^//{{ smb_server | regex_escape }}/{{ item.name | regex_escape }}[ \t]+'
+    line: >-
+      //{{ smb_server }}/{{ item.name }} {{ item.target }} cifs
+      credentials=/etc/smb/.smbcredentials,
+      uid={{ puid }},gid={{ pgid }},
+      dir_mode=0775,file_mode=0664,
+      iocharset=utf8,cache=none,noserverino,nounix,noperm,nofail,noauto,
+      x-systemd.automount,x-systemd.device-timeout=10,_netdev,vers=3.0 0 0
     state: present
     create: yes
   loop: "{{ smb_shares }}"
@@ -89,4 +95,34 @@
     group: root
   notify:
     - Update containers
+    - Restart all containers
+
+- name: Ensure paperless data directory ownership
+  file:
+    path: /srv/apps/paperless/data
+    state: directory
+    owner: "{{ puid }}"
+    group: "{{ guid }}"
+    mode: '0755'
+  notify:
+    - Restart all containers
+
+- name: Ensure Postgres data directory ownership
+  file:
+    path: /srv/apps/paperless/pgdata
+    state: directory
+    owner: 999
+    group: 999
+    mode: '0700'
+  notify:
+    - Restart all containers
+
+- name: Ensure Redis data directory ownership
+  file:
+    path: /srv/apps/paperless/redisdata
+    state: directory
+    owner: 999
+    group: 999
+    mode: '0755'
+  notify:
     - Restart all containers

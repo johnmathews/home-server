@@ -2,7 +2,7 @@ TZ: Europe/Amsterdam
 
 proxmox_api_user: "api@pve"
 
-smb_proxmox_username: proxmox_smb_user
+smb_proxmox_username: proxmox_host
 smb_media_vm_username: media_vm
 
 smb_server: 192.168.2.104
@@ -11,8 +11,6 @@ smb_shares:
     target: /mnt/media/library
   - name: media 
     target: /mnt/media/media
-  - name: youtube 
-    target: /mnt/youtube
   - name: youtube-kids 
     target: /mnt/youtube-kids
 
