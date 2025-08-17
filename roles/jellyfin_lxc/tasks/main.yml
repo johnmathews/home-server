@@ -34,6 +34,7 @@
     state: present
     create: yes
   loop: "{{ smb_shares }}"
+  notify: Restart Docker
 
 - name: Create local mount point
   ansible.builtin.file:
@@ -41,6 +42,7 @@
     state: directory
     mode: '0755'
   loop: "{{ smb_shares }}"
+  notify: Restart Docker
 
 - name: Mount SMB shares
   mount:
@@ -50,6 +52,7 @@
     opts: credentials=/etc/smb/.smbcredentials,iocharset=utf8,noperm,nofail,vers=3.1.1
     state: mounted
   loop: "{{ smb_shares }}"
+  notify: Restart Docker
 
 - name: Create base app directories for containers
   ansible.builtin.file:
@@ -62,6 +65,7 @@
     - /srv/apps/jellyfin/appdata
     - /srv/apps/jellyfin/cache
     - /srv/apps/tunarr
+  notify: Restart Docker
 
 - name: Copy Docker Compose file
   ansible.builtin.copy:
@@ -70,4 +74,4 @@
     owner: root
     group: root
     mode: '0644'
-  notify: Restart Docker Compose stack
+  notify: Restart Docker
