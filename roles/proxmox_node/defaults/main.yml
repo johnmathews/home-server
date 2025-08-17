@@ -4,18 +4,6 @@
 
 proxmox_api_user: "api@pve"
 
-## no smb shares on proxmox itself because it boots before the trueNAS VM is ready.
-## all apps that need smb shares now run in LXC containers with boot_order=2
-# smb_username: smb_user
-# smb_server: 192.168.2.104
-# smb_shares:
-#   - name: library 
-#     target: /mnt/media/library
-#   - name: media 
-#     target: /mnt/media/media
-#   - name: immich 
-#     target: /mnt/immich
-
 # iGPU
 radeontop_exporter_path: /usr/local/bin/radeontop-exporter.py
 
