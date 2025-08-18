@@ -1,0 +1,66 @@
+# tasks/docker-jellyfin.yml
+# /srv/jellyfin/config
+
+---
+
+
+- name: Download Docker GPG key (Bookworm-compatible)
+  get_url:
+    url: https://download.docker.com/linux/debian/gpg
+    dest: /etc/apt/keyrings/docker.asc
+    mode: '0644'
+
+- name: Add Docker apt repository
+  apt_repository:
+    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
+    filename: docker
+    state: present
+
+- name: Install Docker
+  apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+    state: latest
+
+- name: Enable and start Docker service
+  systemd:
+    name: docker
+    enabled: yes
+    state: started
+
+- name: Install CIFS utilities
+  apt:
+    name: cifs-utils
+    state: present
+
+- name: Install Docker Compose plugin
+  apt:
+    name: docker-compose-plugin
+    state: present
+
+- name: Ensure Docker Compose directory exists
+  file:
+    path: /srv/apps
+    state: directory
+
+- name: Deploy docker-compose.yml
+  copy:
+    src: docker-compose.yml
+    dest: /srv/apps/docker-compose.yml
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Deploy .env file template 
+  template:
+    src: templates/.env.j2 
+    dest: /srv/apps/.env
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Start apps using Docker Compose
+  community.docker.docker_compose_v2:
+    project_src: /srv/apps
