@@ -1,0 +1,37 @@
+# proxmox_node/tasks/hdparm.yml
+
+---
+
+- name: Ensure hdparm is installed
+  ansible.builtin.package:
+    name: hdparm
+    state: present
+
+- name: Configure hdparm for PBS disk
+  ansible.builtin.blockinfile:
+    path: /etc/hdparm.conf
+    create: yes
+    block: |
+      /dev/disk/by-id/{{ hdparm_disk_id }} {
+          spindown_time = {{ hdparm_spindown }}
+          apm = {{ hdparm_apm }}
+          write_cache = on
+          acoustic_management = 128
+      }
+
+# Make udev pick up the change now, and reapply to the target device
+- name: Reload udev rules
+  ansible.builtin.command: udevadm control --reload
+  changed_when: false
+
+- name: Trigger udev for target disk (apply hdparm now)
+  ansible.builtin.command: >
+    udevadm trigger --subsystem-match=block --property-match=ID_SERIAL={{ hdparm_disk_id | regex_replace('^ata-', '') }}
+  changed_when: false
+
+# Optional immediate apply (no reboot, no replug)
+- name: Apply hdparm immediately (best-effort)
+  ansible.builtin.command: >
+    /sbin/hdparm -S {{ hdparm_spindown }} /dev/disk/by-id/{{ hdparm_disk_id }}
+  register: hdparm_now
+  changed_when: "'setting' in hdparm_now.stdout"

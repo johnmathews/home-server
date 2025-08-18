@@ -2,6 +2,28 @@
 
 ---
 
+
+- name: Ensure apt cache is updated
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Install Docker dependencies
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
+    state: present
+
+- name: Ensure keyring directory exists
+  file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+
 - name: Set up IPMI exporter
   import_tasks: ipmi_exporter.yml
   tags: [metrics]
@@ -37,7 +59,7 @@
 - name: Install Prometheus Smartctl Exporter
   import_role:
     name: prometheus.prometheus.smartctl_exporter
-  tags: [metrics]
+  tags: [metrics, smartctl]
 
 # iGPU metrics
 - name: Install radeontop metrics exporter
@@ -49,47 +71,9 @@
   import_tasks: glances.yml
   tags: [metrics, glances]
  
-# Docker
-- name: Install Docker and deploy containerised apps 
-  import_tasks: docker-apps.yml
-  tags: [containers]
-
-# hdparm service doesnt exist by default. if the systemd service isnt running then the configuration file /etc/hdparm.conf has no effect.
-- name: Ensure hdparm service unit is present and enabled
-  block:
-    - name: Create hdparm systemd unit file
-      copy:
-        dest: /etc/systemd/system/hdparm.service
-        owner: root
-        group: root
-        mode: '0644'
-        content: |
-          [Unit]
-          Description=Apply hdparm settings
-          DefaultDependencies=no
-          After=local-fs.target
-          Before=shutdown.target
-
-          [Service]
-          Type=oneshot
-          ExecStart=/sbin/hdparm -B {{ hdparm_apm }} -S {{ hdparm_spindown }} /dev/disk/by-id/{{ hdparm_disk_id }}
-
-          [Install]
-          WantedBy=multi-user.target
-
-    - name: Reload systemd to pick up hdparm unit
-      command: systemctl daemon-reexec
-      changed_when: false
-
-    - name: Enable hdparm.service
-      systemd:
-        name: hdparm.service
-        enabled: true
-
-    - name: Start hdparm.service
-      systemd:
-        name: hdparm.service
-        state: started
+- name: Setup hdparm for HDD power management 
+  import_tasks: hdparm.yml
+  tags: [HDD, hdparm]
 
 # NUT 
 - name: Setup NUT 
