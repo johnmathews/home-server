@@ -343,6 +343,7 @@
     - Usage Metrics:
         description: sabnzbd > settings > servers
 
+
 - Infra:
     - VaultWarden:
         href: https://passwords.itsa.pizza
@@ -354,13 +355,13 @@
         siteMonitor: http://192.168.2.106:8082
         icon: filebrowser
 
-    - traefik:
-        href: http://traefik.itsa.pizza
-        siteMonitor: http://192.168.2.108:8080/dashboard/#/
-        icon: traefik
-        widget:
-          type: traefik
-          url: http://192.168.2.108:8080
+    # - traefik:
+    #     href: http://traefik.itsa.pizza
+    #     siteMonitor: http://192.168.2.108:8080/dashboard/#/
+    #     icon: traefik
+    #     widget:
+    #       type: traefik
+    #       url: http://192.168.2.108:8080
 
     - ntfy:
         href: https://ntfy.itsa.pizza/
@@ -444,6 +445,12 @@
         siteMonitor: http://192.168.2.106:5201
         description: wifi speed test
         icon: iperf3
+
+- External:
+    - Pushover:
+        href: https://pushover.net/
+        siteMonitor: https://pushover.net/
+        icon: pushover
 
 - NAS:
     - TrueNAS:

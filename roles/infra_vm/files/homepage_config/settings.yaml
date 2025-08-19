@@ -32,6 +32,11 @@ layout:
     style: row
     columns: 4
 
+  External:
+    tab: Infra
+    style: row
+    columns: 4
+
   PVE:
     tab: Infra
     initiallyCollapsed: false
