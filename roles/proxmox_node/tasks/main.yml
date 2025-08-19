@@ -8,7 +8,7 @@
     update_cache: yes
     cache_valid_time: 3600
 
-- name: Install Docker dependencies
+- name: Install libraries and dependencies
   apt:
     name:
       - apt-transport-https
@@ -16,7 +16,10 @@
       - curl
       - gnupg
       - lsb-release
+      - smartmontools 
+      - sysstat
     state: present
+  tags: [metrics]
 
 - name: Ensure keyring directory exists
   file:
@@ -36,29 +39,13 @@
   import_tasks: pve_exporter.yml
   tags: [metrics]
 
-# Run this before the imported Smartctl exporter role. GNU Tar must be running on the local ansible host
-- name: Check for GNU tar when running tasks locally
-  when: inventory_hostname == 'localhost' or delegate_to is defined and delegate_to == 'localhost'
-  block:
-    - name: Check if GNU tar (gtar) is available
-      command: which gtar
-      register: gnu_tar_check
-      failed_when: gnu_tar_check.rc != 0
-      changed_when: false
+- name: Set up docker 
+  import_tasks: docker-apps.yml
+  tags: [docker]
 
-    - name: Warn if GNU tar not found in PATH
-      fail:
-        msg: |
-          GNU tar (gtar) is required for this role to work locally.
-          Install it using: brew install gnu-tar
-          And add to your PATH: export PATH="/opt/homebrew/opt/gnu-tar/libexec/gnubin:$PATH"
-      when: gnu_tar_check.rc != 0
-  tags: [metrics]
-
-# HDD metrics smart_ctl smartctl_exporter
-- name: Install Prometheus Smartctl Exporter
-  import_role:
-    name: prometheus.prometheus.smartctl_exporter
+# smartctl disk metrics
+- name: Setup smartctl_exporter
+  import_tasks: smartctl.yml
   tags: [metrics, smartctl]
 
 # iGPU metrics

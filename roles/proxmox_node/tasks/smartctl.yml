@@ -1,0 +1,59 @@
+
+# Run this before the imported Smartctl exporter role. GNU Tar must be running on the local ansible host
+- name: Check for GNU tar when running tasks locally
+  when: inventory_hostname == 'localhost' or delegate_to is defined and delegate_to == 'localhost'
+  block:
+    - name: Check if GNU tar (gtar) is available
+      command: which gtar
+      register: gnu_tar_check
+      failed_when: gnu_tar_check.rc != 0
+      changed_when: false
+
+    - name: Warn if GNU tar not found in PATH
+      fail:
+        msg: |
+          GNU tar (gtar) is required for this role to work locally.
+          Install it using: brew install gnu-tar
+          And add to your PATH: export PATH="/opt/homebrew/opt/gnu-tar/libexec/gnubin:$PATH"
+      when: gnu_tar_check.rc != 0
+  tags: [metrics]
+
+# HDD metrics smart_ctl smartctl_exporter
+- name: Install Prometheus Smartctl Exporter
+  import_role:
+    name: prometheus.prometheus.smartctl_exporter
+
+# Ensure drop-in dir exists
+- name: Create systemd drop-in dir for smartctl_exporter
+  become: true
+  ansible.builtin.file:
+    path: /etc/systemd/system/smartctl_exporter.service.d
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+
+# Force root via override
+- name: Ensure smartctl_exporter runs as root via override
+  become: true
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/smartctl_exporter.service.d/override.conf
+    content: |
+      [Service]
+      User=root
+      Group=root
+      Environment=SMARTCTL_EXPORTER_SMARTCTL_PATH=/usr/sbin/smartctl
+  notify: Restart smartctl_exporter
+
+# Reload systemd to pick up the drop-in
+- name: systemd daemon-reload
+  become: true
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: Ensure smartctl_exporter is started and enabled
+  become: true
+  systemd:
+    name: smartctl_exporter
+    state: started
+    enabled: true

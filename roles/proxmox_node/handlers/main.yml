@@ -49,3 +49,9 @@
     name: ups-battery-monitor.timer
     state: restarted
     enabled: true
+
+- name: Restart smartctl_exporter
+  become: true
+  systemd:
+    name: smartctl_exporter
+    state: restarted
