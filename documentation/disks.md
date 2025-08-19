@@ -37,3 +37,16 @@ Trying:
 `sudo hdparm -S 120 /dev/disk/by-id/ata-ST3000DM007-1WY10G_ZFN1TN5X` - This should make it spin down after 1 hour.
 
 ## TrueNAS
+...
+
+`sudo smartctl -s standby,now /dev/sdb`  - this will put the backup HDD to spin down.
+
+`sudo zpool iostat -v 30 24` - this will show IO
+
+`sudo smbstatus` - will show info about SMB connections including locked files 
+
+- Apps cannot run on the tank datapool. Can they run on the boot pool? If not use an SSD and have an `apps` pool.
+
+- SMB shares are noisy.
+
+- SMART service, and NFS service dont seem to cause any IO.
