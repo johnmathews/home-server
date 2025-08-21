@@ -17,10 +17,10 @@ smb_shares:
     target: /mnt/paperless
 
 paperless_smb_subdirectories:
-  - name: paperless-consume
-    target: /mnt/paperless/consume
-  - name: paperless-export
-    target: /mnt/paperless/export
-  - name: paperless-media
-    target: /mnt/paperless/media
+  - name: paperless
+    target: /mnt/paperless
+  # - name: paperless-export
+  #   target: /mnt/paperless/export
+  # - name: paperless-media
+  #   target: /mnt/paperless/media
 

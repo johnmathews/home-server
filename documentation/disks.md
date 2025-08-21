@@ -39,12 +39,11 @@ down.
 - `trim=off`
 - stop `smartctl-exporter` app
 - stop `netdata` service (This is TrueNAS built-in monitoring)
-- *disable SMART on the disk* testing this now
-
 
 ### netdata
 
 netdata config file: `/var/lib/netdata/cloud.d/cloud.conf`
+
 ```
 [plugins]
     apps = no
@@ -66,26 +65,21 @@ sudo systemctl unmask netdata && sudo systemctl stop netdata && sudo systemctl d
 Use `sudo systemctl unmask netdata` to temp turn it on when changing SMART
 settings or getting errors.
 
-- disable SMART service - not necessary for `backup` - def true
-- disable NFS service - not necessary for `backup` - def true
+- disable SMART service - not necessary for `backup`
+- disable NFS service - not necessary for `backup`
 - disable node-exporter app - not necessary for `backup`
+- disable SMART on the disk - not necessary for `backup`
 
 ## Proxmox
 
 The only HDD you need to manage on the host is
 `/dev/disk/by-id/ata-ST3000DM007-1WY10G_ZFN1TN5X`.
 
-`sudo hdparm -S 12 /dev/disk/by-id/ata-ST3000DM007-1WY10G_ZFN1TN5X` works as
-expected - disk will spin down after 1 minute.
+`sudo hdparm -S 120 /dev/disk/by-id/ata-ST3000DM007-1WY10G_ZFN1TN5X` - This will
+make it spin down after 10 minutes.
 
-Trying:
-
-`sudo hdparm -S 120 /dev/disk/by-id/ata-ST3000DM007-1WY10G_ZFN1TN5X` - This
-should make it spin down after 1 hour.
-
-### hdparm
-
-On modern Debian/Proxmox (systemd-based), there is no hdparm.service anymore. Instead:
+On modern Debian/Proxmox (systemd-based), there is no hdparm.service anymore.
+Instead:
 
 - `hdparm` is only called once at boot via udev rules (see `/lib/udev/hdparm`
   which you ran manually).
@@ -97,11 +91,11 @@ settings won’t be re-applied automatically. You need to:
 
 1. Re-apply manually with the helper:
 
-```
-sudo /lib/udev/hdparm start
-```
+   ```
+   sudo /lib/udev/hdparm start
+   ```
 
-To check what happened when you ran `/lib/udev/hdparm` start, look at `dmesg` or
-`syslog` for `hdparm` output:
+2. To check what happened when you ran `/lib/udev/hdparm` start, look at `dmesg`
+   or `syslog` for `hdparm` output:
 
-`journalctl -b | grep hdparm`
+   `journalctl -b | grep hdparm`
