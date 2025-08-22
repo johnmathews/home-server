@@ -43,7 +43,7 @@ hdparm_spindown: 242  # 12: 1 minute, 120: 10 minutes, 242: 60 minutes, 243: 90 
 
 ################################
 ### NUT
-nut_shutdown_threshold: 50
+nut_shutdown_threshold: 30
 
 nut_ups_name: "ups"
 nut_mode: "standalone"          # standalone / netserver / none

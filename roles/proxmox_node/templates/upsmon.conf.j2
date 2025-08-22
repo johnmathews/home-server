@@ -2,7 +2,7 @@ RUN_AS_USER root
 MONITOR {{ nut_ups_name }}@localhost 1 {{ nut_mon_user }} {{ nut_mon_pass }} master
 
 MINSUPPLIES 1
-SHUTDOWNCMD "/sbin/shutdown -h"
+SHUTDOWNCMD "/sbin/shutdown -h now"
 NOTIFYCMD /usr/sbin/upssched
 POLLFREQ 4
 POLLFREQALERT 2
