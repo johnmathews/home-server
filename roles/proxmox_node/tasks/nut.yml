@@ -13,32 +13,10 @@
     state: directory
     mode: "0755"
 
-- name: Configure mode (/etc/nut/nut.conf)
-  ansible.builtin.template:
-    src: nut.conf.j2
-    dest: /etc/nut/nut.conf
-    owner: root
-    group: root
-    mode: "0644"
-  notify:
-    - Restart nut-server
-    - Restart nut-monitor
-
 - name: Configure UPS driver (/etc/nut/ups.conf)
   ansible.builtin.template:
     src: ups.conf.j2
     dest: /etc/nut/ups.conf
-    owner: root
-    group: nut
-    mode: "0640"
-  notify:
-    - Restart nut-server
-    - Restart nut-monitor
-
-- name: Configure NUT users (/etc/nut/upsd.users)
-  ansible.builtin.template:
-    src: upsd.users.j2
-    dest: /etc/nut/upsd.users
     owner: root
     group: nut
     mode: "0640"
@@ -52,6 +30,39 @@
     dest: /etc/nut/upsmon.conf
     owner: root
     group: root
+    mode: "0640"
+  notify:
+    - Restart nut-server
+    - Restart nut-monitor
+
+- name: Configure upsd (/etc/nut/upsd.conf)
+  ansible.builtin.template:
+    src: upsd.conf.j2
+    dest: /etc/nut/upsd.conf
+    owner: root
+    group: nut
+    mode: "0640"
+  notify:
+    - Restart nut-server
+    - Restart nut-monitor
+
+- name: Configure mode (/etc/nut/nut.conf)
+  ansible.builtin.template:
+    src: nut.conf.j2
+    dest: /etc/nut/nut.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - Restart nut-server
+    - Restart nut-monitor
+
+- name: Configure NUT users (/etc/nut/upsd.users)
+  ansible.builtin.template:
+    src: upsd.users.j2
+    dest: /etc/nut/upsd.users
+    owner: root
+    group: nut
     mode: "0640"
   notify:
     - Restart nut-server
@@ -85,17 +96,6 @@
     - Systemd daemon-reload
     - Restart ups-battery-monitor.timer
 
-- name: Configure upsd (/etc/nut/upsd.conf)
-  ansible.builtin.template:
-    src: upsd.conf.j2
-    dest: /etc/nut/upsd.conf
-    owner: root
-    group: nut
-    mode: "0640"
-  notify:
-    - Restart nut-server
-    - Restart nut-monitor
-
 - name: Reload systemd units
   ansible.builtin.systemd:
     daemon_reload: true
@@ -123,16 +123,3 @@
     host: 127.0.0.1
     port: 3493
     timeout: 15
-
-
-# # Optional: quick sanity check (won't change state)
-# - name: Read battery charge via upsc
-#   ansible.builtin.command: "upsc {{ nut_ups_name }}@localhost battery.charge"
-#   register: upsc_batt
-#   changed_when: false
-#   failed_when: upsc_batt.rc != 0
-
-# - name: Debug current battery charge
-#   ansible.builtin.debug:
-#     msg: "UPS battery charge: {{ upsc_batt.stdout | default('unknown') }}%"
-#   when: upsc_batt is defined

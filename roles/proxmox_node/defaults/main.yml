@@ -36,9 +36,10 @@ pve_exporter_install_dir: "/opt/pve_exporter"
 pve_exporter_listen_port: 9221
 
 # backup disk set spindown using hdparm service.
-hdparm_disk_id: ata-ST3000DM007-1WY10G_ZFN1TN5X # this is the PBS HDD.
+# hdparm_disk_id: /dev/disk/by-id/ata-ST3000DM007-1WY10G_ZFN1TN5X # this is the PBS HDD.
+hdparm_disk_id: /dev/sda # this is the PBS HDD.
 hdparm_apm: 128
-hdparm_spindown: 243  # 242: 60 mins, 243: 90 mins, 244: 120mins
+hdparm_spindown: 242  # 12: 1 minute, 120: 10 minutes, 242: 60 minutes, 243: 90 minutes, 244: 120 minutes
 
 ################################
 ### NUT
@@ -48,14 +49,14 @@ nut_ups_name: "ups"
 nut_mode: "standalone"          # standalone / netserver / none
 nut_driver: "usbhid-ups"
 nut_port: "auto"
-nut_desc: "Home Server UPS (CyberPower CP900EPFCLCD)"
 nut_vendorid: "0764"
 nut_productid: "0501"
+nut_desc: "Home Server UPS (CyberPower CP900EPFCLCD)"
 nut_pollinterval: 5
+nut_maxretry: 3
 
 # upsmon user (store passwords in vault!)
 nut_admin_user: "admin"
 nut_admin_pass: "{{ vault_nut_admin_pass }}"
 nut_mon_user: "monuser"
 nut_mon_pass: "{{ vault_nut_mon_pass }}"
-nut_mon_role: "master"          # master/slave

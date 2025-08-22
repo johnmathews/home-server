@@ -1,8 +1,12 @@
 [{{ nut_admin_user }}]
-  password = {{ nut_admin_pass }}
+  password = {{ vault_nut_admin_pass }}
   actions = SET
   instcmds = ALL
+  upsmon master
 
 [{{ nut_mon_user }}]
-  password = {{ nut_mon_pass }}
-  upsmon {{ nut_mon_role }}
+  password = {{ vault_nut_mon_pass }}
+  upsmon master
+
+[readonly]
+  password = {{ vault_nut_mon_pass }}

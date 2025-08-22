@@ -1,6 +1,9 @@
 #!/bin/bash
 #! vim: ft=sh
 
+# this script is run by ups-battery-monitor.service and monitors the ups battery charge. 
+# if the charge is below the threshold then a shutdown is initiated
+
 set -euo pipefail
 
 UPS="{{ nut_ups_name }}@localhost"

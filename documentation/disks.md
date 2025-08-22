@@ -8,10 +8,11 @@
 of seconds in each snapshot. The second number is the number of intervals before
 stopping.
 
-`sudo smartctl -s standby,now /dev/sdb` - this will put the backup HDD to spin
-down.
+`sudo smartctl -s standby,now /dev/sdb` - this will force the backup HDD to spin down.
 
 `sudo smbstatus` - will show info about SMB connections including locked files
+
+`sudo systemctl status netdata` - the netdata service must be stopped (or just leaves the HDDs alone)
 
 - Apps cannot run on the tank datapool. Can they run on the boot pool? If not
   use an SSD and have an `apps` pool.
@@ -59,7 +60,9 @@ netdata config file: `/var/lib/netdata/cloud.d/cloud.conf`
 Maybe netdata will go away now
 
 ```
-sudo systemctl unmask netdata && sudo systemctl stop netdata && sudo systemctl disable netdata && sudo systemctl mask netdata && sudo systemctl status netdata
+sudo systemctl unmask netdata && sudo systemctl stop netdata && \
+sudo systemctl disable netdata && sudo systemctl mask netdata && \
+sudo systemctl status netdata && sudo systemctl daemon-reload
 ```
 
 Use `sudo systemctl unmask netdata` to temp turn it on when changing SMART
@@ -76,7 +79,7 @@ The only HDD you need to manage on the host is
 `/dev/disk/by-id/ata-ST3000DM007-1WY10G_ZFN1TN5X`.
 
 `sudo hdparm -S 120 /dev/disk/by-id/ata-ST3000DM007-1WY10G_ZFN1TN5X` - This will
-make it spin down after 10 minutes.
+make it spin down after 10 minutes. (`-S 242` will make it spindown after 60 minutes.)
 
 On modern Debian/Proxmox (systemd-based), there is no hdparm.service anymore.
 Instead:
