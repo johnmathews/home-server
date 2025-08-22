@@ -1,19 +1,39 @@
-# Monitor this UPS
-MONITOR {{ nut_ups_name }}@localhost 1 {{ nut_mon_user }} {{ nut_mon_pass }} {{ nut_mon_role }}
+RUN_AS_USER root
+MONITOR {{ nut_ups_name }}@localhost 1 {{ nut_mon_user }} {{ nut_mon_pass }} master
 
-# What to run to shutdown
-SHUTDOWNCMD "/sbin/shutdown -h now"
+MINSUPPLIES 1
+SHUTDOWNCMD "/sbin/shutdown -h"
+NOTIFYCMD /usr/sbin/upssched
+POLLFREQ 4
+POLLFREQALERT 2
+HOSTSYNC 15
+DEADTIME 24
+MAXAGE 24
+POWERDOWNFLAG /etc/killpower
 
-# Optional: notifications (to syslog)
-NOTIFYFLAG ONLINE       SYSLOG
-NOTIFYFLAG ONBATT       SYSLOG
-NOTIFYFLAG LOWBATT      SYSLOG
-NOTIFYFLAG FSD          SYSLOG
-NOTIFYFLAG COMMOK       SYSLOG
-NOTIFYFLAG COMMBAD      SYSLOG
-NOTIFYFLAG SHUTDOWN     SYSLOG
-NOTIFYFLAG REPLBATT     SYSLOG
-NOTIFYFLAG NOCOMM       SYSLOG
+NOTIFYMSG ONLINE "UPS %s on line power"
+NOTIFYMSG ONBATT "UPS %s on battery"
+NOTIFYMSG LOWBATT "UPS %s battery is low"
+NOTIFYMSG FSD "UPS %s: forced shutdown in progress"
+NOTIFYMSG COMMOK "Communications with UPS %s established"
+NOTIFYMSG COMMBAD "Communications with UPS %s lost"
+NOTIFYMSG SHUTDOWN "Auto logout and shutdown proceeding"
+NOTIFYMSG REPLBATT "UPS %s battery needs to be replaced"
+NOTIFYMSG NOCOMM "UPS %s is unavailable"
+NOTIFYMSG NOPARENT "upsmon parent process died - shutdown impossible"
 
-# Keep it short; upsmon will hand off to our timer when we hit threshold
+NOTIFYFLAG ONLINE   SYSLOG+WALL+EXEC
+NOTIFYFLAG ONBATT   SYSLOG+WALL+EXEC
+NOTIFYFLAG LOWBATT  SYSLOG+WALL+EXEC
+NOTIFYFLAG FSD      SYSLOG+WALL+EXEC
+NOTIFYFLAG COMMOK   SYSLOG+WALL+EXEC
+NOTIFYFLAG COMMBAD  SYSLOG+WALL+EXEC
+NOTIFYFLAG SHUTDOWN SYSLOG+WALL+EXEC
+NOTIFYFLAG REPLBATT SYSLOG+WALL
+NOTIFYFLAG NOCOMM   SYSLOG+WALL+EXEC
+NOTIFYFLAG NOPARENT SYSLOG+WALL
+
+RBWARNTIME 43200
+NOCOMMWARNTIME 600
+
 FINALDELAY 5

@@ -1,0 +1,50 @@
+# proxmox_node/templates/docker-compose.yml.j2
+# vim: ft=yaml
+
+---
+
+services:
+
+  # node exporter is running outside docker.
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    restart: unless-stopped
+    ports:
+      - "18080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    privileged: true  # required for some metrics
+
+  disk-status-exporter:
+    image: ghcr.io/johnmathews/disk_status_exporter:latest
+    container_name: disk_status_exporter
+    restart: always
+    ports:
+      - "9635:9635"
+    volumes:
+      - /dev:/dev:ro
+    privileged: true  # recommended to access /dev/sdX and run smartctl
+
+  nut_exporter:
+    image: ghcr.io/druggeri/nut_exporter:sha-9e58f9c
+    container_name: nut_exporter
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - NUT_EXPORTER_SERVER=127.0.0.1
+      - NUT_EXPORTER_SERVERPORT=3493
+      - NUT_EXPORTER_USERNAME=readonly
+      - NUT_EXPORTER_PASSWORD="{{ vault_nut_mon_pass }}"
+
+      # Optional: export more variables (comma-separated)
+      # - NUT_EXPORTER_VARIABLES=battery.charge,battery.runtime,ups.load,ups.status,input.voltage,output.voltage
+      # Optional: set log level (error|warn|info|debug)
+      # - NUT_EXPORTER__LOG_LEVEL=info
+      # Optional: change metrics path (default /ups_metrics)
+      # - NUT_EXPORTER_WEB_TELEMETRY_PATH=/ups_metrics
+    ports:
+      - "9199:9199"   # Prometheus will scrape this

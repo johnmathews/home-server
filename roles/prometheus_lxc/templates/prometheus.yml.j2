@@ -127,3 +127,8 @@ scrape_configs:
       - targets: ['192.168.2.214:9635']
         labels:
           instance: proxmox
+
+  - job_name: 'network ups tool'
+    metrics_path: /ups_metrics
+    static_configs:
+      - targets: ['192.168.2.214:9199']   # infra VM IP:port running nut_exporter         instance: proxmox
