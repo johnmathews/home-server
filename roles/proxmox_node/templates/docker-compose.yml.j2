@@ -41,10 +41,7 @@ services:
       - NUT_EXPORTER_PASSWORD="{{ vault_nut_mon_pass }}"
 
       # Optional: export more variables (comma-separated)
-      # - NUT_EXPORTER_VARIABLES=battery.charge,battery.runtime,ups.load,ups.status,input.voltage,output.voltage
-      # Optional: set log level (error|warn|info|debug)
-      # - NUT_EXPORTER__LOG_LEVEL=info
-      # Optional: change metrics path (default /ups_metrics)
-      # - NUT_EXPORTER_WEB_TELEMETRY_PATH=/ups_metrics
+      - NUT_EXPORTER_VARIABLES=battery.charge,battery.runtime,battery.voltage,battery.voltage.nominal,input.voltage,input.voltage.nominal,output.voltage,output.voltage.nominal,ups.load,ups.status
+      - NUT_EXPORTER__LOG_LEVEL=info
     ports:
       - "9199:9199"   # Prometheus will scrape this
