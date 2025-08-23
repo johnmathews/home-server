@@ -34,21 +34,21 @@ media_stack_services:
   jackett_port: 9117
   bazarr_port: 6767
 
-media_stack_users:
-  jellyfin:
-    username: john
-  qbittorrent:
-    username: admin
-  sonarr:
-    username: john
-  radarr:
-    username: john
-  bazarr:
-    username: john
-  jackett:
-    username: john
-  filebrowser:
-    username: john
+# media_stack_users:
+#   jellyfin:
+#     username: john
+#   qbittorrent:
+#     username: admin
+#   sonarr:
+#     username: john
+#   radarr:
+#     username: john
+#   bazarr:
+#     username: john
+#   jackett:
+#     username: john
+#   filebrowser:
+#     username: john
 
 smb_media_vm_username: media_vm
 smb_server: 192.168.2.104
