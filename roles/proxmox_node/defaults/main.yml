@@ -39,7 +39,8 @@ pve_exporter_listen_port: 9221
 # hdparm_disk_id: /dev/disk/by-id/ata-ST3000DM007-1WY10G_ZFN1TN5X # this is the PBS HDD.
 hdparm_disk_id: /dev/sda # this is the PBS HDD.
 hdparm_apm: 128
-hdparm_spindown: 242  # 12: 1 minute, 120: 10 minutes, 242: 60 minutes, 243: 90 minutes, 244: 120 minutes
+#12: 1 minute, 120: 10 minutes, 241: 30 mins, 242: 60 minutes, 243: 90 minutes, 244: 120 minutes
+hdparm_spindown: 241  # doesnt work for 60 mins or longer.
 
 ################################
 ### NUT
