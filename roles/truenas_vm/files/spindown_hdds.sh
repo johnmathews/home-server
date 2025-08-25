@@ -1,6 +1,10 @@
 #!/bin/bash
+
 # Locations /mnt/swift/scripts/spindown_hdds.sh
 # Purpose: Safely spin down ONLY the explicitly listed HDDs (by-id) when idle.
+
+# LOG_FILE must live on SSD so logging never wakes HDDs.
+# UTIL_THRESHOLD is in PERCENT (e.g. 10 = ten percent, 0.1 = one‑tenth percent)
 
 set -euo pipefail
 export LC_ALL=C
@@ -39,7 +43,12 @@ STAMP_DIR="/var/run/spindown-stamps"; mkdir -p "$STAMP_DIR"
 
 HAD_ERROR=0
 
-die() { echo "[$($DATE -Is)] ERROR: $*" | $TEE -a "$LOG_FILE"; exit 1; }
+die() {
+  HAD_ERROR=1
+  echo "[$($DATE -Is)] ERROR: $*" | $TEE -a "$LOG_FILE"
+  exit 1
+}
+
 info(){ echo "[$($DATE -Is)] $*"        | $TEE -a "$LOG_FILE"; }
 
 mkdir -p "$(dirname "$LOG_FILE")" || die "Cannot create log dir"
