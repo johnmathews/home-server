@@ -24,12 +24,6 @@
   delegate_to: localhost
   become: false
 
-# - name: Show ISO search directory and number of matches
-#   debug:
-#     msg: >
-#       Searching for TrueNAS ISOs in "{{ iso_dir }}".
-#       Found {{ found_isos.matched }} file(s).
-
 - name: Fail if no ISO is found
   fail:
     msg: "No TrueNAS ISO found in {{ iso_dir }}. Please download it and place it there."
@@ -143,3 +137,7 @@
 - name: Set up script to unlock datasets using key server 
   import_tasks: key_server.yml
   tags: [key]
+
+- name: Set up script to spindown HDDs if idle 
+  import_tasks: spindown_hdds.yml
+  tags: [hdds]

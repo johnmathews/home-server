@@ -1,7 +1,7 @@
 - name: Upload unlock script to TrueNAS
   template:
     src: templates/get_keys.sh.j2
-    dest: /mnt/tank/apps-config/scripts/get_keys.sh
+    dest: /mnt/swift/scripts/get_keys.sh
     mode: '0755'
     owner: root
     group: wheel

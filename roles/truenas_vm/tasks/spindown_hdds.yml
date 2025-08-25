@@ -1,0 +1,7 @@
+- name: Upload spindown_hdds script to TrueNAS swift/scripts
+  template:
+    src: files/spindown_hdds.sh
+    dest: /mnt/swift/scripts/spindown_hdds.sh
+    mode: '0755'
+    owner: root
+    group: wheel
