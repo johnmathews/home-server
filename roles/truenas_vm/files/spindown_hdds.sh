@@ -36,7 +36,7 @@ TARGET_DEVICES_BY_ID=(
 
 LOG_FILE="/mnt/swift/scripts/spindown.log" # TrueNAS cron runs as root
 SAMPLE_DURATION=120           # seconds to sample iostat
-UTIL_THRESHOLD=0.10           # %util below this => allow spindown
+UTIL_THRESHOLD=0.10           # %util below this (0.1 = 0.1%) => allow spindown
 LOCK_FILE="/var/run/spindown_hdds.lock"
 COOLDOWN_SECS=600             # optional anti-thrash; set 0 to disable
 STAMP_DIR="/var/run/spindown-stamps"; mkdir -p "$STAMP_DIR"
@@ -140,7 +140,7 @@ for devid in "${TARGET_DEVICES_BY_ID[@]}"; do
 
   # Sample iostat for SAMPLE_DURATION and read final %util
   info "$devid sampling I/O for ${SAMPLE_DURATION}s…"
-  util_line=$($NICE -n 10 $IONICE -c3 $IOSTAT -d -x -y "$sdnode" "$SAMPLE_DURATION" 2>/dev/null \
+  util_line=$($NICE -n 10 $IONICE -c3 $IOSTAT -d -x -y "$sdnode" "$SAMPLE_DURATION" 2 2>/dev/null \
               | $GREP -E "^[[:space:]]*$sdnode[[:space:]]" | $TAIL -n1 || true)
 
   if [[ -z "$util_line" ]]; then
