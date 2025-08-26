@@ -26,6 +26,13 @@ if [[ "$CHARGE" -le "$THRESHOLD" ]]; then
 
 ## Notifications
 
+If power is lost and you have a console open in proxmox, you will see a notification like below:
+```
+Broadcast message from root@proxmox (somewhere) (Tue Aug 26 12:35:50 2025):
+
+UPS ups@localhost on battery
+```
+
 ### Low Battery Notification
 
 The LB notification will fire when the UPS reports LB=1. 
@@ -60,16 +67,17 @@ NOTIFYMSG LOWBATT "UPS %s battery is low"
 
 `upsrw ups@localhost` will show which values can be changed. 
 
-Update `ups.conf`, for example: `override.battery.charge.low = {{ ups_battery_charge_low }}`
+Update `ups.conf` then run `make pve TAGS="--tags nut"`. For example: 
+- `override.battery.charge.low = {{ ups_battery_charge_low }}`
 
 
-### Normal
+### Normal parameters
 
 - `nut_shutdown_threshold=40`
 - `ups_battery_charge_low: 20`
 - `ups_battery_runtime_low: 600` (10 minutes)
 
-### Testing
+### Testing parameters
 
 If `nut_shutdown_threshold` is lower than `battery.charge.low` then the `ups-battery-monitor` service wont be used, but instead the `upsmon` service will initiate shutdown. `ups-battery-monitor` seems
 redundant.
