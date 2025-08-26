@@ -44,11 +44,11 @@
   ansible.builtin.systemd:
     daemon_reload: true
 
-# - name: Restart ups-battery-monitor.timer
-#   ansible.builtin.systemd:
-#     name: ups-battery-monitor.timer
-#     state: restarted
-#     enabled: true
+- name: Restart ups-battery-monitor.timer
+  ansible.builtin.systemd:
+    name: ups-battery-monitor.timer
+    state: restarted
+    enabled: true
 
 - name: Restart smartctl_exporter
   become: true
