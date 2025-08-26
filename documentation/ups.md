@@ -56,3 +56,34 @@ NOTIFYMSG ONBATT "UPS %s on battery"
 NOTIFYMSG LOWBATT "UPS %s battery is low"
 ```
 
+## Writable Parameters
+
+`upsrw ups@localhost` will show which values can be changed. 
+
+Update `ups.conf`, for example: `override.battery.charge.low = {{ ups_battery_charge_low }}`
+
+
+### Normal
+
+- `nut_shutdown_threshold=40`
+- `ups_battery_charge_low: 20`
+- `ups_battery_runtime_low: 600` (10 minutes)
+
+### Testing
+
+If `nut_shutdown_threshold` is lower than `battery.charge.low` then the `ups-battery-monitor` service wont be used, but instead the `upsmon` service will initiate shutdown. `ups-battery-monitor` seems
+redundant.
+
+- `nut_shutdown_threshold=70`
+- `ups_battery_charge_low: 75`
+- `ups_battery_runtime_low: 2100` (35 minutes)
+
+
+## Notes
+
+- `FINALDELAY 600` in `upsmon.conf` is how long `upsmon` waits after beginning its own shutdown sequence to tell the UPS to begin shutting itself down and cutting AC power. The shutdown command itself
+  is issued as soon as LB status begins.
+- `ups.delay.shutdown: 20` means that the UPS will wait 20 seconds after it receives a shutdown command from NUT before it switches its outlets off. The delay is meant to give the server time to
+  finish halting cleanly (after they've already been told to shutdown) before AC power is cut.
+- `ups.delay.start: 30` means that the UPS will wait 30 seconds after AC power is restored before turning the power back on.
+
