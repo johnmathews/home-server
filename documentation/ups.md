@@ -6,8 +6,9 @@ The Uninterruptible Power Supply is controlled by `Network UPS Tools`  (NUT).
 
 ### Shutdown
 
-The UPS will initiate a shutdown when the battery reaches a threshold level. 
-This threshold is set in `roles/proxmox_node/defaults/main.yml`
+The UPS will initiate a shutdown when the battery reaches a threshold level. The current value is 40%.
+
+This threshold is set in `roles/proxmox_node/defaults/main.yml`:
 
 `nut_shutdown_threshold=40`
 
