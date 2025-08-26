@@ -42,12 +42,11 @@ hdparm_apm: 128
 #12: 1 minute, 120: 10 minutes, 241: 30 mins, 242: 60 minutes, 243: 90 minutes, 244: 120 minutes
 hdparm_spindown: 241  # doesnt work for 60 mins or longer.
 
-################################
-### NUT
-nut_shutdown_threshold: 30
+### NUT #############################
+nut_shutdown_threshold: 60 # 60 for testing, 40 for normal
 
 nut_ups_name: "ups"
-nut_mode: "standalone"          # standalone / netserver / none
+nut_mode: "standalone"
 nut_driver: "usbhid-ups"
 nut_port: "auto"
 nut_vendorid: "0764"
@@ -56,7 +55,6 @@ nut_desc: "Home Server UPS (CyberPower CP900EPFCLCD)"
 nut_pollinterval: 5
 nut_maxretry: 3
 
-# upsmon user (store passwords in vault!)
 nut_admin_user: "admin"
 nut_admin_pass: "{{ vault_nut_admin_pass }}"
 nut_mon_user: "monuser"

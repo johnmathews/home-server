@@ -139,6 +139,7 @@ sleep $((RANDOM % 10))
 
 ((${#TARGETS[@]} > 0)) || die "No TARGETS configured."
 
+log "============================================================"
 log "Starting HDD spindown  ${C_DIM}(SAMPLE_DURATION=${SAMPLE_DURATION}s, UTIL_THRESHOLD=${UTIL_THRESHOLD}%)${C_RESET}"
 for pair in "${TARGETS[@]}"; do
 	IFS='|' read -r devid label <<<"$pair"
@@ -179,16 +180,20 @@ for pair in "${TARGETS[@]}"; do
 	fi
 
 	# Already in standby?
-	"$NICE" -n 10 "$IONICE" -c3 "$SMARTCTL" -n standby -i "$devid" >/dev/null 2>&1
-	rc=$?
+  # Already in standby?
+  rc=0
+  "$NICE" -n 10 "$IONICE" -c3 "$SMARTCTL" -n standby -i "$devid" >/dev/null 2>&1 || rc=$?
 
-	if [[ $rc -eq 2 ]]; then
-		log_note "${label} [$devid] (${sdnode}): already in standby; skipping."
-		continue
-	elif [[ $rc -ne 0 ]]; then
-		# Non-fatal smartctl error; keep going cautiously
-		log_warn "${label} [$devid]: smartctl returned rc=$rc (non-fatal); continuing."
-	fi
+  case "$rc" in
+    0) ;;  # OK, proceed
+    2)
+      log_note "${label} [$devid] (${sdnode}): already in standby; skipping."
+      continue
+      ;;
+    *)
+      log_warn "${label} [$devid]: smartctl returned rc=$rc (non-fatal); continuing."
+      ;;
+  esac
 
 	if [[ $rc -eq 0 ]]; then
 		# Skip if a SMART self-test is running (won’t wake due to -n standby)
