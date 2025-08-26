@@ -14,12 +14,12 @@ This threshold is set in `roles/proxmox_node/defaults/main.yml`:
 
 This value is used in `ups-battery-monitor.sh`:
 
-    ```sh
+```sh
     if [[ "$CHARGE" -le "$THRESHOLD" ]]; then
       logger -t ups-battery-monitor "UPS battery at ${CHARGE}% (<= ${THRESHOLD}%) and on battery — initiating shutdown"
         /sbin/shutdown -h now "UPS battery low (${CHARGE}%)"
         fi
-    ```
+```
 
 - `ups-battery-monitor.sh` is run by `ups-battery-monitor.service`. 
 - The service runs once every 60 seconds according to the settings in `ups-battery-monitor.timer`.
