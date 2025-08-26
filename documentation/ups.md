@@ -21,18 +21,21 @@ This value is used in `ups-battery-monitor.sh`:
         fi
     ```
 
-`ups-battery-monitor.sh` is run by `ups-battery-monitor.service`. 
-The service runs once every 60 seconds according to the settings in `ups-battery-monitor.timer`.
+- `ups-battery-monitor.sh` is run by `ups-battery-monitor.service`. 
+- The service runs once every 60 seconds according to the settings in `ups-battery-monitor.timer`.
+
+## Notifications
 
 ### Low Battery Notification
 
-It fires when the UPS reports LB=1. LB=1 when either `runtime < battery.runtime.low` or `charge < battery.charge.low`
+The LB notification will fire when the UPS reports LB=1. 
+LB=1 when either `runtime < battery.runtime.low` or `charge < battery.charge.low`
 
 Current settings:
-`battery.runtime.low = 360` (6 minutes)
-`battery.charge.low = 10` (10%)
+- `battery.runtime.low = 360` (6 minutes)
+- `battery.charge.low = 10` (10%)
 
-Settings can be updated using, for example, `upsrw -s battery.runtime.low=600 ups@localhost`
+Settings can be updated using `upsrw -s battery.runtime.low=600 ups@localhost`.
 
 ## Commands
 
