@@ -43,7 +43,9 @@ hdparm_apm: 128
 hdparm_spindown: 241  # doesnt work for 60 mins or longer.
 
 ### NUT #############################
-nut_shutdown_threshold: 60 # 60 for testing, 40 for normal
+nut_shutdown_threshold: 40 # 80 for testing, 40 for normal
+ups_battery_charge_low: 75
+ups_battery_runtime_low: 600
 
 nut_ups_name: "ups"
 nut_mode: "standalone"
@@ -59,3 +61,4 @@ nut_admin_user: "admin"
 nut_admin_pass: "{{ vault_nut_admin_pass }}"
 nut_mon_user: "monuser"
 nut_mon_pass: "{{ vault_nut_mon_pass }}"
+
