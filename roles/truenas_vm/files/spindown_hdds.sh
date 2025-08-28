@@ -110,7 +110,7 @@ on_err() {
 
 on_exit() {
 	if [[ $HAD_ERROR -eq 0 ]]; then
-		log_ok "Spindown pass complete."
+		log_ok "Spindown script complete. Exiting."
 	fi
 }
 
@@ -143,8 +143,19 @@ echo | "$TEE" -a "$LOG_FILE"
 log "============================================================"
 log "Starting HDD spindown  ${C_DIM}(SAMPLE_DURATION=${SAMPLE_DURATION}s, UTIL_THRESHOLD=${UTIL_THRESHOLD}%)${C_RESET}"
 for pair in "${TARGETS[@]}"; do
-	IFS='|' read -r devid label <<<"$pair"
-	log "  target: ${C_BOLD}${sdnode} - ${label}${C_RESET} [$devid]"
+  IFS='|' read -r devid label <<<"$pair"
+  sdnode=""
+  if [[ -e "$devid" ]]; then
+    realnode=$("$READLINK" -f "$devid") || true
+    if [[ -n "$realnode" && -e "$realnode" ]]; then
+      sdnode=$("$BASENAME" "$realnode")
+    else
+      sdnode="(unresolved)"
+    fi
+  else
+    sdnode="(missing)"
+  fi
+  log "  target: ${C_BOLD}${sdnode}${C_RESET} - ${label} [$devid]"
 done
 
 # Abort if any ZFS scrub/resilver is running
@@ -181,17 +192,18 @@ for pair in "${TARGETS[@]}"; do
 	fi
 
 	# Already in standby?
-  # Already in standby?
   rc=0
   "$NICE" -n 10 "$IONICE" -c3 "$SMARTCTL" -n standby -i "$devid" >/dev/null 2>&1 || rc=$?
 
   case "$rc" in
     0) ;;  # OK, proceed
     2)
+      echo | "$TEE" -a "$LOG_FILE"
       log_note "${label} (${sdnode}): already in standby; skipping."
       continue
       ;;
     *)
+      echo | "$TEE" -a "$LOG_FILE"
       log_warn "${label}: smartctl returned rc=$rc (non-fatal); continuing."
       ;;
   esac
@@ -248,13 +260,13 @@ for pair in "${TARGETS[@]}"; do
 	if "$AWK" -v u="$util" -v t="$UTIL_THRESHOLD" 'BEGIN{exit !(u < t)}'; then
 		log_warn "${label} (${sdnode}): Spinning down …"
 		if "$HDPARM" -y "$devid" >/dev/null 2>&1; then
-			log_ok "${label} (${sdnode}): sent to standby."
+			log_ok "${label} (${sdnode}): disk in standby."
 			"$TOUCH" "$stamp" || true
 		else
 			log_err "${label} (${sdnode}): hdparm -y failed; backing off."
 			"$TOUCH" "$stamp" || true
 		fi
 	else
-		log_note "${label} (${sdnode}): busy (util >= ${UTIL_THRESHOLD}%), skipping."
+		log_note "${label} (${sdnode}): utilisation >= ${UTIL_THRESHOLD}%, skipping spindown."
 	fi
 done
