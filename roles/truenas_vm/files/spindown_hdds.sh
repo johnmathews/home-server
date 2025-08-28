@@ -110,6 +110,7 @@ on_err() {
 
 on_exit() {
 	if [[ $HAD_ERROR -eq 0 ]]; then
+    echo | "$TEE" -a "$LOG_FILE"
 		log_ok "Spindown script complete. Exiting."
 	fi
 }
@@ -130,6 +131,7 @@ done
 # Single-run lock
 exec {LOCKFD}>"$LOCK_FILE" || die "Cannot open lock file $LOCK_FILE"
 "$FLOCK" -n "$LOCKFD" || {
+  echo | "$TEE" -a "$LOG_FILE"
 	log_note "Another run is active; exiting."
 	exit 0
 }
