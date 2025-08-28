@@ -144,7 +144,7 @@ log "============================================================"
 log "Starting HDD spindown  ${C_DIM}(SAMPLE_DURATION=${SAMPLE_DURATION}s, UTIL_THRESHOLD=${UTIL_THRESHOLD}%)${C_RESET}"
 for pair in "${TARGETS[@]}"; do
 	IFS='|' read -r devid label <<<"$pair"
-	log "  target: ${C_BOLD}${label}${C_RESET} [$devid]"
+	log "  target: ${C_BOLD}${sdnode} - ${label}${C_RESET} [$devid]"
 done
 
 # Abort if any ZFS scrub/resilver is running
@@ -188,18 +188,18 @@ for pair in "${TARGETS[@]}"; do
   case "$rc" in
     0) ;;  # OK, proceed
     2)
-      log_note "${label} [$devid] (${sdnode}): already in standby; skipping."
+      log_note "${label} (${sdnode}): already in standby; skipping."
       continue
       ;;
     *)
-      log_warn "${label} [$devid]: smartctl returned rc=$rc (non-fatal); continuing."
+      log_warn "${label}: smartctl returned rc=$rc (non-fatal); continuing."
       ;;
   esac
 
 	if [[ $rc -eq 0 ]]; then
 		# Skip if a SMART self-test is running (won’t wake due to -n standby)
 		if "$NICE" -n 10 "$IONICE" -c3 "$SMARTCTL" -n standby -c "$devid" 2>/dev/null | "$GREP" -qi "Self-test routine in progress"; then
-			log_note "${label} [$devid] (${sdnode}): SMART self-test running; skipping."
+			log_note "${label} (${sdnode}): SMART self-test running; skipping."
 			continue
 		fi
 	fi
@@ -210,14 +210,14 @@ for pair in "${TARGETS[@]}"; do
 		last=$("$STAT" -c %Y "$stamp" 2>/dev/null || echo 0)
 		now=$("$DATE" +%s)
 		if ((now - last < COOLDOWN_SECS)); then
-			log_note "${label} [$devid] (${sdnode}): cooldown active $((now - last))s < ${COOLDOWN_SECS}s; skipping."
+			log_note "${label} (${sdnode}): cooldown active $((now - last))s < ${COOLDOWN_SECS}s; skipping."
 			continue
 		fi
 	fi
 
 	# Sample iostat and read final %util
 	echo | "$TEE" -a "$LOG_FILE"
-	log "${label} [$devid] (${sdnode}): sampling I/O for ${SAMPLE_DURATION}s…"
+	log "${label} (${sdnode}): sampling I/O for ${SAMPLE_DURATION}s…"
 	util_line="$(
 		"$NICE" -n 10 "$IONICE" -c3 \
 			"$IOSTAT" -d -x -y "$sdnode" "$SAMPLE_DURATION" 2 2>/dev/null |
@@ -226,11 +226,11 @@ for pair in "${TARGETS[@]}"; do
 
 	if [[ -z "$util_line" ]]; then
 		util="0.00"
-		log_warn "${label} [$devid]: no iostat line captured; treating as idle."
+		log_warn "${label}: no iostat line captured; treating as idle."
 	else
 		util=$("$AWK" '{print $(NF)+0}' <<<"$util_line")
 	fi
-	log "${label} [$devid] (${sdnode}): utilisation=${C_BOLD}${util}%${C_RESET}"
+	log "${label} (${sdnode}): ${C_BOLD}${util}% utilisation${C_RESET}"
 
 	# ZFS-aware guard: if reads/writes non-zero, skip
 	devlabel_byid="$("$BASENAME" "$devid")"
@@ -240,21 +240,21 @@ for pair in "${TARGETS[@]}"; do
 		"$AWK" -v d1="$devlabel_byid" -v d2="$devlabel_sdx" -v d3="$devlabel_real" '
        { name=$1; r=$(NF-1)+0; w=$(NF)+0; if (index(name,d1)||index(name,d2)||index(name,d3)) if (r+w>0) act=1 }
        END{ exit act?0:1 }'; then
-		log_note "${label} [$devid] (${sdnode}): zpool iostat shows activity; skipping."
+		log_note "${label} (${sdnode}): zpool iostat shows activity; skipping."
 		continue
 	fi
 
 	# Compare as numbers: spin down if util < threshold
 	if "$AWK" -v u="$util" -v t="$UTIL_THRESHOLD" 'BEGIN{exit !(u < t)}'; then
-		log_warn "Spinning down ${label} [$devid] (${sdnode})…"
+		log_warn "${label} (${sdnode}): Spinning down …"
 		if "$HDPARM" -y "$devid" >/dev/null 2>&1; then
-			log_ok "${label} [$devid]: sent to standby."
+			log_ok "${label} (${sdnode}): sent to standby."
 			"$TOUCH" "$stamp" || true
 		else
-			log_err "${label} [$devid]: hdparm -y failed; backing off."
+			log_err "${label} (${sdnode}): hdparm -y failed; backing off."
 			"$TOUCH" "$stamp" || true
 		fi
 	else
-		log_note "${label} [$devid] (${sdnode}): busy (util >= ${UTIL_THRESHOLD}%), skipping."
+		log_note "${label} (${sdnode}): busy (util >= ${UTIL_THRESHOLD}%), skipping."
 	fi
 done
