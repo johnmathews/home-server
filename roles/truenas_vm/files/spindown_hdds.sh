@@ -139,6 +139,7 @@ sleep $((RANDOM % 10))
 
 ((${#TARGETS[@]} > 0)) || die "No TARGETS configured."
 
+echo | "$TEE" -a "$LOG_FILE"
 log "============================================================"
 log "Starting HDD spindown  ${C_DIM}(SAMPLE_DURATION=${SAMPLE_DURATION}s, UTIL_THRESHOLD=${UTIL_THRESHOLD}%)${C_RESET}"
 for pair in "${TARGETS[@]}"; do
