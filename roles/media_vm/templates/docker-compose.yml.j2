@@ -4,6 +4,62 @@
 ---
 
 services:
+  gluetun:
+    image: qmcgaw/gluetun
+    container_name: gluetun
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun
+    ports:
+      - 8080:8080 # qBittorrent WebUI
+      - 8081:8081 # sabnzbd WebUI, set in config file.
+      - 3189:3189 # qbittorrent endpoint port
+      - 6881:6881 # BitTorrent port
+      - 6881:6881/udp
+      - 8000:8000/tcp # control server port
+      - 8888:8888/tcp # HTTP proxy
+      - 8388:8388/tcp # Shadowsocks
+      - 8388:8388/udp # Shadowsocks
+    volumes:
+      - /srv/media/config/gluetun:/gluetun
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "https://ifconfig.me"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+    environment:
+      # NO PORT FORWARDING 
+      - FIREWALL=on
+      - FIREWALL_VPN_INPUT_PORTS="3189,6881"
+      - VPN_SERVICE_PROVIDER=${VPN_SERVICE_PROVIDER}
+      - VPN_TYPE=wireguard
+      - WIREGUARD_ENDPOINT=${WIREGUARD_ENDPOINT}
+      - WIREGUARD_PUBLIC_KEY=${WIREGUARD_PUBLIC_KEY}
+      - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
+      - WIREGUARD_ADDRESSES=${WIREGUARD_ADDRESSES}
+      - OWNED_ONLY=yes
+      - TZ=Europe/Amsterdam
+    restart: always
+
+  qbittorrent:
+    image: linuxserver/qbittorrent
+    container_name: qbittorrent
+    security_opt:
+      - no-new-privileges:true
+    network_mode: "service:gluetun"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - WEBUI_USERNAME=${QBITTORRENT_USERNAME}
+      - WEBUI_PASSWORD=${QBITTORRENT_PASSWORD}
+    volumes:
+      - /srv/media/config:/config
+      - /mnt/media/library/downloads:/downloads
+      - /mnt/media/library:/media
+    restart: always
+
   filebrowser:
     image: filebrowser/filebrowser:latest
     container_name: filebrowser
@@ -120,60 +176,6 @@ services:
       - /mnt/media/library/downloads:/downloads # keep this so it understands what sabnzbd sees
     ports:
       - "7878:7878"
-    restart: always
-
-  gluetun:
-    image: qmcgaw/gluetun
-    container_name: gluetun
-    cap_add:
-      - NET_ADMIN
-    devices:
-      - /dev/net/tun
-    ports:
-      - 8080:8080 # qBittorrent WebUI
-      - 8081:8081 # sabnzbd WebUI, set in config file.
-      - 6881:6881 # BitTorrent port
-      - 6881:6881/udp
-      - 3189:3189 # endpoint port
-      - 8000:8000/tcp # control server port
-      - 8888:8888/tcp # HTTP proxy
-      - 8388:8388/tcp # Shadowsocks
-      - 8388:8388/udp # Shadowsocks
-    volumes:
-      - /srv/media/config/gluetun:/gluetun
-    healthcheck:
-      test: ["CMD", "wget", "-qO-", "https://ifconfig.me"]
-      interval: 60s
-      timeout: 10s
-      retries: 3
-    environment:
-      - VPN_SERVICE_PROVIDER=${VPN_SERVICE_PROVIDER}
-      - VPN_TYPE=wireguard
-      - FIREWALL=on
-      - WIREGUARD_ENDPOINT=${WIREGUARD_ENDPOINT}
-      - WIREGUARD_PUBLIC_KEY=${WIREGUARD_PUBLIC_KEY}
-      - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
-      - WIREGUARD_ADDRESSES=${WIREGUARD_ADDRESSES}
-      - OWNED_ONLY=yes
-      - TZ=Europe/Amsterdam
-    restart: always
-
-  qbittorrent:
-    image: linuxserver/qbittorrent
-    container_name: qbittorrent
-    security_opt:
-      - no-new-privileges:true
-    network_mode: "service:gluetun"
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-      - WEBUI_USERNAME=${QBITTORRENT_USERNAME}
-      - WEBUI_PASSWORD=${QBITTORRENT_PASSWORD}
-    volumes:
-      - /srv/media/config:/config
-      - /mnt/media/library/downloads:/downloads
-      - /mnt/media/library:/media
     restart: always
 
   flaresolverr:
