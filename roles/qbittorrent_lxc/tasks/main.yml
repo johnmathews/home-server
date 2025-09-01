@@ -100,17 +100,17 @@
 # 7. Handle qBittorrent config prep before container starts
 - name: Re-create qbittorrent config directory
   file:
-    path: "{{ media_stack_base_dir }}/config/qBittorrent"
+    path: "{{ base_dir }}/qBittorrent"
     state: directory
-    owner: "{{ media_stack_user }}"
-    group: "{{ media_stack_user }}"
+    owner: "{{ docker_user }}"
+    group: "{{ docker_user }}"
     mode: '0755'
   when: reset_qbittorrent_config | default(false)
 
 - name: Pre-seed qBittorrent.conf if missing and not resetting
   ansible.builtin.template:
     src: qBittorrent.conf.j2
-    dest: "{{ media_stack_base_dir }}/config/qBittorrent/qBittorrent.conf"
+    dest: "{{ base_dir }}/qBittorrent/qBittorrent.conf"
     owner: "{{ puid }}"
     group: "{{ guid }}"
     mode: '0644'
