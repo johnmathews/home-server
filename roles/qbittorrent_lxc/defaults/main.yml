@@ -8,6 +8,9 @@ puid: 1001
 guid: 1001
 pgid: 1001
 
+base_dir: /srv/media
+mount_dir: /mnt/media
+
 # smb_media_vm_username: media_vm
 smb_username: smb_user
 
