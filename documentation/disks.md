@@ -78,6 +78,8 @@ settings or getting errors.
 The only HDD you need to manage on the host is
 `/dev/disk/by-id/ata-ST3000DM007-1WY10G_ZFN1TN5X`.
 
+`smartctl -n standby -i /dev/disk/by-id/ata-ST3000DM007-1WY10G_ZFN1TN5X`
+
 `sudo hdparm -S 120 /dev/disk/by-id/ata-ST3000DM007-1WY10G_ZFN1TN5X` - This will
 make it spin down after 10 minutes. (`-S 242` will make it spindown after 60 minutes.)
 
@@ -108,6 +110,9 @@ settings won’t be re-applied automatically. You need to:
 ## hdparm command flags:
 
 - `hdparm -y` - puts the drive into standby mode immediately
-- `hdparm -C` - asks the disk what state it is currently in. But this will wake it, if it is in standby.
+- `hdparm -C` - asks the disk what state it is currently in. But this might (?) wake it, if it is in standby.
 - `smartctl -n standby -i` - check the disk state without waking it.
 - `hdparm -s` - toggles security settings. Don't use this.
+- `hdparm -S` - set spindown time.
+- `smartctl -a ` - lots of info
+- `sudo hdparm -I` - spindown settings
