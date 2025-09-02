@@ -48,6 +48,11 @@
   import_tasks: smartctl.yml
   tags: [metrics, smartctl]
 
+# hd-idle disk spindown settings
+- name: Setup hd-idle
+  import_tasks: hd-idle.yml
+  tags: [hd-idle]
+
 # iGPU metrics
 - name: Install radeontop metrics exporter
   import_tasks: radeontop-exporter.yml
