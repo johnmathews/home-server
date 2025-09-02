@@ -98,7 +98,16 @@ settings won’t be re-applied automatically. You need to:
    sudo /lib/udev/hdparm start
    ```
 
-2. To check what happened when you ran `/lib/udev/hdparm` start, look at `dmesg`
-   or `syslog` for `hdparm` output:
+2. To check what happened when you ran `/lib/udev/hdparm start`, look at `dmesg`
+   or `syslog` for `hdparm` output. (`journalctl` and `dmesg` give the same output):
 
    `journalctl -b | grep hdparm`
+   `journalctl -f | grep -i sdg`
+   `journalctl -k | grep -i sdg`
+
+## hdparm command flags:
+
+- `hdparm -y` - puts the drive into standby mode immediately
+- `hdparm -C` - asks the disk what state it is currently in. But this will wake it, if it is in standby.
+- `smartctl -n standby -i` - check the disk state without waking it.
+- `hdparm -s` - toggles security settings. Don't use this.
