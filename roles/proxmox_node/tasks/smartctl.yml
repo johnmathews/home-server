@@ -18,42 +18,27 @@
       when: gnu_tar_check.rc != 0
   tags: [metrics]
 
-# HDD metrics smart_ctl smartctl_exporter
-- name: Install Prometheus Smartctl Exporter
+- name: Install & configure Prometheus Smartctl Exporter
   import_role:
     name: prometheus.prometheus.smartctl_exporter
+  vars:
+    # Run as root without a systemd drop-in
+    smartctl_exporter_system_user: root
+    smartctl_exporter_system_group: root
 
-# Ensure drop-in dir exists
-- name: Create systemd drop-in dir for smartctl_exporter
-  become: true
-  ansible.builtin.file:
-    path: /etc/systemd/system/smartctl_exporter.service.d
-    state: directory
-    mode: '0755'
-    owner: root
-    group: root
+    # Scrape pacing
+    smartctl_exporter_smartctl_interval: "60s"
+    smartctl_exporter_smartctl_rescan: "10m"
 
-# Force root via override
-- name: Ensure smartctl_exporter runs as root via override
-  become: true
-  ansible.builtin.copy:
-    dest: /etc/systemd/system/smartctl_exporter.service.d/override.conf
-    content: |
-      [Service]
-      User=root
-      Group=root
-      Environment=SMARTCTL_EXPORTER_SMARTCTL_PATH=/usr/sbin/smartctl
-  notify: Restart smartctl_exporter
-
-# Reload systemd to pick up the drop-in
-- name: systemd daemon-reload
-  become: true
-  ansible.builtin.systemd:
-    daemon_reload: true
+    # Only the disks you want on the Proxmox host (examples)
+    # Prefer /dev/disk/by-id for stability across reboots
+    smartctl_exporter_smartctl_devices:
+      - /dev/disk/by-id/ata-ST3000DM007-1WY10G_ZFN1TN5X
 
 - name: Ensure smartctl_exporter is started and enabled
   become: true
-  systemd:
+  ansible.builtin.systemd:
     name: smartctl_exporter
     state: started
     enabled: true
+    daemon_reload: true

@@ -22,14 +22,6 @@ smartmon_exporter_version: "0.11.0"
 smartmon_exporter_install_dir: "/opt/smartmon_exporter"
 smartmon_exporter_listen_port: 9633
 
-# smartctl
-smartctl_exporter_enabled: true
-smartctl_exporter_smartctl_device_include: ""
-smartctl_exporter_smartctl_rescan: "10m"
-smartctl_exporter_smartctl_interval: "30s"
-smartctl_exporter_system_user: root
-smartctl_exporter_system_group: root
-
 # pve_exporter
 pve_exporter_version: "3.5.3"
 pve_exporter_install_dir: "/opt/pve_exporter"
