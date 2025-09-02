@@ -60,7 +60,7 @@
  
 - name: Setup hdparm for HDD power management 
   import_tasks: hdparm.yml
-  tags: [HDD, hdparm]
+  tags: [hdd, hdparm]
 
 # NUT 
 - name: Setup NUT 
