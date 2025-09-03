@@ -1,0 +1,12 @@
+# playbooks/immich_lxc.yml
+
+---
+
+- name: Media-DL LXC
+  hosts: media_dl_lxc 
+  gather_facts: true
+  become: true
+
+  roles:
+    - role: media_dl_lxc
+      tags: media-dl

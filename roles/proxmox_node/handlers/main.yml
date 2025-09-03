@@ -55,3 +55,9 @@
   systemd:
     name: smartctl_exporter
     state: restarted
+
+- name: Restart hd-idle
+  become: true
+  ansible.builtin.systemd:
+    name: hd-idle
+    state: restarted

@@ -38,10 +38,3 @@
     name: hd-idle
     enabled: true
     state: started
-
-# Handler
-- name: Restart hd-idle
-  become: true
-  ansible.builtin.systemd:
-    name: hd-idle
-    state: restarted
