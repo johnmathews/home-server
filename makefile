@@ -50,8 +50,8 @@ prometheus:
 paperless:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/paperless_lxc.yml $(VAULT) $(TAGS)
 
-qbittorrent:
-	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/qbittorrent_lxc.yml $(VAULT) $(TAGS)
+media-dl:
+	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/media_dl_lxc.yml $(VAULT) $(TAGS)
 
 jelly:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/jellyfin_lxc.yml $(VAULT) $(TAGS)
