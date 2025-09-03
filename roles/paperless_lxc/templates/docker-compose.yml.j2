@@ -61,8 +61,8 @@ services:
     environment:
       PAPERLESS_REDIS: redis://paperless-broker:6379
       PAPERLESS_DBHOST: paperless-db
-      PAPERLESS_TRAIN_TASK_CRON: "*/60 9-22 * * *"
-      PAPERLESS_INDEX_TASK_CRON: "*/60 9-22 * * *"
+      PAPERLESS_TRAIN_TASK_CRON: "*/60 10-20 * * *"
+      PAPERLESS_INDEX_TASK_CRON: "*/60 10-20 * * *"
       PUID: ${PUID}
       PGID: ${PGID}
       USERMAP_UID: ${PUID}
