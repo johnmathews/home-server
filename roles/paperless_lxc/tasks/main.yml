@@ -1,5 +1,5 @@
 # roles/paperless_lxc/tasks/main.yml
-#
+
 ---
 
 - name: Ensure cifs-utils is installed
@@ -18,44 +18,75 @@
 
 - name: Create SMB credentials file
   ansible.builtin.copy:
-    dest: "/etc/smb/.smbcredentials"
-    content: |
-      username={{ smb_username }}
-      password={{ vault_smb_username_password }}
+    dest: /etc/smb/.smbcredentials
     owner: root
     group: root
     mode: '0600'
+    content: |
+      username={{ smb_username }}
+      password={{ vault_smb_username_password }}
 
-- name: Persist SMB mount in /etc/fstab
+- name: Ensure /mnt/paperless mountpoint exists
+  ansible.builtin.file:
+    path: /mnt/paperless
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Ensure paperless system group exists with fixed GID
+  ansible.builtin.group:
+    name: paperless
+    gid: "{{ pgid }}"
+    system: yes
+    state: present
+
+- name: Ensure paperless system user exists with fixed UID/GID
+  ansible.builtin.user:
+    name: paperless
+    uid: "{{ puid }}"
+    group: paperless
+    system: yes
+    shell: /usr/sbin/nologin
+    create_home: no
+    state: present
+
+- name: Remove legacy fstab lines for paperless share
   ansible.builtin.lineinfile:
     path: /etc/fstab
-    regexp: '^//{{ smb_server | regex_escape }}/{{ item.name | regex_escape }}[ \t]+'
-    line: >-
-      //{{ smb_server }}/{{ item.name }} {{ item.target }} cifs
-      credentials=/etc/smb/.smbcredentials,
-      uid={{ puid }},gid={{ pgid }},
-      dir_mode=0775,file_mode=0664,
-      iocharset=utf8,cache=none,noserverino,nounix,noperm,nofail,noauto,
-      x-systemd.automount,x-systemd.device-timeout=10,_netdev,vers=3.1.1 0 0
-    state: present
-    create: yes
-  loop: "{{ smb_shares }}"
+    state: absent
+    regexp: '^//{{ smb_server | regex_escape }}/paperless[ \t]+/mnt/paperless[ \t]+cifs[ \t]+'
+  tags: paperless_fstab
 
-- name: Create local mount point
-  ansible.builtin.file:
-    path: "{{ item.target }}"
-    state: directory
-    mode: '0755'
-  loop: "{{ smb_shares }}"
-
-- name: Mount SMB shares
-  mount:
-    path: "{{ item.target }}"
-    src: "//{{ smb_server }}/{{ item.name }}"
+- name: Ensure fstab entry for paperless share is present
+  ansible.posix.mount:
+    path: /mnt/paperless
+    src: "//{{ smb_server }}/paperless"
     fstype: cifs
-    opts: credentials=/etc/smb/.smbcredentials,iocharset=utf8,noperm,nofail,vers=3.1.1
+    opts: "credentials=/etc/smb/.smbcredentials,uid={{ puid }},gid={{ pgid }},dir_mode=0770,file_mode=0660,iocharset=utf8,cache=strict,noserverino,rw,_netdev,noatime,vers=3.1.1"
+    state: present
+  tags: paperless_fstab
+
+- name: Mount or remount paperless share
+  ansible.posix.mount:
+    path: /mnt/paperless
+    src: "//{{ smb_server }}/paperless"
+    fstype: cifs
+    opts: "credentials=/etc/smb/.smbcredentials,uid={{ puid }},gid={{ pgid }},dir_mode=0770,file_mode=0660,iocharset=utf8,cache=strict,noserverino,rw,_netdev,noatime,vers=3.1.1"
     state: mounted
-  loop: "{{ smb_shares }}"
+  tags: paperless_fstab
+
+- name: Ensure paperless subdirectories exist on the SMB share
+  ansible.builtin.file:
+    path: "/mnt/paperless/{{ item }}"
+    state: directory
+    owner: "{{ puid }}"
+    group: "{{ pgid }}"
+    mode: '0770'
+  loop:
+    - consume
+    - media
+    - export
 
 - name: Create base app directories for containers
   ansible.builtin.file:
@@ -66,6 +97,35 @@
     group: root
   loop:
     - /srv/apps/paperless/data
+    - /srv/apps/paperless/pgdata
+    - /srv/apps/paperless/redisdata
+
+- name: Ensure paperless data directory ownership
+  ansible.builtin.file:
+    path: /srv/apps/paperless/data
+    state: directory
+    owner: "{{ puid }}"
+    group: "{{ pgid }}"
+    mode: '0770'
+  notify: Restart all containers
+
+- name: Ensure Postgres data directory ownership
+  ansible.builtin.file:
+    path: /srv/apps/paperless/pgdata
+    state: directory
+    owner: 999
+    group: 999
+    mode: '0700'
+  notify: Restart all containers
+
+- name: Ensure Redis data directory ownership
+  ansible.builtin.file:
+    path: /srv/apps/paperless/redisdata
+    state: directory
+    owner: 999
+    group: 999
+    mode: '0755'
+  notify: Restart all containers
 
 - name: Create environment file from template
   ansible.builtin.template:
@@ -85,34 +145,4 @@
     group: root
   notify:
     - Update containers
-    - Restart all containers
-
-- name: Ensure paperless data directory ownership
-  file:
-    path: /srv/apps/paperless/data
-    state: directory
-    owner: "{{ puid }}"
-    group: "{{ guid }}"
-    mode: '0755'
-  notify:
-    - Restart all containers
-
-- name: Ensure Postgres data directory ownership
-  file:
-    path: /srv/apps/paperless/pgdata
-    state: directory
-    owner: 999
-    group: 999
-    mode: '0700'
-  notify:
-    - Restart all containers
-
-- name: Ensure Redis data directory ownership
-  file:
-    path: /srv/apps/paperless/redisdata
-    state: directory
-    owner: 999
-    group: 999
-    mode: '0755'
-  notify:
     - Restart all containers
