@@ -67,14 +67,14 @@
   loop:
     - /srv/apps/qbittorrent/data
 
-# - name: Create environment file from template
-#   ansible.builtin.template:
-#     src: .env.j2
-#     dest: "{{ docker_compose_dir }}/.env"
-#     mode: '0600'
-#   notify:
-#     - Update containers
-#     - Restart all containers
+- name: Create environment file from template
+  ansible.builtin.template:
+    src: .env.j2
+    dest: "{{ docker_compose_dir }}/.env"
+    mode: '0600'
+  notify:
+    - Update containers
+    - Restart all containers
 
 - name: Copy docker-compose.yml
   ansible.builtin.template:

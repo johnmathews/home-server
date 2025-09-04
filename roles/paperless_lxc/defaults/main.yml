@@ -8,19 +8,9 @@ puid: 1001
 guid: 1001
 pgid: 1001
 
-# smb_media_vm_username: media_vm
 smb_username: smb_user
 
 smb_server: 192.168.2.104
 smb_shares:
   - name: paperless
     target: /mnt/paperless
-
-paperless_smb_subdirectories:
-  - name: paperless
-    target: /mnt/paperless
-  # - name: paperless-export
-  #   target: /mnt/paperless/export
-  # - name: paperless-media
-  #   target: /mnt/paperless/media
-
