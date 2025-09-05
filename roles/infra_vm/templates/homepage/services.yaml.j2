@@ -377,29 +377,6 @@
 
 
 - Infra:
-    - VaultWarden:
-        href: https://passwords.itsa.pizza
-        siteMonitor: https://192.168.2.13:8000
-        icon: vaultwarden
-
-    - File Browser:
-        href: http://192.168.2.106:8082
-        siteMonitor: http://192.168.2.106:8082
-        icon: filebrowser
-
-    # - traefik:
-    #     href: http://traefik.itsa.pizza
-    #     siteMonitor: http://192.168.2.108:8080/dashboard/#/
-    #     icon: traefik
-    #     widget:
-    #       type: traefik
-    #       url: http://192.168.2.108:8080
-
-    - ntfy:
-        href: https://ntfy.itsa.pizza/
-        siteMonitor: https://ntfy.itsa.pizza/
-        icon: ntfy
-
     - Grafana:
         href: https://charts.itsa.pizza/d/dekkfibh9454wb/home-server?orgId=1&from=now-24h&to=now&timezone=browser%3Fkiosk&refresh=10s
         siteMonitor: http://192.168.2.106:3000
@@ -410,6 +387,46 @@
           url: http://192.168.2.106:3000
           username: "{{ vault_grafana_username }}"
           password: "{{ vault_grafana_password }}"
+
+    - Prometheus:
+        href: http://prometheus.itsa.pizza
+        siteMonitor: http://192.168.2.106:9090
+        description: Metrics Collector
+        icon: prometheus
+        widget:
+          type: prometheus
+          url: http://192.168.2.106:9090
+
+    - Uptime Kuma:
+        href: https://uptime.itsa.pizza
+        siteMonitor: http://192.168.2.106:3001
+        description: Monitoring
+        icon: si-uptimekuma 
+        widget:
+          type: uptimekuma
+          url: http://192.168.2.106:3001
+          slug: monitoring
+
+    - Portainer:
+        href: http://portainer.itsa.pizza
+        siteMonitor: http://192.168.2.106:9000
+        description: containers
+        icon: portainer
+        widget:
+          type: portainer
+          url: http://192.168.2.106:9000
+          env: 5
+          key: "{{ vault_portainer_key }}"
+
+    - VaultWarden:
+        href: https://passwords.itsa.pizza
+        siteMonitor: https://192.168.2.13:8000
+        icon: vaultwarden
+
+    - File Browser:
+        href: http://192.168.2.106:8082
+        siteMonitor: http://192.168.2.106:8082
+        icon: filebrowser
 
 
     - Home Assistant:
@@ -435,36 +452,6 @@
           url: http://192.168.2.111
           username: john
           password: "{{ vault_adguard_password }}"
-
-    - Uptime Kuma:
-        href: https://uptime.itsa.pizza
-        siteMonitor: http://192.168.2.106:3001
-        description: Monitoring
-        icon: si-uptimekuma 
-        widget:
-          type: uptimekuma
-          url: http://192.168.2.106:3001
-          slug: monitoring
-
-    - Prometheus:
-        href: http://prometheus.itsa.pizza
-        siteMonitor: http://192.168.2.106:9090
-        description: Metrics Collector
-        icon: prometheus
-        widget:
-          type: prometheus
-          url: http://192.168.2.106:9090
-
-    - Portainer:
-        href: http://portainer.itsa.pizza
-        siteMonitor: http://192.168.2.106:9000
-        description: containers
-        icon: portainer
-        widget:
-          type: portainer
-          url: http://192.168.2.106:9000
-          env: 5
-          key: "{{ vault_portainer_key }}"
 
     - Dozzle:
         href: http://dozzle.itsa.pizza
