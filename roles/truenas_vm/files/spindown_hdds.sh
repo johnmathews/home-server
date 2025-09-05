@@ -260,7 +260,7 @@ for pair in "${TARGETS[@]}"; do
 
 	# Compare as numbers: spin down if util < threshold
 	if "$AWK" -v u="$util" -v t="$UTIL_THRESHOLD" 'BEGIN{exit !(u < t)}'; then
-		log_warn "${label} (${sdnode}): Spinning down …"
+		log_warn "${label} (${sdnode}): Spinning down…"
 		if "$HDPARM" -y "$devid" >/dev/null 2>&1; then
 			log_ok "${label} (${sdnode}): disk in standby."
 			"$TOUCH" "$stamp" || true
