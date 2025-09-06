@@ -3,3 +3,4 @@ iso-images/
 cloud-images/
 .vault_pass.txt
 .env
+sabnzbd.ini.j2
