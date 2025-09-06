@@ -66,6 +66,18 @@
     group: root
   loop:
     - /srv/apps/qbittorrent/data
+    - /srv/apps/sabnzbd/admin
+    - /srv/apps/sabnzbd/logs
+    - /srv/apps/gluetun
+
+- name: Create sabnzbd.ini file from template
+  ansible.builtin.template:
+    src: sabnzbd.ini.j2
+    dest: "{{ docker_compose_dir }}/sabnzbd/sabnzbd.ini"
+    mode: '0600'
+  notify:
+    - Update containers
+    - Restart all containers
 
 - name: Create environment file from template
   ansible.builtin.template:

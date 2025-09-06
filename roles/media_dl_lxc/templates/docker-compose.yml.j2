@@ -86,7 +86,7 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
-      - HOST_WHITELIST=sabnzbd.itsa.pizza,192.168.2.105 # doesnt work for this image. edit sabnzbd.ini instead
+      - HOST_WHITELIST=sabnzbd.itsa.pizza,192.168.2.118 # doesnt work for this image. edit sabnzbd.ini instead
     volumes:
       - /srv/media/config/sabnzbd:/config # Persistent settings
       - /mnt/media/library/downloads:/downloads
