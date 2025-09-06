@@ -36,8 +36,8 @@ hdparm_spindown: 241  # doesnt work for 60 mins or longer.
 
 ### NUT #############################
 nut_shutdown_threshold: 40 # 80 for testing, 40 for normal. percent.
-ups_battery_charge_low: 75 # 75 for tests, 30 for normal. percent.
-ups_battery_runtime_low: 2100 # 600 (10 mins) for normal, 2100 (35 mins) for testing
+ups_battery_charge_low: 30 # 75 for tests, 30 for normal. percent.
+ups_battery_runtime_low: 600 # 600 (10 mins) for normal, 2100 (35 mins) for testing
 
 nut_ups_name: "ups"
 nut_mode: "standalone"

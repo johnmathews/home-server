@@ -4,7 +4,7 @@
 
 groups:
   - name: ups_mains_rules
-    interval: 30s
+    interval: 10s
     rules:
       # 1) Last time OB was 1 (0 if never seen in lookback)
       - record: ups_last_ob_timestamp_seconds
@@ -12,7 +12,7 @@ groups:
           max_over_time(
             ( timestamp(network_ups_tools_ups_status{flag="OB"})
               * (network_ups_tools_ups_status{flag="OB"} == bool 1)
-            )[365d:1m]
+            )[365d:10s]
           )
 
       # 2) First time we saw the metric at all (series first-seen)
@@ -22,7 +22,7 @@ groups:
             timestamp(network_ups_tools_ups_status{flag="OB"})[365d:1m]
           )
 
-      # 3) Days on mains:
+      # 3) days on mains:
       #    - since last OB if any,
       #    - otherwise since first-seen.
       - record: ups_days_on_mains
@@ -35,6 +35,23 @@ groups:
           or
           (
             # Case 2: never on battery -> literal -1 (vectorized per instance)
+            ((ups_last_ob_timestamp_seconds * 0) - 1)
+            and on(instance) (ups_last_ob_timestamp_seconds == 0)
+          )
+
+      # 4) days since on battery:
+      - record: ups_days_since_last_ob
+        expr: |
+          (
+            # Days since last OB (masked to 0 if currently OB)
+            ((time() - ups_last_ob_timestamp_seconds) / 86400)
+            * on(instance) group_left()
+              (network_ups_tools_ups_status{flag="OB"} == bool 0)
+            and on(instance) (ups_last_ob_timestamp_seconds > 0)
+          )
+          or
+          (
+            # Never seen OB -> -1
             ((ups_last_ob_timestamp_seconds * 0) - 1)
             and on(instance) (ups_last_ob_timestamp_seconds == 0)
           )
