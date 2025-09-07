@@ -5,12 +5,11 @@ MONITOR {{ nut_ups_name }}@localhost 1 {{ nut_mon_user }} {{ nut_mon_pass }} mas
 
 MINSUPPLIES 1
 SHUTDOWNCMD "/sbin/shutdown -h now"
-NOTIFYCMD /usr/sbin/upssched
+NOTIFYCMD "/usr/sbin/upssched"
 POLLFREQ {{ nut_upsmon_pollfreq }}
 POLLFREQALERT {{ nut_upsmon_pollfreqalert }}
 HOSTSYNC 15
 DEADTIME 24
-MAXAGE 24
 POWERDOWNFLAG /etc/killpower
 
 NOTIFYMSG ONLINE "UPS %s on line power"

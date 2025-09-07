@@ -47,7 +47,7 @@ nut_vendorid: "0764"
 nut_productid: "0501"
 nut_desc: "Home Server UPS (CyberPower CP900EPFCLCD)"
 nut_pollinterval: 2
-nut_upsmon_pollfreq: 2  # you can template into upsmon.conf
+nut_upsmon_pollfreq: 2
 nut_upsmon_pollfreqalert: 1
 nut_maxretry: 3
 
