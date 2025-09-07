@@ -4,7 +4,7 @@
 
 groups:
   - name: ups_mains_rules
-    interval: 20s
+    interval: 30s
     rules:
       # 1) Last time OB was 1 (0 if never seen in lookback)
       - record: ups_last_ob_timestamp_seconds
@@ -23,8 +23,6 @@ groups:
           )
 
       # 3) days on mains:
-      #    - since last OB if any,
-      #    - otherwise since first-seen.
       - record: ups_days_on_mains
         expr: |
           (
