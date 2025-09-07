@@ -1,0 +1,27 @@
+# Run this when an event fires:
+CMDSCRIPT /usr/local/sbin/upssched-cmd.sh
+
+# State/IPC files (runtime dir is correct on Debian/Ubuntu):
+PIPEFN /run/nut/upssched.pipe
+LOCKFN /run/nut/upssched.lock
+
+# --- Event wiring ---
+
+# Fire immediately on OB (battery). If you want a small debounce, use START-TIMER onbatt 2
+AT ONBATT * EXEC onbatt
+
+# When mains returns, cancel any pending onbatt timers and execute online action
+AT ONLINE * EXEC online
+
+# Low battery & forced shutdown
+AT LOWBATT * EXEC lowbatt
+AT FSD     * EXEC fsd
+
+# Communication flaps — debounce a little
+AT COMMBAD * START-TIMER commbad 3
+AT COMMOK  * CANCEL-TIMER commbad
+AT COMMOK  * EXEC commok
+
+# Optional: other messages you enabled in upsmon NOTIFYFLAGs
+# AT REPLBATT * EXEC replbatt
+# AT NOCOMM  * EXEC nocomm

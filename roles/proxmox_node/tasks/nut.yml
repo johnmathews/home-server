@@ -68,33 +68,23 @@
     - Restart nut-server
     - Restart nut-monitor
 
-# ---- battery threshold shutdown (systemd timer) ----
-- name: Install battery monitor script
+- name: Configure upssched (/etc/nut/upssched.conf)
   ansible.builtin.template:
-    src: ups-battery-monitor.sh.j2
-    dest: /usr/local/sbin/ups-battery-monitor.sh
+    src: upssched.conf.j2
+    dest: /etc/nut/upssched.conf
     owner: root
-    group: root
-    mode: "0755"
-
-- name: Install systemd service for battery monitor
-  ansible.builtin.template:
-    src: ups-battery-monitor.service.j2
-    dest: /etc/systemd/system/ups-battery-monitor.service
-    owner: root
-    group: root
-    mode: "0644"
-
-- name: Install systemd timer for battery monitor (every minute)
-  ansible.builtin.template:
-    src: ups-battery-monitor.timer.j2
-    dest: /etc/systemd/system/ups-battery-monitor.timer
-    owner: root
-    group: root
-    mode: "0644"
+    group: nut
+    mode: "0640"
   notify:
-    - Systemd daemon-reload
-    - Restart ups-battery-monitor.timer
+    - Restart nut-monitor  # upsmon reads this via upssched
+
+- name: Install upssched command script
+  ansible.builtin.template:
+    src: upssched-cmd.sh.j2
+    dest: /usr/local/sbin/upssched-cmd.sh
+    owner: root
+    group: nut
+    mode: "0750"
 
 - name: Reload systemd units
   ansible.builtin.systemd:
@@ -108,15 +98,6 @@
   loop:
     - nut-server
     - nut-monitor
-
-- name: Enable and start battery monitor timer
-  ansible.builtin.systemd:
-    name: ups-battery-monitor.timer
-    enabled: true
-    state: started
-  notify:
-    - Systemd daemon-reload
-    - Restart ups-battery-monitor.timer
 
 - name: Wait for NUT upsd to listen on 127.0.0.1:3493
   ansible.builtin.wait_for:

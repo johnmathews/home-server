@@ -1,11 +1,13 @@
+# vim: ft=sh
+
 RUN_AS_USER root
 MONITOR {{ nut_ups_name }}@localhost 1 {{ nut_mon_user }} {{ nut_mon_pass }} master
 
 MINSUPPLIES 1
 SHUTDOWNCMD "/sbin/shutdown -h now"
 NOTIFYCMD /usr/sbin/upssched
-POLLFREQ 4
-POLLFREQALERT 2
+POLLFREQ {{ nut_upsmon_pollfreq }}
+POLLFREQALERT {{ nut_upsmon_pollfreqalert }}
 HOSTSYNC 15
 DEADTIME 24
 MAXAGE 24

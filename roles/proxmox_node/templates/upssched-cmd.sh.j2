@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+# upssched passes a single argument (action name) and exports UPSNAME.
+ACTION="${1:-unknown}"
+UPS="${UPSNAME:-unknown}"
+
+log() { logger -t upssched "UPS=${UPS} ACTION=${ACTION} $*"; }
+
+case "$ACTION" in
+  onbatt)
+    log "ONBATT: UPS is on battery"
+    ;;
+  online)
+    log "ONLINE: UPS is back on mains"
+    ;;
+  lowbatt)
+    log "LOWBATT: Battery low"
+    ;;
+  fsd)
+    log "FSD: Forced shutdown in progress"
+    ;;
+  commbad)
+    log "COMMBAD: Communications lost"
+    ;;
+  commok)
+    log "COMMOK: Communications restored"
+    ;;
+  *)
+    log "UNKNOWN ACTION"
+    ;;
+esac
+
+# --- Optional integrations ---
+
+# 1) Pushgateway (uncomment & set URL if you use it)
+# curl -sS -X PUT \
+#   --data-binary "ups_event{ups=\"${UPS}\",action=\"${ACTION}\"} 1
+# " http://127.0.0.1:9091/metrics/job/nut_events/instance/${HOSTNAME} >/dev/null
+
+# 2) Node Exporter textfile collector
+# METRICS_DIR=/var/lib/node_exporter/textfile_collector
+# TMP="$(mktemp)"
+# TS="$(date +%s)"
+# cat > "$TMP" <<EOF
+# nut_last_event_timestamp_seconds{ups="${UPS}",action="${ACTION}"} $TS
+# nut_event_total{ups="${UPS}",action="${ACTION}"} 1
+# EOF
+# install -o root -g root -m 0644 "$TMP" "${METRICS_DIR}/nut_events.prom"
+# rm -f "$TMP"
+
+# 3) Pushover (replace with your tokens)
+# curl -sS --data-urlencode "token=APP_TOKEN" \
+#          --data-urlencode "user=USER_KEY" \
+#          --data-urlencode "title=UPS ${UPS}" \
+#          --data-urlencode "message=${ACTION}" \
+#          https://api.pushover.net/1/messages.json >/dev/null || true
