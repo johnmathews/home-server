@@ -114,7 +114,7 @@ po_sound="pushover"
 case "$ACTION" in
   onbatt)     po_priority=1; po_sound="siren" ;;     # AC lost → High
   lowbatt)    po_priority=1; po_sound="siren" ;;     # Battery low → High
-  fsd)        po_priority=2; po_sound="siren" ;;     # Forced shutdown → Emergency (repeats)
+  fsd)        po_priority=2; po_sound="siren" ;;     # Forced shutdown → Emergency (repeats the notification)
   online)     po_priority=0; po_sound="magic" ;;     # AC restored → Normal
   commbad)    po_priority=-1; po_sound="none" ;;     # Flappy USB → Low
   commok)     po_priority=-1; po_sound="none" ;;
