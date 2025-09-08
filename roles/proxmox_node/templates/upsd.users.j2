@@ -4,6 +4,7 @@
   instcmds = ALL
   upsmon master
 
+# ups mon (the monitoring daemon) connects to upsd using this user
 [{{ nut_mon_user }}]
   password = {{ vault_nut_mon_pass }}
   upsmon master

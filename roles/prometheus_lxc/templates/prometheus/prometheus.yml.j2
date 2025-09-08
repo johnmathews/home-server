@@ -133,7 +133,7 @@ scrape_configs:
 
   - job_name: 'network ups tool'
     scrape_interval: 30s
-    scrape_timeout: 30s
+    scrape_timeout: 20s
     metrics_path: /ups_metrics
     static_configs:
       - targets: ['192.168.2.214:9199']   # infra VM IP:port running nut_exporter         instance: proxmox

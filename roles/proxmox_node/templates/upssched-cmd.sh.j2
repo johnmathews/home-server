@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# vim: ft=sh
+
 set -Eeuo pipefail
 
 # upssched passes a single argument (action name) and exports UPSNAME.
@@ -31,14 +33,20 @@ case "$ACTION" in
     ;;
 esac
 
-# --- Optional integrations ---
+# Pushover integration
+PO_MSG="UPS ${UPS}: ${ACTION}"
+PO_ARGS=(
+  --data-urlencode "token={{ vault_pushover_pve_application_token }}" \
+  --data-urlencode "user={{ vault_pushover_user_key }}" \
+  --data-urlencode "title=UPS ${UPS}" \
+  --data-urlencode "message=${PO_MSG}" \
+  --data-urlencode "priority=1"                    #  -2 quiet, -1 low, 0 normal, 1 high, 2 emergency
+  --data-urlencode "sound=pushover"                # or bike, siren, etc.
+)
+curl -sS "${PO_ARGS[@]}" https://api.pushover.net/1/messages.json >/dev/null || true
 
-# 1) Pushgateway (uncomment & set URL if you use it)
-# curl -sS -X PUT \
-#   --data-binary "ups_event{ups=\"${UPS}\",action=\"${ACTION}\"} 1
-# " http://127.0.0.1:9091/metrics/job/nut_events/instance/${HOSTNAME} >/dev/null
-
-# 2) Node Exporter textfile collector
+# Node Exporter textfile collector integration
+#
 # METRICS_DIR=/var/lib/node_exporter/textfile_collector
 # TMP="$(mktemp)"
 # TS="$(date +%s)"
@@ -48,10 +56,3 @@ esac
 # EOF
 # install -o root -g root -m 0644 "$TMP" "${METRICS_DIR}/nut_events.prom"
 # rm -f "$TMP"
-
-# 3) Pushover 
-curl -sS --data-urlencode "token={{ vault_pushover_pve_application_token }}" \
-         --data-urlencode "user={{ vault_pushover_user_key }}" \
-         --data-urlencode "title=UPS ${UPS}" \
-         --data-urlencode "message=${ACTION}" \
-         https://api.pushover.net/1/messages.json >/dev/null || true

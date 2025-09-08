@@ -1,3 +1,5 @@
+# vim: ft=sh
+
 # Run this when an event fires:
 CMDSCRIPT "/usr/local/sbin/upssched-cmd.sh"
 
@@ -5,21 +7,17 @@ CMDSCRIPT "/usr/local/sbin/upssched-cmd.sh"
 PIPEFN /run/nut/upssched.pipe
 LOCKFN /run/nut/upssched.lock
 
-# --- Event wiring ---
-
-AT ONBATT * START-TIMER onbatt 1
-
-AT ONLINE * START-TIMER online 1
-
-# Low battery & forced shutdown
-AT LOWBATT * START-TIMER lowbatt 1
-AT FSD * START-TIMER fsd 1
+# Immediate events
+AT ONBATT * EXECUTE onbatt
+AT ONLINE * EXECUTE online
+AT LOWBATT * EXECUTE lowbatt
+AT FSD * EXECUTE fsd
 
 # Communication flaps — debounce a little
 AT COMMBAD * START-TIMER commbad 3
 AT COMMOK * CANCEL-TIMER commbad
-AT COMMOK * START-TIMER commok 1
+AT COMMOK * EXECUTE commok
 
-# Optional: other messages you enabled in upsmon NOTIFYFLAGs
-# AT REPLBATT * EXEC replbatt
-# AT NOCOMM * EXEC nocomm
+# messages enabled in upsmon NOTIFYFLAGs
+AT REPLBATT * EXECUTE replbatt
+AT NOCOMM * EXECUTE nocomm
