@@ -4,44 +4,41 @@
 
 groups:
   - name: ups_mains_rules
-    interval: 60s
+    interval: 5m 
     rules:
-      # 1) Last time OB was 1 (0 if never seen in lookback)
+      # Helper: timestamp when OB==1, else 0 (cheap input for other rules)
+      - record: ups_ob_ts_seconds
+        expr: |
+          timestamp(network_ups_tools_ups_status{flag="OB"})
+          * (network_ups_tools_ups_status{flag="OB"} == bool 1)
+
+      # Last time OB was 1 (0 if never seen in lookback)
       - record: ups_last_ob_timestamp_seconds
         expr: |
-          max_over_time(
-            ( timestamp(network_ups_tools_ups_status{flag="OB"})
-              * (network_ups_tools_ups_status{flag="OB"} == bool 1)
-            )[365d:20s]
-          )
+          max_over_time(ups_ob_ts_seconds[60d:10m])
 
-      # 2) First time we saw the metric at all (series first-seen)
+      # First time we saw the metric at all (series first-seen in lookback)
       - record: ups_first_seen_timestamp_seconds
         expr: |
-          min_over_time(
-            timestamp(network_ups_tools_ups_status{flag="OB"})[365d:1m]
-          )
+          min_over_time(timestamp(network_ups_tools_ups_status{flag="OB"})[60d:10m])
 
-      # 3) days on mains:
+      # Days on mains: real days since OB if we have an OB in the window; otherwise -1
       - record: ups_days_on_mains
         expr: |
           (
-            # Case 1: OB occurred -> real days since OB (keep only >0)
-            ((time() - ups_last_ob_timestamp_seconds) / 86400)
+            (time() - ups_last_ob_timestamp_seconds) / 86400
             and on(instance) (ups_last_ob_timestamp_seconds > 0)
           )
           or
           (
-            # Case 2: never on battery -> literal -1 (vectorized per instance)
-            ((ups_last_ob_timestamp_seconds * 0) - 1)
+            (0 * ups_last_ob_timestamp_seconds - 1)
             and on(instance) (ups_last_ob_timestamp_seconds == 0)
           )
 
-      # 4) days since on battery:
+      # Days since last OB (masked to 0 if currently OB); -1 if OB never seen in window
       - record: ups_days_since_last_ob
         expr: |
           (
-            # Days since last OB (masked to 0 if currently OB)
             ((time() - ups_last_ob_timestamp_seconds) / 86400)
             * on(instance) group_left()
               (network_ups_tools_ups_status{flag="OB"} == bool 0)
@@ -49,7 +46,6 @@ groups:
           )
           or
           (
-            # Never seen OB -> -1
-            ((ups_last_ob_timestamp_seconds * 0) - 1)
+            (0 * ups_last_ob_timestamp_seconds - 1)
             and on(instance) (ups_last_ob_timestamp_seconds == 0)
           )
