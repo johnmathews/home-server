@@ -9,26 +9,26 @@ The Uninterruptible Power Supply is controlled by `Network UPS Tools`  (NUT).
 2.	Driver (e.g. usbhid-ups) - runs under upsd (the NUT server).
     - Talks directly to the UPS.
     - Exposes variables (status, charge, runtime, etc.).
-    - Applies your ups.conf overrides.
+    - Applies your `ups.conf` overrides.
 
 3.	`upsd` - listens on TCP (127.0.0.1:3493).
-    - Handles authentication (upsd.users).
-    - Provides status and commands to clients (including upsmon).
+    - Handles authentication (`upsd.users`).
+    - Provides status and commands to clients (including `upsmon`).
 
 4.	`upsmon` - the monitoring daemon.
     - Connects to upsd with the monitor user.
     - Polls UPS state (OL, OB, LB, …).
-    - Evaluates shutdown thresholds and rules from upsmon.conf.
-    - When an event occurs, it fires a NOTIFY.
-    - If NOTIFYCMD "/usr/sbin/upssched" is set and NOTIFYFLAG ... +EXEC is present, it calls upssched.
+    - Evaluates shutdown thresholds and rules from `upsmon.conf`.
+    - When an event occurs, it fires a `NOTIFY`.
+    - If `NOTIFYCMD` "/usr/sbin/upssched" is set and `NOTIFYFLAG ... +EXEC` is present, it calls upssched.
 
 5.	`upssched` - lightweight event scheduler.
-    - Reads upssched.conf.
+    - Reads `upssched.conf`.
     - For each event from upsmon, it decides:
-    - Run EXECUTE <token> immediately, or
-    - START-TIMER <token> <secs> and later trigger EXECUTE <token>, or
-    - CANCEL-TIMER <token> to suppress pending actions.
-    - When executing, it calls the script defined by CMDSCRIPT.
+    - Run `EXECUTE <token>` immediately, or
+    - `START-TIMER <token> <secs>` and later trigger `EXECUTE <token>`, or
+    - `CANCEL-TIMER <token>` to suppress pending actions.
+    - When executing, it calls the script defined by `CMDSCRIPT`.
 
 6.	Your `upssched-cmd.sh` - runs with `$1 = token` (onbatt, online, …) and `$UPSNAME` set in `env`.
     - Logs to syslog.
