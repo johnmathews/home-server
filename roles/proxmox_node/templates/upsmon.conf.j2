@@ -1,5 +1,7 @@
 # vim: ft=sh
 
+# this defines the UPS monitoring daemon
+
 RUN_AS_USER root
 MONITOR {{ nut_ups_name }}@localhost 1 {{ nut_mon_user }} {{ nut_mon_pass }} master
 

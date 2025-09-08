@@ -3,9 +3,19 @@
 
 set -Eeuo pipefail
 
+umask 022
+export PATH=/usr/sbin:/usr/bin:/sbin:/bin
+
 # upssched passes a single argument (action name) and exports UPSNAME.
 ACTION="${1:-unknown}"
 UPS="${UPSNAME:-unknown}"
+
+# Normalize the UPS target: if UPS already includes "@", use it as-is; otherwise append @localhost
+UPS_TARGET="$UPS"
+case "$UPS_TARGET" in
+  *@*) : ;;                            # already like "ups@host"
+  *)    UPS_TARGET="${UPS}@localhost" ;;
+esac
 
 log() { logger -t upssched "UPS=${UPS} ACTION=${ACTION} $*"; }
 
@@ -33,20 +43,7 @@ case "$ACTION" in
     ;;
 esac
 
-# Pushover integration
-PO_MSG="UPS ${UPS}: ${ACTION}"
-PO_ARGS=(
-  --data-urlencode "token={{ vault_pushover_pve_application_token }}" \
-  --data-urlencode "user={{ vault_pushover_user_key }}" \
-  --data-urlencode "title=UPS ${UPS}" \
-  --data-urlencode "message=${PO_MSG}" \
-  --data-urlencode "priority=1"                    #  -2 quiet, -1 low, 0 normal, 1 high, 2 emergency
-  --data-urlencode "sound=pushover"                # or bike, siren, etc.
-)
-curl -sS "${PO_ARGS[@]}" https://api.pushover.net/1/messages.json >/dev/null || true
-
-# Node Exporter textfile collector integration
-#
+# # Node Exporter textfile collector integration (optional)
 # METRICS_DIR=/var/lib/node_exporter/textfile_collector
 # TMP="$(mktemp)"
 # TS="$(date +%s)"
@@ -56,3 +53,80 @@ curl -sS "${PO_ARGS[@]}" https://api.pushover.net/1/messages.json >/dev/null || 
 # EOF
 # install -o root -g root -m 0644 "$TMP" "${METRICS_DIR}/nut_events.prom"
 # rm -f "$TMP"
+
+# --- Pushover ----------------------------------------------
+
+pushover_send() {
+  # $1=priority, $2=sound, $3=message
+  local pri="$1" snd="$2" msg="$3"
+  local ts; ts="$(date +%s)"
+
+  # Base args
+  local args=(
+    --data-urlencode "token={{ vault_pushover_pve_application_token }}"
+    --data-urlencode "user={{ vault_pushover_user_key }}"
+    --data-urlencode "title=UPS ${UPS}"
+    --data-urlencode "message=${msg}"
+    --data-urlencode "priority=${pri}"       # -2 quiet, -1 low, 0 normal, 1 high, 2 emergency
+    --data-urlencode "sound=${snd}"          # e.g. pushover, bike, siren, magic
+    --data-urlencode "timestamp=${ts}"
+  )
+
+  # Critical requires retry/expire
+  if [ "${pri}" = "1" ]; then
+    args+=( --data-urlencode "retry=60" --data-urlencode "expire=360" ) # retry every 60 seconds for 10 minutes
+  fi
+
+  # Emergency requires retry/expire
+  if [ "${pri}" = "2" ]; then
+    args+=( --data-urlencode "retry=60" --data-urlencode "expire=3600" ) # retry every 60 seconds for up to an hour
+  fi
+
+  curl -sS "${args[@]}" https://api.pushover.net/1/messages.json >/dev/null || true
+}
+
+# Robustly enrich message with current charge/runtime (best-effort)
+ups_enrich() {
+  # Returns: ' | charge=87% runtime=1543s' or empty
+  local out="" tries=0
+
+  # Tiny retry loop to dodge races
+  while [ $tries -lt 3 ]; do
+    if out="$(upsc "$UPS_TARGET" 2>/dev/null)"; then
+      break
+    fi
+    tries=$((tries+1))
+    sleep 0.3
+  done
+
+  [ -z "$out" ] && return 0
+
+  # Flexible parsing: allow "key:value" or "key: value"
+  local ch rt
+  ch="$(printf '%s\n' "$out" | awk -F': *' '/^battery\.charge:/ {gsub(/^[ \t]+|[ \t]+$/,"",$2); print $2; exit}')"
+  rt="$(printf '%s\n' "$out" | awk -F': *' '/^battery\.runtime:/ {gsub(/^[ \t]+|[ \t]+$/,"",$2); print $2; exit}')"
+
+  # Append fields if present; avoid double "%"
+  if [ -n "$ch" ]; then
+    case "$ch" in *%*) printf ' | charge=%s' "$ch" ;; *) printf ' | charge=%s%%' "$ch" ;; esac
+  fi
+  if [ -n "$rt" ]; then
+    printf ' runtime=%ss' "$rt"
+  fi
+}
+
+po_priority=0
+po_sound="pushover"
+
+case "$ACTION" in
+  onbatt)     po_priority=1; po_sound="siren" ;;     # AC lost → High
+  lowbatt)    po_priority=1; po_sound="siren" ;;     # Battery low → High
+  fsd)        po_priority=2; po_sound="siren" ;;     # Forced shutdown → Emergency (repeats)
+  online)     po_priority=0; po_sound="magic" ;;     # AC restored → Normal
+  commbad)    po_priority=-1; po_sound="none" ;;     # Flappy USB → Low
+  commok)     po_priority=-1; po_sound="none" ;;
+  *)          po_priority=0; po_sound="pushover" ;;
+esac
+
+PO_MSG="UPS ${UPS}: ${ACTION}$(ups_enrich)"
+pushover_send "$po_priority" "$po_sound" "$PO_MSG"
