@@ -6,7 +6,10 @@ RUN_AS_USER root
 MONITOR {{ nut_ups_name }}@localhost 1 {{ nut_mon_user }} {{ nut_mon_pass }} master
 
 MINSUPPLIES 1
+
+# SHUTDOWNCMD "/usr/bin/logger -t nut-test '*** NUT would shut down now ***'"
 SHUTDOWNCMD "/sbin/shutdown -h now"
+
 NOTIFYCMD "/usr/sbin/upssched"
 POLLFREQ {{ nut_upsmon_pollfreq }}
 POLLFREQALERT {{ nut_upsmon_pollfreqalert }}

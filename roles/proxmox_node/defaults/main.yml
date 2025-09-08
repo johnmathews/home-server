@@ -35,7 +35,7 @@ hdparm_apm: 128
 hdparm_spindown: 241  # doesnt work for 60 mins or longer.
 
 ### NUT #############################
-ups_battery_charge_low: 40 # percent - 75 for tests, 40 for normal.
+ups_battery_charge_low: 40 # percent - 90 for tests, 40 for normal.
 ups_battery_runtime_low: 720 # seconds - 720 (12 mins) for normal, 2100 (35 mins) for testing
 
 nut_ups_name: "ups"
