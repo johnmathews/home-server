@@ -14,7 +14,7 @@ services:
       - "18080:8080"
     command:
       - --docker_only
-      - --enable_metrics=cpu,memory,network,disk,filesystem
+      - --enable_metrics=cpu,memory,network
       - --housekeeping_interval=30s
       - --max_housekeeping_interval=120s
       - --global_housekeeping_interval=1m
