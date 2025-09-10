@@ -1,0 +1,18 @@
+TZ: Europe/Amsterdam
+
+proxmox_api_user: "api@pve"
+docker_compose_dir: "/srv/apps"
+docker_user: john
+
+puid: 1001
+guid: 1001
+pgid: 1001
+
+app_name: "open-webui"
+
+smb_username: smb_user
+
+smb_server: 192.168.2.104
+smb_shares:
+  - name: paperless
+    target: /mnt/paperless

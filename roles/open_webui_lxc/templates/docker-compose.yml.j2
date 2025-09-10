@@ -1,0 +1,45 @@
+# vim: ft=yaml
+# paperless_lxc/files/docker-compose.yml
+
+---
+
+services:
+  # node exporter is running outside docker.
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    restart: always
+    ports:
+      - "18080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    privileged: true  # required for some metrics
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    restart: unless-stopped
+    ports:
+      - "3000:8080"
+    environment:
+      # Point to OpenAI (default). If using a proxy, set OPENAI_API_BASE.
+      OPENAI_API_KEY: "${OPENAI_API_KEY}"
+      # Optional: if you use Azure OpenAI or a proxy
+      # OPENAI_API_BASE: "https://api.openai.com/v1"
+      # OPENAI_API_TYPE: "openai"
+
+      # Hardening / behavior
+      WEBUI_NAME: "Home Server Chat"
+      ENABLE_SIGNUP: "false"   # let Cloudflare Access be the gate
+      ENABLE_OAUTH: "false"    # set true only if you wire up an OAuth provider
+      # Optional limits
+      MAX_FILE_SIZE_MB: "50"
+      # Timezone for logs (align with your infra)
+      TZ: "Europe/Amsterdam"
+    volumes:
+      - ./data:/app/backend/data   # persists users, chats, settings
+      # If you want custom prompts or provider configs:
+      # - ./open-webui.json:/app/backend/data/settings.json:ro

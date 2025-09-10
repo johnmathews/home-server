@@ -1,0 +1,12 @@
+# playbooks/immich_lxc.yml
+
+---
+
+- name: Open WebUI LXC
+  hosts: open_webui_lxc
+  gather_facts: true
+  become: true
+
+  roles:
+    - role: open_webui_lxc
+      tags: open-webui
