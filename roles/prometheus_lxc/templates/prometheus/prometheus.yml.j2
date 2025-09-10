@@ -120,10 +120,8 @@ scrape_configs:
           instance: proxmox
 
   - job_name: pve
-    scrape_interval: 15s
     static_configs:
       - targets: ['192.168.2.214:9221']
-
     metric_relabel_configs:
       - source_labels: [type]
         regex: qemu
@@ -134,11 +132,10 @@ scrape_configs:
         target_label: suffix
         replacement: lxc
       - source_labels: [name, suffix]
-        regex: (.+);(.+)
-        target_label: host
+        separator: _
+        regex: (.*)_(.*)
         replacement: ${1}_${2}
-      - action: labeldrop
-        regex: ^suffix$
+        target_label: host
         
   - job_name: 'disk_power_exporter'
     metrics_path: /metrics
