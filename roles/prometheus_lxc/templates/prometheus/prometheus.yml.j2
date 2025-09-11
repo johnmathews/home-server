@@ -118,7 +118,7 @@ scrape_configs:
       - targets: ['192.168.2.214:9221']
         labels:
           instance: proxmox
-        
+
   - job_name: 'disk_power_exporter'
     metrics_path: /metrics
     scrape_interval: 60s
@@ -136,4 +136,6 @@ scrape_configs:
     scrape_timeout: 20s
     metrics_path: /ups_metrics
     static_configs:
-      - targets: ['192.168.2.214:9199']   # infra VM IP:port running nut_exporter         instance: proxmox
+      - targets: ['192.168.2.214:9199']
+        labels: 
+          instance: proxmox
