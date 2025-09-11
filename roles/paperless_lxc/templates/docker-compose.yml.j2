@@ -16,6 +16,10 @@ services:
       - /var/run:/var/run:ro
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
+    command:
+      - --housekeeping_interval=15s
+      - --max_housekeeping_interval=15s
+      - --global_housekeeping_interval=15s
     privileged: true  # required for some metrics
 
   paperless-broker:

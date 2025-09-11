@@ -15,9 +15,9 @@ services:
     command:
       - --docker_only
       - --enable_metrics=cpu,memory,network
-      - --housekeeping_interval=30s
-      - --max_housekeeping_interval=120s
-      - --global_housekeeping_interval=1m
+      - --housekeeping_interval=15s
+      - --max_housekeeping_interval=15s
+      - --global_housekeeping_interval=15s
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:ro

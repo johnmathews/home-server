@@ -3,24 +3,6 @@
 ---
 
 services:
-  # tunarr:
-  #   image: chrisbenincasa/tunarr:latest-vaapi
-  #   container_name: tunarr
-  #   restart: always
-  #   ports:
-  #     - "8000:8000"     # Web UI and API
-  #     - "8001:8001"     # HLS/Stream endpoint
-  #   environment:
-  #     - LOG_LEVEL=INFO
-  #     - TZ=Europe/Amsterdam
-  #     - TRANSCODER_MODE=vaapi
-  #   devices:
-  #     - /dev/dri:/dev/dri
-  #   volumes:
-  #     - /srv/apps/tunarr:/config/tunarr
-  #     - /mnt/media/library:/library  # kids shows, family movies 
-  #     - /mnt/media/media:/media # youtube videos, photography videos
-
   jellyfin:
     image: jellyfin/jellyfin:10.10.7
     container_name: jellyfin
@@ -56,6 +38,10 @@ services:
     restart: always
     ports:
       - "18080:8080"
+    command:
+      - --housekeeping_interval=15s
+      - --max_housekeeping_interval=15s
+      - --global_housekeeping_interval=15s
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:ro

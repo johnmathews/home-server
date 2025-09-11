@@ -4,120 +4,147 @@
 ---
 
 global:
-  scrape_interval: 15s  # default interval for scraping targets
+  scrape_interval: 20s
+  evaluation_interval: 15s
+  external_labels:
+    prom_cluster: home
 
 rule_files:
   - "rules/*.yml"
 
 scrape_configs:
   - job_name: 'prometheus'
-    scrape_interval: 15s
-    scrape_timeout: 15s
+    scrape_timeout: 10s
     static_configs:
       - targets: ['localhost:9090']
+        labels: { hostname: 'prometheus' }
+    relabel_configs:
+      # host without port
+      - source_labels: [__address__]
+        regex: '([^:]+)(?::\d+)?'
+        target_label: host
+        replacement: '$1'
 
   - job_name: 'cadvisor'
-    scrape_interval: 15s
+    scrape_interval: 30s
     scrape_timeout: 15s
     static_configs:
       - targets: ['192.168.2.214:18080']
-        labels:
-          instance: proxmox
+        labels: { hostname: 'proxmox' }
       - targets: ['192.168.2.105:18080']
-        labels:
-          instance: media_vm
+        labels: { hostname: 'media' }
       - targets: ['192.168.2.106:8080']
-        labels:
-          instance: infra_vm
+        labels: { hostname: 'infra' }
       - targets: ['192.168.2.110:18080']
-        labels:
-          instance: jellyfin_lxc
+        labels: { hostname: 'jellyfin' }
       - targets: ['192.168.2.113:18080']
-        labels:
-          instance: immich_lxc
+        labels: { hostname: 'immich' }
       - targets: ['192.168.2.116:18080']
-        labels:
-          instance: tubearchivist_kids_lxc 
+        labels: { hostname: 'tubearchivist-kids' }
       - targets: ['192.168.2.117:18080']
-        labels:
-          instance: paperless_lxc 
+        labels: { hostname: 'paperless' }
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: '([^:]+)(?::\d+)?'
+        target_label: host
+        replacement: '$1'
 
-  - job_name: 'node-exporter'
-    scrape_interval: 15s
-    scrape_timeout: 15s
+  - job_name: 'node_exporter'
+    scrape_timeout: 10s
     static_configs:
-      - targets: ['192.168.2.214:9100']
-        labels:
-          instance: proxmox
-      - targets: ['192.168.2.105:9100']
-        labels:
-          instance: media_vm
-      - targets: ['192.168.2.106:9100']
-        labels:
-          instance: infra_vm
-      - targets: ['192.168.2.104:9100']
-        labels:
-          instance: truenas
+      - targets: ['192.168.2.214:9100']  # proxmox
+        labels: { hostname: 'proxmox' }
+      - targets: ['192.168.2.105:9100']  # media
+        labels: { hostname: 'media' }
+      - targets: ['192.168.2.106:9100']  # infra
+        labels: { hostname: 'infra' }
+      - targets: ['192.168.2.104:9100']  # truenas
+        labels: { hostname: 'truenas' }
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: '([^:]+)(?::\d+)?'
+        target_label: host
+        replacement: '$1'
 
-  - job_name: 'home-assistant'
-    scrape_interval: 15s
-    scrape_timeout: 15s
+  - job_name: 'home_assistant'
     metrics_path: /api/prometheus
     scheme: http
+    scrape_timeout: 10s
     authorization:
       type: Bearer
       credentials: "{{ vault_home_assistant_token }}"
     static_configs:
       - targets: ['192.168.2.102:8123']
-        labels:
-          instance: home-assistant
+        labels: { hostname: 'home-assistant' }
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: '([^:]+)(?::\d+)?'
+        target_label: host
+        replacement: '$1'
 
   - job_name: 'unbound'
+    scrape_timeout: 10s
     static_configs:
       - targets: ['192.168.2.111:9167']
-        labels:
-          instance: unbound
+        labels: { hostname: 'unbound' }
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: '([^:]+)(?::\d+)?'
+        target_label: host
+        replacement: '$1'
 
-  - job_name: 'FastAPI'
+  - job_name: 'fastapi'
     scrape_interval: 60s
-    scrape_timeout: 15s
+    scrape_timeout: 45s
     static_configs:
       - targets: ['192.168.2.201:8001']
-        labels:
-          instance: key-server
+        labels: { hostname: 'key-server' }
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: '([^:]+)(?::\d+)?'
+        target_label: host
+        replacement: '$1'
 
   - job_name: 'ipmi'
-    metrics_path: /metrics
     scrape_interval: 60s
     scrape_timeout: 15s
     static_configs:
       - targets: ['192.168.2.214:9290']
-        labels:
-          instance: proxmox
+        labels: { hostname: 'proxmox' }
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: '([^:]+)(?::\d+)?'
+        target_label: host
+        replacement: '$1'
 
-  - job_name: 'smart_ctl'
-    scrape_interval: 15s
-    scrape_timeout: 15s
+  - job_name: 'smartctl'
+    scrape_timeout: 10s
     static_configs:
-      - targets: ['192.168.2.214:9633']
-        labels:
-          instance: proxmox
-      - targets: ['192.168.2.104:9633']
-        labels:
-          instance: truenas
+      - targets: ['192.168.2.214:9633']  # proxmox
+        labels: { hostname: 'proxmox' }
+      - targets: ['192.168.2.104:9633']  # truenas
+        labels: { hostname: 'truenas' }
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: '([^:]+)(?::\d+)?'
+        target_label: host
+        replacement: '$1'
 
-  - job_name: 'pve-exporter'
+  - job_name: 'pve_exporter'
     metrics_path: /pve
-    scrape_interval: 15s
-    scrape_timeout: 15s
+    scrape_timeout: 10s
     params:
       module: [default]
       cluster: ['1']
       node: ['1']
     static_configs:
       - targets: ['192.168.2.214:9221']
-        labels:
-          instance: proxmox
+        labels: { hostname: 'proxmox' }
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: '([^:]+)(?::\d+)?'
+        target_label: host
+        replacement: '$1'
 
   - job_name: 'disk_power_exporter'
     metrics_path: /metrics
@@ -125,17 +152,24 @@ scrape_configs:
     scrape_timeout: 30s
     static_configs:
       - targets: ['192.168.2.104:9635']
-        labels:
-          instance: truenas
+        labels: { hostname: 'truenas' }
       - targets: ['192.168.2.214:9635']
-        labels:
-          instance: proxmox
+        labels: { hostname: 'proxmox' }
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: '([^:]+)(?::\d+)?'
+        target_label: host
+        replacement: '$1'
 
-  - job_name: 'network ups tool'
+  - job_name: 'nut'
+    metrics_path: /ups_metrics
     scrape_interval: 30s
     scrape_timeout: 20s
-    metrics_path: /ups_metrics
     static_configs:
       - targets: ['192.168.2.214:9199']
-        labels: 
-          instance: proxmox
+        labels: { hostname: 'proxmox' }
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: '([^:]+)(?::\d+)?'
+        target_label: host
+        replacement: '$1'
