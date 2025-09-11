@@ -66,8 +66,7 @@
     owner: root
     group: root
     mode: '0755'
-  loop: 
-    - "{{ smb_shares }}"
+  loop: "{{ smb_shares }}"
 
 - name: Mount or remount paperless share
   ansible.posix.mount:
@@ -77,8 +76,7 @@
     opts: "credentials=/etc/smb/.smbcredentials,uid={{ puid }},gid={{ pgid }},dir_mode=0770,file_mode=0660,iocharset=utf8,cache=strict,noserverino,rw,_netdev,noatime,vers=3.1.1"
     state: mounted
   tags: paperless_fstab
-  loop: 
-    - "{{ smb_shares }}"
+  loop: "{{ smb_shares }}"
 
 - name: Create base app directories
   ansible.builtin.file:
