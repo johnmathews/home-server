@@ -43,40 +43,40 @@
     create_home: no
     state: present
 
-- name: Remove legacy fstab lines for paperless share
-  ansible.builtin.lineinfile:
-    path: /etc/fstab
-    state: absent
-    regexp: '^//{{ smb_server | regex_escape }}/paperless[ \t]+/mnt/paperless[ \t]+cifs[ \t]+'
-  tags: paperless_fstab
+# - name: Remove legacy fstab lines for paperless share
+#   ansible.builtin.lineinfile:
+#     path: /etc/fstab
+#     state: absent
+#     regexp: '^//{{ smb_server | regex_escape }}/paperless[ \t]+/mnt/paperless[ \t]+cifs[ \t]+'
+#   tags: paperless_fstab
 
-- name: Ensure fstab entry for paperless share is present
-  ansible.posix.mount:
-    path: /mnt/paperless
-    src: "//{{ smb_server }}/paperless"
-    fstype: cifs
-    opts: "credentials=/etc/smb/.smbcredentials,uid={{ puid }},gid={{ pgid }},dir_mode=0770,file_mode=0660,iocharset=utf8,cache=strict,noserverino,rw,_netdev,noatime,vers=3.1.1"
-    state: present
-  tags: paperless_fstab
+# - name: Ensure fstab entry for smb share is present
+#   ansible.posix.mount:
+#     path: /mnt/paperless
+#     src: "//{{ smb_server }}/"
+#     fstype: cifs
+#     opts: "credentials=/etc/smb/.smbcredentials,uid={{ puid }},gid={{ pgid }},dir_mode=0770,file_mode=0660,iocharset=utf8,cache=strict,noserverino,rw,_netdev,noatime,vers=3.1.1"
+#     state: present
+#   tags: open_webui_fstab
 
-- name: Ensure mountpoints exists
-  ansible.builtin.file:
-    path: "{{ item.target }}"
-    state: directory
-    owner: root
-    group: root
-    mode: '0755'
-  loop: "{{ smb_shares }}"
+# - name: Ensure mountpoints exists
+#   ansible.builtin.file:
+#     path: "{{ item.target }}"
+#     state: directory
+#     owner: root
+#     group: root
+#     mode: '0755'
+#   loop: "{{ smb_shares }}"
 
-- name: Mount or remount paperless share
-  ansible.posix.mount:
-    path: "{{ item.target }} "
-    src: "//{{ smb_server }}/{{ item.name }}"
-    fstype: cifs
-    opts: "credentials=/etc/smb/.smbcredentials,uid={{ puid }},gid={{ pgid }},dir_mode=0770,file_mode=0660,iocharset=utf8,cache=strict,noserverino,rw,_netdev,noatime,vers=3.1.1"
-    state: mounted
-  tags: paperless_fstab
-  loop: "{{ smb_shares }}"
+# - name: Mount or remount share
+#   ansible.posix.mount:
+#     path: "{{ item.target }} "
+#     src: "//{{ smb_server }}/{{ item.name }}"
+#     fstype: cifs
+#     opts: "credentials=/etc/smb/.smbcredentials,uid={{ puid }},gid={{ pgid }},dir_mode=0770,file_mode=0660,iocharset=utf8,cache=strict,noserverino,rw,_netdev,noatime,vers=3.1.1"
+#     state: mounted
+#   tags: open_webui_fstab
+#   loop: "{{ smb_shares }}"
 
 - name: Create base app directories
   ansible.builtin.file:

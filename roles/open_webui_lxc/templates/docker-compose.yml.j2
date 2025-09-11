@@ -1,5 +1,5 @@
 # vim: ft=yaml
-# paperless_lxc/files/docker-compose.yml
+# open_webui_lxc/files/docker-compose.yml.j2
 
 ---
 
@@ -26,20 +26,17 @@ services:
       - "3000:8080"
     environment:
       # Point to OpenAI (default). If using a proxy, set OPENAI_API_BASE.
-      OPENAI_API_KEY: "${OPENAI_API_KEY}"
+      OPENAI_API_KEY: ${OPENAI_KEY}
       # Optional: if you use Azure OpenAI or a proxy
       # OPENAI_API_BASE: "https://api.openai.com/v1"
       # OPENAI_API_TYPE: "openai"
 
-      # Hardening / behavior
-      WEBUI_NAME: "Home Server Chat"
-      ENABLE_SIGNUP: "false"   # let Cloudflare Access be the gate
+      WEBUI_NAME: "itsa.pizza"
+      ENABLE_SIGNUP: "true"   # let Cloudflare Access be the gate
       ENABLE_OAUTH: "false"    # set true only if you wire up an OAuth provider
-      # Optional limits
       MAX_FILE_SIZE_MB: "50"
-      # Timezone for logs (align with your infra)
-      TZ: "Europe/Amsterdam"
+      TZ: ${TZ}
     volumes:
-      - ./data:/app/backend/data   # persists users, chats, settings
+      - /srv/apps/open-webui/data:/app/backend/data
       # If you want custom prompts or provider configs:
       # - ./open-webui.json:/app/backend/data/settings.json:ro
