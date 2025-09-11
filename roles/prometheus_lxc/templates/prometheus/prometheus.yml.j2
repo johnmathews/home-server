@@ -52,13 +52,13 @@ scrape_configs:
   - job_name: 'node_exporter'
     scrape_timeout: 10s
     static_configs:
-      - targets: ['192.168.2.214:9100']  # proxmox
+      - targets: ['192.168.2.214:9100']
         labels: { hostname: 'proxmox' }
-      - targets: ['192.168.2.105:9100']  # media
+      - targets: ['192.168.2.105:9100']
         labels: { hostname: 'media' }
-      - targets: ['192.168.2.106:9100']  # infra
+      - targets: ['192.168.2.106:9100']
         labels: { hostname: 'infra' }
-      - targets: ['192.168.2.104:9100']  # truenas
+      - targets: ['192.168.2.104:9100']
         labels: { hostname: 'truenas' }
     relabel_configs:
       - source_labels: [__address__]
@@ -120,9 +120,9 @@ scrape_configs:
   - job_name: 'smartctl'
     scrape_timeout: 10s
     static_configs:
-      - targets: ['192.168.2.214:9633']  # proxmox
+      - targets: ['192.168.2.214:9633']
         labels: { hostname: 'proxmox' }
-      - targets: ['192.168.2.104:9633']  # truenas
+      - targets: ['192.168.2.104:9633']
         labels: { hostname: 'truenas' }
     relabel_configs:
       - source_labels: [__address__]

@@ -23,11 +23,10 @@ services:
       - /mnt/media/library:/library # kids shows, family movies, etc
       - /mnt/media/media:/media # youtube videos, photography videos
       - /mnt/youtube-kids:/youtube-kids # tubearchivist lib must be readonly
-      # - /mnt/youtube:/youtube # tubearchivist lib must be readonly
     logging:
       driver: json-file
       options:
-        max-size: "20m"
+        max-size: "10m"
         max-file: "10"
     privileged: true
 
