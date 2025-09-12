@@ -25,17 +25,19 @@ services:
     ports:
       - "3000:8080"
     environment:
+      WEBUI_NAME: "itsa.pizza"
+      WEBUI_URL: "https://chat.itsa.pizza"
+      ENABLE_SIGNUP: "true"   # let Cloudflare Access be the gate
+      ENABLE_SIGNUP_PASSWORD_CONFIRMATION: "true"
+      ENABLE_OAUTH: "false"    # set true only if you wire up an OAuth provider
+      MAX_FILE_SIZE_MB: "50"
+      TZ: ${TZ}
       # Point to OpenAI (default). If using a proxy, set OPENAI_API_BASE.
       OPENAI_API_KEY: ${OPENAI_KEY}
       # Optional: if you use Azure OpenAI or a proxy
       # OPENAI_API_BASE: "https://api.openai.com/v1"
       # OPENAI_API_TYPE: "openai"
 
-      WEBUI_NAME: "itsa.pizza"
-      ENABLE_SIGNUP: "true"   # let Cloudflare Access be the gate
-      ENABLE_OAUTH: "false"    # set true only if you wire up an OAuth provider
-      MAX_FILE_SIZE_MB: "50"
-      TZ: ${TZ}
     volumes:
       - /srv/apps/open-webui/data:/app/backend/data
       # If you want custom prompts or provider configs:

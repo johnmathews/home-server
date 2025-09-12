@@ -38,14 +38,27 @@ groups:
       # - same as above but forced to 0 while currently OB
       # - -1 if OB never seen in window
       - record: ups_days_since_last_ob
+        # expr: |
+        #   (
+        #     ((time() - ups_last_ob_timestamp_seconds) / 86400)
+        #     * on(instance) (network_ups_tools_ups_status{flag="OB"} == bool 0)
+        #     and on(instance) (ups_last_ob_timestamp_seconds > 0)
+        #   )
+        #   or
+        #   (
+        #     (0 * ups_last_ob_timestamp_seconds - 1)
+        #     and on(instance) (ups_last_ob_timestamp_seconds == 0)
+        #   )
         expr: |
           (
-            ((time() - ups_last_ob_timestamp_seconds) / 86400)
-            * on(instance) (network_ups_tools_ups_status{flag="OB"} == bool 0)
-            and on(instance) (ups_last_ob_timestamp_seconds > 0)
-          )
+            (
+              ((time() - ups_last_ob_timestamp_seconds) / 86400)
+              and on(instance) (ups_last_ob_timestamp_seconds > 0)
+            )
           or
           (
-            (0 * ups_last_ob_timestamp_seconds - 1)
+            ((time() - ups_first_seen_timestamp_seconds) / 86400)
             and on(instance) (ups_last_ob_timestamp_seconds == 0)
           )
+          ) on(instance) (network_ups_tools_ups_status{flag="OL"} == bool 1)
+               
