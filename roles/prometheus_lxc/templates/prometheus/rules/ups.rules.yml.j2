@@ -12,12 +12,18 @@ groups:
       # Last time OB was 1 (0 if not seen in the window)
       - record: ups_last_ob_timestamp_seconds
         expr: |
-          max_over_time(ups_ob_ts_seconds[60d:30m])
+          max by(instance) (max_over_time(ups_ob_ts_seconds[60d:30m]))
 
-      # First time we saw the OB metric in the window (series first-seen)
-      - record: ups_first_seen_timestamp_seconds
+      # Helper: "last seen OL timestamp", 0 otherwise
+      - record: ups_ol_ts_seconds
         expr: |
-          min_over_time(timestamp(network_ups_tools_ups_status{flag="OB"})[60d:30m])
+          timestamp(network_ups_tools_ups_status{flag="OL"})
+          * (network_ups_tools_ups_status{flag="OL"} == bool 1)
+
+      # First time we saw OL=1 in the window (series first-seen)
+      - record: ups_first_ol_timestamp_seconds
+        expr: |
+          min by(instance) (min_over_time(ups_ol_ts_seconds[60d:30m]))
 
       # Days on mains:
       # - real days since OB if an OB exists in the window
@@ -34,31 +40,22 @@ groups:
             and on(instance) (ups_last_ob_timestamp_seconds == 0)
           )
 
-      # Days since last OB:
-      # - same as above but forced to 0 while currently OB
-      # - -1 if OB never seen in window
       - record: ups_days_since_last_ob
-        # expr: |
-        #   (
-        #     ((time() - ups_last_ob_timestamp_seconds) / 86400)
-        #     * on(instance) (network_ups_tools_ups_status{flag="OB"} == bool 0)
-        #     and on(instance) (ups_last_ob_timestamp_seconds > 0)
-        #   )
-        #   or
-        #   (
-        #     (0 * ups_last_ob_timestamp_seconds - 1)
-        #     and on(instance) (ups_last_ob_timestamp_seconds == 0)
-        #   )
         expr: |
-          (
+          clamp_min(
             (
+              # Case A: OB seen before & currently NOT OB → days since last OB
               ((time() - ups_last_ob_timestamp_seconds) / 86400)
-              and on(instance) (ups_last_ob_timestamp_seconds > 0)
+              * on(instance) (ups_last_ob_timestamp_seconds > bool 0)
+              * on(instance) (network_ups_tools_ups_status{flag="OB"} == bool 0)
             )
-          or
-          (
-            ((time() - ups_first_seen_timestamp_seconds) / 86400)
-            and on(instance) (ups_last_ob_timestamp_seconds == 0)
+            +
+            (
+              # Case B: OB never seen → time on mains (since first OL)
+              ((time() - ups_first_ol_timestamp_seconds) / 86400)
+              * on(instance) (ups_last_ob_timestamp_seconds == bool 0)
+              * on(instance) (network_ups_tools_ups_status{flag="OB"} == bool 0)
+            ),
+            0
           )
-          ) on(instance) (network_ups_tools_ups_status{flag="OL"} == bool 1)
-               
+
