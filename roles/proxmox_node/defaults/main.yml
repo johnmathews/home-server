@@ -32,7 +32,7 @@ hdparm_disk_id: /dev/disk/by-id/ata-ST3000DM007-1WY10G_ZFN1TN5X # this is the PB
 # hdparm_disk_id: /dev/sdg # this is the PBS HDD.
 hdparm_apm: 128
 #12: 1 minute, 120: 10 minutes, 241: 30 mins, 242: 60 minutes, 243: 90 minutes, 244: 120 minutes
-hdparm_spindown: 241  # doesnt work for 60 mins or longer.
+hdparm_spindown: 242  # doesnt work for 60 mins or longer.
 
 ### NUT #############################
 ups_battery_charge_low: 40 # percent - 90 for tests, 40 for normal.
