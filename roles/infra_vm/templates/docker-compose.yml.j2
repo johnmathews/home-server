@@ -57,9 +57,10 @@ services:
       - GF_SECURITY_COOKIE_SECURE=true
       - GF_SERVER_SERVE_FROM_SUB_PATH=false
       - GF_SECURITY_ALLOW_EMBEDDING=true
+      - GF_SECURITY_ALLOW_EMBEDDING=true
+      - GF_FEATURE_TOGGLES_ENABLE=dashboardNewLayouts
     volumes:
       - /srv/infra/grafana/data:/var/lib/grafana
-      - "{{ docker_compose_dir }}/grafana/config/grafana.ini:/etc/grafana/grafana.ini:ro"
     restart: always
 
   node-exporter:

@@ -42,16 +42,19 @@
     pipx install uv
   environment:
     PATH: "{{ ansible_env.PATH }}:/home/{{ docker_user }}/.local/bin"
+  tags: [grafana]
 
 - name: Add Docker GPG key
   apt_key:
     url: https://download.docker.com/linux/ubuntu/gpg
     state: present
+  tags: [grafana]
 
 - name: Add Docker repository
   apt_repository:
     repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu jammy stable
     state: present
+  tags: [grafana]
 
 - name: Install Docker packages
   apt:
@@ -61,12 +64,14 @@
       - containerd.io
     state: latest
     update_cache: yes
+  tags: [grafana]
 
 - name: Add user to docker group
   user:
     name: "{{ docker_user }}"
     groups: docker
     append: yes
+  tags: [grafana]
 
 - name: Create Docker Compose directory
   file:
@@ -75,6 +80,7 @@
     owner: "{{ docker_user }}"
     group: docker
     mode: '0755'
+  tags: [grafana]
 
 - name: Upload .env file from template
   ansible.builtin.template:
@@ -91,15 +97,16 @@
     owner: root
     group: root
     mode: '0755'
+  tags: [grafana]
 
-- name: Deploy custom grafana.ini
-  template:
-    src: grafana/grafana.ini.j2
-    dest: /srv/infra/grafana/config/grafana.ini
-    owner: root
-    group: root
-    mode: '0644'
-  notify: Restart Grafana container
+# - name: Deploy custom grafana.ini
+#   template:
+#     src: grafana/grafana.ini.j2
+#     dest: /srv/infra/grafana/config/grafana.ini
+#     owner: root
+#     group: root
+#     mode: '0644'
+#   notify: Restart Grafana container
 
 - name: Template Docker Compose file
   template:
@@ -109,6 +116,7 @@
     group: docker
     mode: '0644'
   notify: Apply updated Docker Compose stack
+  tags: [grafana]
 
 - name: Ensure filebrowser config directory exists with correct ownership
   ansible.builtin.file:
@@ -119,6 +127,7 @@
     mode: '0755'
     recurse: yes
   notify: Restart filebrowser container
+  tags: [filebrowser]
 
 - name: Ensure /database dir exists with proper ownership
   ansible.builtin.file:
@@ -127,12 +136,14 @@
     owner: "1000"
     group: "1000"
     mode: '0755'
+  tags: [filebrowser]
 
 - name: Recursively set permissions on files in filebrowser config directory
   ansible.builtin.find:
     paths: /srv/infra/filebrowser/config
     file_type: file
   register: filebrowser_files
+  tags: [filebrowser]
 
 - name: Set file mode to 0644
   ansible.builtin.file:
@@ -140,12 +151,14 @@
     mode: '0644'
   loop: "{{ filebrowser_files.files }}"
   notify: Restart filebrowser container
+  tags: [filebrowser]
 
 - name: Recursively set permissions on directories in filebrowser config directory
   ansible.builtin.find:
     paths: /srv/infra/filebrowser/config
     file_type: directory
   register: filebrowser_dirs
+  tags: [filebrowser]
 
 - name: Set directory mode to 0755
   ansible.builtin.file:
@@ -153,16 +166,19 @@
     mode: '0755'
   loop: "{{ filebrowser_dirs.files }}"
   notify: Restart filebrowser container
+  tags: [filebrowser]
 
 - name: Update containers
   command: docker compose pull
   args:
     chdir: /srv/infra
+  tags: [grafana]
 
 - name: Launch containers
   command: docker compose up -d
   args:
     chdir: /srv/infra
+  tags: [grafana]
 
 - name: Include config tasks for docker services (prometheus and homepage)
   import_tasks: services_config.yml
