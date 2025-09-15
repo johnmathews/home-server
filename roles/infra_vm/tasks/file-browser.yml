@@ -51,4 +51,3 @@
   loop: "{{ filebrowser_dirs.files }}"
   notify: Restart filebrowser container
   tags: [filebrowser]
-  notify: Restart filebrowser container

@@ -1,4 +1,0 @@
-# /opt/grafana/custom/grafana.ini
-
-[security]
-allow_embedding = true
