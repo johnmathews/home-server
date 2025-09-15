@@ -1,0 +1,54 @@
+
+- name: Ensure filebrowser config directory exists with correct ownership
+  ansible.builtin.file:
+    path: /srv/infra/filebrowser/config
+    state: directory
+    owner: "1000"
+    group: "1000"
+    mode: '0755'
+    recurse: yes
+  notify: Restart filebrowser container
+  tags: [filebrowser]
+
+- name: Ensure /database dir exists with proper ownership
+  ansible.builtin.file:
+    path: /srv/infra/filebrowser/config/database
+    state: directory
+    owner: "1000"
+    group: "1000"
+    mode: '0755'
+  tags: [filebrowser]
+  notify: Restart filebrowser container
+
+- name: Recursively set permissions on files in filebrowser config directory
+  ansible.builtin.find:
+    paths: /srv/infra/filebrowser/config
+    file_type: file
+  register: filebrowser_files
+  tags: [filebrowser]
+  notify: Restart filebrowser container
+
+- name: Set file mode to 0644
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    mode: '0644'
+  loop: "{{ filebrowser_files.files }}"
+  notify: Restart filebrowser container
+  tags: [filebrowser]
+
+- name: Recursively set permissions on directories in filebrowser config directory
+  ansible.builtin.find:
+    paths: /srv/infra/filebrowser/config
+    file_type: directory
+  register: filebrowser_dirs
+  tags: [filebrowser]
+  notify: Restart filebrowser container
+
+- name: Set directory mode to 0755
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    mode: '0755'
+  loop: "{{ filebrowser_dirs.files }}"
+  notify: Restart filebrowser container
+  tags: [filebrowser]
+  notify: Restart filebrowser container

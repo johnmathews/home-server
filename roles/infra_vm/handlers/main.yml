@@ -3,7 +3,7 @@
 ---
 
 - name: Apply updated Docker Compose stack
-  command: docker compose up -d
+  command: docker compose up -d && docker compose restart
   args:
     chdir: "{{ docker_compose_dir }}"
 
