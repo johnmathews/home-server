@@ -8,8 +8,7 @@ media_stack_group: john
 puid: 1001
 guid: 1001
 
-tubearchivist_host: "https://tube.itsa.pizza"
-tubearchivist_port: "8000"
+tubearchivist_host: "https://tube.itsa.pizza http:192.168.2.116"
 ta_username: john
 
 smb_media_vm_username: media_vm

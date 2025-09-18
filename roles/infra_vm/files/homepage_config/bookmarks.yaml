@@ -17,9 +17,6 @@
           href: http://192.168.2.117:8000
     - Tubearchivist:
         - abbr:
-          href: http://192.168.2.114:8000
-    - Tubearchivist Kids:
-        - abbr:
           href: http://192.168.2.116:8000
     - Sonarr:
         - abbr: 
