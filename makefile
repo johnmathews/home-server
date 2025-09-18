@@ -41,9 +41,6 @@ immich:
 tube:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/tubearchivist_lxc.yml $(VAULT) $(TAGS)
 
-tube-kids:
-	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/tubearchivist_kids_lxc.yml $(VAULT) $(TAGS)
-
 prometheus:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/prometheus_lxc.yml $(VAULT) $(TAGS)
 

@@ -27,9 +27,9 @@
       # Recommendation: start with a global "-i 0" (no spindown by default),
       # then add device-specific -a/-i pairs.
       #
-      # 900s = 15 minutes for the Barracuda only.
+      # 1800s = 30 minutes for the Barracuda only.
       HD_IDLE_OPTS="-i 0 \
-       -a /dev/disk/by-id/ata-ST3000DM007-1WY10G_ZFN1TN5X -i 900"
+       -a /dev/disk/by-id/ata-ST3000DM007-1WY10G_ZFN1TN5X -i 1800"
   notify: Restart hd-idle
 
 - name: Enable & start hd-idle

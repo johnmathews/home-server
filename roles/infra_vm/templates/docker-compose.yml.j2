@@ -3,6 +3,16 @@
 
 ---
 services:
+  mkdocs:
+    container_name: mkdocs 
+    image: squidfunk/mkdocs-material
+    ports:
+      - "8005:8000"
+    volumes:
+      - /srv/infra/mkdocs/docs:/docs
+    stdin_open: true
+    tty: true
+
   iperf3:
     image: networkstatic/iperf3
     container_name: iperf3
