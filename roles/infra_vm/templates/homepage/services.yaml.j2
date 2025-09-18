@@ -207,7 +207,7 @@
         icon: sh-youtube
         widget:
           type: tubearchivist
-          url: https://tube.itsa.pizza
+          url: http://192.168.2.116:8000
           key: "{{ vault_tubearchivist_key }}"
 
     - Jellyseerr:
@@ -394,12 +394,12 @@
 
     - Prometheus:
         href: http://prometheus.itsa.pizza
-        siteMonitor: http://192.168.2.106:9090
+        siteMonitor: http://192.168.2.115:9090
         description: Metrics Collector
         icon: prometheus
         widget:
           type: prometheus
-          url: http://192.168.2.106:9090
+          url: http://192.168.2.115:9090
 
     - Uptime Kuma:
         href: https://uptime.itsa.pizza
