@@ -19,3 +19,12 @@
     group: "{{ docker_user }}"
     mode: '0644'
   notify: Restart mkdocs container
+
+- name: Copy project markdown docs into mkdocs docs dir
+  copy:
+    src: ../documentation/
+    dest: /srv/infra/mkdocs/docs/
+    owner: "{{ docker_user }}"
+    group: "{{ docker_user }}"
+    mode: '0644'
+  notify: Restart mkdocs container

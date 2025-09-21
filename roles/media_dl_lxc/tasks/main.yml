@@ -26,21 +26,6 @@
     group: root
     mode: '0600'
 
-- name: Persist SMB mount in /etc/fstab
-  ansible.builtin.lineinfile:
-    path: /etc/fstab
-    regexp: '^//{{ smb_server | regex_escape }}/{{ item.name | regex_escape }}[ \t]+'
-    line: >-
-      //{{ smb_server }}/{{ item.name }} {{ item.target }} cifs
-      credentials=/etc/smb/.smbcredentials,
-      uid={{ puid }},gid={{ pgid }},
-      dir_mode=0775,file_mode=0664,
-      iocharset=utf8,cache=none,noserverino,nounix,noperm,nofail,noauto,
-      x-systemd.automount,x-systemd.device-timeout=10,_netdev,vers=3.1.1 0 0
-    state: present
-    create: yes
-  loop: "{{ smb_shares }}"
-
 - name: Create local mount point
   ansible.builtin.file:
     path: "{{ item.target }}"
@@ -69,15 +54,6 @@
     - /srv/apps/sabnzbd/admin
     - /srv/apps/sabnzbd/logs
     - /srv/apps/gluetun
-
-# - name: Create sabnzbd.ini file from template
-#   ansible.builtin.template:
-#     src: sabnzbd.ini.j2
-#     dest: "{{ docker_compose_dir }}/sabnzbd/sabnzbd.ini"
-#     mode: '0600'
-#   notify:
-#     - Update containers
-#     - Restart all containers
 
 - name: Create environment file from template
   ansible.builtin.template:
@@ -129,3 +105,6 @@
     force: false  # Do not overwrite if already exists
   when: reset_qbittorrent_config | default(false)
 
+- name: Include NFS tasks
+  import_tasks: nfs.yml
+  tags: [nfs]

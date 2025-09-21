@@ -9,12 +9,17 @@ guid: 1001
 pgid: 1001
 
 base_dir: /srv/media
-mount_dir: /mnt/media
 
-# smb_media_vm_username: media_vm
 smb_username: smb_user
 
 smb_server: 192.168.2.104
 smb_shares:
   - name: library
     target: /mnt/library
+
+truenas_ip: "192.168.2.104"
+nfs_export: "/mnt/tank/library"
+nfs_mountpoint: "/mnt/nfs/library"
+
+# NFS options tuned for NFSv4.2 over TCP. Adjust as needed:
+nfs_opts: "vers=4.2,proto=tcp,soft,timeo=5,retrans=2,_netdev,nofail"

@@ -1,0 +1,79 @@
+# roles/media_dl_lxc/tasks/nfs_mount.yml
+#
+- name: Ensure nfs-common is installed
+  become: yes
+  apt:
+    name: nfs-common
+    state: present
+    update_cache: yes
+
+- name: Ensure mountpoint exists
+  become: yes
+  file:
+    path: "{{ nfs_mountpoint }}"
+    state: directory
+    mode: "0755"
+
+# Systemd unit names must match the "escaped" path. For /mnt/library:
+#   mount unit:    mnt-library.mount
+#   automount:     mnt-library.automount
+# If your mountpoint changes, update the filenames accordingly.
+
+- name: Create systemd mount unit for NFS
+  become: yes
+  copy:
+    dest: "/etc/systemd/system/mnt-library.mount"
+    mode: "0644"
+    content: |
+      [Unit]
+      Description=Mount {{ nfs_mountpoint }} from {{ truenas_ip }}:{{ nfs_export }}
+      Wants=network-online.target
+      After=network-online.target
+
+      [Mount]
+      What={{ truenas_ip }}:{{ nfs_export }}
+      Where={{ nfs_mountpoint }}
+      Type=nfs
+      Options={{ nfs_opts }}
+
+      [Install]
+      WantedBy=multi-user.target
+
+- name: Create systemd automount unit
+  become: yes
+  copy:
+    dest: "/etc/systemd/system/mnt-library.automount"
+    mode: "0644"
+    content: |
+      [Unit]
+      Description=Automount {{ nfs_mountpoint }}
+
+      [Automount]
+      Where={{ nfs_mountpoint }}
+
+      [Install]
+      WantedBy=multi-user.target
+
+- name: Reload systemd units
+  become: yes
+  systemd:
+    daemon_reload: yes
+
+# Enable + start only the AUTOMOUNT. Systemd will mount on first access.
+- name: Enable and start the automount
+  become: yes
+  systemd:
+    name: mnt-library.automount
+    enabled: yes
+    state: started
+
+# Optional: pre-warm to verify mount works now
+- name: Probe the automount (ls)
+  become: yes
+  command: "ls -la {{ nfs_mountpoint }}"
+  register: probe_ls
+  changed_when: false
+
+- name: Show probe result (debug)
+  debug:
+    var: probe_ls.stdout_lines

@@ -72,7 +72,7 @@
     - "{{ media_stack_base_dir }}"
     - "{{ media_stack_mount_dir }}/library/family"
     - "{{ media_stack_mount_dir }}/library/kids"
-    - "{{ media_stack_mount_dir }}/library/youtube"
+    # - "{{ media_stack_mount_dir }}/library/youtube"
     - "{{ media_stack_base_dir | dirname }}"
   when: item != "/mnt/media/library/downloads/incomplete"
 
@@ -86,8 +86,16 @@
     - /srv/media
     - /mnt/media/library/family
     - /mnt/media/library/kids
-    - /mnt/media/library/youtube
+    # - /mnt/media/library/youtube
   when: item != "/mnt/media/library/downloads/incomplete"
+
+- name:  Ensure hometube config directory exists
+  file:
+    path: "{{ media_stack_base_dir }}/config/hometube/cookies"
+    state: directory
+    owner: "{{ media_stack_user }}"
+    group: "{{ media_stack_user }}"
+    mode: '0755'
 
 # 7. Handle qBittorrent config prep before container starts
 - name: Re-create qbittorrent config directory

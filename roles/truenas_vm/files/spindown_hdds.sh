@@ -42,7 +42,7 @@ TARGETS=(
 )
 
 LOG_FILE="/mnt/swift/scripts/spindown.log" # keep on SSD; never wakes HDDs
-SAMPLE_DURATION=120                        # seconds for iostat sampling
+SAMPLE_DURATION=240                        # seconds for iostat sampling
 UTIL_THRESHOLD=0.10                        # %util below this (0.1 = 0.1%) => allow spindown
 LOCK_FILE="/var/run/spindown_hdds.lock"
 COOLDOWN_SECS=600 # anti-thrash; 0 disables

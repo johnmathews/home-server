@@ -5,6 +5,18 @@
 
 services:
 
+  hometube:
+    image: ghcr.io/egalitarianmonkey/hometube:latest
+    ports:
+      - "8501:8501"
+    environment:
+      - TZ=Europe/Amsterdam
+      - PORT=8501
+    volumes:
+      - /mnt/media/media/Video/YouTube Videos:/data/Videos
+      - /srv/media/config/hometube/cookies:/config # Cookies folder
+    restart: unless-stopped
+
   filebrowser:
     image: filebrowser/filebrowser:latest
     container_name: filebrowser

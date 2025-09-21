@@ -18,6 +18,9 @@
     - Tubearchivist:
         - abbr:
           href: http://192.168.2.116:8000
+    - Hometube:
+        - abbr: 
+          href: http://192.168.2.105:8501/
     - Sonarr:
         - abbr: 
           href: http://192.168.2.105:8989

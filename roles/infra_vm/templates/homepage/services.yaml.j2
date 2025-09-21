@@ -238,6 +238,11 @@
         siteMonitor: http://192.168.2.105:8082
         icon: filebrowser
 
+    - HomeTube:
+        href: http://192.168.2.105:8501
+        siteMonitor: http://192.168.2.105:8501
+        icon: http://192.168.2.105:8501/favicon.ico
+
     - BookLore:
         href: https://books.itsa.pizza
         siteMonitor: http://192.168.2.105:6060
@@ -292,13 +297,13 @@
           enableQueue: false
 
     - Gluetun:
-        href: http://192.168.2.105:8000/v1/publicip/ip
-        siteMonitor: http://192.168.2.105:8000/v1/publicip/ip
+        href: http://192.168.2.118:8000/v1/publicip/ip
+        siteMonitor: http://192.168.2.118:8000/v1/publicip/ip
         description: VPN client
         icon: gluetun
         widget:
           type: gluetun
-          url: http://192.168.2.105:8000
+          url: http://192.168.2.118:8000
 
     - Prowlarr:
         href: http://prowlarr.itsa.pizza
@@ -322,22 +327,22 @@
 
     - SABnzbd:
         href: http://sabnzbd.itsa.pizza
-        siteMonitor: http://192.168.2.105:8081/
+        siteMonitor: http://192.168.2.118:8081/
         description: Usenet download client
         icon: sabnzbd
         widget:
           type: sabnzbd
-          url: http://192.168.2.105:8081/
+          url: http://192.168.2.118:8081/
           key: "{{ vault_sabnzbd_key }}"
 
     - qBittorrent:
         href: http://qbittorrent.itsa.pizza
-        siteMonitor: http://192.168.2.105:8080
+        siteMonitor: http://192.168.2.118:8080
         description: Downloader
         icon: https://cdn.jsdelivr.net/gh/selfhst/icons/svg/qbittorrent.svg
         widget:
           type: qbittorrent
-          url: http://192.168.2.105:8080
+          url: http://192.168.2.118:8080
           username: admin
           password: "{{ vault_qbittorrent_password }}"
           enableLeechProgress: true

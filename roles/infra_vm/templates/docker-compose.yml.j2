@@ -4,14 +4,15 @@
 ---
 services:
   mkdocs:
-    container_name: mkdocs 
-    image: squidfunk/mkdocs-material
-    ports:
-      - "8005:8000"
+    image: squidfunk/mkdocs-material:latest
+    container_name: mkdocs
+    working_dir: /docs
     volumes:
-      - /srv/infra/mkdocs/docs:/docs
-    stdin_open: true
-    tty: true
+      - ./mkdocs/docs:/docs/docs:rw
+      - ./mkdocs/mkdocs.yml:/docs/mkdocs.yml:ro
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
 
   iperf3:
     image: networkstatic/iperf3
