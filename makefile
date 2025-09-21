@@ -9,58 +9,90 @@ PLAYBOOK_DIR := playbooks
 ANSIBLE := .venv/bin/ansible-playbook
 INVENTORY := -i inventory.ini
 
+
+# Pass like: make media TAGS=homepage
+# Also supported:
+#   make media SKIP=bigstuff
+#   make media LIMIT=infra
+#   make media EXTRA="--diff -vv"
+TAGS   ?=
+SKIP   ?=
+LIMIT  ?=
+EXTRA  ?=
+
+tags  ?=
+skip  ?=
+limit ?=
+
+t     ?=          # TAGS shorthand: make media t=homepage
+s     ?=          # SKIP shorthand: make media s=heavy
+l     ?=          # LIMIT shorthand: make media l=infra
+
+# Fold aliases into the canonical vars (uppercase wins if set)
+TAGS  := $(or $(strip $(TAGS)),$(strip $(tags)),$(strip $(t)))
+SKIP  := $(or $(strip $(SKIP)),$(strip $(skip)),$(strip $(s)))
+LIMIT := $(or $(strip $(LIMIT)),$(strip $(limit)),$(strip $(l)))
+
+# Build ansible option string from simple vars
+TAGS_ARG  := $(if $(strip $(TAGS)),--tags $(TAGS),)
+SKIP_ARG  := $(if $(strip $(SKIP)),--skip-tags $(SKIP),)
+LIMIT_ARG := $(if $(strip $(LIMIT)),--limit $(LIMIT),)
+
+ANSIBLE_OPTS := $(TAGS_ARG) $(SKIP_ARG) $(LIMIT_ARG) $(EXTRA)
+
 # Declare all available commands as .PHONY (always run)
 .PHONY: all site truenas cloud_image media help
+
 
 all: site
 
 site:
-	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/site.yml $(VAULT) $(TAGS)
+	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/site.yml $(VAULT) $(ANSIBLE_OPTS)
 
 pve:
-	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/proxmox_node.yml $(VAULT) $(TAGS)
+	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/proxmox_node.yml $(VAULT) $(ANSIBLE_OPTS)
 
 nas:
-	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/truenas.yml $(VAULT) $(TAGS)
+	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/truenas.yml $(VAULT) $(ANSIBLE_OPTS)
 
 media:
-	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/media_vm.yml $(VAULT) $(TAGS)
+	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/media_vm.yml $(VAULT) $(ANSIBLE_OPTS)
 
 infra:
-	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/infra_vm.yml $(VAULT) $(TAGS)
+	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/infra_vm.yml $(VAULT) $(ANSIBLE_OPTS)
 
 key:
-	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/key_server.yml $(VAULT) $(TAGS)
+	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/key_server.yml $(VAULT) $(ANSIBLE_OPTS)
 
 traefik:
-	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/traefik_lxc.yml $(VAULT) $(TAGS)
+	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/traefik_lxc.yml $(VAULT) $(ANSIBLE_OPTS)
 
 immich:
-	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/immich_lxc.yml $(VAULT) $(TAGS)
+	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/immich_lxc.yml $(VAULT) $(ANSIBLE_OPTS)
 
 tube:
-	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/tubearchivist_lxc.yml $(VAULT) $(TAGS)
+	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/tubearchivist_lxc.yml $(VAULT) $(ANSIBLE_OPTS)
 
 prometheus:
-	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/prometheus_lxc.yml $(VAULT) $(TAGS)
+	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/prometheus_lxc.yml $(VAULT) $(ANSIBLE_OPTS)
 
 paperless:
-	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/paperless_lxc.yml $(VAULT) $(TAGS)
+	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/paperless_lxc.yml $(VAULT) $(ANSIBLE_OPTS)
 
 media-dl:
-	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/media_dl_lxc.yml $(VAULT) $(TAGS)
+	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/media_dl_lxc.yml $(VAULT) $(ANSIBLE_OPTS)
 
 jelly:
-	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/jellyfin_lxc.yml $(VAULT) $(TAGS)
+	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/jellyfin_lxc.yml $(VAULT) $(ANSIBLE_OPTS)
 
 open-webui:
-	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/open_webui_lxc.yml $(VAULT) $(TAGS)
+	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/open_webui_lxc.yml $(VAULT) $(ANSIBLE_OPTS)
 
 atuin:
-	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/atuin.yml $(VAULT) $(TAGS)
+	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/atuin.yml $(VAULT) $(ANSIBLE_OPTS)
 
 lint-paths:
-	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/validate-paths.yml $(VAULT) $(TAGS)
+	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/validate-paths.yml $(VAULT) $(ANSIBLE_OPTS)
 
 requirements:
 	.venv/bin/ansible-galaxy install -r requirements.yml && uv pip install -r requirements.txt
