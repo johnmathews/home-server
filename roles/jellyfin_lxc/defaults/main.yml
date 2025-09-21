@@ -14,3 +14,14 @@ smb_shares:
   - name: youtube-kids 
     target: /mnt/youtube-kids
 
+
+# NFS
+truenas_ip: "192.168.2.104"
+nfs_opts: "vers=4.2,proto=tcp,soft,timeo=5,retrans=2,_netdev,nofail"
+nfs_shares:
+  - mountpoint: /mnt/nfs/library
+    target: /mnt/tank/library
+  - mountpoint: /mnt/nfs/media
+    target: /mnt/tank/media
+  - mountpoint: /mnt/nfs/youtube-kids
+    target: /mnt/tank/youtube-kids

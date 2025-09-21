@@ -75,7 +75,7 @@
 - name: Ensure fstab entry for NFS (noauto + nofail to avoid boot blocking)
   become: yes
   mount:
-    src: "{{ truenas_ip }}:{{ nfs_export }}"
+    src: "{{ truenas_ip }}:{{ nfs_target }}"
     path: "{{ nfs_mountpoint }}"
     fstype: nfs
     opts: "noauto,{{ nfs_opts | default('vers=4.2,proto=tcp,hard,timeo=600,retrans=2,_netdev,nofail') }}"

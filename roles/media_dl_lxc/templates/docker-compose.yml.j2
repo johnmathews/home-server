@@ -91,6 +91,7 @@ services:
     volumes:
       - /srv/apps/sabnzbd:/config # Persistent settings
       - /mnt/library/downloads:/downloads
+      - /mnt/nfs/library/downloads:/nfs-downloads
       # - /mnt/media/library:/library
     network_mode: "service:gluetun"
     logging:

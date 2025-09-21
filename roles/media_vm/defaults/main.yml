@@ -34,22 +34,6 @@ media_stack_services:
   jackett_port: 9117
   bazarr_port: 6767
 
-# media_stack_users:
-#   jellyfin:
-#     username: john
-#   qbittorrent:
-#     username: admin
-#   sonarr:
-#     username: john
-#   radarr:
-#     username: john
-#   bazarr:
-#     username: john
-#   jackett:
-#     username: john
-#   filebrowser:
-#     username: john
-
 smb_media_vm_username: media_vm
 smb_server: 192.168.2.104
 smb_shares:
@@ -57,3 +41,12 @@ smb_shares:
     target: /mnt/media/library
   - name: media 
     target: /mnt/media/media
+
+# NFS
+truenas_ip: "192.168.2.104"
+nfs_opts: "vers=4.2,proto=tcp,soft,timeo=5,retrans=2,_netdev,nofail"
+nfs_shares:
+  - mountpoint: /mnt/nfs/library
+    target: /mnt/tank/library
+  - mountpoint: /mnt/nfs/media
+    target: /mnt/tank/media
