@@ -1,5 +1,5 @@
 # roles/media_dl_lxc/tasks/nfs_mount.yml
-#
+
 - name: Ensure nfs-common is installed
   become: yes
   apt:
@@ -7,73 +7,155 @@
     state: present
     update_cache: yes
 
-- name: Ensure mountpoint exists
+- name: Ensure 'acl' package is installed
+  become: yes
+  apt:
+    name: acl
+    state: present
+    update_cache: yes
+
+- name: Ensure /mnt/nfs exists with sane perms
+  become: yes
+  file:
+    path: /mnt/nfs
+    state: directory
+    mode: "0755"
+
+# Best-effort cleanups (never fail the play)
+- name: Remove immutable flag if present (best-effort)
+  become: yes
+  command: chattr -i {{ nfs_mountpoint }}
+  register: chattr_result
+  failed_when: false
+  changed_when: chattr_result.rc == 0
+
+- name: Reset ACLs on parent path (best-effort)
+  become: yes
+  command: setfacl -b /mnt/nfs
+  register: setfacl_result
+  failed_when: false
+  changed_when: setfacl_result.rc == 0
+
+# Only create the leaf dir if it's not already a mount
+- name: Check if NFS is already mounted
+  become: yes
+  command: mountpoint -q {{ nfs_mountpoint }}
+  register: mp
+  failed_when: false
+  changed_when: false
+
+- name: Ensure mountpoint exists (only if not mounted)
   become: yes
   file:
     path: "{{ nfs_mountpoint }}"
     state: directory
     mode: "0755"
+  when: mp.rc != 0
 
-# Systemd unit names must match the "escaped" path. For /mnt/library:
-#   mount unit:    mnt-library.mount
-#   automount:     mnt-library.automount
-# If your mountpoint changes, update the filenames accordingly.
+# Remove any stray units from previous attempts (automount not supported in LXC)
+- name: Remove legacy/automount units if present
+  become: yes
+  file:
+    path: "/etc/systemd/system/{{ item }}"
+    state: absent
+  loop:
+    - mnt-library.automount
+    - mnt-library.mount
+    - mnt-nfs-library.automount
+    - mnt-nfs-library.mount
+    - mount-nfs-library.service
+    - mount-nfs-library.timer
 
-- name: Create systemd mount unit for NFS
+- name: systemd daemon-reload after cleanup
+  become: yes
+  systemd:
+    daemon_reload: yes
+
+# fstab entry (oneshot service will use `mount {{ nfs_mountpoint }}`)
+- name: Ensure fstab entry for NFS (noauto + nofail to avoid boot blocking)
+  become: yes
+  mount:
+    src: "{{ truenas_ip }}:{{ nfs_export }}"
+    path: "{{ nfs_mountpoint }}"
+    fstype: nfs
+    opts: "noauto,{{ nfs_opts | default('vers=4.2,proto=tcp,hard,timeo=600,retrans=2,_netdev,nofail') }}"
+    state: present
+
+# ONESHOT SERVICE THAT MOUNTS THE SHARE
+- name: Install mount service unit
   become: yes
   copy:
-    dest: "/etc/systemd/system/mnt-library.mount"
+    dest: /etc/systemd/system/mount-nfs-library.service
     mode: "0644"
     content: |
       [Unit]
-      Description=Mount {{ nfs_mountpoint }} from {{ truenas_ip }}:{{ nfs_export }}
+      Description=Mount NFS {{ nfs_mountpoint }}
       Wants=network-online.target
       After=network-online.target
 
-      [Mount]
-      What={{ truenas_ip }}:{{ nfs_export }}
-      Where={{ nfs_mountpoint }}
-      Type=nfs
-      Options={{ nfs_opts }}
+      [Service]
+      Type=oneshot
+      ExecStartPre=/bin/sh -c 'for i in 1 2 3 4 5 6; do ping -c1 -W1 {{ truenas_ip }} >/dev/null 2>&1 && exit 0; sleep 5; done; exit 0'
+      ExecStart=/usr/bin/mount {{ nfs_mountpoint }}
+      RemainAfterExit=yes
+      ExecStop=/usr/bin/umount {{ nfs_mountpoint }}
 
-      [Install]
-      WantedBy=multi-user.target
-
-- name: Create systemd automount unit
+# TIMER TO RETRY UNTIL NAS IS UP
+- name: Install mount retry timer
   become: yes
   copy:
-    dest: "/etc/systemd/system/mnt-library.automount"
+    dest: /etc/systemd/system/mount-nfs-library.timer
     mode: "0644"
     content: |
       [Unit]
-      Description=Automount {{ nfs_mountpoint }}
+      Description=Retry mount for {{ nfs_mountpoint }}
 
-      [Automount]
-      Where={{ nfs_mountpoint }}
+      [Timer]
+      OnBootSec=30s
+      OnUnitActiveSec=2min
+      Unit=mount-nfs-library.service
+      Persistent=true
 
       [Install]
-      WantedBy=multi-user.target
+      WantedBy=timers.target
 
 - name: Reload systemd units
   become: yes
   systemd:
     daemon_reload: yes
 
-# Enable + start only the AUTOMOUNT. Systemd will mount on first access.
-- name: Enable and start the automount
+- name: Enable and start the retry timer
   become: yes
   systemd:
-    name: mnt-library.automount
+    name: mount-nfs-library.timer
     enabled: yes
     state: started
 
-# Optional: pre-warm to verify mount works now
-- name: Probe the automount (ls)
+- name: First mount attempt now
   become: yes
-  command: "ls -la {{ nfs_mountpoint }}"
-  register: probe_ls
+  systemd:
+    name: mount-nfs-library.service
+    state: started
+  failed_when: false
+
+- name: Show mount status
+  become: yes
+  shell: |
+    if mountpoint -q {{ nfs_mountpoint }}; then echo mounted; else echo not\ mounted; fi
+  register: mount_status
   changed_when: false
 
-- name: Show probe result (debug)
+- name: Debug mount status
   debug:
-    var: probe_ls.stdout_lines
+    var: mount_status.stdout
+
+- name: Show mount service logs
+  become: yes
+  shell: journalctl -u mount-nfs-library.service -n 200 --no-pager
+  register: mount_journal
+  changed_when: false
+  failed_when: false
+
+- name: Debug mount service logs
+  debug:
+    var: mount_journal.stdout
