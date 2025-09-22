@@ -8,5 +8,16 @@
   become: true
 
   roles:
+    - role: nfs_client
+      tags: [nfs]
     - role: media_dl_lxc
       tags: media-dl
+
+  vars:
+    nfs_client_mounts:
+      - name: library
+        mountpoint: /mnt/nfs/library
+        target: /mnt/tank/library
+      - name: media
+        mountpoint: /mnt/nfs/media
+        target: /mnt/tank/media

@@ -8,8 +8,15 @@
   become: true
 
   roles:
+    - role: nfs_client
+      tags: [nfs]
     - role: immich_lxc
       tags: immich
 
   vars:
     foo: bar
+    # NFS
+    nfs_client_mounts:
+      - name: immich
+        mountpoint: /mnt/nfs/immich
+        target: /mnt/tank/immich
