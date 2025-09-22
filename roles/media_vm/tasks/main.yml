@@ -3,7 +3,6 @@
 ---
 
 
-# 1. Playbook safety and environment setup
 - name: Ensure play runs only on the media VM
   ansible.builtin.assert:
     that:
@@ -16,8 +15,6 @@
 - name: Gather facts for media-vm
   ansible.builtin.setup: {}
 
-
-# 2. OS package updates
 - name: Ensure broken package state is fixed
   ansible.builtin.command: apt --fix-broken install -y
   changed_when: false  # Optional: suppresses 'changed' output unless something is actually fixed
@@ -28,7 +25,6 @@
     update_cache: true
     cache_valid_time: 3600
 
-# 3. Install required packages
 - name: Install SMB client and mount utilities
   ansible.builtin.apt:
     name:
@@ -49,7 +45,6 @@
     append: yes
   become: true
 
-# 4. Create necessary directories
 - import_tasks: mount-smb.yml
   tags: [mount, smb]
 

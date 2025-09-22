@@ -1,0 +1,138 @@
+- name: Show picked up NFS mounts (summary)
+  debug:
+    msg: >-
+      {{ item.name }} →
+      target={{ item.target }},
+      mountpoint={{ item.mountpoint }},
+      opts={{ item.opts | default(nfs_client_opts_default) }}
+  loop: "{{ nfs_client_mounts | default([]) }}"
+  loop_control:
+    label: "{{ item.name | default('UNNAMED') }}"
+  tags: [nfs]
+
+- name: Install client packages
+  become: yes
+  apt:
+    name: "{{ nfs_client_packages }}"
+    state: present
+    update_cache: yes
+
+- name: Ensure /mnt/nfs exists
+  become: yes
+  file:
+    path: /mnt/nfs
+    state: directory
+    mode: "0755"
+
+# Prep each mount (best-effort cleanups)
+- name: Best-effort cleanup (immutable + acls on /mnt/nfs)
+  become: yes
+  block:
+    - command: chattr -i /mnt/nfs
+      register: chattr_result
+      failed_when: false
+      changed_when: chattr_result.rc == 0
+
+    - command: setfacl -b /mnt/nfs
+      register: setfacl_result
+      failed_when: false
+      changed_when: setfacl_result.rc == 0
+
+- name: Prepare mountpoints that are not already mounted
+  include_tasks: prepare_mount.yml
+  loop: "{{ nfs_client_mounts }}"
+  loop_control:
+    loop_var: nfs_item
+
+- name: Ensure fstab entries (noauto + nofail)
+  become: yes
+  vars:
+    _opts: "{{ item.opts | default(nfs_client_opts_default) }}"
+    _src: >-
+      {{ (':' in item.target) | ternary(item.target, truenas_ip ~ ':' ~ item.target) }}
+  loop: "{{ nfs_client_mounts }}"
+  loop_control:
+    label: "{{ item.name }}"
+  mount:
+    src: "{{ _src }}"
+    path: "{{ item.mountpoint }}"
+    fstype: nfs
+    opts: "noauto,{{ _opts }}"
+    state: present
+
+# Clean any legacy units that might clash
+- name: Remove legacy/automount units if present (once)
+  become: yes
+  file:
+    path: "/etc/systemd/system/{{ item }}"
+    state: absent
+  loop:
+    - mnt-library.automount
+    - mnt-library.mount
+    - mnt-nfs-library.automount
+    - mnt-nfs-library.mount
+    - mount-nfs-library.service
+    - mount-nfs-library.timer
+  notify: systemd daemon-reload
+
+# Install templated units per mount
+- name: Install oneshot service units (per mount)
+  become: yes
+  vars:
+    _opts: "{{ item.opts | default(nfs_client_opts_default) }}"
+  loop: "{{ nfs_client_mounts }}"
+  loop_control:
+    label: "{{ item.name }}"
+  template:
+    src: mount-nfs.service.j2
+    dest: "/etc/systemd/system/mount-nfs-{{ item.name }}.service"
+    mode: "0644"
+  notify: systemd daemon-reload
+
+- name: Install retry timer units (per mount)
+  become: yes
+  loop: "{{ nfs_client_mounts }}"
+  loop_control:
+    label: "{{ item.name }}"
+  template:
+    src: mount-nfs.timer.j2
+    dest: "/etc/systemd/system/mount-nfs-{{ item.name }}.timer"
+    mode: "0644"
+  notify: systemd daemon-reload
+
+# Enable timers + kick off first mount
+- name: Enable and start timers
+  become: yes
+  loop: "{{ nfs_client_mounts }}"
+  loop_control:
+    label: "{{ item.name }}"
+  systemd:
+    name: "mount-nfs-{{ item.name }}.timer"
+    enabled: yes
+    state: started
+
+- name: First mount attempt now (don’t fail the play)
+  become: yes
+  loop: "{{ nfs_client_mounts }}"
+  loop_control:
+    label: "{{ item.name }}"
+  systemd:
+    name: "mount-nfs-{{ item.name }}.service"
+    state: started
+  failed_when: false
+
+# Optional diagnostics (handy when debugging)
+- name: Show mount status (per mount)
+  become: yes
+  loop: "{{ nfs_client_mounts }}"
+  loop_control:
+    label: "{{ item.name }}"
+  shell: |
+    echo -n "{{ item.name }}: "
+    if mountpoint -q {{ item.mountpoint }}; then echo "mounted"; else echo "not mounted"; fi
+  register: _mount_status
+  changed_when: false
+
+- name: Debug mount status
+  debug:
+    var: _mount_status.results | map(attribute='stdout') | list

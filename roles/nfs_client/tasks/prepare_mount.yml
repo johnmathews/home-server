@@ -1,0 +1,14 @@
+- name: Check if already mounted
+  become: yes
+  command: mountpoint -q {{ nfs_item.mountpoint }}
+  register: _is_mp
+  failed_when: false
+  changed_when: false
+
+- name: Ensure mountpoint exists (only if not mounted)
+  become: yes
+  file:
+    path: "{{ nfs_item.mountpoint }}"
+    state: directory
+    mode: "0755"
+  when: _is_mp.rc != 0

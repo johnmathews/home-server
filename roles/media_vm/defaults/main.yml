@@ -42,11 +42,3 @@ smb_shares:
   - name: media 
     target: /mnt/media/media
 
-# NFS
-truenas_ip: "192.168.2.104"
-nfs_opts: "vers=4.2,proto=tcp,soft,timeo=5,retrans=2,_netdev,nofail"
-nfs_shares:
-  - mountpoint: /mnt/nfs/library
-    target: /mnt/tank/library
-  - mountpoint: /mnt/nfs/media
-    target: /mnt/tank/media

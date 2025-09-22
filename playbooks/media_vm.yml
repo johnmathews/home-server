@@ -8,8 +8,10 @@
   become: true
 
   roles:
+    - role: nfs_client
+      tags: [nfs]
     - role: media_vm
-      tags: media_vm
+      tags: [media_vm]
 
   vars:
     proxmox_node_name: proxmox
@@ -24,3 +26,12 @@
     vm_cloud_init_user: john 
     vm_cloud_init_mac: 02:00:00:00:01:05 
     vm_ip_address: 192.168.2.105
+
+    # NFS
+    nfs_client_mounts:
+      - name: library
+        mountpoint: /mnt/nfs/library
+        target: /mnt/tank/library
+      - name: media
+        mountpoint: /mnt/nfs/media
+        target: /mnt/tank/media

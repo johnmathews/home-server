@@ -8,5 +8,14 @@
   become: true
 
   roles:
+    - role: nfs_client
+      tags: [nfs]
     - role: paperless_lxc
       tags: paperless
+
+  vars:
+    # NFS
+    nfs_client_mounts:
+      - name: paperless
+        mountpoint: /mnt/nfs/paperless
+        target: /mnt/tank/paperless
