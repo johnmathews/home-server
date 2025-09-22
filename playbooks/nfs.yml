@@ -1,0 +1,11 @@
+# vim: ft=yaml
+
+---
+
+- name: Configure NFS drives on all specified hosts
+  hosts: nfs_clients 
+  become: true
+
+  roles:
+    - role: nfs_client
+      tags: [nfs]

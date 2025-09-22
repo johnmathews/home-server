@@ -4,6 +4,87 @@
 ---
 
 services:
+  gluetun:
+    image: qmcgaw/gluetun
+    container_name: gluetun
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun
+    ports:
+      - 8080:8080 # qBittorrent WebUI
+      - 3189:3189 # qbittorrent endpoint port
+      - 6881:6881 # BitTorrent port
+      - 8081:8081 # sabnzbd WebUI, set in config file.
+      - 8085:8085 # sabnzbd WebUI, set in config file.
+      - 6881:6881/udp
+      - 8000:8000/tcp # control server port
+      - 8888:8888/tcp # HTTP proxy
+      - 8388:8388/tcp # Shadowsocks
+      - 8388:8388/udp # Shadowsocks
+    volumes:
+      - /srv/media/config/gluetun:/gluetun
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "https://ifconfig.me"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+    environment:
+      # NO PORT FORWARDING 
+      - FIREWALL=on
+      - FIREWALL_VPN_INPUT_PORTS="3189,6881"
+      - VPN_SERVICE_PROVIDER=${VPN_SERVICE_PROVIDER}
+      - VPN_TYPE=wireguard
+      - WIREGUARD_ENDPOINT=${WIREGUARD_ENDPOINT}
+      - WIREGUARD_PUBLIC_KEY=${WIREGUARD_PUBLIC_KEY}
+      - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
+      - WIREGUARD_ADDRESSES=${WIREGUARD_ADDRESSES}
+      - OWNED_ONLY=yes
+      - TZ=Europe/Amsterdam
+    restart: always
+
+  qbittorrent:
+    image: linuxserver/qbittorrent
+    container_name: qbittorrent
+    security_opt:
+      - no-new-privileges:true
+    network_mode: "service:gluetun"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - WEBUI_USERNAME=${QBITTORRENT_USERNAME}
+      - WEBUI_PASSWORD=${QBITTORRENT_PASSWORD}
+    volumes:
+      - /srv/media/config:/config
+      - /mnt/media/library/downloads:/downloads
+      - /mnt/media/library:/media
+    restart: always
+
+  sabnzbd:
+    image: lscr.io/linuxserver/sabnzbd:latest
+    container_name: sabnzbd
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "https://ifconfig.me"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - HOST_WHITELIST=sabnzbd.itsa.pizza,192.168.2.118 # doesnt work for this image. edit sabnzbd.ini instead
+    volumes:
+      - /srv/media/config/sabnzbd:/config # Persistent settings
+      - /mnt/media/library/downloads:/downloads
+      - /mnt/media/library:/library
+    network_mode: "service:gluetun"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    restart: always
 
   hometube:
     image: ghcr.io/egalitarianmonkey/hometube:latest
