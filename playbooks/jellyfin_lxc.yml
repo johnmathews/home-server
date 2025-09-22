@@ -11,7 +11,7 @@
     - role: nfs_client
       tags: [nfs]
     - role: jellyfin_lxc
-      tags: jellyfin
+      tags: [jellyfin]
 
   vars:
     foo: bar

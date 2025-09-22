@@ -11,7 +11,7 @@
     - role: nfs_client
       tags: [nfs]
     - role: tubearchivist_lxc
-      tags: tubearchivist
+      tags: [tubearchivist]
 
   vars:
     nfs_client_mounts:

@@ -11,7 +11,7 @@
     - role: nfs_client
       tags: [nfs]
     - role: immich_lxc
-      tags: immich
+      tags: [immich]
 
   vars:
     foo: bar
