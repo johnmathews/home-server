@@ -17,8 +17,20 @@
 ## Debugging tips
 
 - run `mount | grep nfs` to see all nfs mounts
-- run `findmnt -t nfs` to find all nfs mounts
+- run `findmnt -t nfs4` to find all nfs mounts
 - run `sudo umount /path/to/mount/dir` to unmount. you can use `-l` flag to
   detach immediatly and clean up when the file is no longer busy. You can also
   use `-f` to force the unmount, but if files are being written this could cause
   trouble.
+
+
+
+## Clients
+
+### Paperless
+
+Works:
+`sudo mount -t nfs 192.168.2.104:/mnt/tank/paperless /mnt/nfs/paperless`
+`du -h`
+
+### 

@@ -42,19 +42,19 @@
     pipx install uv
   environment:
     PATH: "{{ ansible_env.PATH }}:/home/{{ docker_user }}/.local/bin"
-  tags: [grafana, mkdocs]
+  tags: [grafana, docs]
 
 - name: Add Docker GPG key
   apt_key:
     url: https://download.docker.com/linux/ubuntu/gpg
     state: present
-  tags: [grafana, mkdocs]
+  tags: [grafana, docs]
 
 - name: Add Docker repository
   apt_repository:
     repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu jammy stable
     state: present
-  tags: [grafana, mkdocs]
+  tags: [grafana, docs]
 
 - name: Install Docker packages
   apt:
@@ -64,14 +64,14 @@
       - containerd.io
     state: latest
     update_cache: yes
-  tags: [grafana, mkdocs]
+  tags: [grafana, docs]
 
 - name: Add user to docker group
   user:
     name: "{{ docker_user }}"
     groups: docker
     append: yes
-  tags: [grafana, mkdocs]
+  tags: [grafana, docs]
 
 - name: Create Docker Compose directory
   file:
@@ -80,7 +80,7 @@
     owner: "{{ docker_user }}"
     group: docker
     mode: '0755'
-  tags: [grafana, mkdocs]
+  tags: [grafana, docs]
 
 - name: Ensure grafana custom config directory exists
   file:
@@ -99,7 +99,7 @@
     group: docker
     mode: '0644'
   notify: Apply updated Docker Compose stack
-  tags: [grafana, mkdocs]
+  tags: [grafana, docs]
 
 - name: Upload .env file from template
   ansible.builtin.template:
@@ -119,17 +119,17 @@
 
 - name: Include mkdocs tasks
   import_tasks: mkdocs.yml
-  tags: [config, mkdocs]
+  tags: [config, docs]
 
 - name: Update containers
   command: docker compose pull
   args:
     chdir: /srv/infra
-  tags: [grafana, mkdocs]
+  tags: [grafana, docs]
 
 - name: Launch containers
   command: docker compose up -d
   args:
     chdir: /srv/infra
-  tags: [grafana, mkdocs]
+  tags: [grafana, docs]
 
