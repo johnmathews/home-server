@@ -2,14 +2,8 @@ TZ: Europe/Amsterdam
 
 proxmox_api_user: "api@pve"
 
-smb_username: smb_user
-smb_server: 192.168.2.104
-smb_shares:
-  - name: immich 
-    target: /mnt/immich
-
-# NFS
-truenas_ip: "192.168.2.104"
-nfs_target: "/mnt/tank/immich"
-nfs_mountpoint: "/mnt/nfs/immich"
-nfs_opts: "vers=4.2,proto=tcp,soft,timeo=5,retrans=2,_netdev,nofail"
+# smb_username: smb_user
+# smb_server: 192.168.2.104
+# smb_shares:
+#   - name: immich 
+#     target: /mnt/immich

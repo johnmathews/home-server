@@ -30,7 +30,7 @@ services:
     ports:
       - 8000:8000
     volumes:
-      - /mnt/youtube-kids:/youtube
+      - /mnt/nfs/youtube-kids:/youtube
       - cache:/cache
     environment:
       - ES_URL=http://archivist-es:9200

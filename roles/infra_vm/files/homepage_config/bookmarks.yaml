@@ -30,6 +30,12 @@
     - Sabnzbd:
         - abbr: 
           href: http://192.168.2.105:8081
+    - qBittorrent:
+        - abbr: 
+          href: http://192.168.2.105:8080
+    - Gluetun:
+        - abbr: 
+          href: http://192.168.2.105:8000/v1/publicip/ip
     - BookLore:
         - abbr:
           href: http://192.168.2.105:6060

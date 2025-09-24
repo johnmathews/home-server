@@ -6,6 +6,7 @@ services:
   immich-server:
     container_name: immich_server
     image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
+    user: "1001:1001"
     volumes:
       # Do not edit the next line. If you want to change the media storage location on your system, edit the value of UPLOAD_LOCATION in the .env file
       - ${UPLOAD_LOCATION}:/usr/src/app/upload
@@ -33,6 +34,7 @@ services:
       - model-cache:/cache
     env_file:
       - .env
+    user: "1001:1001"
     restart: always
     healthcheck:
       disable: false

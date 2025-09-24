@@ -14,9 +14,3 @@ smb_server: 192.168.2.104
 smb_shares:
   - name: paperless
     target: /mnt/paperless
-
-# NFS
-truenas_ip: "192.168.2.104"
-nfs_target: "/mnt/tank/paperless"
-nfs_mountpoint: "/mnt/nfs/paperless"
-nfs_opts: "vers=4.2,proto=tcp,soft,timeo=5,retrans=2,_netdev,nofail"

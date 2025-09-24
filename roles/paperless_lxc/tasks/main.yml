@@ -26,13 +26,13 @@
       username={{ smb_username }}
       password={{ vault_smb_username_password }}
 
-- name: Ensure /mnt/paperless mountpoint exists
-  ansible.builtin.file:
-    path: /mnt/paperless
-    state: directory
-    owner: root
-    group: root
-    mode: '0755'
+# - name: Ensure /mnt/paperless mountpoint exists
+#   ansible.builtin.file:
+#     path: /mnt/paperless
+#     state: directory
+#     owner: root
+#     group: root
+#     mode: '0755'
 
 - name: Ensure paperless system group exists with fixed GID
   ansible.builtin.group:
@@ -67,18 +67,18 @@
     state: present
   tags: paperless_fstab
 
-- name: Mount or remount paperless share
-  ansible.posix.mount:
-    path: /mnt/paperless
-    src: "//{{ smb_server }}/paperless"
-    fstype: cifs
-    opts: "credentials=/etc/smb/.smbcredentials,uid={{ puid }},gid={{ pgid }},dir_mode=0770,file_mode=0660,iocharset=utf8,cache=strict,noserverino,rw,_netdev,noatime,vers=3.1.1"
-    state: mounted
-  tags: paperless_fstab
+# - name: Mount or remount paperless share
+#   ansible.posix.mount:
+#     path: /mnt/nfs/paperless
+#     src: "//{{ smb_server }}/paperless"
+#     fstype: cifs
+#     opts: "credentials=/etc/smb/.smbcredentials,uid={{ puid }},gid={{ pgid }},dir_mode=0770,file_mode=0660,iocharset=utf8,cache=strict,noserverino,rw,_netdev,noatime,vers=3.1.1"
+#     state: mounted
+#   tags: paperless_fstab
 
 - name: Ensure paperless subdirectories exist on the SMB share
   ansible.builtin.file:
-    path: "/mnt/paperless/{{ item }}"
+    path: "/mnt/nfs/paperless/{{ item }}"
     state: directory
     owner: "{{ puid }}"
     group: "{{ pgid }}"

@@ -24,6 +24,21 @@
     state: directory
     mode: "0755"
 
+# - name: Ensure nfs_user group exists
+#   group:
+#     name: nfs_user
+#     gid: 1001
+#     state: present
+
+# - name: Ensure nfs_user user exists
+#   user:
+#     name: nfs_user
+#     uid: 1001
+#     group: nfs_user
+#     state: present
+#     create_home: no
+#     shell: /usr/sbin/nologin
+
 # Prep each mount (best-effort cleanups)
 - name: Best-effort cleanup (immutable + acls on /mnt/nfs)
   become: yes
@@ -67,10 +82,6 @@
     path: "/etc/systemd/system/{{ item }}"
     state: absent
   loop:
-    - mnt-library.automount
-    - mnt-library.mount
-    - mnt-nfs-library.automount
-    - mnt-nfs-library.mount
     - mount-nfs-library.service
     - mount-nfs-library.timer
   notify: systemd daemon-reload

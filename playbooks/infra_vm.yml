@@ -8,6 +8,8 @@
   become: true
 
   roles:
+    - role: nfs_client
+      tags: [nfs]
     - role: infra_vm
       tags: infra_vm
 
@@ -25,3 +27,11 @@
     vm_cloud_init_mac: 02:00:00:00:01:06 
     vm_ip_address: 192.168.2.106
 
+    # NFS
+    nfs_client_mounts:
+      - name: library
+        mountpoint: /mnt/nfs/library
+        target: /mnt/tank/library
+      - name: media
+        mountpoint: /mnt/nfs/media
+        target: /mnt/tank/media

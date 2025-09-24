@@ -30,7 +30,7 @@ services:
     ports:
       - "8082:80"
     volumes:
-      - /mnt:/srv
+      - /mnt/nfs:/srv
       - /srv/infra/filebrowser/config:/config
       - /srv/infra/filebrowser/config/database:/database
     environment:

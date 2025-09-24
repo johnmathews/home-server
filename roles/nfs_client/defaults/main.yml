@@ -11,7 +11,6 @@ nfs_client_opts_default: "vers=4.2,proto=tcp,hard,timeo=600,retrans=2,_netdev,no
 truenas_ip: "192.168.2.104"
 nfs_opts: "vers=4.2,proto=tcp,soft,timeo=5,retrans=2,_netdev,nofail"
 
-
 # Dont run like this - itll create every mount on every host
 # nfs_client_mounts:
 #   - name: library

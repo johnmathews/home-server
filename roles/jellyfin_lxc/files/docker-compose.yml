@@ -9,11 +9,14 @@ services:
     restart: always
     mem_limit: 8g
     mem_reservation: 4g
+    # user: "1001:1001" # this breaks volume mounts
     ports:
       - "8096:8096"
     environment:
       - TZ=Europe/Amsterdam
       - JELLYFIN_PublishedServerUrl=http://192.168.2.110:8096
+      - PUID=1001
+      - PGID=1001
     devices:
       - /dev/dri:/dev/dri
     volumes:
@@ -22,7 +25,7 @@ services:
       - /srv/apps/jellyfin/cache:/cache
       - /mnt/media/library:/library # kids shows, family movies, etc
       - /mnt/media/media:/media # youtube videos, photography videos
-      - /mnt/youtube-kids:/youtube-kids # tubearchivist lib must be readonly
+      - /mnt/nfs/youtube-kids:/youtube-kids # tubearchivist lib must be readonly
     logging:
       driver: json-file
       options:
@@ -37,10 +40,6 @@ services:
     restart: always
     ports:
       - "18080:8080"
-    command:
-      - --housekeeping_interval=15s
-      - --max_housekeeping_interval=15s
-      - --global_housekeeping_interval=15s
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:ro
