@@ -8,8 +8,8 @@
   become: true
 
   roles:
-    - role: nfs_client
-      tags: [nfs]
+    # - role: nfs_client
+    #   tags: [nfs]
     - role: media_vm
       tags: [media_vm]
 

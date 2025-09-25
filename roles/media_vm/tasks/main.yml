@@ -25,11 +25,6 @@
     update_cache: true
     cache_valid_time: 3600
 
-- name: Configure NFS mounts
-  include_role:
-    name: nfs_client
-  tags: [nfs]
-
 - name: Install SMB client and mount utilities
   ansible.builtin.apt:
     name:

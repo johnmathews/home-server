@@ -21,21 +21,17 @@
     group: root
     mode: '0600'
 
-# this makes the smb share mount persist across reboots
-- name: Ensure /etc/fstab entries for SMB shares
-  lineinfile:
-    path: /etc/fstab
-    line: "//{{ smb_server }}/{{ item.name }} /mnt/media/{{ item.name }} cifs credentials=/etc/smb-media-credentials,vers=3.1.1.,uid={{ puid }},gid={{ guid }},file_mode=0664,dir_mode=0775 0 0"
-    create: yes
-    state: present
-  loop: "{{ smb_shares }}"
-
-  # src corresponds to a name in the trueNAS SMB shares menu.
-- name: Mount all SMB shares
+- name: Register SMB share in fstab
   mount:
     path: "/mnt/media/{{ item.name }}"
     src: "//{{ smb_server }}/{{ item.name }}"
     fstype: cifs
-    opts: credentials=/etc/smb-media-credentials,vers=3.1.1,uid={{ puid }},gid={{ guid }},file_mode=0664,dir_mode=0775
+    opts: "{{ smb_opts | regex_replace('\\s+', '') }}"
+    state: present
+  loop: "{{ smb_shares }}"
+
+- name: Mount SMB shares now
+  mount:
+    path: "/mnt/media/{{ item.name }}"
     state: mounted
   loop: "{{ smb_shares }}"

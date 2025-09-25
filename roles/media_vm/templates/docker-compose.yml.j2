@@ -57,8 +57,8 @@ services:
       - WEBUI_PASSWORD=${QBITTORRENT_PASSWORD}
     volumes:
       - /srv/media/config:/config
-      - /mnt/nfs/library/downloads:/downloads
-      - /mnt/nfs/library:/media
+      - /mnt/media/library/downloads:/downloads
+      - /mnt/media/library:/media
     restart: always
 
   sabnzbd:
@@ -76,8 +76,8 @@ services:
       - HOST_WHITELIST=sabnzbd.itsa.pizza,192.168.2.118 # doesnt work for this image. edit sabnzbd.ini instead
     volumes:
       - /srv/media/config/sabnzbd:/config # Persistent settings
-      - /mnt/nfs/library/downloads:/downloads
-      - /mnt/nfs/library:/library
+      - /mnt/media/library/downloads:/downloads
+      - /mnt/media/library:/library
     network_mode: "service:gluetun"
     logging:
       driver: json-file
@@ -94,7 +94,7 @@ services:
       - TZ=Europe/Amsterdam
       - PORT=8501
     volumes:
-      - /mnt/nfs/media/Video/YouTube Videos:/data/Videos
+      - /mnt/media/media/Video/YouTube Videos:/data/Videos
       - /srv/media/config/hometube/cookies:/config # Cookies folder
     restart: unless-stopped
 
@@ -105,7 +105,7 @@ services:
     ports:
       - "8082:80"
     volumes:
-      - /mnt/nfs/media:/srv  # Adjust to the path you want to browse
+      - /mnt/media/media:/srv  # Adjust to the path you want to browse
       - /srv/media/config/filebrowser/config:/config  # Config and database
       - /srv/media/config/filebrowser/config/database:/database  # Config and database
     environment:
@@ -133,8 +133,8 @@ services:
     volumes:
       - /srv/media/config/booklore/data:/app/data
       - /srv/media/config/booklore/books:/books
-      - /mnt/nfs/library:/library
-      - /mnt/nfs/media:/media
+      - /mnt/media/library:/library
+      - /mnt/media/media:/media
     restart: unless-stopped
 
   booklore-mariadb:
@@ -167,9 +167,9 @@ services:
       - TZ=${TZ}
     volumes:
       - /srv/media/config/sonarr:/config
-      - /mnt/nfs/library:/library
+      - /mnt/media/library:/library
       - /usr/local/bin:/usr/local/bin
-      - /mnt/nfs/library/downloads:/downloads # keep this so it understands what sabnzbd sees
+      - /mnt/media/library/downloads:/downloads # keep this so it understands what sabnzbd sees
     ports:
       - "8989:8989"
     restart: always
@@ -185,8 +185,8 @@ services:
     volumes:
       - /usr/local/bin:/usr/local/bin
       - /srv/media/config/radarr:/config
-      - /mnt/nfs/library:/library
-      - /mnt/nfs/library/downloads:/downloads # keep this so it understands what sabnzbd sees
+      - /mnt/media/library:/library
+      - /mnt/media/library/downloads:/downloads # keep this so it understands what sabnzbd sees
     ports:
       - "7878:7878"
     restart: always
@@ -240,7 +240,7 @@ services:
       - TZ=${TZ}
     volumes:
       - /srv/media/config/bazarr:/config
-      - /mnt/nfs/library:/library
+      - /mnt/media/library:/library
     restart: always
 
   node-exporter:

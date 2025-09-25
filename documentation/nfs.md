@@ -29,8 +29,24 @@
 
 ### Paperless
 
-Works:
+OK!
+
 `sudo mount -t nfs 192.168.2.104:/mnt/tank/paperless /mnt/nfs/paperless`
 `du -h`
 
-### 
+###  Immich
+
+OK!
+
+### TubeArchivist
+
+OK!
+
+### Jellyfin
+
+not ok
+
+### Media VM
+
+not ok
+

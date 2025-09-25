@@ -69,7 +69,7 @@ services:
       - GF_SERVER_SERVE_FROM_SUB_PATH=false
       - GF_SECURITY_ALLOW_EMBEDDING=true
       - GF_SECURITY_ALLOW_EMBEDDING=true
-      - GF_FEATURE_TOGGLES_ENABLE=dashboardNewLayouts
+      # - GF_FEATURE_TOGGLES_ENABLE=dashboardNewLayouts
     volumes:
       - /srv/infra/grafana/data:/var/lib/grafana
     restart: always

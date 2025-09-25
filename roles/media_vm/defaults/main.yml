@@ -42,3 +42,8 @@ smb_shares:
   - name: media 
     target: /mnt/media/media
 
+smb_opts: >-
+  credentials=/etc/smb-media-credentials,
+  uid={{ puid }},gid={{ guid }},
+  file_mode=0664,dir_mode=0775, vers=3.1.1,
+  cache=strict,noserverino, _netdev,nofail,noauto,x-systemd.automount, x-systemd.device-timeout=10,iocharset=utf8,noperm
