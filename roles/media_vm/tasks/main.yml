@@ -2,16 +2,6 @@
 
 ---
 
-
-- name: Ensure play runs only on the media VM
-  ansible.builtin.assert:
-    that:
-      - inventory_hostname == "media-vm"
-      - ansible_hostname == "media"
-      - ansible_host == "192.168.2.105"
-    fail_msg: >
-      This playbook must run on media (192.168.2.105). Got: inventory_hostname={{ inventory_hostname }}, ansible_host={{ ansible_host }}
-
 - name: Gather facts for media-vm
   ansible.builtin.setup: {}
 
@@ -67,7 +57,6 @@
     - "{{ media_stack_base_dir }}"
     - "{{ media_stack_mount_dir }}/library/family"
     - "{{ media_stack_mount_dir }}/library/kids"
-    # - "{{ media_stack_mount_dir }}/library/youtube"
     - "{{ media_stack_base_dir | dirname }}"
   when: item != "/mnt/media/library/downloads/incomplete"
 
@@ -81,7 +70,6 @@
     - /srv/media
     - /mnt/media/library/family
     - /mnt/media/library/kids
-    # - /mnt/media/library/youtube
   when: item != "/mnt/media/library/downloads/incomplete"
 
 - name:  Ensure hometube config directory exists
@@ -167,18 +155,6 @@
     msg: "docker-compose.yml not found in /srv/media"
   when: not compose_file.stat.exists
 
-- name: Ensure mounted media directories exist
-  stat:
-    path: "{{ item }}"
-  loop:
-    - "{{ media_stack_mount_dir }}/library"
-  register: mounted_dirs
-
-- name: Fail if any mounted media paths are missing
-  fail:
-    msg: "Missing required SMB mount: {{ item.item }}"
-  when: not item.stat.exists
-  loop: "{{ mounted_dirs.results }}"
 
 - name: Set permissions of file browser config directory
   ansible.builtin.command: chown -R 1000:1000 "{{ media_stack_base_dir }}/config/filebrowser"

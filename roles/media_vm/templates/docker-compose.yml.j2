@@ -52,6 +52,7 @@ services:
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
+      - UMASK=002
       - TZ=${TZ}
       - WEBUI_USERNAME=${QBITTORRENT_USERNAME}
       - WEBUI_PASSWORD=${QBITTORRENT_PASSWORD}
@@ -72,6 +73,7 @@ services:
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
+      - UMASK=002
       - TZ=${TZ}
       - HOST_WHITELIST=sabnzbd.itsa.pizza,192.168.2.118 # doesnt work for this image. edit sabnzbd.ini instead
     volumes:
@@ -164,6 +166,7 @@ services:
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
+      - UMASK=002
       - TZ=${TZ}
     volumes:
       - /srv/media/config/sonarr:/config
@@ -181,6 +184,7 @@ services:
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
+      - UMASK=002
       - TZ=${TZ}
     volumes:
       - /usr/local/bin:/usr/local/bin

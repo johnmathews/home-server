@@ -8,7 +8,7 @@
     state: directory
     owner: root
     group: root
-    mode: '0755'
+    mode: "0755"
   loop: "{{ smb_shares }}"
 
 - name: Create SMB credentials file
@@ -19,19 +19,19 @@
       password={{ vault_smb_media_vm_password }}
     owner: root
     group: root
-    mode: '0600'
+    mode: "0600"
 
 - name: Register SMB share in fstab
   mount:
     path: "/mnt/media/{{ item.name }}"
     src: "//{{ smb_server }}/{{ item.name }}"
     fstype: cifs
-    opts: "{{ smb_opts | regex_replace('\\s+', '') }}"
-    state: present
-  loop: "{{ smb_shares }}"
-
-- name: Mount SMB shares now
-  mount:
-    path: "/mnt/media/{{ item.name }}"
+    opts: "{{ smb_opts }}"
     state: mounted
   loop: "{{ smb_shares }}"
+  register: fstab_entries
+
+- name: Reload systemd units if fstab changed
+  systemd:
+    daemon_r3jeload: true
+  when: fstab_entries is changed

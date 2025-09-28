@@ -19,7 +19,7 @@ groups:
       - record: ups_ob_ts_seconds
         expr: |
           timestamp(network_ups_tools_ups_status{flag="OB"})
-          and on(instance) (network_ups_tools_ups_status{flag="OB"} == bool 1)
+          and on(instance) (network_ups_tools_ups_status{flag="OB"} == 1)
 
       # Last time OB was 1 in the lookback window (0 if never)
       - record: ups_last_ob_timestamp_seconds

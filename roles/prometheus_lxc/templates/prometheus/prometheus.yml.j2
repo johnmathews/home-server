@@ -39,14 +39,12 @@ scrape_configs:
         labels: { hostname: 'jellyfin' }
       - targets: ['192.168.2.113:18080']
         labels: { hostname: 'immich' }
-      - targets: ['192.168.2.114:18080']
+      - targets: ['192.168.2.115:18080']
         labels: { hostname: 'prometheus' }
       - targets: ['192.168.2.116:18080']
-        labels: { hostname: 'tubearchivist-kids' }
+        labels: { hostname: 'tubearchivist' }
       - targets: ['192.168.2.117:18080']
         labels: { hostname: 'paperless' }
-      - targets: ['192.168.2.118:18080']
-        labels: { hostname: 'media-dl' }
       - targets: ['192.168.2.119:18080']
         labels: { hostname: 'open-webui' }
     relabel_configs:
