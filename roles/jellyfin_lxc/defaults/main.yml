@@ -2,9 +2,9 @@ TZ: Europe/Amsterdam
 
 proxmox_api_user: "api@pve"
 
-# smb_media_vm_username: media_vm
-smb_username: smb_user
+truenas_ip: "192.168.2.104"
 
+smb_username: smb_user
 smb_server: 192.168.2.104
 smb_shares:
   - name: library 
@@ -13,6 +13,17 @@ smb_shares:
     target: /mnt/media/media
   - name: youtube-kids 
     target: /mnt/youtube-kids
+
+
+nfs_opts: "vers=4.2,proto=tcp,soft,timeo=5,retrans=2,_netdev,nofail"
+nfs_shares:
+  - mountpoint: /mnt/nfs/library
+    target: /mnt/tank/library
+  - mountpoint: /mnt/nfs/media
+    target: /mnt/tank/media
+  - mountpoint: /mnt/nfs/youtube-kids
+    target: /mnt/tank/youtube-kids
+
 
 puid: 1001
 guid: 1001
