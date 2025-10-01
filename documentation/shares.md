@@ -1,8 +1,8 @@
-# NFS
+[TOC]
 
 ## Host
 
-...
+Toggle the particular share, or toggle the entire service.
 
 ## Client
 
@@ -26,7 +26,6 @@
 
 
 ## Clients
-
 
 ###  Immich
 

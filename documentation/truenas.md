@@ -1,5 +1,3 @@
-# TrueNAS
-
 ## ~Scripts~
 
 This is disabled

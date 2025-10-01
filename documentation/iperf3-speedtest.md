@@ -1,5 +1,3 @@
-# iPerf3
-
 `iperf3` is a network testing utility. It runs on the server and also on your
 laptop. Make a connection and you can test the speed of the connection between
 the devices.

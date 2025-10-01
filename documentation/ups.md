@@ -1,6 +1,6 @@
-# UPS 
+[TOC]
 
-The Uninterruptible Power Supply is controlled by `Network UPS Tools`  (NUT).
+The UPS is controlled by `Network UPS Tools` (NUT).
 
 ## Event/Data flow
 

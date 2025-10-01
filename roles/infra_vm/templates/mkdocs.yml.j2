@@ -1,23 +1,26 @@
 site_name: Home Server Documentation
+site_url: https://docs.itsa.pizza
 
 theme:
   name: material
+  palette:
+    primary: green
   features:
-    - navigation.instant
-    - navigation.tracking
     - content.code.copy
+    - navigation.instant
+    - navigation.indexes 
+    - navigation.tracking
+    - navigation.top
 
 markdown_extensions:
   - admonition
-  - toc:
-      permalink: true
+  - toc 
   - tables
 
 plugins:
   - search
 
 nav:
-  - Home: readme.md
   - UPS: ups.md
   - Key Server: key_server.md
   - Adguard + Unbound: adguard-unbound.md

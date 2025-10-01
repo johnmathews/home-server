@@ -1,5 +1,3 @@
-# Media VM
-
 ## qBittorrent
 
 ### Logging in

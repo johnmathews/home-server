@@ -1,5 +1,3 @@
-# HDD Power Management
-
 ## TrueNAS
 
 `sudo smartctl -n standby -i /dev/sdb` - get current status of a disk

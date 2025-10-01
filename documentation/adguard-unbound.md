@@ -1,5 +1,3 @@
-# AdGuard + Unbound
-
 The router uses AdGuard as its DNS resolver.
 
 AdGuard uses Unbound to resolve DNS recursively. 

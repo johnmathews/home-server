@@ -1,5 +1,3 @@
-# Cloudflared
-
 This LXC container runs the `cloudflared` service, enabling secure remote access
 to services hosted on your Proxmox server via Cloudflare Tunnel.
 

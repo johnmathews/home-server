@@ -1,5 +1,3 @@
-# Key Server
-
 Datasets on TrueNAS are encrypted and need a passphrase to be unlocked. After
 startup, a script runs to retrieve the passphrases from a key server.
 
