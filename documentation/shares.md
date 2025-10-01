@@ -27,42 +27,43 @@
 
 ## Clients
 
+
+###  Immich
+
+- NFS only
+
+### Jellyfin
+
+- SMB for `media` and `library`
+- NFS for `youtube-kids`
+
+### Media VM
+
+- SMB only
+
 ### Paperless
 
-OK!
+- NFS only
 
 `sudo mount -t nfs 192.168.2.104:/mnt/tank/paperless /mnt/nfs/paperless`
 `du -h`
 
-###  Immich
-
-OK!
-
 ### TubeArchivist
 
-OK!
-
-### Jellyfin
-
-not ok
-
-### Media VM
-
-not ok
-
+- NFS only
 
 ## SMB
 
 Toggle the share on and off in TrueNAS after changing ACLs to restart the service.
 
-manually mount:
-```
-sudo mount -t cifs //192.168.2.104/media /mnt/media/media    -o credentials=/etc/smb-media-credentials,uid=1001,gid=1001,vers=3.1.1
+- manually mount:
+    ```
+    sudo mount -t cifs //192.168.2.104/media /mnt/media/media    -o credentials=/etc/smb-media-credentials,uid=1001,gid=1001,vers=3.1.1
 
-```
+    ```
 
-see available shares:
-```
-smbclient -L //192.168.2.104 -U media_vm
-```
+- see available shares:
+    ```
+    smbclient -L //192.168.2.104 -U media_vm
+    ```
 
