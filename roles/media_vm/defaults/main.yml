@@ -36,8 +36,10 @@ smb_server: 192.168.2.104
 smb_shares:
   - name: library 
     target: /mnt/media/library
+    mountpoint: /mnt/media/library 
   - name: media 
     target: /mnt/media/media
+    mountpoint: /mnt/media/media 
 
 smb_opts_items:
   - credentials=/etc/smb-media-credentials

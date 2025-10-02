@@ -28,16 +28,40 @@ Toggle the particular share, or toggle the entire service.
 
 `du -h`
 
+## Mount Probe
+
+Writes results into the node_exporter text file location
+
+```
+systemctl daemon-reload
+systemctl restart mount-touch-probe.timer
+systemctl start mount-touch-probe.service
+
+ls -l /var/lib/node_exporter/textfile_collector/mount_touch_probe.prom
+cat /var/lib/node_exporter/textfile_collector/mount_touch_probe.prom
+
+systemctl list-units 'mount-nfs-*.service' 'mnt-nfs-*.mount'
+
+```
+
+`journalctl -u mount-touch-probe.service  `
+`journalctl -u mount-touch-probe.timer -u mount-touch-probe.service --since "1 hour ago" `
+`systemctl list-timers mount-touch-probe.timer`
+
+
+```
+```
+
 
 ## SMB
 
 Toggle the share on and off in TrueNAS after changing ACLs to restart the service.
 
 - manually mount:
-    ```
-    sudo mount -t cifs //192.168.2.104/media /mnt/media/media    -o credentials=/etc/smb-media-credentials,uid=1001,gid=1001,vers=3.1.1
 
-    ```
+```
+sudo mount -t cifs //192.168.2.104/media /mnt/media/media -o credentials=/etc/smb-media-credentials,uid=1001,gid=1001,vers=3.1.1
+```
 
 - see available shares:
     ```
@@ -68,3 +92,5 @@ Toggle the share on and off in TrueNAS after changing ACLs to restart the servic
 ### TubeArchivist
 
 - NFS ok
+
+

@@ -15,3 +15,7 @@ mount_touch_probe_state_dir: /var/lib/mount_touch_probe
 
 mount_touch_probe_textfile_dir_mode: '0755'
 mount_touch_probe_metrics_mode: '0644'
+
+mount_touch_probe_autofs_wake: true
+mount_touch_probe_autofs_poll_count: 30          # 30 * 0.1s = 3s max wait after wake
+mount_touch_probe_autofs_poll_sleep_sec: '0.1'
