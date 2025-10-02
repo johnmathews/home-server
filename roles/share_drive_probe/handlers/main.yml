@@ -4,9 +4,11 @@
 - name: Daemon reload
   systemd:
     daemon_reload: true
+  tags: test 
 
 - name: Restart mount-touch-probe timer
   systemd:
     name: mount-touch-probe.timer
     state: restarted
     enabled: true
+  tags: test 

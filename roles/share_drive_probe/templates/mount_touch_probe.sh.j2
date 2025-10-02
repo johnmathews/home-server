@@ -3,6 +3,9 @@
 
 set -euo pipefail
 
+log() { printf '%s mount-touch-probe[%s]: %s\n' "$(date -Is)" "$$" "$*" >&2; }
+
+
 TARGETS_FILE="{{ mount_touch_probe_targets_file }}"
 TEXTFILE_DIR="{{ mount_touch_probe_textfile_dir }}"
 STATE_DIR="{{ mount_touch_probe_state_dir }}"
@@ -15,6 +18,8 @@ EPOCH_NOW="$(date +%s)"
 STATE_FAIL=0     # mount not available / probe failed
 STATE_SUCCESS=1  # probe succeeded
 STATE_ERROR=-1   # not 0 or 1
+
+log "start run: host=$HOST targets_file=$TARGETS_FILE"
 
 # Ensure dirs exist (Ansible should normally create these)
 mkdir -p "$TEXTFILE_DIR" "$STATE_DIR"
@@ -100,10 +105,14 @@ while IFS=',' read -r mount_path mount_label; do
     echo "mount_touch_probe_success{host=\"$HOST\",mount=\"$mount_path\",label=\"$label\"} 0" >> "$tmp_metrics"
     any_fail=1
   fi
+
+  log "probe mount=$mount_path label=$label state=$current_state reason=$reason"
 done < "$TARGETS_FILE"
 
 echo "mount_touch_probe_last_run_timestamp_seconds{host=\"$HOST\"} $EPOCH_NOW" >> "$tmp_metrics"
 
 mv "$tmp_metrics" "$METRIC_FILE"
+
+log "wrote metrics to $METRIC_FILE"
 
 exit "$any_fail"

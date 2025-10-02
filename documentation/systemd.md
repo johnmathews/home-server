@@ -72,6 +72,14 @@ sudo systemctl disable nginx
 sudo systemctl reload nginx
 ```
 
+### Debug
+
+```
+systemctl start mount-touch-probe.service
+journalctl -u mount-touch-probe.service -n 50 -e
+
+```
+
 ## Service Lifecycle
 
 When you enable and start a service: 

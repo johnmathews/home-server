@@ -12,6 +12,7 @@
   loop:
     - "{{ mount_touch_probe_conf_dir }}"
     - "{{ mount_touch_probe_textfile_dir }}"
+  tags: test 
 
 - name: Ensure state dir exists
   file:
@@ -20,6 +21,7 @@
     owner: root
     group: root
     mode: '0755'
+  tags: test 
 
 - name: Write targets file
   copy:
@@ -34,34 +36,39 @@
       {%- for t in (smb_shares | default([])) -%}
       {{ t.mountpoint }},{{ t.target }}
       {% endfor -%}
+  tags: test 
 
 - name: Install probe script
   template:
-    src: mount_touch_probe.sh.j2
+    src: templates/mount_touch_probe.sh.j2
     dest: "{{ mount_touch_probe_bin }}"
     owner: root
     group: root
     mode: '0755'
   notify: Restart mount-touch-probe timer
+  tags: test 
 
 - name: Install systemd service
   template:
-    src: mount-touch-probe.service.j2
+    src: templates/mount_touch_probe.service.j2
     dest: /etc/systemd/system/mount-touch-probe.service
     mode: '0644'
   notify: Daemon reload
+  tags: test 
 
 - name: Install systemd timer
   template:
-    src: mount-touch-probe.timer.j2
+    src: templates/mount_touch_probe.timer.j2
     dest: /etc/systemd/system/mount-touch-probe.timer
     mode: '0644'
   notify:
     - Daemon reload
     - Restart mount-touch-probe timer
+  tags: test 
 
 - name: Enable and start timer
   systemd:
     name: mount-touch-probe.timer
     enabled: true
     state: started
+  tags: test 
