@@ -2,3 +2,10 @@
   become: yes
   systemd:
     daemon_reload: yes
+
+- name: Restart autofs
+  become: yes
+  listen: Restart autofs
+  systemd:
+    name: autofs
+    state: restarted

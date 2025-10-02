@@ -5,7 +5,7 @@
 # Changing this will require you to `cd /src/media && docker compose logs qbittorrent` 
 # to get the new temp password. Then in qBittorrent set the old password again
 reset_qbittorrent_config: false
-
+# qbittorrent_password_hash: 16c5e9c9b842bd6bf78aafa66643304e0cfe2586
 
 TZ: Europe/Amsterdam
 
@@ -14,17 +14,14 @@ proxmox_api_host: "{{ hostvars['pve']['ansible_host'] }}"
 media_stack_base_dir: /srv/media
 media_stack_mount_dir: /mnt/media
 
-
 media_stack_user: john
 media_stack_group: john
 
 puid: 1001
 guid: 1001
 
-qbittorrent_password_hash: 16c5e9c9b842bd6bf78aafa66643304e0cfe2586
-
-tubearchivist_host: "http://192.168.2.105:8002"
-ta_username: john
+# tubearchivist_host: "http://192.168.2.105:8002"
+# ta_username: john
 
 media_stack_services:
   jellyfin_port: 8096
@@ -42,7 +39,7 @@ smb_shares:
   - name: media 
     target: /mnt/media/media
 
-smb_opts_list:
+smb_opts_items:
   - credentials=/etc/smb-media-credentials
   - uid={{ puid }}
   - gid={{ guid }}
@@ -64,4 +61,26 @@ smb_opts_list:
   - timeo=60,
   - retrans=3
 
-smb_opts: "{{ smb_opts_list | join(',') }}"
+smb_opts: "{{ smb_opts_items | join(',') }}"
+
+
+nfs_opts_items:
+  - _netdev
+  - hard
+  - nofail
+  - proto=tcp
+  - retrans=2
+  - timeo=150
+  - vers=4.2
+  - x-systemd.automount
+  - x-systemd.idle-timeout=60s
+
+nfs_opts: "{{ nfs_opts_items | join(',') }}"
+
+nfs_shares:
+  - name: library
+    mountpoint: /mnt/nfs/library
+    target: /mnt/tank/library
+  - name: media
+    mountpoint: /mnt/nfs/media
+    target: /mnt/tank/media

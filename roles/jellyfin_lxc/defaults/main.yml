@@ -1,8 +1,8 @@
 TZ: Europe/Amsterdam
-
 proxmox_api_user: "api@pve"
 
-truenas_ip: "192.168.2.104"
+puid: 1001
+guid: 1001
 
 smb_username: smb_user
 smb_server: 192.168.2.104
@@ -14,6 +14,8 @@ smb_shares:
   - name: youtube-kids 
     target: /mnt/youtube-kids
 
+
+truenas_ip: "192.168.2.104"
 
 nfs_opts_items:
   - _netdev
@@ -38,7 +40,3 @@ nfs_shares:
   - name: youtube-kids
     mountpoint: /mnt/nfs/youtube-kids
     target: /mnt/tank/youtube-kids
-
-
-puid: 1001
-guid: 1001

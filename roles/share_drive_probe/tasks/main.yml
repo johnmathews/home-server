@@ -21,7 +21,7 @@
     group: root
     mode: '0755'
 
-- name: Write targets file (one mount per line: path,label)
+- name: Write targets file
   copy:
     dest: "{{ mount_touch_probe_targets_file }}"
     owner: root

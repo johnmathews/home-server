@@ -1,0 +1,39 @@
+---
+
+- name: Install autofs (LXCs only)
+  become: yes
+  when: not nfs_can_systemd_automount
+  apt:
+    name: autofs
+    state: present
+    update_cache: yes
+
+- name: Configure autofs master map (LXCs only)
+  become: yes
+  when: not nfs_can_systemd_automount
+  copy:
+    dest: /etc/auto.master.d/nfs.autofs
+    mode: '0644'
+    content: |
+      /mnt/nfs  /etc/auto.nfs  --timeout=60 --ghost
+  notify: Restart autofs
+
+- name: Build /etc/auto.nfs from nfs_shares (LXCs only)
+  become: yes
+  when: not nfs_can_systemd_automount
+  copy:
+    dest: /etc/auto.nfs
+    mode: '0644'
+    content: |
+      {% for s in nfs_shares %}
+      {{ s.name }} -fstype=nfs4,proto=tcp,hard,retrans=2,timeo=150 {{ (':' in s.target) | ternary(s.target, truenas_ip ~ ':' ~ s.target) }}
+      {% endfor %}
+  notify: Restart autofs
+
+- name: Ensure autofs is enabled and running (LXCs only)
+  become: yes
+  when: not nfs_can_systemd_automount
+  systemd:
+    name: autofs
+    enabled: true
+    state: restarted

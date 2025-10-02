@@ -7,3 +7,8 @@ proxmox_api_user: "api@pve"
 # smb_shares:
 #   - name: immich 
 #     target: /mnt/immich
+
+nfs_shares:
+  - name: immich
+    mountpoint: /mnt/nfs/immich
+    target: /mnt/tank/immich

@@ -24,32 +24,10 @@ Toggle the particular share, or toggle the entire service.
   trouble.
 
 
-
-## Clients
-
-###  Immich
-
-- NFS only
-
-### Jellyfin
-
-- SMB for `media` and `library`
-- NFS for `youtube-kids`
-
-### Media VM
-
-- SMB only
-
-### Paperless
-
-- NFS only
-
 `sudo mount -t nfs 192.168.2.104:/mnt/tank/paperless /mnt/nfs/paperless`
+
 `du -h`
 
-### TubeArchivist
-
-- NFS only
 
 ## SMB
 
@@ -66,3 +44,27 @@ Toggle the share on and off in TrueNAS after changing ACLs to restart the servic
     smbclient -L //192.168.2.104 -U media_vm
     ```
 
+
+## Clients
+
+###  Immich
+
+- NFS ok
+
+### Jellyfin
+
+- SMB for `media` and `library`
+- NFS ok
+
+### Media VM
+
+- SMB ok
+- NFS ok
+
+### Paperless
+
+- NFS ok
+
+### TubeArchivist
+
+- NFS ok

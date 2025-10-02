@@ -12,30 +12,31 @@
     state: directory
     mode: "0755"
 
-- name: Ensure nfs group (optional)
-  become: yes
-  when: nfs_manage_local_user | bool
+- name: Ensure nfs group exists
   group:
     name: "{{ nfs_user_name }}"
-    gid: "{{ nfs_user_gid }}"
     state: present
-    system: yes
+    system: true
+  register: nfs_group
 
-- name: Ensure nfs user (optional)
-  become: yes
-  when: nfs_manage_local_user | bool
+- name: Ensure nfs user exists
   user:
     name: "{{ nfs_user_name }}"
-    uid: "{{ nfs_user_uid }}"
-    group: "{{ nfs_user_name }}"
     state: present
-    create_home: no
+    system: true
     shell: /usr/sbin/nologin
-    system: yes
+    create_home: false
+    uid: "{{ nfs_user_uid | default(omit) }}"
+    group: "{{ nfs_user_name }}"
+  when: nfs_group is changed
+
+- name: Detect automount capability
+  set_fact:
+    nfs_can_systemd_automount: "{{ (ansible_service_mgr == 'systemd') and (ansible_virtualization_type != 'lxc') }}"
 
 - name: Prepare mountpoints that are not already mounted
   include_tasks: prepare_mount.yml
-  loop: "{{ nfs_client_mounts }}"
+  loop: "{{ nfs_shares }}"
   loop_control:
     loop_var: nfs_item
 
@@ -60,12 +61,34 @@
   systemd:
     daemon_reload: true
 
-- name: Trigger first access to automounts (non-fatal)
+- name: Enable+start systemd automount units (VMs only)
+  become: yes
+  when: nfs_can_systemd_automount
+  loop: "{{ nfs_shares }}"
+  loop_control: { label: "{{ item.name }}" }
+  systemd:
+    name: "{{ (item.mountpoint | regex_replace('^/', '') | regex_replace('/', '-')) }}.automount"
+    enabled: true
+    state: started
+
+- name: Show systemd automount status
   become: yes
   loop: "{{ nfs_shares }}"
   loop_control:
     label: "{{ item.name }}"
-  command: bash -lc "timeout 5s ls -d {{ item.mountpoint }} >/dev/null 2>&1 || true"
+  command: "systemctl show -p ActiveState {{ (item.mountpoint | regex_replace('^/', '') | regex_replace('/', '-')) }}.automount"
+  changed_when: false
+  when: nfs_can_systemd_automount
+
+- name: Include autofs setup (LXCs only)
+  when: not nfs_can_systemd_automount
+  include_tasks: autofs.yml
+
+- name: Trigger first access
+  become: yes
+  loop: "{{ nfs_shares }}"
+  loop_control: { label: "{{ item.name }}" }
+  command: "bash -lc 'timeout 5s ls -d {{ item.mountpoint }}/{{ item.name }} >/dev/null 2>&1 || true'"
   changed_when: false
   failed_when: false
 

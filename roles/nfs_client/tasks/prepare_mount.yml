@@ -11,4 +11,6 @@
     path: "{{ nfs_item.mountpoint }}"
     state: directory
     mode: "0755"
-  when: _is_mp.rc != 0
+  when:
+    - _is_mp.rc != 0
+    - nfs_can_systemd_automount

@@ -1,4 +1,4 @@
-# playbooks/immich_lxc.yml
+# playbooks/paperless_lxc.yml
 
 ---
 
@@ -14,10 +14,3 @@
       tags: [nfs]
     - role: share_drive_probe 
       tags: [shares]
-
-  vars:
-    # NFS
-    nfs_client_mounts:
-      - name: paperless
-        mountpoint: /mnt/nfs/paperless
-        target: /mnt/tank/paperless

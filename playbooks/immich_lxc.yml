@@ -14,11 +14,3 @@
       tags: [immich]
     - role: share_drive_probe 
       tags: [shares]
-
-  vars:
-    foo: bar
-    # NFS
-    nfs_client_mounts:
-      - name: immich
-        mountpoint: /mnt/nfs/immich
-        target: /mnt/tank/immich

@@ -9,11 +9,11 @@
 
   roles:
     - role: media_vm
-      tags: [media_vm]
-    # - role: nfs_client
-    #   tags: [nfs]
-    - role: share_drive_probe 
-      tags: [shares]
+      tags: [media]
+    - role: nfs_client
+      tags: [nfs]
+    # - role: share_drive_probe 
+    #   tags: [shares]
 
   vars:
     proxmox_node_name: proxmox
@@ -28,21 +28,3 @@
     vm_cloud_init_user: john 
     vm_cloud_init_mac: 02:00:00:00:01:05 
     vm_ip_address: 192.168.2.105
-
-    # NFS
-    nfs_client_mounts:
-      - name: media
-        mountpoint: /mnt/nfs/media
-        target: /mnt/tank/media
-      - name: youtube-kids
-        mountpoint: /mnt/nfs/youtube-kids
-        target: /mnt/tank/youtube-kids
-      - name: kids
-        mountpoint: /mnt/nfs/library/kids
-        target: /mnt/tank/library/kids
-      - name: family
-        mountpoint: /mnt/nfs/library/family
-        target: /mnt/tank/library/family
-      - name: downloads
-        mountpoint: /mnt/nfs/library/downloads
-        target: /mnt/tank/library/downloads 
