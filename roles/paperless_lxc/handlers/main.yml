@@ -4,13 +4,16 @@
   command: docker compose pull
   args:
     chdir: "{{ docker_compose_dir }}"
+  tags: docker
 
 - name: Restart all containers 
   ansible.builtin.command: docker compose restart
   args:
     chdir: "{{ docker_compose_dir }}"
+  tags: docker
 
 - name: Restart paperless container
   command: docker compose restart paperless
   args:
     chdir: "{{ docker_compose_dir }}"
+  tags: docker

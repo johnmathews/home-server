@@ -12,3 +12,6 @@ mount_touch_probe_targets_file: "{{ mount_touch_probe_conf_dir }}/targets.list"
 # Where node_exporter reads textfile metrics (adjust if you use a custom dir)
 mount_touch_probe_textfile_dir: /var/lib/node_exporter/textfile_collector
 mount_touch_probe_state_dir: /var/lib/mount_touch_probe
+
+mount_touch_probe_textfile_dir_mode: '0755'
+mount_touch_probe_metrics_mode: '0644'

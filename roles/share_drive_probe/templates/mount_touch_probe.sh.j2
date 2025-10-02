@@ -25,8 +25,9 @@ log "start run: host=$HOST targets_file=$TARGETS_FILE"
 mkdir -p "$TEXTFILE_DIR" "$STATE_DIR"
 
 # Start fresh metrics each run
-tmp_metrics="$(mktemp)"
+tmp_metrics="$(mktemp "{{ mount_touch_probe_textfile_dir }}/.mount_touch_probe.prom.XXXXXX")"
 trap 'rm -f "$tmp_metrics"' EXIT
+
 
 # Header comment (Prometheus ignores #)
 {
@@ -110,9 +111,11 @@ while IFS=',' read -r mount_path mount_label; do
 done < "$TARGETS_FILE"
 
 echo "mount_touch_probe_last_run_timestamp_seconds{host=\"$HOST\"} $EPOCH_NOW" >> "$tmp_metrics"
+chown root:root "$tmp_metrics"
+chmod 0644 "$tmp_metrics"
 
-mv "$tmp_metrics" "$METRIC_FILE"
-
+mv -f "$tmp_metrics" "$METRIC_FILE"
 log "wrote metrics to $METRIC_FILE"
 
+trap - EXIT  # prevent trap from removing the now-moved file
 exit "$any_fail"

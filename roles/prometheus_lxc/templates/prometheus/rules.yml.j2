@@ -1,5 +1,20 @@
 # vim: ft=yaml
+
+---
+
 groups:
+  - name: mounts.touch-probe.derived
+    rules:
+    - record: mount_touch_probe_state_current_age_seconds
+      expr: time() - mount_touch_probe_state_change_timestamp_seconds
+
+    - record: mount_touch_probe_is_success
+      expr: mount_touch_probe_state == 1
+    - record: mount_touch_probe_is_fail
+      expr: mount_touch_probe_state == 0
+    - record: mount_touch_probe_is_error
+      expr: mount_touch_probe_state == -1
+
   - name: disk-spindown
     interval: 30s   # set to your scrape interval (e.g., 15s/30s)
     rules:

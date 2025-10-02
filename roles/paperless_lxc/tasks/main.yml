@@ -51,12 +51,12 @@
     create_home: no
     state: present
 
-- name: Remove legacy fstab lines for paperless share
-  ansible.builtin.lineinfile:
-    path: /etc/fstab
-    state: absent
-    regexp: '^//{{ smb_server | regex_escape }}/paperless[ \t]+/mnt/paperless[ \t]+cifs[ \t]+'
-  tags: paperless_fstab
+# - name: Remove legacy fstab lines for paperless share
+#   ansible.builtin.lineinfile:
+#     path: /etc/fstab
+#     state: absent
+#     regexp: '^//{{ smb_server | regex_escape }}/paperless[ \t]+/mnt/paperless[ \t]+cifs[ \t]+'
+#   tags: paperless_fstab
 
 # - name: Ensure fstab entry for paperless share is present
 #   ansible.posix.mount:
@@ -99,6 +99,7 @@
     - /srv/apps/paperless/data
     - /srv/apps/paperless/pgdata
     - /srv/apps/paperless/redisdata
+  tags: docker
 
 - name: Ensure paperless data directory ownership
   ansible.builtin.file:
@@ -108,6 +109,7 @@
     group: "{{ pgid }}"
     mode: '0770'
   notify: Restart all containers
+  tags: docker
 
 - name: Ensure Postgres data directory ownership
   ansible.builtin.file:
@@ -117,6 +119,7 @@
     group: 999
     mode: '0700'
   notify: Restart all containers
+  tags: docker
 
 - name: Ensure Redis data directory ownership
   ansible.builtin.file:
@@ -126,6 +129,7 @@
     group: 999
     mode: '0755'
   notify: Restart all containers
+  tags: docker
 
 - name: Create environment file from template
   ansible.builtin.template:
@@ -135,6 +139,7 @@
   notify:
     - Update containers
     - Restart all containers
+  tags: docker
 
 - name: Copy docker-compose.yml
   ansible.builtin.template:
@@ -146,3 +151,4 @@
   notify:
     - Update containers
     - Restart all containers
+  tags: docker

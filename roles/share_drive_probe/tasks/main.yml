@@ -14,6 +14,32 @@
     - "{{ mount_touch_probe_textfile_dir }}"
   tags: test 
 
+
+- name: Ensure textfile collector directory permissions are correct
+  file:
+    path: "{{ mount_touch_probe_textfile_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "{{ mount_touch_probe_textfile_dir_mode }}"
+  become: true
+  notify:
+    - Daemon reload
+    - Restart mount-touch-probe timer
+
+- name: Ensure probe metrics file has correct permissions (if present)
+  file:
+    path: "{{ mount_touch_probe_textfile_dir }}/mount_touch_probe.prom"
+    state: file
+    owner: root
+    group: root
+    mode: "{{ mount_touch_probe_metrics_mode }}"
+  become: true
+  ignore_errors: true
+  notify:
+    - Daemon reload
+    - Restart mount-touch-probe timer
+
 - name: Ensure state dir exists
   file:
     path: "{{ mount_touch_probe_state_dir }}"
@@ -72,3 +98,4 @@
     enabled: true
     state: started
   tags: test 
+

@@ -8,9 +8,9 @@
   become: true
 
   roles:
-    - role: paperless_lxc
-      tags: [paperless]
     - role: nfs_client
       tags: [nfs]
     - role: share_drive_probe 
       tags: [shares]
+    - role: paperless_lxc
+      tags: [paperless]

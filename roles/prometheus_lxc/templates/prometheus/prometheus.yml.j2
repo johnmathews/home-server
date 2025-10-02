@@ -64,6 +64,14 @@ scrape_configs:
         labels: { hostname: 'infra' }
       - targets: ['192.168.2.104:9100']
         labels: { hostname: 'truenas' }
+      - targets: ['192.168.2.117:9100']
+        labels: { hostname: 'paperless' }
+      - targets: ['192.168.2.113:9100']
+        labels: { hostname: 'immich' }
+      - targets: ['192.168.2.110:9100']
+        labels: { hostname: 'jellyfin' }
+      - targets: ['192.168.2.116:9100']
+        labels: { hostname: 'tubearchivist' }
     relabel_configs:
       - source_labels: [__address__]
         regex: '([^:]+)(?::\d+)?'
