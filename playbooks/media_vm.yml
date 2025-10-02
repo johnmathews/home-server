@@ -12,8 +12,8 @@
       tags: [media]
     - role: nfs_client
       tags: [nfs]
-    # - role: share_drive_probe 
-    #   tags: [shares]
+    - role: share_drive_probe 
+      tags: [shares]
 
   vars:
     proxmox_node_name: proxmox

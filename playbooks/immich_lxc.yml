@@ -10,7 +10,7 @@
   roles:
     - role: nfs_client
       tags: [nfs]
-    - role: immich_lxc
-      tags: [immich]
     - role: share_drive_probe 
       tags: [shares]
+    - role: immich_lxc
+      tags: [immich]
