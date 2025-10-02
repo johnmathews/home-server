@@ -8,9 +8,14 @@ puid: 1001
 guid: 1001
 pgid: 1001
 
-smb_username: smb_user
+# smb_username: smb_user
+# smb_server: 192.168.2.104
+# smb_shares:
+#   - name: paperless
+#     target: /mnt/paperless
 
-smb_server: 192.168.2.104
-smb_shares:
+nfs_opts: "vers=4.2,proto=tcp,soft,timeo=5,retrans=2,_netdev,nofail"
+nfs_shares:
   - name: paperless
-    target: /mnt/paperless
+    mountpoint: /mnt/nfs/paperless
+    target: /mnt/tank/paperless

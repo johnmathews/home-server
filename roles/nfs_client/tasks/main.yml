@@ -1,15 +1,3 @@
-- name: Show picked up NFS mounts (summary)
-  debug:
-    msg: >-
-      {{ item.name }} →
-      target={{ item.target }},
-      mountpoint={{ item.mountpoint }},
-      opts={{ item.opts | default(nfs_client_opts_default) }}
-  loop: "{{ nfs_client_mounts | default([]) }}"
-  loop_control:
-    label: "{{ item.name | default('UNNAMED') }}"
-  tags: [nfs]
-
 - name: Install client packages
   become: yes
   apt:
@@ -24,34 +12,26 @@
     state: directory
     mode: "0755"
 
-# - name: Ensure nfs_user group exists
-#   group:
-#     name: nfs_user
-#     gid: 1001
-#     state: present
-
-# - name: Ensure nfs_user user exists
-#   user:
-#     name: nfs_user
-#     uid: 1001
-#     group: nfs_user
-#     state: present
-#     create_home: no
-#     shell: /usr/sbin/nologin
-
-# Prep each mount (best-effort cleanups)
-- name: Best-effort cleanup (immutable + acls on /mnt/nfs)
+- name: Ensure nfs group (optional)
   become: yes
-  block:
-    - command: chattr -i /mnt/nfs
-      register: chattr_result
-      failed_when: false
-      changed_when: chattr_result.rc == 0
+  when: nfs_manage_local_user | bool
+  group:
+    name: "{{ nfs_user_name }}"
+    gid: "{{ nfs_user_gid }}"
+    state: present
+    system: yes
 
-    - command: setfacl -b /mnt/nfs
-      register: setfacl_result
-      failed_when: false
-      changed_when: setfacl_result.rc == 0
+- name: Ensure nfs user (optional)
+  become: yes
+  when: nfs_manage_local_user | bool
+  user:
+    name: "{{ nfs_user_name }}"
+    uid: "{{ nfs_user_uid }}"
+    group: "{{ nfs_user_name }}"
+    state: present
+    create_home: no
+    shell: /usr/sbin/nologin
+    system: yes
 
 - name: Prepare mountpoints that are not already mounted
   include_tasks: prepare_mount.yml
@@ -59,88 +39,44 @@
   loop_control:
     loop_var: nfs_item
 
-- name: Ensure fstab entries (noauto + nofail)
+- name: Ensure fstab entries
   become: yes
   vars:
-    _opts: "{{ item.opts | default(nfs_client_opts_default) }}"
+    _opts: "{{ nfs_opts | default(nfs_opts_default) }}"
     _src: >-
       {{ (':' in item.target) | ternary(item.target, truenas_ip ~ ':' ~ item.target) }}
-  loop: "{{ nfs_client_mounts }}"
+  loop: "{{ nfs_shares }}"
   loop_control:
     label: "{{ item.name }}"
   mount:
     src: "{{ _src }}"
     path: "{{ item.mountpoint }}"
     fstype: nfs
-    opts: "noauto,{{ _opts }}"
+    opts: "{{ _opts }}"
     state: present
 
-# Clean any legacy units that might clash
-- name: Remove legacy/automount units if present (once)
+- name: systemd daemon-reload
   become: yes
-  file:
-    path: "/etc/systemd/system/{{ item }}"
-    state: absent
-  loop:
-    - mount-nfs-library.service
-    - mount-nfs-library.timer
-  notify: systemd daemon-reload
-
-# Install templated units per mount
-- name: Install oneshot service units (per mount)
-  become: yes
-  vars:
-    _opts: "{{ item.opts | default(nfs_client_opts_default) }}"
-  loop: "{{ nfs_client_mounts }}"
-  loop_control:
-    label: "{{ item.name }}"
-  template:
-    src: mount-nfs.service.j2
-    dest: "/etc/systemd/system/mount-nfs-{{ item.name }}.service"
-    mode: "0644"
-  notify: systemd daemon-reload
-
-- name: Install retry timer units (per mount)
-  become: yes
-  loop: "{{ nfs_client_mounts }}"
-  loop_control:
-    label: "{{ item.name }}"
-  template:
-    src: mount-nfs.timer.j2
-    dest: "/etc/systemd/system/mount-nfs-{{ item.name }}.timer"
-    mode: "0644"
-  notify: systemd daemon-reload
-
-# Enable timers + kick off first mount
-- name: Enable and start timers
-  become: yes
-  loop: "{{ nfs_client_mounts }}"
-  loop_control:
-    label: "{{ item.name }}"
   systemd:
-    name: "mount-nfs-{{ item.name }}.timer"
-    enabled: yes
-    state: started
+    daemon_reload: true
 
-- name: First mount attempt now (don’t fail the play)
+- name: Trigger first access to automounts (non-fatal)
   become: yes
-  loop: "{{ nfs_client_mounts }}"
+  loop: "{{ nfs_shares }}"
   loop_control:
     label: "{{ item.name }}"
-  systemd:
-    name: "mount-nfs-{{ item.name }}.service"
-    state: started
+  command: bash -lc "timeout 5s ls -d {{ item.mountpoint }} >/dev/null 2>&1 || true"
+  changed_when: false
   failed_when: false
 
-# Optional diagnostics (handy when debugging)
 - name: Show mount status (per mount)
   become: yes
-  loop: "{{ nfs_client_mounts }}"
+  loop: "{{ nfs_shares }}"
   loop_control:
     label: "{{ item.name }}"
   shell: |
     echo -n "{{ item.name }}: "
-    if mountpoint -q {{ item.mountpoint }}; then echo "mounted"; else echo "not mounted"; fi
+    if mountpoint -q {{ item.mountpoint }}; then echo "mounted"; else echo "not mounted (automount armed)"; fi
   register: _mount_status
   changed_when: false
 

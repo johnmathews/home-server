@@ -4,34 +4,16 @@
 ---
 
 services:
-  # node exporter is running outside docker.
-  cadvisor:
-    image: gcr.io/cadvisor/cadvisor:latest
-    container_name: cadvisor
-    restart: always
-    ports:
-      - "18080:8080"
-    volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:ro
-      - /sys:/sys:ro
-      - /var/lib/docker/:/var/lib/docker:ro
+  node_exporter:
+    image: quay.io/prometheus/node-exporter:latest
+    container_name: node_exporter
     command:
-      - --housekeeping_interval=15s
-      - --max_housekeeping_interval=15s
-      - --global_housekeeping_interval=15s
-    privileged: true  # required for some metrics
-
-  paperless-broker:
-    container_name: paperless-broker
-    image: docker.io/library/redis:8
-    restart: always
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
+      - '--path.rootfs=/host'
+    network_mode: host
+    pid: host
+    restart: unless-stopped
     volumes:
-      - "{{ docker_compose_dir }}//paperless/redisdata:/data"
+      - '/:/host:ro,rslave'
 
   paperless-db:
     container_name: paperless-db
@@ -72,3 +54,31 @@ services:
       USERMAP_UID: ${PUID}
       USERMAP_GID: ${PGID}
       TZ: ${TZ}
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    restart: always
+    ports:
+      - "18080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    command:
+      - --housekeeping_interval=15s
+      - --max_housekeeping_interval=15s
+      - --global_housekeeping_interval=15s
+    privileged: true  # required for some metrics
+
+  paperless-broker:
+    container_name: paperless-broker
+    image: docker.io/library/redis:8
+    restart: always
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - "{{ docker_compose_dir }}//paperless/redisdata:/data"

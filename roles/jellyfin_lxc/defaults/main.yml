@@ -15,13 +15,28 @@ smb_shares:
     target: /mnt/youtube-kids
 
 
-nfs_opts: "vers=4.2,proto=tcp,soft,timeo=5,retrans=2,_netdev,nofail"
+nfs_opts_items:
+  - _netdev
+  - hard
+  - nofail
+  - proto=tcp
+  - retrans=2
+  - timeo=150
+  - vers=4.2
+  - x-systemd.automount
+  - x-systemd.idle-timeout=60s
+
+nfs_opts: "{{ nfs_opts_items | join(',') }}"
+
 nfs_shares:
-  - mountpoint: /mnt/nfs/library
+  - name: library
+    mountpoint: /mnt/nfs/library
     target: /mnt/tank/library
-  - mountpoint: /mnt/nfs/media
+  - name: media
+    mountpoint: /mnt/nfs/media
     target: /mnt/tank/media
-  - mountpoint: /mnt/nfs/youtube-kids
+  - name: youtube-kids
+    mountpoint: /mnt/nfs/youtube-kids
     target: /mnt/tank/youtube-kids
 
 
