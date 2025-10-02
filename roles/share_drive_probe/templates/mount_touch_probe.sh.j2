@@ -5,7 +5,6 @@ set -euo pipefail
 
 log() { printf '%s mount-touch-probe[%s]: %s\n' "$(date -Is)" "$$" "$*" >&2; }
 
-
 TARGETS_FILE="{{ mount_touch_probe_targets_file }}"
 TEXTFILE_DIR="{{ mount_touch_probe_textfile_dir }}"
 STATE_DIR="{{ mount_touch_probe_state_dir }}"
@@ -19,17 +18,21 @@ STATE_FAIL=0     # mount not available / probe failed
 STATE_SUCCESS=1  # probe succeeded
 STATE_ERROR=-1   # not 0 or 1
 
+# Autofs wake options (tweak via Ansible vars if you like)
+AUTOFS_WAKE="{{ mount_touch_probe_autofs_wake | default('true') }}"
+AUTOFS_POLL_COUNT={{ mount_touch_probe_autofs_poll_count | default(30) }}         # times to poll after wake
+AUTOFS_POLL_SLEEP_SEC={{ mount_touch_probe_autofs_poll_sleep_sec | default('0.1') }} # seconds between polls
+
 log "start run: host=$HOST targets_file=$TARGETS_FILE"
 
 # Ensure dirs exist (Ansible should normally create these)
 mkdir -p "$TEXTFILE_DIR" "$STATE_DIR"
 
-# Start fresh metrics each run
+# Create temp metrics inside textfile dir; atomic rename at end
 tmp_metrics="$(mktemp "{{ mount_touch_probe_textfile_dir }}/.mount_touch_probe.prom.XXXXXX")"
 trap 'rm -f "$tmp_metrics"' EXIT
 
-
-# Header comment (Prometheus ignores #)
+# Headers
 {
   echo "# HELP mount_touch_probe_success 1 if probe succeeded, else 0"
   echo "# TYPE mount_touch_probe_success gauge"
@@ -53,6 +56,31 @@ hash_str() {
   fi
 }
 
+is_container() {
+  # return 0 if running in a container (LXC/Docker/etc.)
+  if command -v systemd-detect-virt >/dev/null 2>&1; then
+    systemd-detect-virt --quiet --container && return 0 || return 1
+  fi
+  # fallback heuristics
+  grep -qE '/(lxc|docker|kubepods)/' /proc/1/cgroup 2>/dev/null && return 0 || return 1
+}
+
+wake_autofs_if_needed() {
+  # $1 = mount_path
+  local p="$1"
+  # Just stat/ls the directory to trigger autofs; ignore errors
+  timeout "$OP_TIMEOUT" bash -c "ls -ld \"$p\" >/dev/null 2>&1 || true" || true
+  # Poll for it to appear as a mount
+  local i
+  for ((i=0; i< AUTOFS_POLL_COUNT; i++)); do
+    if findmnt -T "$p" >/dev/null 2>&1; then
+      return 0
+    fi
+    sleep "$AUTOFS_POLL_SLEEP_SEC"
+  done
+  return 1
+}
+
 while IFS=',' read -r mount_path mount_label; do
   [[ -z "${mount_path// }" ]] && continue
   [[ "${mount_path:0:1}" == "#" ]] && continue
@@ -65,10 +93,24 @@ while IFS=',' read -r mount_path mount_label; do
   current_state=$STATE_ERROR
   reason="error"
 
+  # 1) If not mounted yet, optionally wake autofs (common on LXCs)
+  if ! findmnt -T "$mount_path" >/dev/null 2>&1; then
+    if [[ "$AUTOFS_WAKE" == "true" ]] && is_container; then
+      log "autofs wake attempt for $mount_path (container detected)"
+      if wake_autofs_if_needed "$mount_path"; then
+        log "autofs wake succeeded for $mount_path"
+      else
+        log "autofs wake did not mount $mount_path within timeout"
+      fi
+    fi
+  fi
+
+  # 2) Check if mounted now
   if ! findmnt -T "$mount_path" >/dev/null 2>&1; then
     current_state=$STATE_FAIL
     reason="fail"
   else
+    # 3) Do the touch+rm probe
     probe_file="${mount_path}/.probe.$HOST.$EPOCH_NOW.$$.$RANDOM"
     start_ns=$(date +%s%N)
     if timeout "$OP_TIMEOUT" bash -c "umask 077; : > \"$probe_file\"" 2>/dev/null; then
@@ -89,6 +131,7 @@ while IFS=',' read -r mount_path mount_label; do
     fi
   fi
 
+  # 4) Emit metrics and update state-change timestamp if needed
   last_state=""
   [[ -f "$last_state_file" ]] && last_state="$(cat "$last_state_file" 2>/dev/null || true)"
 
@@ -113,9 +156,7 @@ done < "$TARGETS_FILE"
 echo "mount_touch_probe_last_run_timestamp_seconds{host=\"$HOST\"} $EPOCH_NOW" >> "$tmp_metrics"
 chown root:root "$tmp_metrics"
 chmod 0644 "$tmp_metrics"
-
 mv -f "$tmp_metrics" "$METRIC_FILE"
 log "wrote metrics to $METRIC_FILE"
-
-trap - EXIT  # prevent trap from removing the now-moved file
+trap - EXIT
 exit "$any_fail"
