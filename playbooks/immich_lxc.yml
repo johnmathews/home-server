@@ -12,6 +12,8 @@
       tags: [nfs]
     - role: immich_lxc
       tags: [immich]
+    - role: share_drive_probe 
+      tags: [shares]
 
   vars:
     foo: bar

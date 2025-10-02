@@ -1,0 +1,12 @@
+[Unit]
+Description=Run Mount Touch Probe every {{ mount_touch_probe_interval }}
+
+[Timer]
+OnUnitActiveSec={{ mount_touch_probe_interval }}
+# Spread starts a bit to avoid thundering herd across VMs
+RandomizedDelaySec=20s
+Unit=mount-touch-probe.service
+Persistent=true
+
+[Install]
+WantedBy=timers.target

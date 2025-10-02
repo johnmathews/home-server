@@ -8,10 +8,12 @@
   become: true
 
   roles:
-    # - role: nfs_client
-    #   tags: [nfs]
     - role: media_vm
       tags: [media_vm]
+    # - role: nfs_client
+    #   tags: [nfs]
+    - role: share_drive_probe 
+      tags: [shares]
 
   vars:
     proxmox_node_name: proxmox

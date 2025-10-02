@@ -1,0 +1,67 @@
+# share_drive_probe/tasks/main.yml
+
+---
+
+- name: Ensure config and metrics directories exist
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  loop:
+    - "{{ mount_touch_probe_conf_dir }}"
+    - "{{ mount_touch_probe_textfile_dir }}"
+
+- name: Ensure state dir exists
+  file:
+    path: "{{ mount_touch_probe_state_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Write targets file (one mount per line: path,label)
+  copy:
+    dest: "{{ mount_touch_probe_targets_file }}"
+    owner: root
+    group: root
+    mode: '0644'
+    content: |
+      {%- for t in (nfs_shares | default([])) -%}
+      {{ t.mountpoint }},{{ t.target }}
+      {% endfor -%}
+      {%- for t in (smb_shares | default([])) -%}
+      {{ t.mountpoint }},{{ t.target }}
+      {% endfor -%}
+
+- name: Install probe script
+  template:
+    src: mount_touch_probe.sh.j2
+    dest: "{{ mount_touch_probe_bin }}"
+    owner: root
+    group: root
+    mode: '0755'
+  notify: Restart mount-touch-probe timer
+
+- name: Install systemd service
+  template:
+    src: mount-touch-probe.service.j2
+    dest: /etc/systemd/system/mount-touch-probe.service
+    mode: '0644'
+  notify: Daemon reload
+
+- name: Install systemd timer
+  template:
+    src: mount-touch-probe.timer.j2
+    dest: /etc/systemd/system/mount-touch-probe.timer
+    mode: '0644'
+  notify:
+    - Daemon reload
+    - Restart mount-touch-probe timer
+
+- name: Enable and start timer
+  systemd:
+    name: mount-touch-probe.timer
+    enabled: true
+    state: started

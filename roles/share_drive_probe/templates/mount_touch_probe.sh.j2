@@ -1,0 +1,109 @@
+#!/usr/bin/env bash
+# vim: ft=sh
+
+set -euo pipefail
+
+TARGETS_FILE="{{ mount_touch_probe_targets_file }}"
+TEXTFILE_DIR="{{ mount_touch_probe_textfile_dir }}"
+STATE_DIR="{{ mount_touch_probe_state_dir }}"
+METRIC_FILE="${TEXTFILE_DIR}/mount_touch_probe.prom"
+OP_TIMEOUT="{{ mount_touch_probe_op_timeout }}"
+HOST="$(hostname)"
+EPOCH_NOW="$(date +%s)"
+
+# State constants
+STATE_FAIL=0     # mount not available / probe failed
+STATE_SUCCESS=1  # probe succeeded
+STATE_ERROR=-1   # not 0 or 1
+
+# Ensure dirs exist (Ansible should normally create these)
+mkdir -p "$TEXTFILE_DIR" "$STATE_DIR"
+
+# Start fresh metrics each run
+tmp_metrics="$(mktemp)"
+trap 'rm -f "$tmp_metrics"' EXIT
+
+# Header comment (Prometheus ignores #)
+{
+  echo "# HELP mount_touch_probe_success 1 if probe succeeded, else 0"
+  echo "# TYPE mount_touch_probe_success gauge"
+  echo "# HELP mount_touch_probe_duration_seconds Time to touch+rm"
+  echo "# TYPE mount_touch_probe_duration_seconds gauge"
+  echo "# HELP mount_touch_probe_last_run_timestamp_seconds UNIX time of last run on this host"
+  echo "# TYPE mount_touch_probe_last_run_timestamp_seconds gauge"
+  echo "# HELP mount_touch_probe_state -1=error,0=fail,1=success"
+  echo "# TYPE mount_touch_probe_state gauge"
+  echo "# HELP mount_touch_probe_state_change_timestamp_seconds UNIX time of last state change"
+  echo "# TYPE mount_touch_probe_state_change_timestamp_seconds gauge"
+} >> "$tmp_metrics"
+
+any_fail=0
+
+hash_str() {
+  if command -v sha256sum >/dev/null 2>&1; then
+    echo -n "$1" | sha256sum | awk '{print $1}'
+  else
+    echo -n "$1" | md5sum | awk '{print $1}'
+  fi
+}
+
+while IFS=',' read -r mount_path mount_label; do
+  [[ -z "${mount_path// }" ]] && continue
+  [[ "${mount_path:0:1}" == "#" ]] && continue
+
+  label="${mount_label:-unknown}"
+
+  safe_key="$(hash_str "${mount_path}_${label}")"
+  last_state_file="${STATE_DIR}/${safe_key}.state"
+
+  current_state=$STATE_ERROR
+  reason="error"
+
+  if ! findmnt -T "$mount_path" >/dev/null 2>&1; then
+    current_state=$STATE_FAIL
+    reason="fail"
+  else
+    probe_file="${mount_path}/.probe.$HOST.$EPOCH_NOW.$$.$RANDOM"
+    start_ns=$(date +%s%N)
+    if timeout "$OP_TIMEOUT" bash -c "umask 077; : > \"$probe_file\"" 2>/dev/null; then
+      (command -v sync >/dev/null && sync -d "$probe_file") >/dev/null 2>&1 || true
+      if timeout "$OP_TIMEOUT" rm -f -- "$probe_file" 2>/dev/null; then
+        end_ns=$(date +%s%N)
+        dur_ns=$((end_ns - start_ns))
+        dur_s=$(awk -v ns="$dur_ns" 'BEGIN{printf "%.6f", ns/1000000000}')
+        current_state=$STATE_SUCCESS
+        reason="success"
+      else
+        current_state=$STATE_FAIL
+        reason="fail"
+      fi
+    else
+      current_state=$STATE_ERROR
+      reason="error"
+    fi
+  fi
+
+  last_state=""
+  [[ -f "$last_state_file" ]] && last_state="$(cat "$last_state_file" 2>/dev/null || true)"
+
+  if [[ "$current_state" != "$last_state" ]]; then
+    echo "$current_state" > "$last_state_file"
+    echo "mount_touch_probe_state_change_timestamp_seconds{host=\"$HOST\",mount=\"$mount_path\",label=\"$label\"} $EPOCH_NOW" >> "$tmp_metrics"
+  fi
+
+  echo "mount_touch_probe_state{host=\"$HOST\",mount=\"$mount_path\",label=\"$label\",reason=\"$reason\"} $current_state" >> "$tmp_metrics"
+
+  if [[ "$current_state" -eq $STATE_SUCCESS ]]; then
+    echo "mount_touch_probe_success{host=\"$HOST\",mount=\"$mount_path\",label=\"$label\"} 1" >> "$tmp_metrics"
+    echo "mount_touch_probe_duration_seconds{host=\"$HOST\",mount=\"$mount_path\",label=\"$label\"} $dur_s" >> "$tmp_metrics"
+  else
+    echo "mount_touch_probe_success{host=\"$HOST\",mount=\"$mount_path\",label=\"$label\"} 0" >> "$tmp_metrics"
+    any_fail=1
+  fi
+done < "$TARGETS_FILE"
+
+echo "mount_touch_probe_last_run_timestamp_seconds{host=\"$HOST\"} $EPOCH_NOW" >> "$tmp_metrics"
+
+mv "$tmp_metrics" "$METRIC_FILE"
+
+exit "$any_fail"

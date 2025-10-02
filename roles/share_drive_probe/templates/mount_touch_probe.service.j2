@@ -1,0 +1,15 @@
+# vim: ft=systemd
+
+[Unit]
+Description=Mount Touch Probe (SMB/NFS liveness)
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/timeout 85s {{ mount_touch_probe_bin }}
+TimeoutStartSec=90s
+
+User=root
+Group=root
+Nice=5

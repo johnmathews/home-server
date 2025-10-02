@@ -1,0 +1,14 @@
+# How often to probe (systemd timer)
+mount_touch_probe_interval: 2m
+
+# Per-operation timeout (touch/rm), use GNU timeout syntax (e.g., 10s, 1m)
+mount_touch_probe_op_timeout: 10s
+
+# Script + config install locations
+mount_touch_probe_bin: /usr/local/bin/mount_touch_probe.sh
+mount_touch_probe_conf_dir: /etc/mount-touch-probe
+mount_touch_probe_targets_file: "{{ mount_touch_probe_conf_dir }}/targets.list"
+
+# Where node_exporter reads textfile metrics (adjust if you use a custom dir)
+mount_touch_probe_textfile_dir: /var/lib/node_exporter/textfile_collector
+mount_touch_probe_state_dir: /var/lib/mount-touch-probe
