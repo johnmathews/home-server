@@ -3,7 +3,7 @@
 ---
 
 - name: Configure NFS drives on all specified hosts
-  hosts: share_clients 
+  hosts: share_drive_clients 
   become: true
 
   roles:

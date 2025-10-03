@@ -9,7 +9,7 @@ An Ansible role `share_drive_probe` is added to each playbook. It has the tag
 
 The metrics are produced by a systemd timer that calls a one-shot service. The
 service calls a shell script that creates
-`/var/lib/node_exporter/textfile_collector/mount_touch_probe.prom`.
+`/var/lib/node_exporter/textfile_collector/share_drive_probe.prom`.
 
 Some useful commands:
 
@@ -34,8 +34,8 @@ systemctl list-timers mount-touch-probe.timer
 ### See if the file exists
 
 ```sh
-ls -l /var/lib/node_exporter/textfile_collector/mount_touch_probe.prom
-cat /var/lib/node_exporter/textfile_collector/mount_touch_probe.prom
+ls -l /var/lib/node_exporter/textfile_collector/share_drive_probe.prom
+cat /var/lib/node_exporter/textfile_collector/share_drive_probe.prom
 ```
 ### See the logs
 
@@ -48,20 +48,20 @@ journalctl -u mount-touch-probe.timer -u mount-touch-probe.service --since "1 ho
 ## Example output:
 
 ```sh
-> cat /var/lib/node_exporter/textfile_collector/mount_touch_probe.prom
+> cat /var/lib/node_exporter/textfile_collector/share_drive_probe.prom
 
-# HELP mount_touch_probe_success 1 if probe succeeded, else 0
-# TYPE mount_touch_probe_success gauge
-# HELP mount_touch_probe_duration_seconds Time to touch+rm
-# TYPE mount_touch_probe_duration_seconds gauge
-# HELP mount_touch_probe_last_run_timestamp_seconds UNIX time of last run on this host
-# TYPE mount_touch_probe_last_run_timestamp_seconds gauge
-# HELP mount_touch_probe_state -1=error,0=fail,1=success
-# TYPE mount_touch_probe_state gauge
-# HELP mount_touch_probe_state_change_timestamp_seconds UNIX time of last state change
-# TYPE mount_touch_probe_state_change_timestamp_seconds gauge
-mount_touch_probe_state{host="immich",mount="/mnt/nfs/immich",label="/mnt/tank/immich",reason="success"} 1
-mount_touch_probe_success{host="immich",mount="/mnt/nfs/immich",label="/mnt/tank/immich"} 1
-mount_touch_probe_duration_seconds{host="immich",mount="/mnt/nfs/immich",label="/mnt/tank/immich"} 0.012154
-mount_touch_probe_last_run_timestamp_seconds{host="immich"} 1759421849
+# HELP share_drive_probe_success 1 if probe succeeded, else 0
+# TYPE share_drive_probe_success gauge
+# HELP share_drive_probe_duration_seconds Time to touch+rm
+# TYPE share_drive_probe_duration_seconds gauge
+# HELP share_drive_probe_last_run_timestamp_seconds UNIX time of last run on this host
+# TYPE share_drive_probe_last_run_timestamp_seconds gauge
+# HELP share_drive_probe_state -1=error,0=fail,1=success
+# TYPE share_drive_probe_state gauge
+# HELP share_drive_probe_state_change_timestamp_seconds UNIX time of last state change
+# TYPE share_drive_probe_state_change_timestamp_seconds gauge
+share_drive_probe_state{host="immich",mount="/mnt/nfs/immich",label="/mnt/tank/immich",reason="success"} 1
+share_drive_probe_success{host="immich",mount="/mnt/nfs/immich",label="/mnt/tank/immich"} 1
+share_drive_probe_duration_seconds{host="immich",mount="/mnt/nfs/immich",label="/mnt/tank/immich"} 0.012154
+share_drive_probe_last_run_timestamp_seconds{host="immich"} 1759421849
 ```

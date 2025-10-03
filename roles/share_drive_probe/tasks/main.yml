@@ -10,38 +10,38 @@
     group: root
     mode: '0755'
   loop:
-    - "{{ mount_touch_probe_conf_dir }}"
-    - "{{ mount_touch_probe_textfile_dir }}"
+    - "{{ share_drive_probe_conf_dir }}"
+    - "{{ share_drive_probe_textfile_dir }}"
 
 
 - name: Ensure textfile collector directory permissions are correct
   file:
-    path: "{{ mount_touch_probe_textfile_dir }}"
+    path: "{{ share_drive_probe_textfile_dir }}"
     state: directory
     owner: root
     group: root
-    mode: "{{ mount_touch_probe_textfile_dir_mode }}"
+    mode: "{{ share_drive_probe_textfile_dir_mode }}"
   become: true
   notify:
     - Daemon reload
-    - Restart mount-touch-probe timer
+    - Restart share-drive-probe timer
 
 - name: Ensure probe metrics file has correct permissions (if present)
   file:
-    path: "{{ mount_touch_probe_textfile_dir }}/mount_touch_probe.prom"
+    path: "{{ share_drive_probe_textfile_dir }}/share_drive_probe.prom"
     state: file
     owner: root
     group: root
-    mode: "{{ mount_touch_probe_metrics_mode }}"
+    mode: "{{ share_drive_probe_metrics_mode }}"
   become: true
   ignore_errors: true
   notify:
     - Daemon reload
-    - Restart mount-touch-probe timer
+    - Restart share-drive-probe timer
 
 - name: Ensure state dir exists
   file:
-    path: "{{ mount_touch_probe_state_dir }}"
+    path: "{{ share_drive_probe_state_dir }}"
     state: directory
     owner: root
     group: root
@@ -49,7 +49,7 @@
 
 - name: Write targets file
   copy:
-    dest: "{{ mount_touch_probe_targets_file }}"
+    dest: "{{ share_drive_probe_targets_file }}"
     owner: root
     group: root
     mode: '0644'
@@ -63,32 +63,32 @@
 
 - name: Install probe script
   template:
-    src: templates/mount_touch_probe.sh.j2
-    dest: "{{ mount_touch_probe_bin }}"
+    src: templates/share_drive_probe.sh.j2
+    dest: "{{ share_drive_probe_bin }}"
     owner: root
     group: root
     mode: '0755'
-  notify: Restart mount-touch-probe timer
+  notify: Restart share-drive-probe timer
 
 - name: Install systemd service
   template:
-    src: templates/mount_touch_probe.service.j2
-    dest: /etc/systemd/system/mount-touch-probe.service
+    src: templates/share_drive_probe.service.j2
+    dest: /etc/systemd/system/share-drive-probe.service
     mode: '0644'
   notify: Daemon reload
 
 - name: Install systemd timer
   template:
-    src: templates/mount_touch_probe.timer.j2
-    dest: /etc/systemd/system/mount-touch-probe.timer
+    src: templates/share_drive_probe.timer.j2
+    dest: /etc/systemd/system/share-drive-probe.timer
     mode: '0644'
   notify:
     - Daemon reload
-    - Restart mount-touch-probe timer
+    - Restart share-drive-probe timer
 
 - name: Enable and start timer
   systemd:
-    name: mount-touch-probe.timer
+    name: share-drive-probe.timer
     enabled: true
     state: started
 

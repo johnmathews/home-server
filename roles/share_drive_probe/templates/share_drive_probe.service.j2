@@ -1,0 +1,26 @@
+# vim: ft=systemd
+
+[Unit]
+Description=Share Drive Probe (SMB/NFS liveness)
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/timeout 85s {{ share_drive_probe_bin }}
+TimeoutStartSec=90s
+User=root
+Group=root
+UMask=0022
+Nice=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=share-drive-probe
+
+# Optional hardening:
+# ProtectSystem=strict
+# ReadWritePaths={{ share_drive_probe_textfile_dir }} {{ share_drive_probe_state_dir }} {{ share_drive_probe_conf_dir }}
+
+Environment=MTP_MODE=auto
+Environment=MTP_RO_START={{ share_drive_probe_dont_spin_up_start }}
+Environment=MTP_RO_END={{ share_drive_probe_dont_spin_up_end }}

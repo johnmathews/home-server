@@ -1,3 +1,4 @@
+# share_drive_probe/handlers/main.yml
 
 ---
 
@@ -5,8 +6,8 @@
   systemd:
     daemon_reload: true
 
-- name: Restart mount-touch-probe timer
+- name: Restart share-drive-probe timer
   systemd:
-    name: mount-touch-probe.timer
+    name: share-drive-probe.timer
     state: restarted
     enabled: true

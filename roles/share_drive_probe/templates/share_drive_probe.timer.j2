@@ -1,0 +1,14 @@
+# vim: ft=systemd
+
+[Unit]
+Description=Run Share Drive Probe every {{ share_drive_probe_interval }}
+
+[Timer]
+OnUnitActiveSec={{ share_drive_probe_interval }}
+RandomizedDelaySec=20s
+Unit=share-drive-probe.service
+Persistent=true
+AccuracySec=1s
+
+[Install]
+WantedBy=timers.target

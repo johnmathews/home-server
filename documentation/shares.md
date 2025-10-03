@@ -37,8 +37,8 @@ systemctl daemon-reload
 systemctl restart mount-touch-probe.timer
 systemctl start mount-touch-probe.service
 
-ls -l /var/lib/node_exporter/textfile_collector/mount_touch_probe.prom
-cat /var/lib/node_exporter/textfile_collector/mount_touch_probe.prom
+ls -l /var/lib/node_exporter/textfile_collector/share_drive_probe.prom
+cat /var/lib/node_exporter/textfile_collector/share_drive_probe.prom
 
 systemctl list-units 'mount-nfs-*.service' 'mnt-nfs-*.mount'
 

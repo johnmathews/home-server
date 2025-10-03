@@ -9,11 +9,11 @@ RO_START="${MTP_RO_START:-22:00}"      # read-only during off-hours
 RO_END="${MTP_RO_END:-07:00}"          # off-hours end
 PROBE_MODE_DEFAULT="${MTP_MODE:-auto}" # auto|rw|ro
 
-TARGETS_FILE="{{ mount_touch_probe_targets_file }}"
-TEXTFILE_DIR="{{ mount_touch_probe_textfile_dir }}"
-STATE_DIR="{{ mount_touch_probe_state_dir }}"
-METRIC_FILE="${TEXTFILE_DIR}/mount_touch_probe.prom"
-OP_TIMEOUT="{{ mount_touch_probe_op_timeout }}"
+TARGETS_FILE="{{ share_drive_probe_targets_file }}"
+TEXTFILE_DIR="{{ share_drive_probe_textfile_dir }}"
+STATE_DIR="{{ share_drive_probe_state_dir }}"
+METRIC_FILE="${TEXTFILE_DIR}/share_drive_probe.prom"
+OP_TIMEOUT="{{ share_drive_probe_op_timeout }}"
 HOST="$(hostname)"
 EPOCH_NOW="$(date +%s)"
 
@@ -23,9 +23,9 @@ STATE_SUCCESS=1
 STATE_ERROR=-1
 
 # Autofs wake options
-AUTOFS_WAKE="{{ mount_touch_probe_autofs_wake | default('true') }}"
-AUTOFS_POLL_COUNT={{ mount_touch_probe_autofs_poll_count | default(30) }}
-AUTOFS_POLL_SLEEP_SEC={{ mount_touch_probe_autofs_poll_sleep_sec | default('0.1') }}
+AUTOFS_WAKE="{{ share_drive_probe_autofs_wake | default('true') }}"
+AUTOFS_POLL_COUNT={{ share_drive_probe_autofs_poll_count | default(30) }}
+AUTOFS_POLL_SLEEP_SEC={{ share_drive_probe_autofs_poll_sleep_sec | default('0.1') }}
 
 log "start run: host=$HOST targets_file=$TARGETS_FILE"
 
@@ -33,21 +33,21 @@ log "start run: host=$HOST targets_file=$TARGETS_FILE"
 mkdir -p "$TEXTFILE_DIR" "$STATE_DIR"
 
 # Create temp metrics inside textfile dir; atomic rename at end
-tmp_metrics="$(mktemp "{{ mount_touch_probe_textfile_dir }}/.mount_touch_probe.prom.XXXXXX")"
+tmp_metrics="$(mktemp "{{ share_drive_probe_textfile_dir }}/.share_drive_probe.prom.XXXXXX")"
 trap 'rm -f "$tmp_metrics"' EXIT
 
 # Headers
 {
-  echo "# HELP mount_touch_probe_success 1 if probe succeeded, else 0"
-  echo "# TYPE mount_touch_probe_success gauge"
-  echo "# HELP mount_touch_probe_duration_seconds Time to probe (s)"
-  echo "# TYPE mount_touch_probe_duration_seconds gauge"
-  echo "# HELP mount_touch_probe_last_run_timestamp_seconds UNIX time of last run on this host"
-  echo "# TYPE mount_touch_probe_last_run_timestamp_seconds gauge"
-  echo "# HELP mount_touch_probe_state -1=error,0=fail,1=success"
-  echo "# TYPE mount_touch_probe_state gauge"
-  echo "# HELP mount_touch_probe_state_change_timestamp_seconds UNIX time of last state change"
-  echo "# TYPE mount_touch_probe_state_change_timestamp_seconds gauge"
+  echo "# HELP share_drive_probe_success 1 if probe succeeded, else 0"
+  echo "# TYPE share_drive_probe_success gauge"
+  echo "# HELP share_drive_probe_duration_seconds Time to probe (s)"
+  echo "# TYPE share_drive_probe_duration_seconds gauge"
+  echo "# HELP share_drive_probe_last_run_timestamp_seconds UNIX time of last run on this host"
+  echo "# TYPE share_drive_probe_last_run_timestamp_seconds gauge"
+  echo "# HELP share_drive_probe_state -1=error,0=fail,1=success"
+  echo "# TYPE share_drive_probe_state gauge"
+  echo "# HELP share_drive_probe_state_change_timestamp_seconds UNIX time of last state change"
+  echo "# TYPE share_drive_probe_state_change_timestamp_seconds gauge"
 } >> "$tmp_metrics"
 
 any_fail=0
@@ -166,23 +166,23 @@ while IFS=',' read -r mount_path mount_label; do
   [[ -f "$last_state_file" ]] && last_state="$(cat "$last_state_file" 2>/dev/null || true)"
   if [[ "$current_state" != "$last_state" ]]; then
     echo "$current_state" > "$last_state_file"
-    echo "mount_touch_probe_state_change_timestamp_seconds{host=\"$HOST\",mount=\"$mount_path\",label=\"$label\",mode=\"$mode\"} $EPOCH_NOW" >> "$tmp_metrics"
+    echo "share_drive_probe_state_change_timestamp_seconds{host=\"$HOST\",mount=\"$mount_path\",label=\"$label\",mode=\"$mode\"} $EPOCH_NOW" >> "$tmp_metrics"
   fi
 
   # Metrics (single set, with mode)
-  echo "mount_touch_probe_state{host=\"$HOST\",mount=\"$mount_path\",label=\"$label\",reason=\"$reason\",mode=\"$mode\"} $current_state" >> "$tmp_metrics"
+  echo "share_drive_probe_state{host=\"$HOST\",mount=\"$mount_path\",label=\"$label\",reason=\"$reason\",mode=\"$mode\"} $current_state" >> "$tmp_metrics"
   if [[ "$current_state" -eq $STATE_SUCCESS ]]; then
-    echo "mount_touch_probe_success{host=\"$HOST\",mount=\"$mount_path\",label=\"$label\",mode=\"$mode\"} 1" >> "$tmp_metrics"
-    echo "mount_touch_probe_duration_seconds{host=\"$HOST\",mount=\"$mount_path\",label=\"$label\",mode=\"$mode\"} $dur_s" >> "$tmp_metrics"
+    echo "share_drive_probe_success{host=\"$HOST\",mount=\"$mount_path\",label=\"$label\",mode=\"$mode\"} 1" >> "$tmp_metrics"
+    echo "share_drive_probe_duration_seconds{host=\"$HOST\",mount=\"$mount_path\",label=\"$label\",mode=\"$mode\"} $dur_s" >> "$tmp_metrics"
   else
-    echo "mount_touch_probe_success{host=\"$HOST\",mount=\"$mount_path\",label=\"$label\",mode=\"$mode\"} 0" >> "$tmp_metrics"
+    echo "share_drive_probe_success{host=\"$HOST\",mount=\"$mount_path\",label=\"$label\",mode=\"$mode\"} 0" >> "$tmp_metrics"
     any_fail=1
   fi
 
   log "probe mount=$mount_path label=$label mode=$mode state=$current_state reason=$reason"
 done < "$TARGETS_FILE"
 
-echo "mount_touch_probe_last_run_timestamp_seconds{host=\"$HOST\"} $EPOCH_NOW" >> "$tmp_metrics"
+echo "share_drive_probe_last_run_timestamp_seconds{host=\"$HOST\"} $EPOCH_NOW" >> "$tmp_metrics"
 chown root:root "$tmp_metrics"
 chmod 0644 "$tmp_metrics"
 mv -f "$tmp_metrics" "$METRIC_FILE"
