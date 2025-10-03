@@ -89,6 +89,23 @@
 - name: Enable and start timer
   systemd:
     name: share-drive-probe.timer
-    enabled: true
     state: started
+    enabled: true
 
+- name: Enable and start service
+  systemd:
+    name: share-drive-probe.service
+    state: started
+    enabled: true
+
+- name: Restart share-drive-probe timer
+  systemd:
+    name: share-drive-probe.timer
+    state: restarted
+    enabled: true
+
+- name: Restart share-drive-probe service
+  systemd:
+    name: share-drive-probe.service
+    state: restarted
+    enabled: true

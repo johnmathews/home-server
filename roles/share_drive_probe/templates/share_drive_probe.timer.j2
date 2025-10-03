@@ -4,11 +4,12 @@
 Description=Run Share Drive Probe every {{ share_drive_probe_interval }}
 
 [Timer]
-OnUnitActiveSec={{ share_drive_probe_interval }}
-RandomizedDelaySec=20s
+OnCalendar=*:0/{{ share_drive_probe_interval_minutes }}
+OnBootSec=30s
+
+RandomizedDelaySec=10s
 Unit=share-drive-probe.service
 Persistent=true
-AccuracySec=1s
 
 [Install]
 WantedBy=timers.target

@@ -144,6 +144,9 @@ systemctl show myservice.service
 
 ```sh
 journalctl -u <unitname>.service
+
+journalctl -xeu share-drive-probe.service
+
 ```
 - `-f` follow
 - `-n 10` last 10 rows
