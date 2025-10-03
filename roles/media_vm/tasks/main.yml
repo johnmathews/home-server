@@ -27,6 +27,7 @@
 - name: Install Docker using official role
   import_role:
     name: geerlingguy.docker
+  tags: docker
 
 - name: Add user to docker group
   user:
@@ -34,6 +35,7 @@
     groups: docker
     append: yes
   become: true
+  tags: docker
 
 - import_tasks: mount-smb.yml
   tags: [mount, smb]
@@ -107,6 +109,7 @@
   notify: 
     - Update containers
     - Restart media stack
+  tags: docker
 
 - name: Create environment file from template
   template:
@@ -116,6 +119,7 @@
   notify: 
     - Update containers
     - Restart media stack
+  tags: docker
 
 - name: Ensure .env and docker-compose.yml are owned by "john"
   ansible.builtin.file:
@@ -124,6 +128,7 @@
     group: "{{ media_stack_user }}"
   loop:
     - /srv/media/.env
+  tags: docker
 
 - name: Ensure Radarr config directory has correct UID/GID
   ansible.builtin.file:
@@ -147,11 +152,13 @@
   stat:
     path: /srv/media/docker-compose.yml
   register: compose_file
+  tags: docker
 
 - name: Fail if docker-compose.yml is missing
   fail:
     msg: "docker-compose.yml not found in /srv/media"
   when: not compose_file.stat.exists
+  tags: docker
 
 
 - name: Set permissions of file browser config directory
@@ -165,4 +172,5 @@
     state: present
     recreate: auto
   become: false
+  tags: docker
 

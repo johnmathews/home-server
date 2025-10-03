@@ -1,0 +1,4 @@
+nfs_shares:
+  - name: paperless
+    mountpoint: /mnt/nfs/paperless
+    target: /mnt/tank/paperless

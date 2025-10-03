@@ -33,13 +33,6 @@ media_stack_services:
 
 smb_media_vm_username: media_vm
 smb_server: 192.168.2.104
-smb_shares:
-  - name: library 
-    target: /mnt/media/library
-    mountpoint: /mnt/media/library 
-  - name: media 
-    target: /mnt/media/media
-    mountpoint: /mnt/media/media 
 
 smb_opts_items:
   - credentials=/etc/smb-media-credentials
@@ -78,11 +71,3 @@ nfs_opts_items:
   - x-systemd.idle-timeout=60s
 
 nfs_opts: "{{ nfs_opts_items | join(',') }}"
-
-nfs_shares:
-  - name: library
-    mountpoint: /mnt/nfs/library
-    target: /mnt/tank/library
-  - name: media
-    mountpoint: /mnt/nfs/media
-    target: /mnt/tank/media

@@ -1,0 +1,11 @@
+# vim: ft=yaml
+
+---
+
+- name: Configure NFS drives on all specified hosts
+  hosts: share_clients 
+  become: true
+
+  roles:
+    - role: share_drive_probe
+      tags: [shares]

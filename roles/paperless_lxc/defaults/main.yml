@@ -27,7 +27,3 @@ nfs_opts_items:
 
 nfs_opts: "{{ nfs_opts_items | join(',') }}"
 
-nfs_shares:
-  - name: paperless
-    mountpoint: /mnt/nfs/paperless
-    target: /mnt/tank/paperless

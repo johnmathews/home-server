@@ -91,6 +91,9 @@ open-webui:
 atuin:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/atuin.yml $(VAULT) $(ANSIBLE_OPTS)
 
+share_probe:
+	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/share_probe.yml $(VAULT) $(ANSIBLE_OPTS)
+
 lint-paths:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/validate-paths.yml $(VAULT) $(ANSIBLE_OPTS)
 

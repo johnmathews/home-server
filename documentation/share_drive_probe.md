@@ -21,20 +21,22 @@ systemctl restart mount-touch-probe.timer
 systemctl start mount-touch-probe.service
 ```
 
+### See whats running
+
+```sh
+
+systemctl status mount-touch-probe.service
+journalctl -xeu mount-touch-probe.service
+systemctl list-units 'mount-nfs-*.service' 'mnt-nfs-*.mount'
+systemctl list-timers mount-touch-probe.timer
+```
+
 ### See if the file exists
 
 ```sh
 ls -l /var/lib/node_exporter/textfile_collector/mount_touch_probe.prom
 cat /var/lib/node_exporter/textfile_collector/mount_touch_probe.prom
 ```
-
-### See whats running
-
-```sh
-systemctl list-units 'mount-nfs-*.service' 'mnt-nfs-*.mount'
-systemctl list-timers mount-touch-probe.timer
-```
-
 ### See the logs
 
 ```sh

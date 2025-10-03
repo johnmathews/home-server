@@ -1,0 +1,4 @@
+nfs_shares:
+  - name: youtube-kids
+    mountpoint: /mnt/nfs/youtube-kids
+    target: /mnt/tank/youtube-kids

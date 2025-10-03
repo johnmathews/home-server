@@ -19,3 +19,6 @@ mount_touch_probe_metrics_mode: '0644'
 mount_touch_probe_autofs_wake: true
 mount_touch_probe_autofs_poll_count: 30          # 30 * 0.1s = 3s max wait after wake
 mount_touch_probe_autofs_poll_sleep_sec: '0.1'
+
+mount_touch_probe_dont_spin_up_start: 21:00
+mount_touch_probe_dont_spin_up_end: 11:00
