@@ -3,6 +3,31 @@
 
 ---
 services:
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    command: ["-config.file=/etc/loki/config.yml"]
+    ports:
+      - "3100:3100"
+    user: "0:0"               # writes to local volume
+    volumes:
+      - ./loki/config.yml:/etc/loki/config.yml:ro
+      - ./loki/data:/loki       # local storage
+    restart: unless-stopped
+
+  promtail:
+    image: grafana/promtail:latest
+    container_name: promtail
+    command: ["-config.file=/etc/promtail/config.yml"]
+    depends_on:
+      - loki
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - ./promtail/config.yml:/etc/promtail/config.yml:ro
+      - ./promtail/data:/positions
+    restart: unless-stopped
+
   mkdocs:
     image: squidfunk/mkdocs-material:latest
     container_name: mkdocs
@@ -69,6 +94,7 @@ services:
       - GF_SERVER_SERVE_FROM_SUB_PATH=false
       - GF_SECURITY_ALLOW_EMBEDDING=true
       - GF_SECURITY_ALLOW_EMBEDDING=true
+      - GF_INSTALL_PLUGINS=grafana-polystat-panel
       # - GF_FEATURE_TOGGLES_ENABLE=dashboardNewLayouts
     volumes:
       - /srv/infra/grafana/data:/var/lib/grafana

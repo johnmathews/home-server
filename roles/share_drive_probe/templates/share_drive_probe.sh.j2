@@ -163,11 +163,22 @@ while IFS=',' read -r mount_path mount_label; do
 
   # State-change timestamp (with mode)
   last_state=""
-  [[ -f "$last_state_file" ]] && last_state="$(cat "$last_state_file" 2>/dev/null || true)"
-  if [[ "$current_state" != "$last_state" ]]; then
-    echo "$current_state" > "$last_state_file"
-    echo "share_drive_probe_state_change_timestamp_seconds{host=\"$HOST\",mount=\"$mount_path\",label=\"$label\",mode=\"$mode\"} $EPOCH_NOW" >> "$tmp_metrics"
+  last_changed_ts=""
+  if [[ -f "$last_state_file" ]]; then
+    # Legacy files may only contain the state; read gracefully.
+    read -r last_state last_changed_ts < "$last_state_file" || true
   fi
+
+  # First observation or actual change ⇒ set changed_ts = now
+  if [[ -z "$last_state" || "$current_state" != "$last_state" || -z "$last_changed_ts" ]]; then
+    last_changed_ts="$EPOCH_NOW"
+  fi
+
+  # Persist both values (state and changed_ts) for next runs
+  printf '%s %s\n' "$current_state" "$last_changed_ts" > "$last_state_file"
+
+  # ALWAYS expose the timestamp every run, so Prom never goes stale
+  echo "share_drive_probe_state_change_timestamp_seconds{host=\"$HOST\",mount=\"$mount_path\",label=\"$label\",mode=\"$mode\"} $last_changed_ts" >> "$tmp_metrics"
 
   # Metrics (single set, with mode)
   echo "share_drive_probe_state{host=\"$HOST\",mount=\"$mount_path\",label=\"$label\",reason=\"$reason\",mode=\"$mode\"} $current_state" >> "$tmp_metrics"

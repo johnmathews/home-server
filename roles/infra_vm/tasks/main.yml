@@ -42,19 +42,19 @@
     pipx install uv
   environment:
     PATH: "{{ ansible_env.PATH }}:/home/{{ docker_user }}/.local/bin"
-  tags: [grafana, docs]
+  tags: [grafana, docs, docker]
 
 - name: Add Docker GPG key
   apt_key:
     url: https://download.docker.com/linux/ubuntu/gpg
     state: present
-  tags: [grafana, docs]
+  tags: [grafana, docs, docker]
 
 - name: Add Docker repository
   apt_repository:
     repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu jammy stable
     state: present
-  tags: [grafana, docs]
+  tags: [grafana, docs, docker]
 
 - name: Install Docker packages
   apt:
@@ -64,14 +64,14 @@
       - containerd.io
     state: latest
     update_cache: yes
-  tags: [grafana, docs]
+  tags: [grafana, docs, docker]
 
 - name: Add user to docker group
   user:
     name: "{{ docker_user }}"
     groups: docker
     append: yes
-  tags: [grafana, docs]
+  tags: [grafana, docs, docker]
 
 - name: Create Docker Compose directory
   file:
@@ -80,16 +80,29 @@
     owner: "{{ docker_user }}"
     group: docker
     mode: '0755'
-  tags: [grafana, docs]
+  tags: [grafana, docs, docker]
 
-- name: Ensure grafana custom config directory exists
+- name: Ensure required directories exist
   file:
-    path: /srv/infra/grafana/config
+    path: "{{item}}"
     state: directory
     owner: root
     group: root
     mode: '0755'
-  tags: [grafana]
+  loop:
+    - /srv/infra/grafana/config
+    - /srv/infra/loki/data
+    - /srv/infra/promtail/data
+  tags: [grafana, docker]
+
+# - name: Ensure grafana custom config directory exists
+#   file:
+#     path: /srv/infra/grafana/config
+#     state: directory
+#     owner: root
+#     group: root
+#     mode: '0755'
+#   tags: [grafana, docker]
 
 - name: Template Docker Compose file
   template:
@@ -99,7 +112,7 @@
     group: docker
     mode: '0644'
   notify: Apply updated Docker Compose stack
-  tags: [grafana, docs]
+  tags: [grafana, docs, docker]
 
 - name: Upload .env file from template
   ansible.builtin.template:
@@ -109,27 +122,43 @@
     group: docker 
     mode: '0600'
 
+- name: Upload promtail and loki config files 
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{docker_user }}"
+    group: "{{docker_user }}"
+    mode: '0644'
+  loop:
+    - promtail:
+      src: templates/promtail-config.yml
+      dest: /srv/infra/promtail/config.yml 
+    - loki:
+      src: templates/loki-config.yml
+      dest: /srv/infra/loki/config.yml 
+  become: true
+
 - name: Include file-browser tasks 
   import_tasks: file-browser.yml
-  tags: [config, file-browser]
+  tags: [config, file-browser, docker]
 
 - name: Include homepage tasks
   import_tasks: homepage.yml
-  tags: [config, homepage]
+  tags: [config, homepage, docker]
 
 - name: Include mkdocs tasks
   import_tasks: mkdocs.yml
-  tags: [config, docs]
+  tags: [config, docs, docker]
 
 - name: Update containers
   command: docker compose pull
   args:
     chdir: /srv/infra
-  tags: [grafana, docs]
+  tags: [grafana, docs, docker]
 
 - name: Launch containers
   command: docker compose up -d
   args:
     chdir: /srv/infra
-  tags: [grafana, docs]
+  tags: [grafana, docs, docker]
 
