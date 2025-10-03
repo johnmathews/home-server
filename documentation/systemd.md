@@ -46,7 +46,7 @@ Use `systemctl` to manage services. Use `journalctl` to monitor them.
 
 ### Start/stop/restart a service immediately
 
-```
+```sh
 sudo systemctl start nginx
 sudo systemctl stop nginx
 sudo systemctl restart nginx
@@ -54,27 +54,27 @@ sudo systemctl restart nginx
 
 ### Check status and logs
 
-```
+```sh
 systemctl status nginx
 journalctl -u nginx
 ```
 
 ### Enable/disable at boot
 
-```
+```sh
 sudo systemctl enable nginx
 sudo systemctl disable nginx
 ```
 
 ### Reload configs (without restart if supported)
 
-```
+```sh
 sudo systemctl reload nginx
 ```
 
 ### Debug
 
-```
+```sh
 systemctl start mount-touch-probe.service
 journalctl -u mount-touch-probe.service -n 50 -e
 
@@ -92,4 +92,89 @@ When you enable and start a service:
 
 4. It monitors the process. If it dies unexpectedly, `systemd` can restart it (depends on Restart=). 
 
-5. `systemd` logs stdout/stderr to the journal. View it with `journalctl -u <service>`.
+5. `systemd` logs `stdout`/`stderr` to the journal. View it with `journalctl -u <service>`.
+
+## Investigation
+
+### See all defined units
+
+Even if they're not currently running
+
+```sh
+systemctl list-unit-files
+```
+
+### See what services are running
+
+This will show all services currently running, it doesnt show services that exist but are not currently running.
+
+It includes `.mount`, `.service`, `.slice`, `.socket`, `.target`, `.timer`.
+
+```sh
+systemctl list-units
+```
+
+Filter running units:
+
+```sh
+systemctl list-units --type=service 'mount-nfs-*.service' 'mnt-nfs-*.mount'
+```
+
+### Find out about a service
+
+To find-out where a unit file lives, so that you can `rm` it, use the `status` command.
+
+```sh
+systemctl list-dependencies myservice.service
+```
+
+```sh
+systemctl status myservice.service
+```
+
+```sh
+systemctl cat myservice.service
+```
+
+```sh
+systemctl show myservice.service
+```
+
+**Logs**:
+
+```sh
+journalctl -u <unitname>.service
+```
+- `-f` follow
+- `-n 10` last 10 rows
+- `-b` since last boot
+
+### Remove a unit
+
+1. Disable 
+
+    So it doesn't start on boot
+
+    ```
+    sudo systemctl disable myservice.service
+    ```
+
+2. Stop
+
+    Stop it immediately
+
+    ```
+    sudo systemctl stop myservice.service
+    ```
+
+3. Remove
+
+    ```
+    sudo rm /etc/systemd/system/myservice.service
+    ```
+
+4. Reload systemd
+
+    ```
+    sudo systemctl daemon-reload
+    ```

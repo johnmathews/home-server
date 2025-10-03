@@ -8,11 +8,11 @@ groups:
     - record: share_drive_probe_state_current_age_seconds
       expr: time() - share_drive_probe_state_change_timestamp_seconds
 
-    - record: share_drive_probe_is_success
+    - record: share_drive_is_ok
       expr: share_drive_probe_state == 1
-    - record: share_drive_probe_is_fail
+    - record: share_drive_is_down
       expr: share_drive_probe_state == 0
-    - record: share_drive_probe_is_error
+    - record: share_drive_probe_returns_error
       expr: share_drive_probe_state == -1
 
   - name: disk-spindown
