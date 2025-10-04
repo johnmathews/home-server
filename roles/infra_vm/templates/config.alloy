@@ -13,24 +13,19 @@ loki.write "local" {
   endpoint { url = "http://loki:3100/loki/api/v1/push" }
 }
 
-// Build relabel rules once, then plug them into loki.source.docker
 discovery.relabel "docker_labels" {
-  // We only want the exported rules, so no targets to mutate here.
   targets = []
 
-  // service: docker compose service name (e.g., grafana, loki, alloy)
   rule {
     source_labels = ["__meta_docker_container_label_com_docker_compose_service"]
     target_label  = "service"
   }
 
-  // compose_project: stack/folder name
   rule {
     source_labels = ["__meta_docker_container_label_com_docker_compose_project"]
     target_label  = "compose_project"
   }
 
-  // container: strip leading "/" from container name
   rule {
     source_labels = ["__meta_docker_container_name"]
     regex         = "/(.*)"
@@ -38,17 +33,33 @@ discovery.relabel "docker_labels" {
     target_label  = "container"
   }
 
-  // (optional) short image label
   rule {
     source_labels = ["__meta_docker_container_image"]
+    regex         = ".*/([^:@]+).*"
+    replacement   = "$1"
     target_label  = "image"
+  }
+
+  rule {
+    action = "labeldrop"
+    regex  = "service_name"
+  }
+  rule {
+    action = "labeldrop"
+    regex  = "container_id|image_id"
   }
 }
 
 loki.source.docker "containers" {
   host          = "unix:///var/run/docker.sock"
   targets       = discovery.docker.self.targets
-  labels        = { host = sys.env("NODE_HOSTNAME") }
+
+  labels        = {
+    host = sys.env("NODE_HOSTNAME"), // set via environment on the Alloy container
+    job  = "docker"                  // handy for Grafana/Loki queries
+  }
+
   relabel_rules = discovery.relabel.docker_labels.rules
+
   forward_to    = [loki.write.local.receiver]
 }
