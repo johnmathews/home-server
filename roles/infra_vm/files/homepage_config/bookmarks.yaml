@@ -56,6 +56,9 @@
     - Loki:
         - abbr: 
           href: http://192.168.2.106:3100
+    - Alloy:
+        - abbr: 
+          href: http://192.168.2.106:12345
     - Prometheus:
         - abbr: 
           href: http://192.168.2.115:9090

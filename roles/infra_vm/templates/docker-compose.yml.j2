@@ -11,22 +11,29 @@ services:
       - "3100:3100"
     user: "0:0"               # writes to local volume
     volumes:
-      - ./loki/config.yml:/etc/loki/config.yml:ro
+      - ./loki/config.yml:/etc/loki/config.yml
       - ./loki/data:/loki       # local storage
     restart: unless-stopped
 
-  promtail:
-    image: grafana/promtail:latest
-    container_name: promtail
-    command: ["-config.file=/etc/promtail/config.yml"]
-    depends_on:
-      - loki
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      - ./promtail/config.yml:/etc/promtail/config.yml:ro
-      - ./promtail/data:/positions
-    restart: unless-stopped
+  alloy:
+   image: grafana/alloy:latest
+   container_name: alloy
+   privileged: true
+   environment:
+     - NODE_HOSTNAME=infra 
+   ports:
+     - 12345:12345
+     - 4317:4317
+     - 4318:4318
+   volumes:
+     - ./alloy/config.alloy:/etc/alloy/config.alloy
+     - /var/run/docker.sock:/var/run/docker.sock
+     - /:/rootfs:ro
+     - /var/run:/var/run:rw
+     - /sys:/sys:ro
+     - /var/lib/docker/:/var/lib/docker:ro
+     - /dev/disk/:/dev/disk:ro
+   command: run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
 
   mkdocs:
     image: squidfunk/mkdocs-material:latest

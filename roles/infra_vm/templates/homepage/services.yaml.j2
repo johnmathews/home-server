@@ -397,6 +397,11 @@
           username: "{{ vault_grafana_username }}"
           password: "{{ vault_grafana_password }}"
 
+    - Alloy:
+        href: https://alloy.itsa.pizza
+        siteMonitor: http://192.168.2.106:12345
+        icon: alloy
+
     - Prometheus:
         href: http://prometheus.itsa.pizza
         siteMonitor: http://192.168.2.115:9090

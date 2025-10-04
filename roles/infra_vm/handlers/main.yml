@@ -3,9 +3,10 @@
 ---
 
 - name: Apply updated Docker Compose stack
-  command: docker compose up -d && docker compose restart
+  command: docker compose up -d
   args:
     chdir: "{{ docker_compose_dir }}"
+ 
 
 - name: Restart Grafana container
   command: docker compose restart grafana

@@ -1,33 +1,31 @@
+# /etc/loki/config.yml
+
 auth_enabled: false
 
 server:
   http_listen_port: 3100
-  grpc_listen_port: 0            # no gRPC listener needed in single-binary
 
 common:
-  instance_addr: 127.0.0.1
   path_prefix: /loki
   storage:
     filesystem:
       chunks_directory: /loki/chunks
       rules_directory: /loki/rules
-  replication_factor: 1
   ring:
     kvstore:
       store: inmemory
+  replication_factor: 1
 
-# TSDB (v13) with 24h index period (required for retention)
 schema_config:
   configs:
-    - from: "2024-01-01"
+    - from: 2024-01-01
       store: tsdb
       object_store: filesystem
       schema: v13
       index:
         prefix: index_
-        period: 24h
+        period: 24h     # required for retention
 
-# TSDB shipper + local filesystem paths
 storage_config:
   tsdb_shipper:
     active_index_directory: /loki/index
@@ -35,20 +33,14 @@ storage_config:
   filesystem:
     directory: /loki/chunks
 
-# Compactor handles compaction + retention for TSDB
 compactor:
   working_directory: /loki/compactor
-  compaction_interval: 10m
   retention_enabled: true
-  retention_delete_delay: 2h
-  retention_delete_worker_count: 150
-  delete_request_store: filesystem   # required when retention_enabled=true
+  # Loki 3.5.x requires this when retention is enabled:
+  delete_request_store: filesystem
 
 limits_config:
-  retention_period: 336h        # 14d
-  ingestion_rate_mb: 16
-  ingestion_burst_size_mb: 32
-  max_streams_per_user: 0
+  retention_period: 336h   # 14 days
 
 query_range:
   parallelise_shardable_queries: true
