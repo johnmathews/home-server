@@ -10,6 +10,7 @@
     owner: root
     group: root
   loop:
+    - "{{ docker_compose_dir }}/alloy"
     - "{{ docker_compose_dir }}/prometheus"
     - "{{ docker_compose_dir }}/prometheus/rules"
 
@@ -40,6 +41,22 @@
     mode: '0644'
   notify: Restart Prometheus container
 
+- name: Upload alloy config files 
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ puid }}"
+    group: "{{ guid }}"
+    mode: '0644'
+  loop:
+    - alloy:
+      src: templates/config.alloy
+      dest: /srv/apps/alloy/config.alloy 
+  become: true
+  tags: [docker, alloy] 
+  notify: 
+    - Restart Alloy
+
 # Copy environment and compose files
 - name: Copy docker-compose.yml
   template:
@@ -49,5 +66,4 @@
     owner: root
     group: root
   notify: 
-    - Update containers
     - Restart Docker Compose stack

@@ -1,10 +1,5 @@
 ---
 
-- name: Update containers
-  command: docker compose pull
-  args:
-    chdir: /srv/apps
-
 - name: Restart Docker Compose stack
   ansible.builtin.command: docker compose -f /srv/apps/docker-compose.yml up -d
   args:
@@ -15,3 +10,7 @@
   args:
     chdir: "{{ docker_compose_dir }}"
 
+- name: Restart Alloy
+  command: docker compose restart alloy
+  args:
+    chdir: "{{ docker_compose_dir }}"

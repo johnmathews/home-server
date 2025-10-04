@@ -8,32 +8,6 @@
     state: present
     update_cache: yes
 
-# - name: Create directory for SMB credentials
-#   ansible.builtin.file:
-#     path: /etc/smb
-#     state: directory
-#     mode: '0750'
-#     owner: root
-#     group: root
-
-# - name: Create SMB credentials file
-#   ansible.builtin.copy:
-#     dest: /etc/smb/.smbcredentials
-#     owner: root
-#     group: root
-#     mode: '0600'
-#     content: |
-#       username={{ smb_username }}
-#       password={{ vault_smb_username_password }}
-
-# - name: Ensure /mnt/paperless mountpoint exists
-#   ansible.builtin.file:
-#     path: /mnt/paperless
-#     state: directory
-#     owner: root
-#     group: root
-#     mode: '0755'
-
 - name: Ensure paperless system group exists with fixed GID
   ansible.builtin.group:
     name: paperless
@@ -51,43 +25,6 @@
     create_home: no
     state: present
 
-# - name: Remove legacy fstab lines for paperless share
-#   ansible.builtin.lineinfile:
-#     path: /etc/fstab
-#     state: absent
-#     regexp: '^//{{ smb_server | regex_escape }}/paperless[ \t]+/mnt/paperless[ \t]+cifs[ \t]+'
-#   tags: paperless_fstab
-
-# - name: Ensure fstab entry for paperless share is present
-#   ansible.posix.mount:
-#     path: /mnt/paperless
-#     src: "//{{ smb_server }}/paperless"
-#     fstype: cifs
-#     opts: "credentials=/etc/smb/.smbcredentials,uid={{ puid }},gid={{ pgid }},dir_mode=0770,file_mode=0660,iocharset=utf8,cache=strict,noserverino,rw,_netdev,noatime,vers=3.1.1"
-#     state: present
-#   tags: paperless_fstab
-
-# - name: Mount or remount paperless share
-#   ansible.posix.mount:
-#     path: /mnt/nfs/paperless
-#     src: "//{{ smb_server }}/paperless"
-#     fstype: cifs
-#     opts: "credentials=/etc/smb/.smbcredentials,uid={{ puid }},gid={{ pgid }},dir_mode=0770,file_mode=0660,iocharset=utf8,cache=strict,noserverino,rw,_netdev,noatime,vers=3.1.1"
-#     state: mounted
-#   tags: paperless_fstab
-
-# - name: Ensure paperless subdirectories exist on the SMB share
-#   ansible.builtin.file:
-#     path: "/mnt/paperless/{{ item }}"
-#     state: directory
-#     owner: "{{ puid }}"
-#     group: "{{ pgid }}"
-#     mode: '0770'
-#   loop:
-#     - consume
-#     - media
-#     - export
-
 - name: Create base app directories for containers
   ansible.builtin.file:
     path: "{{ item }}"
@@ -99,6 +36,7 @@
     - /srv/apps/paperless/data
     - /srv/apps/paperless/pgdata
     - /srv/apps/paperless/redisdata
+    - /srv/apps/alloy
   tags: docker
 
 - name: Ensure paperless data directory ownership
@@ -137,9 +75,24 @@
     dest: "{{ docker_compose_dir }}/.env"
     mode: '0600'
   notify:
-    - Update containers
     - Restart all containers
   tags: docker
+
+- name: Upload alloy config files 
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ puid }}"
+    group: "{{ guid }}"
+    mode: '0644'
+  loop:
+    - alloy:
+      src: templates/config.alloy
+      dest: /srv/apps/alloy/config.alloy 
+  become: true
+  tags: [docker, alloy] 
+  notify: 
+    - Restart Alloy
 
 - name: Copy docker-compose.yml
   ansible.builtin.template:
@@ -149,6 +102,5 @@
     owner: root
     group: root
   notify:
-    - Update containers
     - Restart all containers
   tags: docker

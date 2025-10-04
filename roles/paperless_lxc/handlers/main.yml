@@ -16,4 +16,8 @@
   command: docker compose restart paperless
   args:
     chdir: "{{ docker_compose_dir }}"
-  tags: docker
+
+- name: Restart Alloy 
+  command: docker compose restart alloy
+  args:
+    chdir: "{{ docker_compose_dir }}"
