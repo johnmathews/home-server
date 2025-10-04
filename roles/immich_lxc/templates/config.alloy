@@ -1,0 +1,62 @@
+// vim: ft=terraform
+
+logging {
+  level  = "info"
+  format = "logfmt"
+}
+
+discovery.docker "self" {
+  host = "unix:///var/run/docker.sock"
+}
+
+discovery.relabel "docker_labels" {
+  // We only want to export the relabeling rules, not mutate anything here.
+  targets = []
+
+  // service: Docker Compose service name, e.g. "grafana", "loki", "alloy"
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_compose_service"]
+    target_label  = "service"
+  }
+
+  // container: strip leading "/" from container name
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    regex         = "^/(.*)"
+    replacement   = "$1"
+    target_label  = "container"
+  }
+
+  // optional cleanup to avoid noisy labels
+  rule {
+    action = "labeldrop"
+    regex  = "service_name|job|container_id|image_id"
+  }
+}
+
+loki.write "to_infra" {
+  endpoint { url = sys.env("LOKI_WRITE_ENDPOINT") }
+}
+
+loki.process "drop_old" {
+  // REQUIRED: where to send logs after processing
+  forward_to = [loki.write.to_infra.receiver]
+
+  stage.drop {
+    older_than          = "1h"                // ok for Alloy/River durations
+    drop_counter_reason = "too_old_for_loki"
+  }
+}
+
+loki.source.docker "containers" {
+  host          = "unix:///var/run/docker.sock"
+  targets       = discovery.docker.self.targets
+  relabel_rules = discovery.relabel.docker_labels.rules
+
+  labels = {
+    "host" = sys.env("NODE_HOSTNAME"),
+  }
+
+  // Send to the processor first, then on to Loki
+  forward_to = [loki.process.drop_old.receiver]
+}
