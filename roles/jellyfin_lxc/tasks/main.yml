@@ -64,8 +64,25 @@
   loop:
     - /srv/apps/jellyfin/appdata
     - /srv/apps/jellyfin/cache
-    - /srv/apps/tunarr
+    - /srv/apps/alloy
   notify: Restart Docker
+  tags: [docker, alloy] 
+
+- name: Upload alloy config files 
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ puid }}"
+    group: "{{ guid }}"
+    mode: '0644'
+  loop:
+    - alloy:
+      src: files/config.alloy
+      dest: /srv/apps/alloy/config.alloy 
+  become: true
+  tags: [docker, alloy] 
+  notify: 
+    - Restart Alloy
 
 - name: Copy Docker Compose file
   ansible.builtin.copy:
@@ -75,3 +92,4 @@
     group: root
     mode: '0644'
   notify: Restart Docker
+  tags: [docker, alloy] 

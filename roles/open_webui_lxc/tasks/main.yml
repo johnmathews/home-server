@@ -8,23 +8,23 @@
     state: present
     update_cache: yes
 
-- name: Create directory for SMB credentials
-  ansible.builtin.file:
-    path: /etc/smb
-    state: directory
-    mode: '0750'
-    owner: root
-    group: root
+# - name: Create directory for SMB credentials
+#   ansible.builtin.file:
+#     path: /etc/smb
+#     state: directory
+#     mode: '0750'
+#     owner: root
+#     group: root
 
-- name: Create SMB credentials file
-  ansible.builtin.copy:
-    dest: /etc/smb/.smbcredentials
-    owner: root
-    group: root
-    mode: '0600'
-    content: |
-      username={{ smb_username }}
-      password={{ vault_smb_username_password }}
+# - name: Create SMB credentials file
+#   ansible.builtin.copy:
+#     dest: /etc/smb/.smbcredentials
+#     owner: root
+#     group: root
+#     mode: '0600'
+#     content: |
+#       username={{ smb_username }}
+#       password={{ vault_smb_username_password }}
 
 - name: Ensure {{ app_name }} system group exists with fixed GID
   ansible.builtin.group:
@@ -87,6 +87,7 @@
     group: root
   loop:
     - /srv/apps/open-webui/data
+    - /srv/apps/alloy
 
 - name: Ensure data directory ownership
   ansible.builtin.file:
@@ -103,8 +104,23 @@
     dest: "{{ docker_compose_dir }}/.env"
     mode: '0600'
   notify:
-    - Update containers
     - Restart all containers
+
+- name: Upload alloy config files 
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ puid }}"
+    group: "{{ guid }}"
+    mode: '0644'
+  loop:
+    - alloy:
+      src: templates/config.alloy
+      dest: /srv/apps/alloy/config.alloy 
+  become: true
+  tags: [docker, alloy] 
+  notify: 
+    - Restart Alloy
 
 - name: Copy docker-compose.yml
   ansible.builtin.template:
@@ -114,5 +130,4 @@
     owner: root
     group: root
   notify:
-    - Update containers
     - Restart all containers

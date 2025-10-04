@@ -1,10 +1,5 @@
 ---
 
-- name: Update containers
-  command: docker compose pull
-  args:
-    chdir: "{{ docker_compose_dir }}"
-
 - name: Restart all containers 
   ansible.builtin.command: docker compose restart
   args:
@@ -12,5 +7,10 @@
 
 - name: Restart container
   command: docker compose restart open-webui
+  args:
+    chdir: "{{ docker_compose_dir }}"
+
+- name: Restart Alloy
+  command: docker compose restart alloy
   args:
     chdir: "{{ docker_compose_dir }}"
