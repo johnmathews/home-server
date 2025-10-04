@@ -17,7 +17,7 @@
     chdir: /srv/media
   listen: Restart qbittorrent
 
-- name: Update containers
-  command: docker compose pull
+- name: Restart alloy container
+  ansible.builtin.shell: docker compose restart alloy
   args:
     chdir: /srv/media

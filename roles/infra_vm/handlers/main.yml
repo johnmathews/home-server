@@ -37,3 +37,8 @@
   command: docker compose restart filebrowser
   args:
     chdir: "{{ docker_compose_dir }}"
+
+- name: Restart alloy container
+  command: docker compose restart alloy 
+  args:
+    chdir: "{{ docker_compose_dir }}"

@@ -23,15 +23,17 @@
   copy:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
-    owner: "{{docker_user }}"
-    group: "{{docker_user }}"
+    owner: "{{ puid }}"
+    group: "{{ guid }}"
     mode: '0644'
   loop:
     - alloy:
       src: templates/config.alloy
-      dest: /srv/infra/alloy/config.alloy 
+      dest: /srv/apps/alloy/config.alloy 
   become: true
   tags: [docker, alloy] 
+  notify: 
+    - Restart Alloy
 
 # Copy environment and compose files
 - name: Copy docker-compose.yml
@@ -42,6 +44,5 @@
     owner: root
     group: root
   notify: 
-    - Update containers
     - Restart Docker Compose stack
-  tags: docker
+  tags: docker, alloy

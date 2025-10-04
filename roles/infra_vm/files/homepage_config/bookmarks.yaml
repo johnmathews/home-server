@@ -56,15 +56,22 @@
     - Loki:
         - abbr: 
           href: http://192.168.2.106:3100
-    - Alloy:
-        - abbr: 
-          href: http://192.168.2.106:12345
     - Prometheus:
         - abbr: 
           href: http://192.168.2.115:9090
     - Uptime Kuma:
         - abbr:
           href: http://192.168.2.106:3001
+    - Infra Alloy:
+        - abbr: 
+          href: http://192.168.2.106:12345
+    - Media Alloy:
+        - abbr: 
+          href: http://192.168.2.105:12345
+
+    - Tube Alloy:
+        - abbr: 
+          href: http://192.168.2.116:12345
 
 - Services:
     - Home Assistant:

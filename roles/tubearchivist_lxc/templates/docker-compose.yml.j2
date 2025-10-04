@@ -21,6 +21,11 @@ services:
       /etc/alloy/config.alloy
     ports:
       - "12345:12345"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
 
   node_exporter:
     image: quay.io/prometheus/node-exporter:latest
@@ -36,6 +41,11 @@ services:
     volumes:
       - '/:/host:ro,rslave'
       - '/var/lib/node_exporter/textfile_collector:/textfile:ro'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
@@ -53,6 +63,11 @@ services:
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
     privileged: true  # required for some metrics
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
 
 
   tubearchivist:
@@ -83,6 +98,11 @@ services:
     depends_on:
       - archivist-es
       - archivist-redis
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
 
   archivist-redis:
     image: redis
@@ -94,6 +114,11 @@ services:
       - redis:/data
     depends_on:
       - archivist-es
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
 
   archivist-es:
     image: elasticsearch:8.18.0
@@ -113,6 +138,12 @@ services:
       - es:/usr/share/elasticsearch/data 
     expose:
       - "9200"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
 
 volumes:
   media:

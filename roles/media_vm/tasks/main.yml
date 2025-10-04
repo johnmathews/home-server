@@ -60,21 +60,17 @@
     - "{{ media_stack_mount_dir }}/library"
     - "{{ media_stack_mount_dir }}/media"
 
-# - name: Set ownership of config and mount dirs
-#   file:
-#     path: "{{ item }}"
-#     recurse: true
-#     owner: "{{ media_stack_user }}"
-#     group: "{{ media_stack_group }}"
-#   loop:
-#     - /srv/media
-#     - /mnt/media/library/family
-#     - /mnt/media/library/kids
-#   when: item != "/mnt/media/library/downloads/incomplete"
-
 - name:  Ensure hometube config directory exists
   file:
     path: "{{ media_stack_base_dir }}/config/hometube/cookies"
+    state: directory
+    owner: "{{ media_stack_user }}"
+    group: "{{ media_stack_user }}"
+    mode: '0755'
+
+- name:  Ensure alloy config directory exists
+  file:
+    path: "{{ media_stack_base_dir }}/config/alloy"
     state: directory
     owner: "{{ media_stack_user }}"
     group: "{{ media_stack_user }}"
@@ -107,9 +103,23 @@
     dest: /srv/media/docker-compose.yml
     mode: '0644'
   notify: 
-    - Update containers
     - Restart media stack
   tags: docker
+
+- name: Upload alloy config file
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ puid }}"
+    group: "{{ guid }}"
+    mode: '0644'
+  loop:
+    - alloy:
+      src: templates/config.alloy
+      dest: /srv/media/config/alloy/config.alloy 
+  become: true
+  tags: [docker, alloy] 
+  notify: Restart alloy container
 
 - name: Create environment file from template
   template:
@@ -117,7 +127,6 @@
     dest: /srv/media/.env
     mode: '0600'
   notify: 
-    - Update containers
     - Restart media stack
   tags: docker
 

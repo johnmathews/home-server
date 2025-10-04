@@ -5,7 +5,7 @@
   args:
     chdir: /srv/apps
 
-- name: Update containers
-  command: docker compose pull
+- name: Restart Alloy 
+  ansible.builtin.command: docker compose -f /srv/apps/docker-compose.yml restart alloy
   args:
     chdir: /srv/apps

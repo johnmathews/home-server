@@ -9,20 +9,35 @@ discovery.docker "self" {
   host = "unix:///var/run/docker.sock"
 }
 
-loki.write "local" {
-  endpoint { url = env("LOKI_WRITE_ENDPOINT") }
-}
-
 discovery.relabel "docker_labels" {
+  // We only want to export the relabeling rules, not mutate anything here.
   targets = []
 
+  // service: Docker Compose service name, e.g. "grafana", "loki", "alloy"
   rule {
-    source_labels = ["__meta_docker_container_label_com_docker_compose_project"]
-    target_label  = "compose_project"
+    source_labels = ["__meta_docker_container_label_com_docker_compose_service"]
+    target_label  = "service"
   }
 
-  // ---- Drop noise / high-cardinality labels ----
-  rule { action = "labeldrop"; regex = "container|image|container_id|image_id" }
+  // container: strip leading "/" from container name
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    regex         = "^/(.*)"
+    replacement   = "$1"
+    target_label  = "container"
+  }
+
+  // optional cleanup to avoid noisy labels
+  rule {
+    action = "labeldrop"
+    regex  = "service_name|job|container_id|image_id"
+  }
+}
+
+loki.write "local" {
+  endpoint {
+    url = sys.env("LOKI_WRITE_ENDPOINT")
+  }
 }
 
 loki.source.docker "containers" {
@@ -30,14 +45,10 @@ loki.source.docker "containers" {
   targets       = discovery.docker.self.targets
   relabel_rules = discovery.relabel.docker_labels.rules
 
-  labels        = {
-    host = sys.env("NODE_HOSTNAME"), // set via environment on the Alloy container
-    job  = "docker"                  // handy for Grafana/Loki queries
+  // Objects (maps) need commas between fields
+  labels = {
+    host = sys.env("NODE_HOSTNAME"),
   }
 
-  forward_to    = [loki.write.local.receiver]
-
-  // on restart, ingest a recent slice
-  read_recent       = true
-  read_recent_limit = "10m"
+  forward_to = [loki.write.local.receiver]
 }

@@ -94,6 +94,7 @@
     - /srv/infra/loki/data
     - /srv/infra/alloy/data
   tags: [docker, grafana, loki, alloy]
+  notify: Restart alloy container
 
 - name: Template Docker Compose file
   template:
@@ -130,6 +131,7 @@
       dest: /srv/infra/loki/config.yml 
   become: true
   tags: [docker, loki, alloy] 
+  notify: Restart alloy container
 
 - name: Include file-browser tasks 
   import_tasks: file-browser.yml
@@ -142,12 +144,6 @@
 - name: Include mkdocs tasks
   import_tasks: mkdocs.yml
   tags: [docs, docker]
-
-- name: Update containers
-  command: docker compose pull
-  args:
-    chdir: /srv/infra
-  tags: [docker, grafana, docs, loki, alloy]
 
 - name: Launch containers
   command: docker compose up -d
