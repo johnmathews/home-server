@@ -6,13 +6,15 @@ logging {
 }
 
 discovery.docker "self" {
-  host = "unix:///var/run/docker.sock"
+  host             = "unix:///var/run/docker.sock"
+  refresh_interval = "10s"
 }
 
-loki.write "local" {
+loki.write "to_infra" {
   endpoint { url = env("LOKI_WRITE_ENDPOINT") }
 }
 
+// Keep a small, useful label set; drop the noisy stuff
 discovery.relabel "docker_labels" {
   targets = []
 
@@ -23,19 +25,22 @@ discovery.relabel "docker_labels" {
 
   // ---- Drop noise / high-cardinality labels ----
   rule { action = "labeldrop"; regex = "container|image|container_id|image_id" }
+
+  // Drop all other raw docker labels to keep cardinality low
+  rule { action = "labeldrop"; regex = "__meta_docker_container_label_.*" }
 }
 
 loki.source.docker "containers" {
-  host          = "unix:///var/run/docker.sock"
   targets       = discovery.docker.self.targets
   relabel_rules = discovery.relabel.docker_labels.rules
 
-  labels        = {
-    host = sys.env("NODE_HOSTNAME"), // set via environment on the Alloy container
-    job  = "docker"                  // handy for Grafana/Loki queries
+  // Add stable labels to every stream
+  labels = {
+    host = env("NODE_HOSTNAME")
+    job  = "docker"
   }
 
-  forward_to    = [loki.write.local.receiver]
+  forward_to = [loki.write.to_infra.receiver]
 
   // on restart, ingest a recent slice
   read_recent       = true
