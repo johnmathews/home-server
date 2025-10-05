@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Version: 2025-10-05 14:27
+
 # Location: /mnt/swift/scripts/spindown_hdds.sh
 # Purpose: Safely spin down ONLY the explicitly listed HDDs (by-id) when idle.
 
@@ -13,6 +15,21 @@ set -Eeuo pipefail
 shopt -s lastpipe
 export LC_ALL=C
 PATH=/usr/sbin:/usr/bin:/sbin:/bin
+
+# ---------- CONFIG ----------
+# Pair each device with a friendly label: "<by-id>|<label>"
+TARGETS=(
+	"/dev/disk/by-id/ata-ST3000DM007-1WY10G_ZFN19YRG|backup"
+	"/dev/disk/by-id/ata-ST8000VN004-3CP101_WWZ5AS90|tank"
+	"/dev/disk/by-id/ata-ST8000VN004-3CP101_WWZ5TZSF|tank"
+)
+
+SAMPLE_DURATION=240                          # seconds for iostat sampling
+UTIL_THRESHOLD=0.10                          # %util below this (0.1 = 0.1%) => allow spindown
+LOG_FILE="/mnt/swift/logs/spindown_hdds.log" # keep on SSD; never wakes HDDs
+COOLDOWN_SECS=600                            # 0 disables
+LOCK_FILE="/var/run/spindown_hdds.lock"
+STAMP_DIR="/var/run/spindown-stamps"
 
 # ---------- ABSOLUTE PATHS (cron-safe) ----------
 AWK=/usr/bin/awk
@@ -32,21 +49,6 @@ STAT=/usr/bin/stat
 TAIL=/usr/bin/tail
 TOUCH=/usr/bin/touch
 MKDIR=/usr/bin/mkdir
-
-# ---------- CONFIG ----------
-# Pair each device with a friendly label: "<by-id>|<label>"
-TARGETS=(
-	"/dev/disk/by-id/ata-ST3000DM007-1WY10G_ZFN19YRG|backup"
-	"/dev/disk/by-id/ata-ST8000VN004-3CP101_WWZ5AS90|tank"
-	"/dev/disk/by-id/ata-ST8000VN004-3CP101_WWZ5TZSF|tank"
-)
-
-LOG_FILE="/mnt/swift/scripts/spindown.log" # keep on SSD; never wakes HDDs
-SAMPLE_DURATION=240                        # seconds for iostat sampling
-UTIL_THRESHOLD=0.10                        # %util below this (0.1 = 0.1%) => allow spindown
-LOCK_FILE="/var/run/spindown_hdds.lock"
-COOLDOWN_SECS=600 # anti-thrash; 0 disables
-STAMP_DIR="/var/run/spindown-stamps"
 
 # ---------- COLORS ----------
 if [[ -z "${NO_COLOR:-}" ]]; then

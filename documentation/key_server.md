@@ -28,3 +28,9 @@ Prometheus Metrics: `http://192.168.2.201:8001/metrics`
 ## SSH
 
 You can `ssh` into the server using `ssh key` or using user: `john`
+
+## Updating the NAS
+
+```
+make nas tags=key
+```
