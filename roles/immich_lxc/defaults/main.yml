@@ -5,5 +5,7 @@ proxmox_api_user: "api@pve"
 puid: 1001
 guid: 1001
 
+docker_compose_dir: "/srv/apps"
+
 # smb_username: smb_user
 # smb_server: 192.168.2.104

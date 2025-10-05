@@ -17,7 +17,9 @@
     group: root
   loop:
     - /srv/apps/alloy
-  tags: alloy
+  tags: alloy, docker
+  notify: 
+    - Restart Alloy
 
 - name: Upload alloy config files 
   copy:

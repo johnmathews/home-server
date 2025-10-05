@@ -27,7 +27,7 @@ services:
         max-file: "5"
 
   jellyfin:
-    image: jellyfin/jellyfin:10.10.7
+    image: jellyfin/jellyfin
     container_name: jellyfin
     restart: always
     mem_limit: 8g

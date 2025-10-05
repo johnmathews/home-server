@@ -9,6 +9,8 @@ smb_server: 192.168.2.104
 
 truenas_ip: "192.168.2.104"
 
+docker_compose_dir: "/srv/apps"
+
 nfs_opts_items:
   - _netdev
   - hard

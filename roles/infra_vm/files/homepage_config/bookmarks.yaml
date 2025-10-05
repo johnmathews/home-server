@@ -46,7 +46,7 @@
         - abbr:
           href: http://192.168.2.110:8000
 
-- Infra Apps:
+- Infra Services:
     - TrueNAS:
         - abbr: 
           href: http://192.168.2.104
@@ -68,12 +68,26 @@
     - Media Alloy:
         - abbr: 
           href: http://192.168.2.105:12345
-
     - Tube Alloy:
         - abbr: 
           href: http://192.168.2.116:12345
+    - Prometheus Alloy:
+        - abbr: 
+          href: http://192.168.2.115:12345
+    - Immich Alloy:
+        - abbr: 
+          href: http://192.168.2.113:12345
+    - Open-UI Alloy:
+        - abbr: 
+          href: http://192.168.2.119:12345
+    - Jellyfin Alloy:
+        - abbr: 
+          href: http://192.168.2.110:12345
+    - Paperless Alloy:
+        - abbr: 
+          href: http://192.168.2.117:12345
 
-- Services:
+- Other Apps:
     - Home Assistant:
         - abbr: 
           href: http://192.168.2.102:8123

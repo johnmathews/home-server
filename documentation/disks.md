@@ -1,3 +1,67 @@
+## Proxmox
+
+### disks
+
+The only HDD you need to manage on the host is
+`/dev/disk/by-id/ata-ST3000DM007-1WY10G_ZFN1TN5X`. This is the disk that contains Proxmox backup data.
+
+Get its current spin state using:
+
+`smartctl -n standby -i /dev/disk/by-id/ata-ST3000DM007-1WY10G_ZFN1TN5X`
+
+`hdparm` doesn't seem to work reliably. Use `hd-idle` package instead.
+
+### hd-idle
+
+`hd-idle` is a systemd service. The project repo is
+[https://github.com/adelolmo/hd-idle](https://github.com/adelolmo/hd-idle). It's
+used to manage the spindown of the proxmox backup HDD.
+
+Its configured and deployed using Ansible: `proxmox-node/tasks/hd-idle.yml`
+
+### hdparm
+
+hdparm doesnt seem to work reliably.
+
+`sudo hdparm -S 120 /dev/disk/by-id/ata-ST3000DM007-1WY10G_ZFN1TN5X` - This will
+make it spin down after 10 minutes. (`-S 242` will make it spindown after 60
+minutes.)
+
+On modern Debian/Proxmox (systemd-based), there is no hdparm.service anymore.
+Instead:
+
+- `hdparm` is only called once at boot via udev rules (see `/lib/udev/hdparm`
+  which can be run manually).
+- That script parses `/etc/hdparm.conf` and applies settings to matching devices
+  when udev adds them.
+
+So if you edit `/etc/hdparm.conf` after the disk is already present, the
+settings won’t be re-applied automatically. You need to:
+
+1. Re-apply manually with the helper:
+
+   ```
+   sudo /lib/udev/hdparm start
+   ```
+
+2. To check what happened when you ran `/lib/udev/hdparm start`, look at `dmesg`
+   or `syslog` for `hdparm` output. (`journalctl` and `dmesg` give the same
+   output):
+
+   `journalctl -b | grep hdparm` `journalctl -f | grep -i sdg`
+   `journalctl -k | grep -i sdg`
+
+## hdparm command flags:
+
+- `hdparm -y` - puts the drive into standby mode immediately
+- `hdparm -C` - asks the disk what state it is currently in. But this might (?)
+  wake it, if it is in standby.
+- `smartctl -n standby -i` - check the disk state without waking it.
+- `hdparm -s` - toggles security settings. Don't use this.
+- `hdparm -S` - set spindown time.
+- `smartctl -a ` - lots of info
+- `sudo hdparm -I` - spindown settings
+
 ## TrueNAS
 
 `sudo smartctl -n standby -i /dev/sdb` - get current status of a disk
@@ -6,11 +70,13 @@
 of seconds in each snapshot. The second number is the number of intervals before
 stopping.
 
-`sudo smartctl -s standby,now /dev/sdb` - this will force the backup HDD to spin down.
+`sudo smartctl -s standby,now /dev/sdb` - this will force the backup HDD to spin
+down.
 
 `sudo smbstatus` - will show info about SMB connections including locked files
 
-`sudo systemctl status netdata` - the netdata service must be stopped (or just leaves the HDDs alone)
+`sudo systemctl status netdata` - the netdata service must be stopped (or just
+leaves the HDDs alone)
 
 - Apps cannot run on the tank datapool. Can they run on the boot pool? If not
   use an SSD and have an `apps` pool.
@@ -70,47 +136,3 @@ settings or getting errors.
 - disable NFS service - not necessary for `backup`
 - disable node-exporter app - not necessary for `backup`
 - disable SMART on the disk - not necessary for `backup`
-
-## Proxmox
-
-The only HDD you need to manage on the host is
-`/dev/disk/by-id/ata-ST3000DM007-1WY10G_ZFN1TN5X`.
-
-`smartctl -n standby -i /dev/disk/by-id/ata-ST3000DM007-1WY10G_ZFN1TN5X`
-
-`sudo hdparm -S 120 /dev/disk/by-id/ata-ST3000DM007-1WY10G_ZFN1TN5X` - This will
-make it spin down after 10 minutes. (`-S 242` will make it spindown after 60 minutes.)
-
-On modern Debian/Proxmox (systemd-based), there is no hdparm.service anymore.
-Instead:
-
-- `hdparm` is only called once at boot via udev rules (see `/lib/udev/hdparm`
-  which you ran manually).
-- That script parses `/etc/hdparm.conf` and applies settings to matching devices
-  when udev adds them.
-
-So if you edit `/etc/hdparm.conf` after the disk is already present, the
-settings won’t be re-applied automatically. You need to:
-
-1. Re-apply manually with the helper:
-
-   ```
-   sudo /lib/udev/hdparm start
-   ```
-
-2. To check what happened when you ran `/lib/udev/hdparm start`, look at `dmesg`
-   or `syslog` for `hdparm` output. (`journalctl` and `dmesg` give the same output):
-
-   `journalctl -b | grep hdparm`
-   `journalctl -f | grep -i sdg`
-   `journalctl -k | grep -i sdg`
-
-## hdparm command flags:
-
-- `hdparm -y` - puts the drive into standby mode immediately
-- `hdparm -C` - asks the disk what state it is currently in. But this might (?) wake it, if it is in standby.
-- `smartctl -n standby -i` - check the disk state without waking it.
-- `hdparm -s` - toggles security settings. Don't use this.
-- `hdparm -S` - set spindown time.
-- `smartctl -a ` - lots of info
-- `sudo hdparm -I` - spindown settings

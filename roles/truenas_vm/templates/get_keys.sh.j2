@@ -14,7 +14,7 @@
 # }
 
 # Redirect stdout and stderr to a log file
-LOG_FILE="/mnt/tank/apps-config/scripts/get_keys.log"
+LOG_FILE="/mnt/swift/logs/get_keys.log"
 exec > >(tee -a "$LOG_FILE") 2>&1
 
 echo "────────────────────────────────────────────"

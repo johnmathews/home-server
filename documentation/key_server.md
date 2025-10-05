@@ -1,36 +1,44 @@
-Datasets on TrueNAS are encrypted and need a passphrase to be unlocked. After
-startup, a script runs to retrieve the passphrases from a key server.
+Some TrueNAS datasets are encrypted and need a passphrase to be unlocked. It is
+annoying to manually decrypt them whenever TrueNAS reboots.
 
-There is an ansible role `key_server` that sets this up.
+After startup, TrueNAS runs a script that retrieve the passphrase from a key
+server and then unlocks the dataset.
+
+You can connect to the server using the command `ssh key` using user: `john`
+
+## TrueNAS script to retrieve keys
+
+Local Location: `truenas_vm/templates/get_keys.sh.j2`.
+Update and deploy: `make nas tags=key`
+
+Location on TrueNAS: `/mnt/swift/scripts/get_keys.sh`
+Logs: `/mnt/swift/logs/get_keys.log`
+
+## Key server to provide keys
+
+The key server itself is defined and deployed using the Ansible `key_server`
+role.
 
 The IP address of the key server is `192.168.2.201`.
 
-The key server is a FastAPI script `key_server/templates/key-server-main.py`. 
+The key server is defined in a FastAPI script
+`key_server/templates/key-server-main.py`.
 
-Bearer token and dataset keys are stored in the Ansible vault.
+## Updating keys
 
-## Updating keys 
-
-The keys are stored in ansible vault. 
+The keys are stored in the Ansible vault.
 
 ## Endpoints
 
-It has a single functional endpoint at `/unlock`.
+- A single functional endpoint at `/unlock`.
+- A `/health` endpoint that should return `ok`.
+- A Prometheus metrics endpoint at `/metrics`
 
-It has a `/health` endpoint that will return `ok`. 
+#### Local URLs
 
-It also has Prometheus metrics at `/metrics` 
-
-
-Health Check: `http://192.168.2.201:8001/health`
-Prometheus Metrics: `http://192.168.2.201:8001/metrics`
-
-## SSH
-
-You can `ssh` into the server using `ssh key` or using user: `john`
-
-## Updating the NAS
-
-```
-make nas tags=key
-```
+- Unlock:
+  [`http://192.168.2.201:8001/unlock`](http://192.168.2.201:8001/unlock)
+- Health Check:
+  [`http://192.168.2.201:8001/health`](http://192.168.2.201:8001/health)
+- Prometheus Metrics:
+  [`http://192.168.2.201:8001/metrics`](http://192.168.2.201:8001/metrics)

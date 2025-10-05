@@ -5,3 +5,4 @@
     mode: '0755'
     owner: root
     group: wheel
+  tags: key

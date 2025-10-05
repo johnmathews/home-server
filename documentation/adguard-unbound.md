@@ -1,4 +1,4 @@
-The router uses AdGuard as its DNS resolver.
+Our home router uses AdGuard as its DNS resolver.
 
 AdGuard uses Unbound to resolve DNS recursively. 
 
@@ -26,40 +26,45 @@ SSH into the LXC and then:
 ## Unbound
 
 
-1. Recursive DNS Resolution
+### Recursive DNS Resolution
 
-    Unbound doesn't forward queries to other DNS servers (like Google or Cloudflare) by default. Instead, it:
-	- Starts from the root DNS servers
-	- Walks down the hierarchy (root → TLD → authoritative servers)
-	- Gets the final answer directly
+Unbound doesn't forward queries to other DNS servers (like Google or Cloudflare) by default. Instead, it:
 
-    This gives you:
-	- More privacy
-	- Less dependence on third parties
-	- More control over DNS behavior
+- Starts from the root DNS servers
+- Walks down the hierarchy (root → TLD → authoritative servers)
+- Gets the final answer directly
 
+This gives:
 
-2. DNSSEC Validation
-
-    DNSSEC is enabled. 
-
-    When DNSSEC is enabled:
-	- Unbound verifies that DNS responses are digitally signed
-	- Unbound rejects tampered or spoofed data
+- More privacy
+- Less dependence on third parties
+- More control over DNS behavior
 
 
-3. Caching
+### DNSSEC Validation
 
-    Unbound stores DNS responses locally:
-	- If a domain has already been resolved, it answers immediately from cache
-	- Greatly reduces latency and upstream traffic
-	- You can tune cache TTLs and size
+DNSSEC is enabled. 
+
+When DNSSEC is enabled:
+
+- Unbound verifies that DNS responses are digitally signed
+- Unbound rejects tampered or spoofed data
 
 
-4. Hardened DNS Behavior
+### Caching
 
-    It supports:
-	- Query minimization (leaks less data to upstream servers)
-	- Blocking malicious response patterns (e.g., DNS rebinding)
-	- DNS-over-TLS (if desired)
-	- Prefetching for faster results
+Unbound stores DNS responses locally:
+
+- If a domain has already been resolved, it answers immediately from cache
+- Greatly reduces latency and upstream traffic
+- You can tune cache TTLs and size
+
+
+### Hardened DNS Behavior
+
+It supports:
+
+- Query minimization (leaks less data to upstream servers)
+- Blocking malicious response patterns (e.g., DNS rebinding)
+- DNS-over-TLS (if desired)
+- Prefetching for faster results

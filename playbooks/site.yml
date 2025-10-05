@@ -1,9 +1,17 @@
 # Master playbook: orchestrates all playbooks
 ---
 
-- import_playbook: truenas.yml
-- import_playbook: media_vm.yml
-- import_playbook: infra_vm.yml
-- import_playbook: key_server.yml
 - import_playbook: immich_lxc.yml
+- import_playbook: infra_vm.yml
 - import_playbook: jellyfin_lxc.yml
+- import_playbook: key_server.yml
+- import_playbook: media_vm.yml
+- import_playbook: truenas.yml
+- import_playbook: nfs.yml
+- import_playbook: open_webui_lxc.yml
+- import_playbook: paperless_lxc.yml
+- import_playbook: prometheus_lxc.yml
+- import_playbook: proxmox_node.yml
+- import_playbook: share_drive_probe.yml
+- import_playbook: truenas.yml
+- import_playbook: tubearchivist_lxc.yml

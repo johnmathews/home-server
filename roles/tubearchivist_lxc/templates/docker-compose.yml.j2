@@ -80,15 +80,16 @@ services:
       - /mnt/nfs/youtube-kids:/youtube
       - cache:/cache
     environment:
-      - ES_URL=http://archivist-es:9200
-      - REDIS_CON=redis://archivist-redis:6379
+      - TZ=Europe/Amsterdam
       - HOST_UID=1000
       - HOST_GID=1000
+      - ES_URL=http://archivist-es:9200
+      - ELASTIC_PASSWORD={{ vault_ta_elastic_search_password }}
+      - REDIS_CON=redis://archivist-redis:6379
       - TA_HOST={{ tubearchivist_host }}
       - TA_USERNAME={{ ta_username }}
       - TA_PASSWORD={{ vault_ta_password }}
-      - ELASTIC_PASSWORD={{ vault_ta_elastic_search_password }}
-      - TZ=Europe/Amsterdam
+      - TA_AUTO_UPDATE_YTDLP=release
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
       interval: 1m

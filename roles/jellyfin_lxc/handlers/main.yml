@@ -3,7 +3,7 @@
 - name: Restart Docker
   ansible.builtin.command: docker compose restart
   args:
-    chdir: /srv/apps
+    chdir: "{{ docker_compose_dir }}"
 
 - name: Restart Alloy
   command: docker compose restart alloy

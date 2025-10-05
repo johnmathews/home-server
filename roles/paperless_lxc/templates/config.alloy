@@ -54,7 +54,7 @@ loki.source.docker "containers" {
   relabel_rules = discovery.relabel.docker_labels.rules
 
   labels = {
-    "host" = sys.env("NODE_HOSTNAME"),
+    "hostname" = sys.env("NODE_HOSTNAME"),
   }
 
   // Send to the processor first, then on to Loki

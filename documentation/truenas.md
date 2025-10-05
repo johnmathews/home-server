@@ -1,6 +1,24 @@
+This document covers the disk spindown script and the disk-status-exporter app
+
 ## Disk Spindown
 
-### Deploy
+TrueNAS HDDs in the `tank` dataset don't ever spin down by themselves. I don't
+know why, but I suspect its caused by ZFS rather than TrueNAS. I've taken the
+following measures to make spindown possible:
+
+- TrueNAS apps live on the `switft` datapool,
+- the `netdata` reporting service is masked,
+- the `tank` datapool uses:
+  - a "metadata" VDEV
+  - a "log" VDEV
+
+Therefore a script runs on a cronjob to try to spindown the disks at night. The
+script measures utilisation over a sample period and only if utilisation is
+below 0.1% is a spindown using `hdparm` implemented. See below for details.
+
+### Spindown Script Deployment
+
+The current version of the disk spindown script can be
 
 - `make nas tags=hdds`
 
@@ -60,14 +78,19 @@ TARGETS=(
 
 ## Disk status exporter
 
-Github:
+Grafana shows the spindown status of each hard disk. This is possible because a
+custom TrueNAS app queries the disks and exposes Prometheus style metrics.
+
+The custom app lives in a separate repo and is containerized using a Github action.
+
+Github repo:
 [https://github.com/johnmathews/disk_status_exporter](https://github.com/johnmathews/disk_status_exporter)
 
 ### Deploy
 
-- Push to the `main` branch of the github remote. This will trigger a github
+- Push to the `main` branch of the Github remote. This will trigger a Github
   action that will deploy a new version of the container to the Github Container
-  Registry (GHCR).
+  Registry (GHCR.io).
 - Then update the app in the TrueNAS apps UI.
 
 ### UI
@@ -88,4 +111,5 @@ Github:
 
 ### Logs
 
-In the TrueNAS UI, click on the app and then select `Details > Workloads > View Logs`
+In the TrueNAS UI, click on the app and then select
+`Details > Workloads > View Logs`

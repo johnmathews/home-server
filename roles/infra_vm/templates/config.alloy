@@ -47,7 +47,7 @@ loki.source.docker "containers" {
 
   // Objects (maps) need commas between fields
   labels = {
-    host = sys.env("NODE_HOSTNAME"),
+    hostname = sys.env("NODE_HOSTNAME"),
   }
 
   forward_to = [loki.write.local.receiver]
