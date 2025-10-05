@@ -1,24 +1,33 @@
 It is useful to have a chart in Grafana showing which NFS and SMB share drives
 are alive. This also enables alerting if they go down.
 
-This is implemented by running a service on each VM or LXC that writes
-Prometheus metrics to the node_exporter text_file location.
+This is implemented by running `share_drive_probe` - a systemd service (not a
+container!) on each VM or LXC that writes Prometheus metrics to the
+node_exporter text_file location.
+
+Deploy it to an individual host using `make <host> tags=shares` or to all hosts
+by `make <shares>`.
 
 An Ansible role `share_drive_probe` is added to each playbook. It has the tag
 `shares`. This will setup the metrics.
 
-The metrics are produced by a systemd timer that calls a one-shot service. The
-service calls a shell script that creates
+A systemd timer `share_drive_probe.timer` calls a one-shot service
+`share_drive_probe.service`. The service calls a shell script
+`share_drive_probe.sh` that writes Prometheus style metrics to
 `/var/lib/node_exporter/textfile_collector/share_drive_probe.prom`.
 
-Some useful commands:
+The `node-exporter` docker service will collect any .prom files in
+`/var/lib/node_exporter/textfile_collector` and add them to its output. See the
+docker compose file for any host that has NFS or SMB drives mounted.
+
+## Some useful commands:
 
 ### Manual reset/start
 
 ```sh
-systemctl daemon-reload
 systemctl restart mount-touch-probe.timer
 systemctl start mount-touch-probe.service
+systemctl daemon-reload
 ```
 
 ### See whats running
@@ -31,13 +40,14 @@ systemctl list-units 'mount-nfs-*.service' 'mnt-nfs-*.mount'
 systemctl list-timers mount-touch-probe.timer
 ```
 
-### See if the file exists
+### See if the metrics file is being written
 
 ```sh
 ls -l /var/lib/node_exporter/textfile_collector/share_drive_probe.prom
 cat /var/lib/node_exporter/textfile_collector/share_drive_probe.prom
 ```
-### See the logs
+
+### View systemd logs
 
 ```sh
 journalctl -u mount-touch-probe.service
