@@ -5,6 +5,10 @@ logging {
   format = "logfmt"
 }
 
+livedebugging {
+  enabled = true
+}
+
 discovery.docker "self" {
   host = "unix:///var/run/docker.sock"
 }
