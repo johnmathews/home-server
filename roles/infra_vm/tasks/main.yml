@@ -151,8 +151,11 @@
   tags: [docs, docker]
 
 - name: Launch containers
-  command: docker compose up -d
-  args:
-    chdir: /srv/infra
+  community.docker.docker_compose_v2:
+    project_src: "{{ docker_compose_dir }}"
+    state: restarted
+    recreate: always
+    dependencies: true
+    remove_orphans: true
+  become: false
   tags: [docker, grafana, docs, loki, alloy]
-

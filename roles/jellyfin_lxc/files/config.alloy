@@ -17,12 +17,6 @@ discovery.relabel "docker_labels" {
   // We only want to export the relabeling rules, not mutate anything here.
   targets = []
 
-  // service: Docker Compose service name, e.g. "grafana", "loki", "alloy"
-  rule {
-    source_labels = ["__meta_docker_container_label_com_docker_compose_service"]
-    target_label  = "service"
-  }
-
   // container: strip leading "/" from container name
   rule {
     source_labels = ["__meta_docker_container_name"]
@@ -30,29 +24,40 @@ discovery.relabel "docker_labels" {
     replacement   = "$1"
     target_label  = "container"
   }
-
-  // optional cleanup to avoid noisy labels
-  rule {
-    action = "labeldrop"
-    regex  = "service_name|job|container_id|image_id"
-  }
-}
-
-loki.write "to_infra" {
-  endpoint { url = sys.env("LOKI_WRITE_ENDPOINT") }
 }
 
 loki.process "log_processor" {
-  forward_to = [loki.write.to_infra.receiver]
+  forward_to = [loki.process.detect_level.receiver]
 
   stage.label_drop {
-    values = ["service_name", "job", "container_id", "image_id"]
+    values = ["job", "container_id", "image_id"]
+  }
+
+  stage.label_keep {
+    values = ["hostname", "service", "container", "detected_level",]
   }
 
   stage.drop {
-    older_than          = "1h"                // ok for Alloy/River durations
-    drop_counter_reason = "too_old_for_loki"
+    older_than          = "1h"
+    drop_counter_reason = "too_old"
   }
+}
+
+loki.process "detect_level" {
+  forward_to = [loki.write.to_infra.receiver]
+
+  # Parse key=value pairs first (logfmt-style)
+  stage.logfmt {}
+
+  # Promote the 'level' field as a label
+  stage.labels {
+    values = { level = "level" }
+  }
+
+  # # Optional: drop noise if missing
+  # stage.drop {
+  #   expression = "level == 'unknown' or level == ''"
+  # }
 }
 
 loki.source.docker "containers" {
@@ -67,3 +72,8 @@ loki.source.docker "containers" {
   // Send to the processor first, then on to Loki
   forward_to = [loki.process.log_processor.receiver]
 }
+
+loki.write "to_infra" {
+  endpoint { url = sys.env("LOKI_WRITE_ENDPOINT") }
+}
+

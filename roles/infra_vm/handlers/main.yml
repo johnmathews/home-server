@@ -27,22 +27,22 @@
     remove_orphans: true
   become: false
 
-- name: restart loki
+- name: restart alloy
   community.docker.docker_compose_v2:
     project_src: "{{ docker_compose_dir }}"
     services:
-      - loki
+      - alloy
     state: present
     recreate: always
     dependencies: true
     remove_orphans: true
   become: false
 
-- name: restart alloy
+- name: restart loki
   community.docker.docker_compose_v2:
     project_src: "{{ docker_compose_dir }}"
     services:
-      - alloy
+      - loki
     state: present
     recreate: always
     dependencies: true
