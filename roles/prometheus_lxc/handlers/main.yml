@@ -1,16 +1,29 @@
 ---
 
-- name: Restart Docker Compose stack
-  ansible.builtin.command: docker compose -f /srv/apps/docker-compose.yml up -d
-  args:
-    chdir: /srv/apps
+- name: restart docker compose stack
+  community.docker.docker_compose_v2:
+    project_src: "{{ docker_compose_dir }}"
+    state: present
+    recreate: always
+    dependencies: true
+  become: false
 
-- name: Restart Prometheus container
-  command: docker compose restart prometheus
-  args:
-    chdir: "{{ docker_compose_dir }}"
+- name: restart prometheus
+  community.docker.docker_compose_v2:
+    project_src: "{{ docker_compose_dir }}"
+    services:
+      - prometheus
+    state: present
+    recreate: always
+    dependencies: true
+  become: false
 
-- name: Restart Alloy
-  command: docker compose restart alloy
-  args:
-    chdir: "{{ docker_compose_dir }}"
+- name: restart alloy
+  community.docker.docker_compose_v2:
+    project_src: "{{ docker_compose_dir }}"
+    services:
+      - alloy
+    state: present
+    recreate: always
+    dependencies: true
+  become: false

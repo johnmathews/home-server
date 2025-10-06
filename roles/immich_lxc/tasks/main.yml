@@ -51,8 +51,7 @@
       dest: /srv/apps/alloy/config.alloy 
   become: true
   tags: [docker, alloy] 
-  notify: 
-    - Restart Alloy
+  notify: restart alloy
 
 - name: Copy Docker Compose file
   ansible.builtin.copy:
@@ -61,5 +60,5 @@
     owner: root
     group: root
     mode: '0644'
-  notify: Restart Docker Compose stack
+  notify: restart docker compose stack
   tags: [docker, alloy] 

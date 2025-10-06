@@ -7,7 +7,7 @@
     group: "1000"
     mode: '0755'
     recurse: yes
-  notify: Restart filebrowser container
+  notify: restart filebrowser
   tags: [filebrowser]
 
 - name: Ensure /database dir exists with proper ownership
@@ -18,7 +18,7 @@
     group: "1000"
     mode: '0755'
   tags: [filebrowser]
-  notify: Restart filebrowser container
+  notify: Restart filebrowser
 
 - name: Recursively set permissions on files in filebrowser config directory
   ansible.builtin.find:
@@ -33,7 +33,7 @@
     path: "{{ item.path }}"
     mode: '0644'
   loop: "{{ filebrowser_files.files }}"
-  notify: Restart filebrowser container
+  notify: restart filebrowser
   tags: [filebrowser]
 
 - name: Recursively set permissions on directories in filebrowser config directory
@@ -42,12 +42,12 @@
     file_type: directory
   register: filebrowser_dirs
   tags: [filebrowser]
-  notify: Restart filebrowser container
+  notify: restart filebrowser
 
 - name: Set directory mode to 0755
   ansible.builtin.file:
     path: "{{ item.path }}"
     mode: '0755'
   loop: "{{ filebrowser_dirs.files }}"
-  notify: Restart filebrowser container
+  notify: restart filebrowser
   tags: [filebrowser]

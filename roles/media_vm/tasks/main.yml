@@ -103,7 +103,9 @@
     dest: /srv/media/docker-compose.yml
     mode: '0644'
   notify: 
-    - Restart media stack
+    - restart media stack
+    - restart alloy
+
   tags: docker
 
 - name: Upload alloy config file
@@ -119,15 +121,14 @@
       dest: /srv/media/config/alloy/config.alloy 
   become: true
   tags: [docker, alloy] 
-  notify: Restart alloy container
+  notify: restart alloy
 
 - name: Create environment file from template
   template:
     src: .env.j2
     dest: /srv/media/.env
     mode: '0600'
-  notify: 
-    - Restart media stack
+  notify: restart media stack
   tags: docker
 
 - name: Ensure .env and docker-compose.yml are owned by "john"

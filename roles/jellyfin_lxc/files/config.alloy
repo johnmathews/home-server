@@ -38,9 +38,12 @@ loki.write "to_infra" {
   endpoint { url = sys.env("LOKI_WRITE_ENDPOINT") }
 }
 
-loki.process "drop_old" {
-  // REQUIRED: where to send logs after processing
+loki.process "log_processor" {
   forward_to = [loki.write.to_infra.receiver]
+
+  stage.labeldrop {
+    values = ["service_name", "job", "container_id", "image_id"]
+  }
 
   stage.drop {
     older_than          = "1h"                // ok for Alloy/River durations
@@ -58,5 +61,5 @@ loki.source.docker "containers" {
   }
 
   // Send to the processor first, then on to Loki
-  forward_to = [loki.process.drop_old.receiver]
+  forward_to = [loki.process.log_processor.receiver]
 }

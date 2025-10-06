@@ -94,7 +94,10 @@
     - /srv/infra/loki/data
     - /srv/infra/alloy/data
   tags: [docker, grafana, loki, alloy]
-  notify: Restart alloy container
+  notify: 
+    - restart alloy
+    - restart loki
+    - restart grafana
 
 - name: Template Docker Compose file
   template:
@@ -103,7 +106,7 @@
     owner: "{{ docker_user }}"
     group: docker
     mode: '0644'
-  notify: Apply updated Docker Compose stack
+  notify: update docker compose stack
   tags: [docker, grafana, docs, loki, alloy]
 
 - name: Upload .env file from template
@@ -131,7 +134,9 @@
       dest: /srv/infra/loki/config.yml 
   become: true
   tags: [docker, loki, alloy] 
-  notify: Restart alloy container
+  notify:
+    - restart alloy
+    - restart loki
 
 - name: Include file-browser tasks 
   import_tasks: file-browser.yml

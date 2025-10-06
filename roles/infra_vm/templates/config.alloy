@@ -34,9 +34,20 @@ discovery.relabel "docker_labels" {
   }
 }
 
-loki.write "local" {
-  endpoint {
-    url = sys.env("LOKI_WRITE_ENDPOINT")
+loki.write "to_infra" {
+  endpoint { url = sys.env("LOKI_WRITE_ENDPOINT") }
+}
+
+loki.process "log_processor" {
+  forward_to = [loki.write.to_infra.receiver]
+
+  stage.labeldrop {
+    values = ["service_name", "job", "container_id", "image_id"]
+  }
+
+  stage.drop {
+    older_than          = "1h"                // ok for Alloy/River durations
+    drop_counter_reason = "too_old_for_loki"
   }
 }
 
@@ -45,10 +56,10 @@ loki.source.docker "containers" {
   targets       = discovery.docker.self.targets
   relabel_rules = discovery.relabel.docker_labels.rules
 
-  // Objects (maps) need commas between fields
   labels = {
-    hostname = sys.env("NODE_HOSTNAME"),
+    "hostname" = sys.env("NODE_HOSTNAME"),
   }
 
-  forward_to = [loki.write.local.receiver]
+  // Send to the processor first, then on to Loki
+  forward_to = [loki.process.log_processor.receiver]
 }

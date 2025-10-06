@@ -2,43 +2,75 @@
 
 ---
 
-- name: Apply updated Docker Compose stack
-  command: docker compose up -d
-  args:
-    chdir: "{{ docker_compose_dir }}"
- 
-
-- name: Restart Grafana container
-  command: docker compose restart grafana
-  args:
-    chdir: "{{ docker_compose_dir }}"
-
-- name: Restart Prometheus container
-  command: docker compose restart prometheus
-  args:
-    chdir: "{{ docker_compose_dir }}"
-
 - name: Restart ipmi_exporter
   systemd:
     name: ipmi_exporter
     state: restarted
 
-- name: Restart homepage container
-  command: docker compose restart homepage 
-  args:
-    chdir: "{{ docker_compose_dir }}"
+- name: update docker compose stack
+  community.docker.docker_compose_v2:
+    project_src: "{{ docker_compose_dir }}"
+    state: present
+    recreate: always
+    dependencies: true
+  become: false
 
-- name: Restart mkdocs container
-  command: docker compose restart mkdocs 
-  args:
-    chdir: "{{ docker_compose_dir }}"
+- name: restart grafana
+  community.docker.docker_compose_v2:
+    project_src: "{{ docker_compose_dir }}"
+    services:
+      - grafana
+    state: present
+    recreate: always
+    dependencies: true
+  become: false
 
-- name: Restart filebrowser container
-  command: docker compose restart filebrowser
-  args:
-    chdir: "{{ docker_compose_dir }}"
+- name: restart loki
+  community.docker.docker_compose_v2:
+    project_src: "{{ docker_compose_dir }}"
+    services:
+      - loki
+    state: present
+    recreate: always
+    dependencies: true
+  become: false
 
-- name: Restart alloy container
-  command: docker compose restart alloy 
-  args:
-    chdir: "{{ docker_compose_dir }}"
+- name: restart alloy
+  community.docker.docker_compose_v2:
+    project_src: "{{ docker_compose_dir }}"
+    services:
+      - alloy
+    state: present
+    recreate: always
+    dependencies: true
+  become: false
+
+- name: restart homepage
+  community.docker.docker_compose_v2:
+    project_src: "{{ docker_compose_dir }}"
+    services:
+      - homepage
+    state: present
+    recreate: always
+    dependencies: true
+  become: false
+
+- name: restart mkdocs
+  community.docker.docker_compose_v2:
+    project_src: "{{ docker_compose_dir }}"
+    services:
+      - mkdocs
+    state: present
+    recreate: always
+    dependencies: true
+  become: false
+
+- name: restart filebrowser
+  community.docker.docker_compose_v2:
+    project_src: "{{ docker_compose_dir }}"
+    services:
+      - filebrowser
+    state: present
+    recreate: always
+    dependencies: true
+  become: false

@@ -5,7 +5,7 @@
 services:
   node_exporter:
     image: quay.io/prometheus/node-exporter:latest
-    container_name: node_exporter
+    container_name: immich_node_exporter
     command:
       - '--path.rootfs=/host'
       - '--collector.textfile.directory=/textfile'
@@ -20,7 +20,7 @@ services:
 
   alloy:
     image: grafana/alloy:latest
-    container_name: alloy
+    container_name: immich_alloy
     restart: unless-stopped
     environment:
       LOKI_WRITE_ENDPOINT: "http://192.168.2.106:3100/loki/api/v1/push"
@@ -101,7 +101,7 @@ services:
   # node exporter is running outside docker.
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
-    container_name: cadvisor
+    container_name: immich_cadvisor
     restart: unless-stopped
     ports:
       - "18080:8080"

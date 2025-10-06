@@ -9,7 +9,7 @@
     owner: "{{ docker_user }}"
     group: "{{ docker_user }}"
     mode: '0755'
-  notify: Restart mkdocs container
+  notify: restart mkdocs
 
 - name: Template mkdocs.yml
   template:
@@ -18,7 +18,7 @@
     owner: "{{ docker_user }}"
     group: "{{ docker_user }}"
     mode: '0644'
-  notify: Restart mkdocs container
+  notify: restart mkdocs
 
 - name: Copy project markdown docs into mkdocs docs dir
   copy:
@@ -27,4 +27,4 @@
     owner: "{{ docker_user }}"
     group: "{{ docker_user }}"
     mode: '0644'
-  notify: Restart mkdocs container
+  notify: restart mkdocs

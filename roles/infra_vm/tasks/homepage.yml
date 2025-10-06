@@ -9,7 +9,7 @@
     owner: "{{ docker_user }}"
     group: "{{ docker_user }}"
     mode: '0755'
-  notify: Restart homepage container
+  notify: restart homepage
 
 - name: Upload homepage config files to infra VM
   copy:
@@ -22,7 +22,7 @@
     - "files/homepage_config/*"
   register: homepage_config_uploads
   become: true
-  notify: Restart homepage container
+  notify: restart homepage
 
 - name: Template homepage services.yaml
   template:
@@ -31,5 +31,5 @@
     owner: "{{ docker_user }}"
     group: "{{ docker_user }}"
     mode: '0644'
-  notify: Restart homepage container
+  notify: restart homepage
 

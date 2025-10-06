@@ -19,7 +19,7 @@
     - /srv/apps/alloy
   tags: alloy, docker
   notify: 
-    - Restart Alloy
+    - restart alloy
 
 - name: Upload alloy config files 
   copy:
@@ -35,7 +35,7 @@
   become: true
   tags: [docker, alloy] 
   notify: 
-    - Restart Alloy
+    - restart alloy
 
 # Copy environment and compose files
 - name: Copy docker-compose.yml
@@ -46,5 +46,5 @@
     owner: root
     group: root
   notify: 
-    - Restart Docker Compose stack
+    - restart docker compose stack
   tags: docker, alloy

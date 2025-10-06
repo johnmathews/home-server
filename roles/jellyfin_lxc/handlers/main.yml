@@ -1,11 +1,19 @@
 ---
 
-- name: Restart Docker
-  ansible.builtin.command: docker compose restart
-  args:
-    chdir: "{{ docker_compose_dir }}"
+- name: restart docker
+  community.docker.docker_compose_v2:
+    project_src: "{{ docker_compose_dir }}"
+    state: present
+    recreate: always
+    dependencies: true
+  become: false
 
-- name: Restart Alloy
-  command: docker compose restart alloy
-  args:
-    chdir: "{{ docker_compose_dir }}"
+- name: restart alloy
+  community.docker.docker_compose_v2:
+    project_src: "{{ docker_compose_dir }}"
+    services:
+      - alloy
+    state: present
+    recreate: always
+    dependencies: true
+  become: false
