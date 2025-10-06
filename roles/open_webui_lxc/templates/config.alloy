@@ -27,7 +27,7 @@ discovery.relabel "docker_labels" {
 }
 
 loki.process "log_processor" {
-  forward_to = [loki.process.detect_level.receiver]
+  forward_to = [loki.write.to_infra.receiver]
 
   stage.label_drop {
     values = ["job", "container_id", "image_id"]
@@ -40,18 +40,6 @@ loki.process "log_processor" {
   stage.drop {
     older_than          = "1h"
     drop_counter_reason = "too_old"
-  }
-}
-
-loki.process "detect_level" {
-  forward_to = [loki.write.to_infra.receiver]
-
-  stage.logfmt {
-    mapping = { "level" = "level" }
-  }
-
-  stage.labels {
-    values = { "detected_level" = "level" }
   }
 }
 
