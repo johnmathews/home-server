@@ -41,7 +41,7 @@ loki.write "to_infra" {
 loki.process "log_processor" {
   forward_to = [loki.write.to_infra.receiver]
 
-  stage.labeldrop {
+  stage.label_drop {
     values = ["service_name", "job", "container_id", "image_id"]
   }
 
