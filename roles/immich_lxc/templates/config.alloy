@@ -46,18 +46,13 @@ loki.process "log_processor" {
 loki.process "detect_level" {
   forward_to = [loki.write.to_infra.receiver]
 
-  # Parse key=value pairs first (logfmt-style)
-  stage.logfmt {}
-
-  # Promote the 'level' field as a label
-  stage.labels {
-    values = { level = "level" }
+  stage.logfmt {
+    mapping = { "level" = "level" }
   }
 
-  // # Optional: drop noise if missing
-  // stage.drop {
-  //   expression = "level == 'unknown' or level == ''"
-  // }
+  stage.labels {
+    values = { "detected_level" = "level" }
+  }
 }
 
 loki.source.docker "containers" {

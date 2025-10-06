@@ -14,6 +14,7 @@
     recreate: always
     dependencies: true
     remove_orphans: true
+  listen: restart alloy 
   become: false
 
 - name: restart grafana
