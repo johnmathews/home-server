@@ -6,6 +6,7 @@
     state: present
     recreate: always
     dependencies: true
+    remove_orphans: true
   become: false
 
 - name: restart open-webui 
@@ -16,6 +17,7 @@
     state: present
     recreate: always
     dependencies: true
+    remove_orphans: true
   become: false
 
 - name: restart alloy
@@ -26,4 +28,5 @@
     state: present
     recreate: always
     dependencies: true
+    remove_orphans: true
   become: false

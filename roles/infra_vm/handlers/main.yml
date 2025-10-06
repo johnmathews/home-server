@@ -13,6 +13,7 @@
     state: present
     recreate: always
     dependencies: true
+    remove_orphans: true
   become: false
 
 - name: restart grafana
@@ -23,6 +24,7 @@
     state: present
     recreate: always
     dependencies: true
+    remove_orphans: true
   become: false
 
 - name: restart loki
@@ -33,6 +35,7 @@
     state: present
     recreate: always
     dependencies: true
+    remove_orphans: true
   become: false
 
 - name: restart alloy
@@ -43,6 +46,7 @@
     state: present
     recreate: always
     dependencies: true
+    remove_orphans: true
   become: false
 
 - name: restart homepage
@@ -53,6 +57,7 @@
     state: present
     recreate: always
     dependencies: true
+    remove_orphans: true
   become: false
 
 - name: restart mkdocs
@@ -63,6 +68,7 @@
     state: present
     recreate: always
     dependencies: true
+    remove_orphans: true
   become: false
 
 - name: restart filebrowser
@@ -73,4 +79,5 @@
     state: present
     recreate: always
     dependencies: true
+    remove_orphans: true
   become: false

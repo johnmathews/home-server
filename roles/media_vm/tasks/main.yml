@@ -178,9 +178,10 @@
 # 11. Start Docker stack (only after config + paths are ready)
 - name: Start media stack containers
   community.docker.docker_compose_v2:
-    project_src: /srv/media
+    project_src: "{{ media_stack_base_dir }}"
     state: present
-    recreate: auto
+    recreate: always
+    remove_orphans: true
   become: false
   tags: docker
 
