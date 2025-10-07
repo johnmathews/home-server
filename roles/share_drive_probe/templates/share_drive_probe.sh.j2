@@ -4,8 +4,9 @@
 set -euo pipefail
 
 # ---------- CONFIG (via env / Ansible template) ----------
-RO_START="${SDP_RO_START}"              # read-only start time
-RO_END="${SDP_RO_END}"                  # read-only end time
+TZ="${SDP_TZ:-Europe/Amsterdam}"
+RO_START="${SDP_RO_START:-22:00}"              # read-only start time
+RO_END="${SDP_RO_END:-10:00}"                  # read-only end time
 PROBE_MODE_DEFAULT="${SDP_MODE:-auto}"  # auto|rw|ro
 
 TARGETS_FILE="{{ share_drive_probe_targets_file }}"
@@ -42,6 +43,9 @@ mkdir -p "$TEXTFILE_DIR" "$STATE_DIR"
 if [[ ! -f "$TARGETS_FILE" ]]; then
   log_warn "targets file missing: $TARGETS_FILE (will still emit paused/housekeeping metrics)"
 fi
+
+# set the timezone 
+export TZ
 
 # ---------- HELPERS ----------
 hash_str() {

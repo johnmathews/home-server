@@ -25,8 +25,8 @@ docker compose file for any host that has NFS or SMB drives mounted.
 ### Manual reset/start
 
 ```sh
-systemctl restart share-drive-prove.timer
-systemctl start share-drive-prove.service
+systemctl restart share-drive-probe.timer
+systemctl start share-drive-probe.service
 systemctl daemon-reload
 ```
 
@@ -34,10 +34,10 @@ systemctl daemon-reload
 
 ```sh
 
-systemctl status share-drive-prove.service
-journalctl -xeu share-drive-prove.service
+systemctl status share-drive-probe.service
+journalctl -xeu share-drive-probe.service
 systemctl list-units 'mount-nfs-*.service' 'mnt-nfs-*.mount'
-systemctl list-timers share-drive-prove.timer
+systemctl list-timers share-drive-probe.timer
 ```
 
 ### See if the metrics file is being written
@@ -50,8 +50,8 @@ cat /var/lib/node_exporter/textfile_collector/share_drive_probe.prom
 ### View systemd logs
 
 ```sh
-journalctl -u share-drive-prove.service
-journalctl -u share-drive-prove.timer -u share-drive-prove.service --since "1 hour ago"
+journalctl -u share-drive-probe.service
+journalctl -u share-drive-probe.timer -u share-drive-probe.service --since "1 hour ago"
 
 ```
 
