@@ -23,8 +23,8 @@
     mode: "{{ share_drive_probe_textfile_dir_mode }}"
   become: true
   notify:
-    - Daemon reload
-    - Restart share-drive-probe timer
+    - reload daemon
+    - restart share-drive-probe timer
 
 - name: Ensure probe metrics file has correct permissions (if present)
   file:
@@ -36,8 +36,8 @@
   become: true
   ignore_errors: true
   notify:
-    - Daemon reload
-    - Restart share-drive-probe timer
+    - reload daemon
+    - restart share-drive-probe timer
 
 - name: Ensure state dir exists
   file:
@@ -68,14 +68,19 @@
     owner: root
     group: root
     mode: '0755'
-  notify: Restart share-drive-probe timer
+  notify: 
+    - reload daemon
+    - run share-drive-probe service
+    - restart share-drive-probe timer
 
 - name: Install systemd service
   template:
     src: templates/share_drive_probe.service.j2
     dest: /etc/systemd/system/share-drive-probe.service
     mode: '0644'
-  notify: Daemon reload
+  notify: 
+    - reload daemon
+    - run share-drive-probe service
 
 - name: Install systemd timer
   template:
@@ -83,29 +88,6 @@
     dest: /etc/systemd/system/share-drive-probe.timer
     mode: '0644'
   notify:
-    - Daemon reload
-    - Restart share-drive-probe timer
+    - reload daemon
+    - restart share-drive-probe timer
 
-- name: Enable and start timer
-  systemd:
-    name: share-drive-probe.timer
-    state: started
-    enabled: true
-
-- name: Enable and start service
-  systemd:
-    name: share-drive-probe.service
-    state: started
-    enabled: true
-
-- name: Restart share-drive-probe timer
-  systemd:
-    name: share-drive-probe.timer
-    state: restarted
-    enabled: true
-
-- name: Restart share-drive-probe service
-  systemd:
-    name: share-drive-probe.service
-    state: restarted
-    enabled: true

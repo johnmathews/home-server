@@ -2,12 +2,20 @@
 
 ---
 
-- name: Daemon reload
+# handlers run in the order they are definied in handlers/main.yml
+
+- name: reload daemon
   systemd:
     daemon_reload: true
 
-- name: Restart share-drive-probe timer
+- name: restart share-drive-probe timer
   systemd:
     name: share-drive-probe.timer
+    state: restarted
+    enabled: true
+
+- name: run share-drive-probe service
+  systemd:
+    name: share-drive-probe.service
     state: restarted
     enabled: true

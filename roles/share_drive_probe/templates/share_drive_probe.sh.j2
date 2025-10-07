@@ -3,55 +3,47 @@
 
 set -euo pipefail
 
-log() { printf '%s mount-touch-probe[%s]: %s\n' "$(date -Is)" "$$" "$*" >&2; }
-
-RO_START="${MTP_RO_START:-22:00}"      # read-only during off-hours
-RO_END="${MTP_RO_END:-07:00}"          # off-hours end
-PROBE_MODE_DEFAULT="${MTP_MODE:-auto}" # auto|rw|ro
+# ---------- CONFIG (via env / Ansible template) ----------
+RO_START="${SDP_RO_START}"              # read-only start time
+RO_END="${SDP_RO_END}"                  # read-only end time
+PROBE_MODE_DEFAULT="${SDP_MODE:-auto}"  # auto|rw|ro
 
 TARGETS_FILE="{{ share_drive_probe_targets_file }}"
 TEXTFILE_DIR="{{ share_drive_probe_textfile_dir }}"
 STATE_DIR="{{ share_drive_probe_state_dir }}"
 METRIC_FILE="${TEXTFILE_DIR}/share_drive_probe.prom"
 OP_TIMEOUT="{{ share_drive_probe_op_timeout }}"
-HOST="$(hostname)"
-EPOCH_NOW="$(date +%s)"
-
-# State constants
-STATE_FAIL=0
-STATE_SUCCESS=1
-STATE_ERROR=-1
-
-# Autofs wake options
 AUTOFS_WAKE="{{ share_drive_probe_autofs_wake | default('true') }}"
 AUTOFS_POLL_COUNT={{ share_drive_probe_autofs_poll_count | default(30) }}
 AUTOFS_POLL_SLEEP_SEC={{ share_drive_probe_autofs_poll_sleep_sec | default('0.1') }}
 
-log "start run: host=$HOST targets_file=$TARGETS_FILE"
+HOST="$(hostname)"
+EPOCH_NOW="$(date +%s)"
+LAST_ACTIVE_TS_FILE="${STATE_DIR}/last_active_run.ts"
 
-# Ensure dirs exist
+# ---------- CONSTANTS ----------
+STATE_FAIL=0
+STATE_SUCCESS=1
+STATE_ERROR=-1
+
+# ---------- LOGGING ----------
+LOG_LEVEL="${SDP_LOG_LEVEL:-info}"      # debug|info|warn|error
+_ts()  { date -Is; }
+lvl()  { case "$1" in debug) n=0;; info) n=1;; warn) n=2;; error) n=3;; *) n=1;; esac; echo "$n"; }
+oklvl(){ [ "$(lvl "$LOG_LEVEL")" -le "$(lvl "$1")" ]; }
+
+log()      { oklvl info  && printf '%s mount-touch-probe[%s]: %s\n'  "$(_ts)" "$$" "$*" >&2; }
+log_debug(){ oklvl debug && printf '%s mount-touch-probe[%s] DEBUG: %s\n' "$(_ts)" "$$" "$*" >&2; }
+log_warn() { oklvl warn  && printf '%s mount-touch-probe[%s] WARN:  %s\n' "$(_ts)" "$$" "$*" >&2; }
+log_err()  { oklvl error && printf '%s mount-touch-probe[%s] ERROR: %s\n' "$(_ts)" "$$" "$*" >&2; }
+
+# ---------- PRECHECKS ----------
 mkdir -p "$TEXTFILE_DIR" "$STATE_DIR"
+if [[ ! -f "$TARGETS_FILE" ]]; then
+  log_warn "targets file missing: $TARGETS_FILE (will still emit paused/housekeeping metrics)"
+fi
 
-# Create temp metrics inside textfile dir; atomic rename at end
-tmp_metrics="$(mktemp "{{ share_drive_probe_textfile_dir }}/.share_drive_probe.prom.XXXXXX")"
-trap 'rm -f "$tmp_metrics"' EXIT
-
-# Headers
-{
-  echo "# HELP share_drive_probe_success 1 if probe succeeded, else 0"
-  echo "# TYPE share_drive_probe_success gauge"
-  echo "# HELP share_drive_probe_duration_seconds Time to probe (s)"
-  echo "# TYPE share_drive_probe_duration_seconds gauge"
-  echo "# HELP share_drive_probe_last_run_timestamp_seconds UNIX time of last run on this host"
-  echo "# TYPE share_drive_probe_last_run_timestamp_seconds gauge"
-  echo "# HELP share_drive_probe_state -1=error,0=fail,1=success"
-  echo "# TYPE share_drive_probe_state gauge"
-  echo "# HELP share_drive_probe_state_change_timestamp_seconds UNIX time of last state change"
-  echo "# TYPE share_drive_probe_state_change_timestamp_seconds gauge"
-} >> "$tmp_metrics"
-
-any_fail=0
-
+# ---------- HELPERS ----------
 hash_str() {
   if command -v sha256sum >/dev/null 2>&1; then
     echo -n "$1" | sha256sum | awk '{print $1}'
@@ -67,6 +59,42 @@ is_container() {
   grep -qE '/(lxc|docker|kubepods)/' /proc/1/cgroup 2>/dev/null && return 0 || return 1
 }
 
+# Parse "HH:MM" into seconds since midnight
+hhmm_to_secs() {
+  local t="$1"
+  local h="${t%:*}"
+  local m="${t#*:}"
+  echo $((10#$h*3600 + 10#$m*60))
+}
+
+# Is now in [RO_START, RO_END) with wrap across midnight handled
+is_quiet_hours_now() {
+  local now_s=$(date +%H:%M)
+  local now_secs="$(hhmm_to_secs "$now_s")"
+  local start_secs="$(hhmm_to_secs "$RO_START")"
+  local end_secs="$(hhmm_to_secs "$RO_END")"
+
+  if (( start_secs < end_secs )); then
+    # same-day window: [start, end)
+    (( now_secs >= start_secs && now_secs < end_secs ))
+  else
+    # wraps midnight: [start, 24h) U [0, end)
+    (( now_secs >= start_secs || now_secs < end_secs ))
+  fi
+}
+
+# Compute next resume epoch at today's or tomorrow's RO_END
+next_resume_epoch() {
+  local today_end_epoch tomorrow_end_epoch
+  today_end_epoch="$(date -d "today $RO_END" +%s)"
+  tomorrow_end_epoch="$(date -d "tomorrow $RO_END" +%s)"
+  if (( EPOCH_NOW < today_end_epoch )); then
+    echo "$today_end_epoch"
+  else
+    echo "$tomorrow_end_epoch"
+  fi
+}
+
 wake_autofs_if_needed() {
   local p="$1"
   timeout "$OP_TIMEOUT" bash -c "ls -ld \"$p\" >/dev/null 2>&1 || true" || true
@@ -80,20 +108,11 @@ wake_autofs_if_needed() {
   return 1
 }
 
-is_now_between() {  # is_now_between HH:MM HH:MM (wraps midnight)
-  local start="$1" end="$2" now
-  now="$(date +%H:%M)"
-  if [[ "$start" < "$end" ]]; then
-    [[ "$now" > "$start" && "$now" < "$end" ]]
-  else
-    [[ "$now" > "$start" || "$now" < "$end" ]]
-  fi
-}
-
 decide_probe_mode() {
   case "$PROBE_MODE_DEFAULT" in
     rw|ro) echo "$PROBE_MODE_DEFAULT" ;;
-    auto)  is_now_between "$RO_START" "$RO_END" && echo "ro" || echo "rw" ;;
+    auto)  is_quiet_hours_now && echo "ro" || echo "rw" ;;
+    *)     echo "auto" ;;
   esac
 }
 
@@ -106,97 +125,162 @@ probe_ro() {  # metadata-only checks
   return 0
 }
 
-while IFS=',' read -r mount_path mount_label; do
-  [[ -z "${mount_path// }" ]] && continue
-  [[ "${mount_path:0:1}" == "#" ]] && continue
+# ---------- START ----------
+log "start run: host=$HOST targets_file=$TARGETS_FILE mode_default=$PROBE_MODE_DEFAULT quiet_window=${RO_START}-${RO_END}"
 
-  label="${mount_label:-unknown}"
-  safe_key="$(hash_str "${mount_path}_${label}")"
-  last_state_file="${STATE_DIR}/${safe_key}.state"
+# Prepare temp metrics atomically
+tmp_metrics="$(mktemp "${TEXTFILE_DIR}/.share_drive_probe.prom.XXXXXX")"
+trap 'rm -f "$tmp_metrics"' EXIT
 
-  current_state=$STATE_ERROR
-  reason="error"
-  mode="unknown"
-  dur_s="0"
+# Read/seed last active ts
+last_active_ts="0"
+if [[ -f "$LAST_ACTIVE_TS_FILE" ]]; then
+  last_active_ts="$(cat "$LAST_ACTIVE_TS_FILE" 2>/dev/null || echo 0)"
+fi
 
-  # Decide probe mode up-front
-  mode="$(decide_probe_mode)"
+# Housekeeping headers (Kept small; Prometheus ignores comments anyway)
+{
+  echo "# HELP share_drive_probe_quiet_hours 1 during quiet hours window, else 0"
+  echo "# TYPE share_drive_probe_quiet_hours gauge"
+  echo "# HELP share_drive_probe_paused 1 when probe is paused (no per-mount checks), else 0"
+  echo "# TYPE share_drive_probe_paused gauge"
+  echo "# HELP share_drive_probe_next_resume_timestamp_seconds Next time probing will resume"
+  echo "# TYPE share_drive_probe_next_resume_timestamp_seconds gauge"
+  echo "# HELP share_drive_probe_last_active_run_timestamp_seconds Last time a real probe (non-paused) ran"
+  echo "# TYPE share_drive_probe_last_active_run_timestamp_seconds gauge"
+} >> "$tmp_metrics"
 
-  # If not mounted and we're in RW mode on a container, try to wake autofs
-  if ! findmnt -T "$mount_path" >/dev/null 2>&1; then
-    if [[ "$mode" == "rw" && "$AUTOFS_WAKE" == "true" ]] && is_container; then
-      log "autofs wake attempt for $mount_path (mode=rw, container)"
-      wake_autofs_if_needed "$mount_path" || log "autofs wake timeout: $mount_path"
-    fi
-  fi
+# Compute quiet-hours + next resume
+in_quiet=0
+if is_quiet_hours_now; then in_quiet=1; fi
+next_resume="$(next_resume_epoch)"
 
-  # Check again
-  if ! findmnt -T "$mount_path" >/dev/null 2>&1; then
-    current_state=$STATE_FAIL
-    reason="fail"
-  else
-    if [[ "$mode" == "ro" ]]; then
-      if probe_ro "$mount_path"; then
-        current_state=$STATE_SUCCESS; reason="success"
-      else
-        current_state=$STATE_FAIL; reason="fail"
+# Always export these (night or day)
+echo "share_drive_probe_quiet_hours{host=\"$HOST\",start=\"$RO_START\",end=\"$RO_END\"} $in_quiet" >> "$tmp_metrics"
+echo "share_drive_probe_next_resume_timestamp_seconds{host=\"$HOST\"} $next_resume" >> "$tmp_metrics"
+echo "share_drive_probe_last_active_run_timestamp_seconds{host=\"$HOST\"} $last_active_ts" >> "$tmp_metrics"
+
+# If in quiet hours, PAUSE (no per-mount series)
+if (( in_quiet == 1 )); then
+  echo "share_drive_probe_paused{host=\"$HOST\"} 1" >> "$tmp_metrics"
+  chown root:root "$tmp_metrics"; chmod 0644 "$tmp_metrics"; mv -f "$tmp_metrics" "$METRIC_FILE"
+  log "QUIET HOURS active (${RO_START}–${RO_END}). Paused run. next_resume_epoch=$next_resume last_active=$last_active_ts"
+  trap - EXIT
+  exit 0
+fi
+
+# ACTIVE run below
+echo "share_drive_probe_paused{host=\"$HOST\"} 0" >> "$tmp_metrics"
+
+# Per-mount metric headers
+{
+  echo "# HELP share_drive_probe_success 1 if probe succeeded, else 0"
+  echo "# TYPE share_drive_probe_success gauge"
+  echo "# HELP share_drive_probe_duration_seconds Time to probe (s) for rw mode"
+  echo "# TYPE share_drive_probe_duration_seconds gauge"
+  echo "# HELP share_drive_probe_last_run_timestamp_seconds UNIX time of last run on this host"
+  echo "# TYPE share_drive_probe_last_run_timestamp_seconds gauge"
+  echo "# HELP share_drive_probe_state -1=error,0=fail,1=success"
+  echo "# TYPE share_drive_probe_state gauge"
+  echo "# HELP share_drive_probe_state_change_timestamp_seconds UNIX time of last state change"
+  echo "# TYPE share_drive_probe_state_change_timestamp_seconds gauge"
+} >> "$tmp_metrics"
+
+any_fail=0
+
+if [[ -f "$TARGETS_FILE" ]]; then
+  while IFS=',' read -r mount_path mount_label; do
+    [[ -z "${mount_path// }" ]] && continue
+    [[ "${mount_path:0:1}" == "#" ]] && continue
+
+    label="${mount_label:-unknown}"
+    safe_key="$(hash_str "${mount_path}_${label}")"
+    last_state_file="${STATE_DIR}/${safe_key}.state"
+
+    current_state=$STATE_ERROR
+    reason="error"
+    mode="$(decide_probe_mode)"
+    dur_s="0"
+
+    log_debug "probe start: mount=$mount_path label=$label decided_mode=$mode"
+
+    # If not mounted and (rw + container + autofs_wake), try autofs
+    if ! findmnt -T "$mount_path" >/dev/null 2>&1; then
+      if [[ "$mode" == "rw" && "$AUTOFS_WAKE" == "true" ]] && is_container; then
+        log_debug "autofs wake attempt for $mount_path"
+        if ! wake_autofs_if_needed "$mount_path"; then
+          log_warn "autofs wake timeout: $mount_path"
+        fi
       fi
+    fi
+
+    # Check again
+    if ! findmnt -T "$mount_path" >/dev/null 2>&1; then
+      current_state=$STATE_FAIL
+      reason="not_mounted"
     else
-      probe_file="${mount_path}/.probe.$HOST.$EPOCH_NOW.$$.$RANDOM"
-      start_ns=$(date +%s%N)
-      if timeout "$OP_TIMEOUT" bash -c "umask 077; : > \"$probe_file\"" 2>/dev/null; then
-        # (optional) avoid extra churn:
-        # (command -v sync >/dev/null && sync -d "$probe_file") >/dev/null 2>&1 || true
-        if timeout "$OP_TIMEOUT" rm -f -- "$probe_file" 2>/dev/null; then
-          end_ns=$(date +%s%N)
-          dur_ns=$((end_ns - start_ns))
-          dur_s=$(awk -v ns="$dur_ns" 'BEGIN{printf "%.6f", ns/1e9}')
-          current_state=$STATE_SUCCESS; reason="success"
+      if [[ "$mode" == "ro" ]]; then
+        if probe_ro "$mount_path"; then
+          current_state=$STATE_SUCCESS; reason="success_ro"
         else
-          current_state=$STATE_FAIL; reason="fail"
+          current_state=$STATE_FAIL; reason="ro_check_failed"
         fi
       else
-        current_state=$STATE_ERROR; reason="error"
+        probe_file="${mount_path}/.probe.$HOST.$EPOCH_NOW.$$.$RANDOM"
+        start_ns=$(date +%s%N || true)
+        if timeout "$OP_TIMEOUT" bash -c "umask 077; : > \"$probe_file\"" 2>/dev/null; then
+          if timeout "$OP_TIMEOUT" rm -f -- "$probe_file" 2>/dev/null; then
+            end_ns=$(date +%s%N || true)
+            if [[ -n "${start_ns:-}" && -n "${end_ns:-}" ]]; then
+              dur_ns=$((end_ns - start_ns))
+              dur_s=$(awk -v ns="$dur_ns" 'BEGIN{printf "%.6f", ns/1e9}')
+            fi
+            current_state=$STATE_SUCCESS; reason="success_rw"
+          else
+            current_state=$STATE_FAIL; reason="remove_failed"
+          fi
+        else
+          current_state=$STATE_ERROR; reason="create_failed"
+        fi
       fi
     fi
-  fi
 
-  # State-change timestamp (with mode)
-  last_state=""
-  last_changed_ts=""
-  if [[ -f "$last_state_file" ]]; then
-    # Legacy files may only contain the state; read gracefully.
-    read -r last_state last_changed_ts < "$last_state_file" || true
-  fi
+    # State-change bookkeeping
+    last_state=""; last_changed_ts=""
+    if [[ -f "$last_state_file" ]]; then
+      read -r last_state last_changed_ts < "$last_state_file" || true
+    fi
+    if [[ -z "$last_state" || "$current_state" != "$last_state" || -z "$last_changed_ts" ]]; then
+      last_changed_ts="$EPOCH_NOW"
+    fi
+    printf '%s %s\n' "$current_state" "$last_changed_ts" > "$last_state_file"
 
-  # First observation or actual change ⇒ set changed_ts = now
-  if [[ -z "$last_state" || "$current_state" != "$last_state" || -z "$last_changed_ts" ]]; then
-    last_changed_ts="$EPOCH_NOW"
-  fi
+    # Emit per-mount metrics
+    echo "share_drive_probe_state_change_timestamp_seconds{host=\"$HOST\",mount=\"$mount_path\",label=\"$label\",mode=\"$mode\"} $last_changed_ts" >> "$tmp_metrics"
+    echo "share_drive_probe_state{host=\"$HOST\",mount=\"$mount_path\",label=\"$label\",reason=\"$reason\",mode=\"$mode\"} $current_state" >> "$tmp_metrics"
+    if [[ "$current_state" -eq $STATE_SUCCESS ]]; then
+      echo "share_drive_probe_success{host=\"$HOST\",mount=\"$mount_path\",label=\"$label\",mode=\"$mode\"} 1" >> "$tmp_metrics"
+      [[ "$mode" == "rw" ]] && echo "share_drive_probe_duration_seconds{host=\"$HOST\",mount=\"$mount_path\",label=\"$label\",mode=\"$mode\"} $dur_s" >> "$tmp_metrics"
+    else
+      echo "share_drive_probe_success{host=\"$HOST\",mount=\"$mount_path\",label=\"$label\",mode=\"$mode\"} 0" >> "$tmp_metrics"
+      any_fail=1
+    fi
 
-  # Persist both values (state and changed_ts) for next runs
-  printf '%s %s\n' "$current_state" "$last_changed_ts" > "$last_state_file"
+    log "probe mount=$mount_path label=$label mode=$mode state=$current_state reason=$reason dur_s=$dur_s"
+  done < "$TARGETS_FILE"
+else
+  log_warn "No targets file present; skipping per-mount probes."
+fi
 
-  # ALWAYS expose the timestamp every run, so Prom never goes stale
-  echo "share_drive_probe_state_change_timestamp_seconds{host=\"$HOST\",mount=\"$mount_path\",label=\"$label\",mode=\"$mode\"} $last_changed_ts" >> "$tmp_metrics"
-
-  # Metrics (single set, with mode)
-  echo "share_drive_probe_state{host=\"$HOST\",mount=\"$mount_path\",label=\"$label\",reason=\"$reason\",mode=\"$mode\"} $current_state" >> "$tmp_metrics"
-  if [[ "$current_state" -eq $STATE_SUCCESS ]]; then
-    echo "share_drive_probe_success{host=\"$HOST\",mount=\"$mount_path\",label=\"$label\",mode=\"$mode\"} 1" >> "$tmp_metrics"
-    echo "share_drive_probe_duration_seconds{host=\"$HOST\",mount=\"$mount_path\",label=\"$label\",mode=\"$mode\"} $dur_s" >> "$tmp_metrics"
-  else
-    echo "share_drive_probe_success{host=\"$HOST\",mount=\"$mount_path\",label=\"$label\",mode=\"$mode\"} 0" >> "$tmp_metrics"
-    any_fail=1
-  fi
-
-  log "probe mount=$mount_path label=$label mode=$mode state=$current_state reason=$reason"
-done < "$TARGETS_FILE"
-
+# Top-level run stamps
 echo "share_drive_probe_last_run_timestamp_seconds{host=\"$HOST\"} $EPOCH_NOW" >> "$tmp_metrics"
+echo "$EPOCH_NOW" > "$LAST_ACTIVE_TS_FILE"
+echo "share_drive_probe_last_active_run_timestamp_seconds{host=\"$HOST\"} $EPOCH_NOW" >> "$tmp_metrics"
+
+# Flush metrics atomically
 chown root:root "$tmp_metrics"
 chmod 0644 "$tmp_metrics"
 mv -f "$tmp_metrics" "$METRIC_FILE"
-log "wrote metrics to $METRIC_FILE"
+log "ACTIVE run complete. wrote metrics → $METRIC_FILE any_fail=$any_fail"
 trap - EXIT
 exit "$any_fail"
