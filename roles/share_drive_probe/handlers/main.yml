@@ -2,7 +2,7 @@
 
 ---
 
-# handlers run in the order they are definied in handlers/main.yml
+# handlers run in the order they are definied
 
 - name: reload daemon
   systemd:
@@ -18,4 +18,4 @@
   systemd:
     name: share-drive-probe.service
     state: restarted
-    enabled: true
+    enabled: false
