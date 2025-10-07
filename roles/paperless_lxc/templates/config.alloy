@@ -14,28 +14,31 @@ discovery.docker "self" {
 }
 
 discovery.relabel "docker_labels" {
-  // We only want to export the relabeling rules, not mutate anything here.
   targets = []
 
-  // container: strip leading "/" from container name
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_compose_service"]
+    target_label  = "service"
+  }
+
   rule {
     source_labels = ["__meta_docker_container_name"]
     regex         = "^/(.*)"
     replacement   = "$1"
     target_label  = "container"
   }
+
+  rule {
+    action = "labeldrop"
+    regex  = "service_name|job|container_id|image_id"
+  }
 }
 
 loki.process "log_processor" {
-  forward_to = [loki.write.to_infra.receiver]
+  forward_to = [loki.write.infra.receiver]
 
-  stage.label_drop {
-    values = ["job", "container_id", "image_id"]
-  }
-
-  stage.label_keep {
-    values = ["hostname", "service", "container", "detected_level",]
-  }
+  stage.label_drop { values = ["job", "container_id", "image_id", "service_name"] }
+  stage.label_keep { values = ["hostname", "service", "container", "detected_level",] }
 
   stage.drop {
     older_than          = "1h"
@@ -52,11 +55,22 @@ loki.source.docker "containers" {
     "hostname" = sys.env("NODE_HOSTNAME"),
   }
 
-  // Send to the processor first, then on to Loki
   forward_to = [loki.process.log_processor.receiver]
 }
 
-loki.write "to_infra" {
+loki.source.journal "share_drive_probe" {
+  matches = "_SYSTEMD_UNIT=share-drive-probe.service"
+
+  labels = { 
+    hostname = sys.env("NODE_HOSTNAME"),
+    service  = "share-drive-probe" ,
+  }
+
+  max_age = "24h"
+  forward_to = [loki.write.infra.receiver]
+}
+
+loki.write "infra" {
   endpoint { url = sys.env("LOKI_WRITE_ENDPOINT") }
 }
 

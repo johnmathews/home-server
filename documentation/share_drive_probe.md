@@ -6,14 +6,14 @@ container!) on each VM or LXC that writes Prometheus metrics to the
 node_exporter text_file location.
 
 Deploy it to an individual host using `make <host> tags=shares` or to all hosts
-by `make <shares>`.
+by `make site tags=shares`.
 
-An Ansible role `share_drive_probe` is added to each playbook. It has the tag
-`shares`. This will setup the metrics.
+The Ansible role `share_drive_probe` is added to each playbook. It has the tag
+`shares`. In `inventory.ini` there is a `share_drive_clients` section.
 
 A systemd timer `share_drive_probe.timer` calls a one-shot service
 `share_drive_probe.service`. The service calls a shell script
-`share_drive_probe.sh` that writes Prometheus style metrics to
+`share_drive_probe.sh` that writes Prometheus metrics to
 `/var/lib/node_exporter/textfile_collector/share_drive_probe.prom`.
 
 The `node-exporter` docker service will collect any .prom files in
