@@ -7,12 +7,12 @@ After=network-online.target
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/timeout 85s {{ share_drive_probe_bin }}
+ExecStart={{ share_drive_probe_bin }}
+TimeoutStartSec=90s
 
 # Treat “1” as success (partial failure already lands in Prometheus)
-SuccessExitStatus=1
+SuccessExitStatus=0 1
 
-TimeoutStartSec=90s
 User=root
 Group=root
 UMask=0022
@@ -22,8 +22,8 @@ StandardOutput=journal
 StandardError=journal
 SyslogIdentifier=share-drive-probe
 
-Environment=SDP_MODE=auto
-Environment=SDP_RO_START={{ share_drive_probe_dont_spin_up_start }}
-Environment=SDP_RO_END={{ share_drive_probe_dont_spin_up_end }}
-Environment=SDP_LOG_LEVEL=debug
 Environment=SDP_TZ=Europe/Amsterdam
+Environment=SDP_MODE=auto
+Environment=SDP_RO_START={{ share_drive_probe_quiet_hours_start }}
+Environment=SDP_RO_END={{ share_drive_probe_quiet_hours_end }}
+Environment=SDP_LOG_LEVEL=info

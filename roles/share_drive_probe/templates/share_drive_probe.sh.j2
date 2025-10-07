@@ -14,7 +14,8 @@ TEXTFILE_DIR="{{ share_drive_probe_textfile_dir }}"
 STATE_DIR="{{ share_drive_probe_state_dir }}"
 METRIC_FILE="${TEXTFILE_DIR}/share_drive_probe.prom"
 OP_TIMEOUT="{{ share_drive_probe_op_timeout }}"
-AUTOFS_WAKE="{{ share_drive_probe_autofs_wake | default('true') }}"
+
+AUTOFS_WAKE="{{ share_drive_probe_autofs_wake | default('true') | lower }}"
 AUTOFS_POLL_COUNT={{ share_drive_probe_autofs_poll_count | default(30) }}
 AUTOFS_POLL_SLEEP_SEC={{ share_drive_probe_autofs_poll_sleep_sec | default('0.1') }}
 
@@ -27,16 +28,46 @@ STATE_FAIL=0
 STATE_SUCCESS=1
 STATE_ERROR=-1
 
-# ---------- LOGGING ----------
+# ---------- LOGGING - insert timestamps only if not running from systemd ----------
 LOG_LEVEL="${SDP_LOG_LEVEL:-info}"      # debug|info|warn|error
-_ts()  { date -Is; }
 lvl()  { case "$1" in debug) n=0;; info) n=1;; warn) n=2;; error) n=3;; *) n=1;; esac; echo "$n"; }
 oklvl(){ [ "$(lvl "$LOG_LEVEL")" -le "$(lvl "$1")" ]; }
 
-log()      { oklvl info  && printf '%s mount-touch-probe[%s]: %s\n'  "$(_ts)" "$$" "$*" >&2; }
-log_debug(){ oklvl debug && printf '%s mount-touch-probe[%s] DEBUG: %s\n' "$(_ts)" "$$" "$*" >&2; }
-log_warn() { oklvl warn  && printf '%s mount-touch-probe[%s] WARN:  %s\n' "$(_ts)" "$$" "$*" >&2; }
-log_err()  { oklvl error && printf '%s mount-touch-probe[%s] ERROR: %s\n' "$(_ts)" "$$" "$*" >&2; }
+_ts(){ date -Is; }
+
+# If running under systemd (journal), don't duplicate ts/PID.
+_if_journal(){ [ -n "${JOURNAL_STREAM:-}" ]; }
+
+log() {
+  if ! _if_journal; then
+    oklvl info && printf '%s [%s]: %s\n' "$(_ts)" "$$" "$*" >&2
+  else
+    oklvl info && printf '%s\n' "$*" >&2
+  fi
+}
+log_info(){ log "$@"; }
+
+log_debug(){
+  if ! _if_journal; then
+    oklvl debug && printf '%s [%s] DEBUG: %s\n' "$(_ts)" "$$" "$*" >&2
+  else
+    oklvl debug && printf 'DEBUG: %s\n' "$*" >&2
+  fi
+}
+log_warn(){
+  if ! _if_journal; then
+    oklvl warn && printf '%s [%s] WARN:  %s\n' "$(_ts)" "$$" "$*" >&2
+  else
+    oklvl warn && printf 'WARN:  %s\n' "$*" >&2
+  fi
+}
+log_err(){
+  if ! _if_journal; then
+    oklvl error && printf '%s [%s] ERROR: %s\n' "$(_ts)" "$$" "$*" >&2
+  else
+    oklvl error && printf 'ERROR: %s\n' "$*" >&2
+  fi
+}
 
 # ---------- PRECHECKS ----------
 mkdir -p "$TEXTFILE_DIR" "$STATE_DIR"
@@ -134,7 +165,20 @@ log "start run: host=$HOST targets_file=$TARGETS_FILE mode_default=$PROBE_MODE_D
 
 # Prepare temp metrics atomically
 tmp_metrics="$(mktemp "${TEXTFILE_DIR}/.share_drive_probe.prom.XXXXXX")"
-trap 'rm -f "$tmp_metrics"' EXIT
+
+finalize() {
+  # Always try to publish whatever we have, even on failures/timeouts
+  {
+    # Minimal heartbeat in case we bailed very early
+    echo "share_drive_probe_last_seen_epoch{host=\"$HOST\"} $EPOCH_NOW"
+  } >>"$tmp_metrics" 2>/dev/null || true
+
+  chown root:root "$tmp_metrics" 2>/dev/null || true
+  chmod 0644 "$tmp_metrics" 2>/dev/null || true
+  mv -f "$tmp_metrics" "$METRIC_FILE" 2>/dev/null || true
+}
+
+trap finalize EXIT
 
 # Read/seed last active ts
 last_active_ts="0"
@@ -162,12 +206,23 @@ next_resume="$(next_resume_epoch)"
 # Always export these (night or day)
 echo "share_drive_probe_quiet_hours{host=\"$HOST\",start=\"$RO_START\",end=\"$RO_END\"} $in_quiet" >> "$tmp_metrics"
 echo "share_drive_probe_next_resume_timestamp_seconds{host=\"$HOST\"} $next_resume" >> "$tmp_metrics"
-echo "share_drive_probe_last_active_run_timestamp_seconds{host=\"$HOST\"} $last_active_ts" >> "$tmp_metrics"
 
 # If in quiet hours, PAUSE (no per-mount series)
 if (( in_quiet == 1 )); then
+
   echo "share_drive_probe_paused{host=\"$HOST\"} 1" >> "$tmp_metrics"
+  echo "share_drive_probe_last_active_run_timestamp_seconds{host=\"$HOST\"} $last_active_ts" >> "$tmp_metrics"
   chown root:root "$tmp_metrics"; chmod 0644 "$tmp_metrics"; mv -f "$tmp_metrics" "$METRIC_FILE"
+
+  if [[ -f "$TARGETS_FILE" ]]; then
+    while IFS=',' read -r mount_path mount_label; do
+      [[ -z "${mount_path// }" ]] && continue
+      [[ "${mount_path:0:1}" == "#" ]] && continue
+      label="${mount_label:-unknown}"
+      log_info "skipping (quiet hours): mount=$mount_path target=$label mode=ro"
+    done < "$TARGETS_FILE"
+  fi
+
   log "QUIET HOURS active (${RO_START}–${RO_END}). Paused run. next_resume_epoch=$next_resume last_active=$last_active_ts"
   trap - EXIT
   exit 0
@@ -206,7 +261,7 @@ if [[ -f "$TARGETS_FILE" ]]; then
     mode="$(decide_probe_mode)"
     dur_s="0"
 
-    log_debug "probe start: mount=$mount_path label=$label decided_mode=$mode"
+    log_info "probe start: mount=$mount_path target=$label decided_mode=$mode"
 
     # If not mounted and (rw + container + autofs_wake), try autofs
     if ! findmnt -T "$mount_path" >/dev/null 2>&1; then
@@ -260,17 +315,17 @@ if [[ -f "$TARGETS_FILE" ]]; then
     printf '%s %s\n' "$current_state" "$last_changed_ts" > "$last_state_file"
 
     # Emit per-mount metrics
-    echo "share_drive_probe_state_change_timestamp_seconds{host=\"$HOST\",mount=\"$mount_path\",label=\"$label\",mode=\"$mode\"} $last_changed_ts" >> "$tmp_metrics"
-    echo "share_drive_probe_state{host=\"$HOST\",mount=\"$mount_path\",label=\"$label\",reason=\"$reason\",mode=\"$mode\"} $current_state" >> "$tmp_metrics"
+    echo "share_drive_probe_state_change_timestamp_seconds{host=\"$HOST\",mount=\"$mount_path\",target=\"$label\",mode=\"$mode\"} $last_changed_ts" >> "$tmp_metrics"
+    echo "share_drive_probe_state{host=\"$HOST\",mount=\"$mount_path\",target=\"$label\",reason=\"$reason\",mode=\"$mode\"} $current_state" >> "$tmp_metrics"
     if [[ "$current_state" -eq $STATE_SUCCESS ]]; then
-      echo "share_drive_probe_success{host=\"$HOST\",mount=\"$mount_path\",label=\"$label\",mode=\"$mode\"} 1" >> "$tmp_metrics"
-      [[ "$mode" == "rw" ]] && echo "share_drive_probe_duration_seconds{host=\"$HOST\",mount=\"$mount_path\",label=\"$label\",mode=\"$mode\"} $dur_s" >> "$tmp_metrics"
+      echo "share_drive_probe_success{host=\"$HOST\",mount=\"$mount_path\",target=\"$label\",mode=\"$mode\"} 1" >> "$tmp_metrics"
+      [[ "$mode" == "rw" ]] && echo "share_drive_probe_duration_seconds{host=\"$HOST\",mount=\"$mount_path\",target=\"$label\",mode=\"$mode\"} $dur_s" >> "$tmp_metrics"
     else
-      echo "share_drive_probe_success{host=\"$HOST\",mount=\"$mount_path\",label=\"$label\",mode=\"$mode\"} 0" >> "$tmp_metrics"
+      echo "share_drive_probe_success{host=\"$HOST\",mount=\"$mount_path\",target=\"$label\",mode=\"$mode\"} 0" >> "$tmp_metrics"
       any_fail=1
     fi
 
-    log "probe mount=$mount_path label=$label mode=$mode state=$current_state reason=$reason dur_s=$dur_s"
+    log "probe mount=$mount_path target=$label mode=$mode state=$current_state reason=$reason dur_s=$dur_s"
   done < "$TARGETS_FILE"
 else
   log_warn "No targets file present; skipping per-mount probes."

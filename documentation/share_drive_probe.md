@@ -20,42 +20,58 @@ The `node-exporter` docker service will collect any .prom files in
 `/var/lib/node_exporter/textfile_collector` and add them to its output. See the
 docker compose file for any host that has NFS or SMB drives mounted.
 
-## Some useful commands:
+## Inputs
 
-### Manual reset/start
-
-```sh
-systemctl restart share-drive-probe.timer
-systemctl start share-drive-probe.service
-systemctl daemon-reload
-```
-
-### See whats running
-
-```sh
-
-systemctl status share-drive-probe.service
-journalctl -xeu share-drive-probe.service
-systemctl list-units 'mount-nfs-*.service' 'mnt-nfs-*.mount'
-systemctl list-timers share-drive-probe.timer
-```
-
-### See if the metrics file is being written
+### Metrics file
 
 ```sh
 ls -l /var/lib/node_exporter/textfile_collector/share_drive_probe.prom
 cat /var/lib/node_exporter/textfile_collector/share_drive_probe.prom
 ```
 
+### Targets file
+
+```sh
+ls -l /etc/share_drive_probe/targets.list
+cat /etc/share_drive_probe/targets.list
+```
+
+### Script file
+
+```sh
+ls -l /usr/local/bin/share_drive_probe.sh
+cat /usr/local/bin/share_drive_probe.sh
+```
+
+## Outputs 
+
+### View Prometheus metrics file
+
+```sh
+cat /var/lib/node_exporter/textfile_collector/share_drive_probe.prom
+```
+
+### See the service definition file
+
+```sh
+systemctl cat share-drive-probe.service
+systemctl cat share-drive-probe.timer
+```
+
 ### View systemd logs
 
 ```sh
-journalctl -u share-drive-probe.service
-journalctl -u share-drive-probe.timer -u share-drive-probe.service --since "1 hour ago"
+journalctl -u share-drive-probe.service -n 50
+journalctl -u share-drive-probe.timer -u share-drive-probe.service --since "10 minutes ago"
 
 ```
 
-## Example output:
+### View logs from the last run:
+```
+sudo systemctl status share-drive-probe.service
+```
+
+### Example output:
 
 ```sh
 > cat /var/lib/node_exporter/textfile_collector/share_drive_probe.prom
@@ -75,3 +91,25 @@ share_drive_probe_success{host="immich",mount="/mnt/nfs/immich",label="/mnt/tank
 share_drive_probe_duration_seconds{host="immich",mount="/mnt/nfs/immich",label="/mnt/tank/immich"} 0.012154
 share_drive_probe_last_run_timestamp_seconds{host="immich"} 1759421849
 ```
+
+## Commands:
+
+### Manual reset/start
+
+```sh
+systemctl restart share-drive-probe.timer
+systemctl start share-drive-probe.service
+systemctl daemon-reload
+```
+
+### See whats running
+
+```sh
+
+systemctl status share-drive-probe.service
+journalctl -xeu share-drive-probe.service
+systemctl list-units 'mount-nfs-*.service' 'mnt-nfs-*.mount'
+systemctl list-timers share-drive-probe.timer
+```
+
+
