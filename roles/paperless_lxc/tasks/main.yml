@@ -60,7 +60,7 @@
     dest: "{{ docker_compose_dir }}/.env"
     mode: '0600'
   notify:
-    - restart all containers
+    - restart paperless
   tags: docker
 
 - name: Upload config files 
@@ -80,8 +80,7 @@
   become: true
   tags: [docker, alloy] 
   notify: 
-    # - restart alloy
-    - restart promtail
+    - restart alloy
 
 - name: Copy docker-compose.yml
   ansible.builtin.template:
@@ -90,6 +89,4 @@
     mode: '0644'
     owner: root
     group: root
-  notify:
-    - restart all containers
   tags: docker

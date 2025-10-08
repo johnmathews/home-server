@@ -1,5 +1,3 @@
-// vim: ft=terraform
-
 logging {
   level  = "info"
   format = "logfmt"
@@ -31,16 +29,6 @@ discovery.relabel "docker_labels" {
   }
 }
 
-// ---- Processing pipeline (shared) ----
-loki.process "log_processor" {
-  forward_to = [loki.write.infra.receiver]
-
-  stage.drop {
-    older_than          = "1h"
-    drop_counter_reason = "too_old"
-  }
-}
-
 // ---- Docker log source ----
 loki.source.docker "containers" {
   host          = "unix:///var/run/docker.sock"
@@ -63,6 +51,20 @@ loki.source.journal "share_drive_probe" {
   max_age    = "24h"
   forward_to = [loki.process.log_processor.receiver]
 }
+
+// ---- Processing pipeline (shared) ----
+loki.process "log_processor" {
+  forward_to = [loki.write.infra.receiver]
+
+  stage.drop {
+    older_than          = "1h"
+    drop_counter_reason = "too_old"
+  }
+
+  stage.label_drop { values = ["job", "container_id", "image_id", "service_name"] }
+  stage.label_keep { values = ["hostname", "service", "container", "detected_level",] }
+}
+
 
 // ---- Loki writer ----
 loki.write "infra" {
