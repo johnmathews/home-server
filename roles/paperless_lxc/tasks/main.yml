@@ -37,37 +37,22 @@
     - /srv/apps/paperless/pgdata
     - /srv/apps/paperless/redisdata
     - /srv/apps/alloy
+    - /srv/apps/promtail
   tags: docker
 
-- name: Ensure paperless data directory ownership
+- name: Ensure correct directory ownership
   ansible.builtin.file:
-    path: /srv/apps/paperless/data
-    state: directory
-    owner: "{{ puid }}"
-    group: "{{ pgid }}"
-    mode: '0770'
-  notify: restart all containers
-  tags: docker
-
-- name: Ensure Postgres data directory ownership
-  ansible.builtin.file:
-    path: /srv/apps/paperless/pgdata
+    path: "{{ item }}"
     state: directory
     owner: 999
     group: 999
     mode: '0700'
   notify: restart all containers
   tags: docker
-
-- name: Ensure Redis data directory ownership
-  ansible.builtin.file:
-    path: /srv/apps/paperless/redisdata
-    state: directory
-    owner: 999
-    group: 999
-    mode: '0755'
-  notify: restart all containers
-  tags: docker
+  loop:
+    - /srv/apps/paperless/data
+    - /srv/apps/paperless/pgdata
+    - /srv/apps/paperless/redisdata
 
 - name: Create environment file from template
   ansible.builtin.template:
@@ -78,7 +63,7 @@
     - restart all containers
   tags: docker
 
-- name: Upload alloy config files 
+- name: Upload config files 
   copy:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
@@ -89,10 +74,14 @@
     - alloy:
       src: templates/config.alloy
       dest: /srv/apps/alloy/config.alloy 
+    - promtail:
+      src: templates/promtail-config.yml
+      dest: /srv/apps/promtail/config.yml
   become: true
   tags: [docker, alloy] 
   notify: 
-    - restart alloy
+    # - restart alloy
+    - restart promtail
 
 - name: Copy docker-compose.yml
   ansible.builtin.template:

@@ -20,6 +20,27 @@ services:
       - '/:/host:ro,rslave'
       - '/var/lib/node_exporter/textfile_collector:/textfile:ro'
 
+  # promtail:
+  #   image: grafana/promtail:latest
+  #   container_name: promtail
+  #   command: -config.file=/etc/promtail/config.yml 
+  #   restart: unless-stopped
+  #   volumes:
+  #     # Your config + positions
+  #     - ./promtail/config.yml:/etc/promtail/config.yml:ro
+  #     - promtail_positions:/var/lib/promtail
+  #     # Required for the docker job:
+  #     - /var/run/docker.sock:/var/run/docker.sock:ro
+  #     - /var/lib/docker/containers:/var/lib/docker/containers:ro
+  #     # Required for the journal job:
+  #     - /var/log/journal:/var/log/journal:ro
+  #     - /run/log/journal:/run/log/journal:ro
+  #     - /etc/machine-id:/etc/machine-id:ro
+  #   ports:
+  #     - 9080:9080
+  #     - 1514:1514
+  #     - 1514:1514/udp
+
   alloy:
     image: grafana/alloy:latest
     container_name: alloy
@@ -109,3 +130,6 @@ services:
       - TZ=${TZ}
     volumes:
       - "{{ docker_compose_dir }}//paperless/redisdata:/data"
+
+volumes:
+  promtail_positions: {}

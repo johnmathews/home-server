@@ -1,9 +1,9 @@
 # How often to probe (systemd timer)
-share_drive_probe_interval: 2m
-share_drive_probe_interval_minutes: 2
+share_drive_probe_interval: 3m
+share_drive_probe_interval_minutes: 3
 
 # Per-operation timeout (touch/rm), use GNU timeout syntax (e.g., 10s, 1m)
-share_drive_probe_op_timeout: 10s
+share_drive_probe_op_timeout: 15s
 
 # Script + config install locations
 share_drive_probe_bin: /usr/local/bin/share_drive_probe.sh
@@ -18,8 +18,8 @@ share_drive_probe_textfile_dir_mode: '0755'
 share_drive_probe_metrics_mode: '0644'
 
 share_drive_probe_autofs_wake: true
-share_drive_probe_autofs_poll_count: 30          # 30 * 0.1s = 3s max wait after wake
-share_drive_probe_autofs_poll_sleep_sec: '0.1'
+share_drive_probe_autofs_poll_count: 10          # 10 * 0.5s = 5s max wait after wake
+share_drive_probe_autofs_poll_sleep_sec: '0.5'
 
-share_drive_probe_quiet_hours_start: "22:00"
-share_drive_probe_quiet_hours_end: "10:00"
+share_drive_probe_quiet_hours_start: "22:30"
+share_drive_probe_quiet_hours_end: "09:30"
