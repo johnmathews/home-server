@@ -13,8 +13,15 @@ services:
       LOKI_WRITE_ENDPOINT: "http://192.168.2.106:3100/loki/api/v1/push"
       NODE_HOSTNAME: "tube-archivist"
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+      # config 
       - ./alloy:/etc/alloy:ro 
+      # docker 
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      # journalctl  
+      - /var/log/journal:/var/log/journal:ro
+      - /run/log/journal:/run/log/journal:ro
+      - /etc/machine-id:/etc/machine-id:ro
     command: >
       run --server.http.listen-addr=0.0.0.0:12345
       --storage.path=/var/lib/alloy/data
@@ -91,7 +98,7 @@ services:
       - TA_PASSWORD={{ vault_ta_password }}
       - TA_AUTO_UPDATE_YTDLP=release
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health/"]
       interval: 1m
       timeout: 5s
       retries: 3

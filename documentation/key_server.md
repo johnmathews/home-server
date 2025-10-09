@@ -28,6 +28,10 @@ The key server is defined in a FastAPI script
 
 The keys are stored in the Ansible vault.
 
+## Adding datasets
+
+If you create a new encrypted dataset in TrueNAS, add it to the list in the vault.
+
 ## Endpoints
 
 - A single functional endpoint at `/unlock`.

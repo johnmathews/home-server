@@ -1,74 +1,125 @@
-// vim: ft=terraform
-
 logging {
   level  = "info"
   format = "logfmt"
 }
 
-livedebugging {
-  enabled = true
-}
+livedebugging { enabled = true }
 
 discovery.docker "self" {
   host = "unix:///var/run/docker.sock"
 }
 
 discovery.relabel "docker_labels" {
-  // We only want to export the relabeling rules, not mutate anything here.
-  targets = []
+  targets = [] // no-op here; reuse the rules below
 
-  // container: strip leading "/" from container name
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_compose_service"]
+    target_label  = "service_name"
+  }
   rule {
     source_labels = ["__meta_docker_container_name"]
     regex         = "^/(.*)"
     replacement   = "$1"
     target_label  = "container"
   }
-}
-
-loki.process "log_processor" {
-  forward_to = [loki.process.detect_level.receiver]
-
-  stage.label_drop {
-    values = ["job", "container_id", "image_id"]
-  }
-
-  stage.label_keep {
-    values = ["hostname", "service", "container", "detected_level",]
-  }
-
-  stage.drop {
-    older_than          = "1h"
-    drop_counter_reason = "too_old"
-  }
-}
-
-loki.process "detect_level" {
-  forward_to = [loki.write.to_infra.receiver]
-
-  stage.logfmt {
-    mapping = { "level" = "level" }
-  }
-
-  stage.labels {
-    values = { "detected_level" = "level" }
+  rule {
+    action = "labeldrop"
+    regex  = "job|container_id|image_id"
   }
 }
 
 loki.source.docker "containers" {
   host          = "unix:///var/run/docker.sock"
+
   targets       = discovery.docker.self.targets
   relabel_rules = discovery.relabel.docker_labels.rules
 
+  labels = { hostname = sys.env("NODE_HOSTNAME") }
+  forward_to = [loki.process.normalize.receiver]
+}
+
+loki.source.journal "share_drive_probe" {
+  matches = "_SYSTEMD_UNIT=share-drive-probe.service"
+
   labels = {
-    "hostname" = sys.env("NODE_HOSTNAME"),
+    hostname = sys.env("NODE_HOSTNAME"),
+    service_name  = "share-drive-probe",
   }
 
-  // Send to the processor first, then on to Loki
-  forward_to = [loki.process.log_processor.receiver]
+  max_age    = "24h"
+  forward_to = [loki.process.drop_logs.receiver]
 }
 
-loki.write "to_infra" {
+loki.process "drop_logs" {
+  // 0) Drop very old entries to avoid "entry too old" errors
+  stage.drop {
+    older_than          = "1h"
+    drop_counter_reason = "too_old"
+  }
+
+  forward_to = [loki.process.normalize.receiver]
+}
+
+loki.process "normalize" {
+
+  // 1) Generic level token capture (NestJS, Postgres, many apps)
+  //    Matches: fatal|panic|error|warn|warning|notice|info|log|debug|verbose|trace
+  stage.regex {
+    expression = "(?i)\\b(?P<detected_level>fatal|panic|error|warn(?:ing)?|notice|info|log|debug|verbose|trace)\\b"
+  }
+
+  // 2) Redis: map severity symbol to a name
+  //    . debug, - info, * notice, # warn
+  stage.match {
+    // Safer than an exact name; adjust if you prefer exact container label
+    selector = "{container=~\".*redis.*\"}"
+
+    stage.regex {
+      expression = "\\s(?P<detected_level>[.\\-*#])\\s"
+    }
+    stage.template {
+      source   = "detected_level"
+      template = "{{ if eq .Value \"*\" }}notice{{ else if eq .Value \"#\" }}warn{{ else if eq .Value \"-\" }}info{{ else if eq .Value \".\" }}debug{{ else }}info{{ end }}"
+    }
+  }
+
+  // 3) Normalize: lowercase + canonical names
+  stage.template {
+    source   = "detected_level"
+    template = "{{ if .Value }}{{ ToLower .Value | Replace \"warning\" \"warn\" | Replace \"log\" \"info\" | Replace \"panic\" \"fatal\" }}{{ end }}"
+  }
+
+  // 4) Default when nothing matched
+  stage.template {
+    source   = "detected_level"
+    template = "{{ if .Value }}{{ .Value }}{{ else }}info{{ end }}"
+  }
+
+  // 5) Publish as a label
+  stage.labels {
+    values = { detected_level = "" }
+  }
+
+  // 6) Label hygiene
+  stage.label_drop { values = ["job", "container_id", "image_id", "service"] }
+  stage.label_keep { values = ["hostname", "service_name", "container", "detected_level"] }
+
+
+  forward_to = [loki.process.all_logs.receiver]
+}
+
+loki.process "all_logs" {
+
+  stage.label_drop { 
+    values = ["job", "container_id", "image_id", "service"] 
+  }
+  stage.label_keep { 
+    values = ["hostname", "service_name", "container", "detected_level",] 
+  }
+
+  forward_to = [loki.write.infra.receiver]
+}
+
+loki.write "infra" {
   endpoint { url = sys.env("LOKI_WRITE_ENDPOINT") }
 }
-

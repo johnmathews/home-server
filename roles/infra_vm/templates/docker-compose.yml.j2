@@ -16,25 +16,33 @@ services:
     restart: unless-stopped
 
   alloy:
-   image: grafana/alloy:latest
-   container_name: alloy
-   privileged: true
-   environment:
-     - NODE_HOSTNAME=infra_vm 
-     - LOKI_WRITE_ENDPOINT=http://loki:3100/loki/api/v1/push
-   ports:
-     - 12345:12345
-     - 4317:4317
-     - 4318:4318
-   volumes:
-     - ./alloy/config.alloy:/etc/alloy/config.alloy
-     - /var/run/docker.sock:/var/run/docker.sock
-     - /:/rootfs:ro
-     - /var/run:/var/run:rw
-     - /sys:/sys:ro
-     - /var/lib/docker/:/var/lib/docker:ro
-     - /dev/disk/:/dev/disk:ro
-   command: run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
+    image: grafana/alloy:latest
+    container_name: alloy
+    restart: unless-stopped
+    environment:
+      LOKI_WRITE_ENDPOINT: "http://192.168.2.106:3100/loki/api/v1/push"
+      NODE_HOSTNAME: "infra"
+    volumes:
+      # config 
+      - ./alloy:/etc/alloy:ro 
+      # docker 
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      # journalctl  
+      - /var/log/journal:/var/log/journal:ro
+      - /run/log/journal:/run/log/journal:ro
+      - /etc/machine-id:/etc/machine-id:ro
+    command: >
+      run --server.http.listen-addr=0.0.0.0:12345
+      --storage.path=/var/lib/alloy/data
+      /etc/alloy/config.alloy
+    ports:
+      - "12345:12345"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
 
   mkdocs:
     image: squidfunk/mkdocs-material:latest

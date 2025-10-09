@@ -55,7 +55,7 @@
           href: http://192.168.2.106:3000
     - Loki:
         - abbr: 
-          href: http://192.168.2.106:3100
+          href: http://192.168.2.106:3100/config
     - Prometheus:
         - abbr: 
           href: http://192.168.2.115:9090
