@@ -10,32 +10,42 @@ discovery.docker "self" {
 }
 
 discovery.relabel "docker_labels" {
-  targets = [] // no-op here; reuse the rules below
+  targets = []
 
+  // Compose service → service_name
   rule {
     source_labels = ["__meta_docker_container_label_com_docker_compose_service"]
     target_label  = "service_name"
   }
+
+  // container = name without leading slash
   rule {
     source_labels = ["__meta_docker_container_name"]
     regex         = "^/(.*)"
     replacement   = "$1"
     target_label  = "container"
   }
+
+  // If service_name is empty, set it from container
   rule {
-    action = "labeldrop"
-    regex  = "job|container_id|image_id"
+    target_label  = "service_name"
+    replacement   = "$1"
+    source_labels = ["service_name","container"]
+    regex         = "^(?:|)(.*)$"
   }
+
+  rule { action = "labeldrop"; regex = "job|container_id|image_id" }
 }
 
 loki.source.docker "containers" {
   host          = "unix:///var/run/docker.sock"
+  max_age       = "24h"
 
   targets       = discovery.docker.self.targets
   relabel_rules = discovery.relabel.docker_labels.rules
 
   labels = { hostname = sys.env("NODE_HOSTNAME") }
-  forward_to = [loki.process.normalize.receiver]
+  forward_to = [loki.process.drop_logs.receiver]
 }
 
 loki.source.journal "share_drive_probe" {
@@ -61,49 +71,41 @@ loki.process "drop_logs" {
 }
 
 loki.process "normalize" {
+  // Try to parse a logfmt key first (e.g., "level=INFO")
+  stage.logfmt {
+    mapping = { "level" = "detected_level" }
+  }
 
-  // 1) Generic level token capture (NestJS, Postgres, many apps)
-  //    Matches: fatal|panic|error|warn|warning|notice|info|log|debug|verbose|trace
+  // Fallback regex if the above didn’t set it
   stage.regex {
     expression = "(?i)\\b(?P<detected_level>fatal|panic|error|warn(?:ing)?|notice|info|log|debug|verbose|trace)\\b"
   }
 
-  // 2) Redis: map severity symbol to a name
-  //    . debug, - info, * notice, # warn
+  // Redis mapper (unchanged)
   stage.match {
-    // Safer than an exact name; adjust if you prefer exact container label
     selector = "{container=~\".*redis.*\"}"
-
-    stage.regex {
-      expression = "\\s(?P<detected_level>[.\\-*#])\\s"
-    }
+    stage.regex { expression = "\\s(?P<detected_level>[.\\-*#])\\s" }
     stage.template {
       source   = "detected_level"
       template = "{{ if eq .Value \"*\" }}notice{{ else if eq .Value \"#\" }}warn{{ else if eq .Value \"-\" }}info{{ else if eq .Value \".\" }}debug{{ else }}info{{ end }}"
     }
   }
 
-  // 3) Normalize: lowercase + canonical names
+  // Normalize case/aliases (unchanged)
   stage.template {
     source   = "detected_level"
     template = "{{ if .Value }}{{ ToLower .Value | Replace \"warning\" \"warn\" | Replace \"log\" \"info\" | Replace \"panic\" \"fatal\" }}{{ end }}"
   }
 
-  // 4) Default when nothing matched
+  // Default to info if still empty (unchanged)
   stage.template {
     source   = "detected_level"
     template = "{{ if .Value }}{{ .Value }}{{ else }}info{{ end }}"
   }
 
-  // 5) Publish as a label
-  stage.labels {
-    values = { detected_level = "" }
-  }
-
-  // 6) Label hygiene
-  stage.label_drop { values = ["job", "container_id", "image_id", "service"] }
-  stage.label_keep { values = ["hostname", "service_name", "container", "detected_level"] }
-
+  // Publish + hygiene
+  stage.labels { values = { detected_level = "detected_level" } }
+  stage.label_drop { values = ["job", "container_id", "image_id", "service", "detected_level_extracted"] }
 
   forward_to = [loki.process.all_logs.receiver]
 }
