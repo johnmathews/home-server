@@ -34,12 +34,14 @@ discovery.relabel "docker_labels" {
     regex         = "^(?:|)(.*)$"
   }
 
-  rule { action = "labeldrop"; regex = "job|container_id|image_id" }
+  rule { 
+    action = "labeldrop" 
+    regex = "job|container_id|image_id"
+  }
 }
 
 loki.source.docker "containers" {
   host          = "unix:///var/run/docker.sock"
-  max_age       = "24h"
 
   targets       = discovery.docker.self.targets
   relabel_rules = discovery.relabel.docker_labels.rules
@@ -71,17 +73,17 @@ loki.process "drop_logs" {
 }
 
 loki.process "normalize" {
-  // Try to parse a logfmt key first (e.g., "level=INFO")
+  // 1) try logfmt first (e.g., "level=INFO")
   stage.logfmt {
     mapping = { "level" = "detected_level" }
   }
 
-  // Fallback regex if the above didn’t set it
+  // 2) fallback regex if logfmt didn’t set it
   stage.regex {
-    expression = "(?i)\\b(?P<detected_level>fatal|panic|error|warn(?:ing)?|notice|info|log|debug|verbose|trace)\\b"
+    expression = "(?i)\\b(?P<detected_level>fatal|panic|error|err|warn(?:ing)?|notice|info|log|debug|verbose|trace)\\b"
   }
 
-  // Redis mapper (unchanged)
+  // 3) special Redis mapper
   stage.match {
     selector = "{container=~\".*redis.*\"}"
     stage.regex { expression = "\\s(?P<detected_level>[.\\-*#])\\s" }
@@ -91,19 +93,25 @@ loki.process "normalize" {
     }
   }
 
-  // Normalize case/aliases (unchanged)
+  // 4) force lowercase ONLY (no aliasing here)
   stage.template {
     source   = "detected_level"
-    template = "{{ if .Value }}{{ ToLower .Value | Replace \"warning\" \"warn\" | Replace \"log\" \"info\" | Replace \"panic\" \"fatal\" }}{{ end }}"
+    template = "{{ ToLower .Value }}"
   }
 
-  // Default to info if still empty (unchanged)
+  // 5) alias/normalize equivalents (input is already lowercase)
+  stage.template {
+    source   = "detected_level"
+    template = "{{ .Value | Replace \"warning\" \"warn\" | Replace \"err\" \"error\" | Replace \"log\" \"info\" | Replace \"panic\" \"fatal\" }}"
+  }
+
+  // 6) default if still empty
   stage.template {
     source   = "detected_level"
     template = "{{ if .Value }}{{ .Value }}{{ else }}info{{ end }}"
   }
 
-  // Publish + hygiene
+  // 7) publish + hygiene
   stage.labels { values = { detected_level = "detected_level" } }
   stage.label_drop { values = ["job", "container_id", "image_id", "service", "detected_level_extracted"] }
 
