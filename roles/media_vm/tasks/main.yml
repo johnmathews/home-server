@@ -104,8 +104,6 @@
     mode: '0644'
   notify: 
     - restart media stack
-    - restart alloy
-
   tags: docker
 
 - name: Upload alloy config file
@@ -120,7 +118,7 @@
       src: templates/config.alloy
       dest: /srv/media/config/alloy/config.alloy 
   become: true
-  tags: [docker, alloy] 
+  tags: [alloy] 
   notify: restart alloy
 
 - name: Create environment file from template

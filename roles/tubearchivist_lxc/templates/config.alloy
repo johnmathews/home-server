@@ -79,6 +79,14 @@ loki.process "normalize" {
     mapping = { "level" = "detected_level" }
   }
 
+  // cant get this to work
+  //stage.match {
+  //    selector = "^\\s*[A-Za-z_][A-Za-z0-9_.-]*=\\S+(?:\\s+[A-Za-z_][A-Za-z0-9_.-]*=\\S+){1,}\\s*$"
+  //    stage.logfmt {
+  //      mapping = { "level" = "detected_level" }
+  //    }
+  //}
+
   // 2) fallback regex if logfmt didn’t set it
   stage.regex {
     expression = "(?i)\\b(?P<detected_level>fatal|panic|error|err|warn(?:ing)?|notice|info|log|debug|verbose|trace)\\b"

@@ -15,7 +15,7 @@ services:
       LOG_LEVEL: "warn"
     volumes:
       # config 
-      - ./alloy:/etc/alloy:ro 
+      - ./config/alloy:/etc/alloy:ro 
       # docker 
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
