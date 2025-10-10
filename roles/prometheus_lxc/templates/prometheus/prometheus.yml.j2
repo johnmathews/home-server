@@ -42,7 +42,7 @@ scrape_configs:
       - targets: ['192.168.2.115:18080']
         labels: { hostname: 'prometheus' }
       - targets: ['192.168.2.116:18080']
-        labels: { hostname: 'tubearchivist' }
+        labels: { hostname: 'tube-archivist' }
       - targets: ['192.168.2.117:18080']
         labels: { hostname: 'paperless' }
       - targets: ['192.168.2.119:18080']
@@ -58,20 +58,24 @@ scrape_configs:
     static_configs:
       - targets: ['192.168.2.214:9100']
         labels: { hostname: 'proxmox' }
+      - targets: ['192.168.2.104:9100']
+        labels: { hostname: 'truenas' }
       - targets: ['192.168.2.105:9100']
         labels: { hostname: 'media' }
       - targets: ['192.168.2.106:9100']
         labels: { hostname: 'infra' }
-      - targets: ['192.168.2.104:9100']
-        labels: { hostname: 'truenas' }
-      - targets: ['192.168.2.117:9100']
-        labels: { hostname: 'paperless' }
-      - targets: ['192.168.2.113:9100']
-        labels: { hostname: 'immich' }
       - targets: ['192.168.2.110:9100']
         labels: { hostname: 'jellyfin' }
+      - targets: ['192.168.2.113:9100']
+        labels: { hostname: 'immich' }
+      - targets: ['192.168.2.115:9100']
+        labels: { hostname: 'prometheus' }
       - targets: ['192.168.2.116:9100']
-        labels: { hostname: 'tubearchivist' }
+        labels: { hostname: 'tube-archivist' }
+      - targets: ['192.168.2.117:9100']
+        labels: { hostname: 'paperless' }
+      - targets: ['192.168.2.119:9100']
+        labels: { hostname: 'open-webui' }
     relabel_configs:
       - source_labels: [__address__]
         regex: '([^:]+)(?::\d+)?'

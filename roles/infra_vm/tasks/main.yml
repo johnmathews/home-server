@@ -107,7 +107,7 @@
     group: docker
     mode: '0644'
   notify: update docker compose stack
-  tags: [docker, grafana, docs, loki, alloy]
+  tags: docker 
 
 - name: Upload .env file from template
   ansible.builtin.template:
@@ -158,4 +158,4 @@
     dependencies: true
     remove_orphans: true
   become: false
-  tags: [docker, grafana, docs, loki, alloy]
+  tags: [docker]

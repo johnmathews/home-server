@@ -22,6 +22,7 @@ services:
     environment:
       LOKI_WRITE_ENDPOINT: "http://192.168.2.106:3100/loki/api/v1/push"
       NODE_HOSTNAME: "infra"
+      LOG_LEVEL: "warn"
     volumes:
       # config 
       - ./alloy:/etc/alloy:ro 
@@ -101,6 +102,7 @@ services:
     ports:
       - "3000:3000"
     environment:
+      - GF_LOG_LEVEL=warn
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
       - GF_SERVER_DOMAIN=charts.itsa.pizza
@@ -108,7 +110,6 @@ services:
       - GF_SECURITY_COOKIE_SAMESITE=none
       - GF_SECURITY_COOKIE_SECURE=true
       - GF_SERVER_SERVE_FROM_SUB_PATH=false
-      - GF_SECURITY_ALLOW_EMBEDDING=true
       - GF_SECURITY_ALLOW_EMBEDDING=true
       - GF_INSTALL_PLUGINS=grafana-polystat-panel
       # - GF_FEATURE_TOGGLES_ENABLE=dashboardNewLayouts

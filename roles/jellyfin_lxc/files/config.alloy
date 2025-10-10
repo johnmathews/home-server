@@ -1,5 +1,5 @@
 logging {
-  level  = "info"
+  level  = sys.env("LOG_LEVEL")
   format = "logfmt"
 }
 
@@ -28,10 +28,11 @@ discovery.relabel "docker_labels" {
 
   // If service_name is empty, set it from container
   rule {
+    action       = "replace"
+    source_labels = ["service_name","container"]
+    regex         = "^(?:|);(.*)$"
     target_label  = "service_name"
     replacement   = "$1"
-    source_labels = ["service_name","container"]
-    regex         = "^(?:|)(.*)$"
   }
 
   rule { 

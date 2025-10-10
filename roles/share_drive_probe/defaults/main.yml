@@ -1,6 +1,6 @@
 # How often to probe (systemd timer)
-share_drive_probe_interval: 3m
-share_drive_probe_interval_minutes: 3
+share_drive_probe_interval: 5m
+share_drive_probe_interval_minutes: 5
 
 # Per-operation timeout (touch/rm), use GNU timeout syntax (e.g., 10s, 1m)
 share_drive_probe_op_timeout: 15s

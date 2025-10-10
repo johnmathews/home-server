@@ -12,6 +12,7 @@ services:
     environment:
       LOKI_WRITE_ENDPOINT: "http://192.168.2.106:3100/loki/api/v1/push"
       NODE_HOSTNAME: "media"
+      LOG_LEVEL: "warn"
     volumes:
       # config 
       - ./alloy:/etc/alloy:ro 

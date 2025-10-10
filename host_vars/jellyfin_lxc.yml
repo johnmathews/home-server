@@ -16,7 +16,4 @@ smb_shares:
   - name: media 
     target: /mnt/media/media
     mountpoint: /mnt/media/media
-  - name: youtube-kids 
-    target: /mnt/youtube-kids
-    mountpoint: /mnt/media/youtube-kids
 
