@@ -33,3 +33,15 @@
     dependencies: true
     remove_orphans: true
   become: false
+
+
+- name: restart gluetun
+  community.docker.docker_compose_v2:
+    project_src: "{{ media_stack_base_dir }}"
+    services:
+      - gluetun
+    state: present
+    recreate: always
+    dependencies: true
+    remove_orphans: true
+  become: false

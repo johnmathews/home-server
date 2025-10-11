@@ -62,14 +62,11 @@ services:
       - 3189:3189 # qbittorrent endpoint port
       - 6881:6881 # BitTorrent port
       - 8081:8081 # sabnzbd WebUI, set in config file.
-      # - 8085:8085 # sabnzbd WebUI, set in config file. DELETE
       - 6881:6881/udp
       - 8000:8000/tcp # control server port
-      # - 8888:8888/tcp # HTTP proxy
-      # - 8388:8388/tcp # Shadowsocks
-      # - 8388:8388/udp # Shadowsocks
     volumes:
       - /srv/media/config/gluetun:/gluetun
+      # - /srv/media/config/gluetun/auth:/gluetun/auth/
     healthcheck:
       test: ["CMD", "wget", "-qO-", "https://ifconfig.me"]
       interval: 60s

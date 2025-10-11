@@ -1,0 +1,12 @@
+# /srv/media/config/gluetun/auth/config.toml
+
+[[roles]]
+name   = "media-stack"
+# add routes you actually use; these two are the common ones
+routes = [
+  "GET /v1/publicip/ip",
+  "GET /v1/openvpn/portforwarded"
+]
+auth     = "basic"
+username = "{{ vault_gluetun_user }}"
+# password = "{{ vault_gluetun_password }}"
