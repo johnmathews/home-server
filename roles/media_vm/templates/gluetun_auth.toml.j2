@@ -1,12 +1,26 @@
-# /srv/media/config/gluetun/auth/config.toml
+# vim: ft=toml
 
 [[roles]]
-name   = "media-stack"
-# add routes you actually use; these two are the common ones
-routes = [
-  "GET /v1/publicip/ip",
-  "GET /v1/openvpn/portforwarded"
-]
+name = "basic"
+
+# Define a list of routes with the syntax "Http-Method /path"
+routes = ["GET /v1/publicip/ip"]
+
+# Define an authentication method with its parameters
 auth     = "basic"
 username = "{{ vault_gluetun_user }}"
-# password = "{{ vault_gluetun_password }}"
+password = "{{ vault_gluetun_password }}"
+
+
+[[roles]]
+name = "api"
+
+# Define a list of routes with the syntax "Http-Method /path"
+routes = ["GET /v1/publicip/ip"]
+
+# Define an authentication method with its parameters
+auth = "apikey"
+apikey = "plumbers9splendid_TONI"
+
+
+
