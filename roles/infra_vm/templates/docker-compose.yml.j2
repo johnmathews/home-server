@@ -101,18 +101,6 @@ services:
     container_name: grafana
     ports:
       - "3000:3000"
-    environment:
-      - GF_LOG_LEVEL=warn
-      - GF_AUTH_ANONYMOUS_ENABLED=true
-      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
-      - GF_SERVER_DOMAIN=charts.itsa.pizza
-      - GF_SERVER_ROOT_URL=https://charts.itsa.pizza
-      - GF_SECURITY_COOKIE_SAMESITE=none
-      - GF_SECURITY_COOKIE_SECURE=true
-      - GF_SERVER_SERVE_FROM_SUB_PATH=false
-      - GF_SECURITY_ALLOW_EMBEDDING=true
-      # - GF_INSTALL_PLUGINS=grafana-polystat-panel
-      # - GF_FEATURE_TOGGLES_ENABLE=dashboardNewLayouts
     volumes:
       - /srv/infra/grafana/data:/var/lib/grafana
       - /srv/infra/grafana/grafana.ini:/etc/grafana/grafana.ini

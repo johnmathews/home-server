@@ -132,17 +132,17 @@
     owner: "{{ docker_user }}"
     group: docker 
     mode: '0600'
-  tags: [atuin, docker]
+  tags: atuin
 
 - name: Upload grafana config.ini 
   ansible.builtin.template:
     src: files/grafana/grafana.ini 
     dest: /srv/infra/grafana/grafana.ini 
-    owner: "{{ docker_user }}"
-    group: docker 
+    owner: 472
+    group: 472
     mode: '0600'
   notify: restart grafana
-  tags: [grafana]
+  tags: grafana
 
 - name: Upload alloy and loki config files 
   copy:
@@ -166,15 +166,15 @@
 
 - name: Include file-browser tasks 
   import_tasks: file-browser.yml
-  tags: [file-browser, docker]
+  tags: file-browser
 
 - name: Include homepage tasks
   import_tasks: homepage.yml
-  tags: [homepage, docker]
+  tags: homepage
 
 - name: Include mkdocs tasks
   import_tasks: mkdocs.yml
-  tags: [docs, docker]
+  tags: docs, docker
 
 - name: Launch containers
   community.docker.docker_compose_v2:
@@ -184,4 +184,4 @@
     dependencies: true
     remove_orphans: true
   become: false
-  tags: [docker]
+  tags: docker
