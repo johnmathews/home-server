@@ -72,12 +72,23 @@ sudo systemctl disable nginx
 sudo systemctl reload nginx
 ```
 
-### Debug
+## See what timers are active
+
+```sh
+systemctl list-timers --all
+systemctl list-timers --all | grep Docker
+```
+
+### Start a service 
 
 ```sh
 systemctl start mount-touch-probe.service
-journalctl -u mount-touch-probe.service -n 50 -e
+```
 
+### Check the logs for a service 
+
+```sh
+journalctl -u mount-touch-probe.service -n 50 -e
 ```
 
 ## Service Lifecycle

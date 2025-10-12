@@ -72,5 +72,5 @@ nfs_opts_items:
 
 nfs_opts: "{{ nfs_opts_items | join(',') }}"
 
-docker_quiet_hours_start: "23:45"
-docker_quiet_hours_end: "07:45"
+docker_quiet_hours_start: "23:55"
+docker_quiet_hours_end: "08:45"

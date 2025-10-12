@@ -63,6 +63,29 @@ loki.source.journal "share_drive_probe" {
   forward_to = [loki.process.drop_logs.receiver]
 }
 
+loki.source.journal "docker_quiet_pause" {
+  matches = "_SYSTEMD_UNIT=docker-quiet@pause.service"
+
+  labels = {
+    hostname = sys.env("NODE_HOSTNAME"),
+    service_name  = "share-drive-probe",
+  }
+
+  max_age    = "24h"
+  forward_to = [loki.process.drop_logs.receiver]
+}
+loki.source.journal "docker_quiet_unpause" {
+  matches = "_SYSTEMD_UNIT=docker-quiet@unpause.service"
+
+  labels = {
+    hostname = sys.env("NODE_HOSTNAME"),
+    service_name  = "share-drive-probe",
+  }
+
+  max_age    = "24h"
+  forward_to = [loki.process.drop_logs.receiver]
+}
+
 loki.process "drop_logs" {
   // 0) Drop very old entries to avoid "entry too old" errors
   stage.drop {

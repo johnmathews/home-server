@@ -34,7 +34,6 @@
     remove_orphans: true
   become: false
 
-
 - name: restart gluetun
   community.docker.docker_compose_v2:
     project_src: "{{ media_stack_base_dir }}"
@@ -45,3 +44,13 @@
     dependencies: true
     remove_orphans: true
   become: false
+
+
+- name: restart quiet-hours timers 
+  become: true
+  systemd:
+    name: "{{ item }}"
+    state: restarted
+  loop:
+    - docker-quiet@pause.timer
+    - docker-quiet@unpause.timer

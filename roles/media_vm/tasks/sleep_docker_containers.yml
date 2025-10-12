@@ -11,7 +11,7 @@
 
 - name: Install docker-quiet script
   become: true
-  template:
+  ansible.builtin.copy:
     src: templates/sleep_containers/docker-quiet.sh
     dest: /usr/local/bin/docker-quiet.sh
     owner: root
