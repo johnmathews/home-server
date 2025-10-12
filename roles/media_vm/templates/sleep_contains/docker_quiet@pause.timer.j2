@@ -1,0 +1,9 @@
+[Unit]
+Description=Pause media containers at {{ docker_quiet_hours_start }}
+
+[Timer]
+OnCalendar={{ docker_quiet_hours_start }}
+Persistent=true
+
+[Install]
+WantedBy=timers.target
