@@ -6,4 +6,4 @@ After=docker.service
 [Service]
 Type=oneshot
 # Run as root unless your service account is in the docker group
-ExecStart=/usr/local/bin/docker-quiet.sh %i
+ExecStart=/usr/local/bin/docker-sleep.sh %i

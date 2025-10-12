@@ -66,6 +66,12 @@ sudo systemctl enable nginx
 sudo systemctl disable nginx
 ```
 
+### reload systemd
+
+```sh
+systemctl daemon-reload
+```
+
 ### Reload configs (without restart if supported)
 
 ```sh

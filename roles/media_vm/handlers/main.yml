@@ -46,11 +46,11 @@
   become: false
 
 
-- name: restart quiet-hours timers 
+- name: restart sleep-hours timers 
   become: true
   systemd:
     name: "{{ item }}"
     state: restarted
   loop:
-    - docker-quiet@pause.timer
-    - docker-quiet@unpause.timer
+    - docker-sleep@pause.timer
+    - docker-sleep@unpause.timer

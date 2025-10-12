@@ -3,61 +3,61 @@
 - name: Ensure quiet-hours directory exists
   become: true
   file:
-    path: /etc/quiet-hours
+    path: /etc/sleep-hours
     state: directory
     owner: root
     group: root
     mode: '0755'
 
-- name: Install docker-quiet script
+- name: Install docker-sleep script
   become: true
   ansible.builtin.copy:
-    src: templates/sleep_containers/docker-quiet.sh
-    dest: /usr/local/bin/docker-quiet.sh
+    src: templates/sleep_containers/docker-sleep.sh
+    dest: /usr/local/bin/docker-sleep.sh
     owner: root
     group: root
     mode: '0755'
-  notify: restart quiet-hours timers
+  notify: restart sleep-hours timers
 
 - name: Install systemd service (templated @ service)
   become: true
   template:
-    src: templates/sleep_containers/docker-quiet@.service
-    dest: /etc/systemd/system/docker-quiet@.service
+    src: templates/sleep_containers/docker-sleep@.service
+    dest: /etc/systemd/system/docker-sleep@.service
     owner: root
     group: root
     mode: '0644'
-  notify: restart quiet-hours timers
+  notify: restart sleep-hours timers
 
 - name: Install pause timer
   become: true
   template:
-    src: templates/sleep_containers/docker-quiet@pause.timer.j2
-    dest: /etc/systemd/system/docker-quiet@pause.timer
+    src: templates/sleep_containers/docker-sleep@pause.timer.j2
+    dest: /etc/systemd/system/docker-sleep@pause.timer
     owner: root
     group: root
     mode: '0644'
-  notify: restart quiet-hours timers
+  notify: restart sleep-hours timers
 
 - name: Install unpause timer
   become: true
   template:
-    src: templates/sleep_containers/docker-quiet@unpause.timer.j2
-    dest: /etc/systemd/system/docker-quiet@unpause.timer
+    src: templates/sleep_containers/docker-sleep@unpause.timer.j2
+    dest: /etc/systemd/system/docker-sleep@unpause.timer
     owner: root
     group: root
     mode: '0644'
-  notify: restart quiet-hours timers
+  notify: restart sleep-hours timers
 
 - name: Install containers list
   become: true
   template:
     src: templates/sleep_containers/containers.list
-    dest: /etc/quiet-hours/containers.list
+    dest: /etc/sleep-hours/containers.list
     owner: root
     group: root
     mode: '0644'
-  notify: restart quiet-hours timers
+  notify: restart sleep-hours timers
 
 - name: Enable and start timers
   become: true
@@ -67,5 +67,5 @@
     state: started
     daemon_reload: true
   loop:
-    - docker-quiet@pause.timer
-    - docker-quiet@unpause.timer
+    - docker-sleep@pause.timer
+    - docker-sleep@unpause.timer
