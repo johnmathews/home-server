@@ -74,3 +74,7 @@ nfs_opts: "{{ nfs_opts_items | join(',') }}"
 
 docker_quiet_hours_start: "23:55"
 docker_quiet_hours_end: "08:45"
+
+uptime_kuma_url: "http://192.168.2.106:3001"
+uptime_kuma_user: "john"
+

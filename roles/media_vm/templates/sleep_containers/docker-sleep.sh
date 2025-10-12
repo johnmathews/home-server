@@ -70,6 +70,22 @@ normalize_state() {
   fi
 }
 
+kuma_notify() {
+  # $1: pause|resume  $2: container
+  # We let kumactl print its own logfmt line; we add one line to correlate outcome.
+  local act="$1" name="$2"
+  if out="$(/usr/local/bin/kumactl.py "$act" --container "$name" 2>&1)"; then
+    # kumactl itself prints a logfmt line; echo it as-is so it shows in journal
+    echo "$out"
+    log info "$name" notified kuma_ok action="$act"
+  else
+    local rc=$?
+    # print whatever kumactl said; then summarize
+    [[ -n "$out" ]] && echo "$out"
+    log warn "$name" notified kuma_failed action="$act" rc="$rc"
+  fi
+}
+
 total=0 changed=0 skipped=0 failed=0
 
 handle_one() {
@@ -102,6 +118,7 @@ handle_one() {
         log info "$name" changed paused "$pre"
       fi
       (( changed += 1 ))
+      kuma_notify pause "$name"
     else
       rc=$?; log error "$name" failed pause_error "$pre" rc="$rc" err="$(printf %q "$out")"
       (( failed += 1 ))
@@ -122,6 +139,7 @@ handle_one() {
         log info "$name" changed unpaused "$pre"
       fi
       (( changed += 1 ))
+      kuma_notify resume "$name"
     else
       rc=$?; log error "$name" failed unpause_error "$pre" rc="$rc" err="$(printf %q "$out")"
       (( failed += 1 ))
