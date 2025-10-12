@@ -197,7 +197,6 @@
   when: not compose_file.stat.exists
   tags: docker
 
-
 - name: Set permissions of file browser config directory
   ansible.builtin.command: chown -R 1000:1000 "{{ media_stack_base_dir }}/config/filebrowser"
   become: true
@@ -212,3 +211,5 @@
   become: false
   tags: docker
 
+- import_tasks: sleep_docker_containers.yml
+  tags: sleep
