@@ -82,22 +82,38 @@
     mode: '0755'
   tags: [docker]
 
-- name: Ensure required directories exist
-  file:
-    path: "{{item}}"
+# - name: Ensure required directories exist
+#   file:
+#     path: "{{item}}"
+#     state: directory
+#     owner: root
+#     group: root
+#     mode: '0755'
+#   loop:
+#     - /srv/infra/grafana/config
+#     - /srv/infra/loki/data
+#     - /srv/infra/alloy/data
+#   tags: [grafana, loki, alloy]
+#   notify: 
+#     - restart alloy
+#     - restart loki
+#     - restart grafana
+
+- name: Ensure required directories exist (one task)
+  ansible.builtin.file:
+    path: "{{ item.path }}"
     state: directory
     owner: root
     group: root
     mode: '0755'
   loop:
-    - /srv/infra/grafana/config
-    - /srv/infra/loki/data
-    - /srv/infra/alloy/data
-  tags: [docker, grafana, loki, alloy]
-  notify: 
-    - restart alloy
-    - restart loki
-    - restart grafana
+    - { name: grafana, path: /srv/infra/grafana }
+    - { name: loki,    path: /srv/infra/loki/data }
+    - { name: alloy,   path: /srv/infra/alloy/data }
+  loop_control:
+    label: "{{ item.path }}"
+  tags: [grafana, loki, alloy]
+  notify: "restart {{ item.name }}"
 
 - name: Template Docker Compose file
   template:
@@ -117,6 +133,16 @@
     group: docker 
     mode: '0600'
   tags: [atuin, docker]
+
+- name: Upload grafana config.ini 
+  ansible.builtin.template:
+    src: files/grafana/grafana.ini 
+    dest: /srv/infra/grafana/grafana.ini 
+    owner: "{{ docker_user }}"
+    group: docker 
+    mode: '0600'
+  notify: restart grafana
+  tags: [grafana]
 
 - name: Upload alloy and loki config files 
   copy:

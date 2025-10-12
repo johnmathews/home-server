@@ -111,10 +111,11 @@ services:
       - GF_SECURITY_COOKIE_SECURE=true
       - GF_SERVER_SERVE_FROM_SUB_PATH=false
       - GF_SECURITY_ALLOW_EMBEDDING=true
-      - GF_INSTALL_PLUGINS=grafana-polystat-panel
+      # - GF_INSTALL_PLUGINS=grafana-polystat-panel
       # - GF_FEATURE_TOGGLES_ENABLE=dashboardNewLayouts
     volumes:
       - /srv/infra/grafana/data:/var/lib/grafana
+      - /srv/infra/grafana/grafana.ini:/etc/grafana/grafana.ini
     restart: always
 
   node-exporter:
