@@ -144,7 +144,7 @@
 
 - name: Create gluetun config file from template
   template:
-    src: gluetun_config.toml.j2
+    src: templates/gluetun/gluetun_config.toml.j2
     dest: /srv/media/config/gluetun/config.toml
     mode: '0600'
   notify: restart gluetun
@@ -152,7 +152,7 @@
 
 - name: Create gluetun auth file from template
   template:
-    src: gluetun_auth.toml.j2
+    src: templates/gluetun/gluetun_auth.toml.j2
     dest: /srv/media/config/gluetun/auth/config.toml
     mode: '0600'
   notify: restart gluetun
