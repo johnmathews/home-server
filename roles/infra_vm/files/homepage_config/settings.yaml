@@ -63,8 +63,8 @@ layout:
   More Charts:
     tab: Charts
     style: row
-    columns: 2
-    initiallyCollapsed: true
+    columns: 1
+    initiallyCollapsed: false
 
   Monitoring:
     tab: Monitoring
