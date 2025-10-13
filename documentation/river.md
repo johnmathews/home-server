@@ -1,17 +1,17 @@
-We use the `Alloy` docker container to send logs to `Loki`. `Alloy` is
-configured using the River configuration language.
+We use Grafana Alloy to send logs to Loki. Loki makes the logs available in
+Grafana.
 
-The `config.alloy` file must contain at least 1 connected dataflow graph of
-components in order to run. The graph must contain at least one source and one
-output. There can be optional components in the middle to process the data.
+Alloy is configured using the River configuration language.
 
-Alloy is a dataflow engine. It uses the `river` configuration language in its
-configuration files (config.alloy). River is similar but different to terraform
-configs. It's not Terraform HCL. River is hierarchical, declarative, and
-strongly typed. Designed specifically for Alloy, apparently. Designed for
-pipelines.
+The `config.alloy` file must contain at least 1 connected graph of components in
+order to run. The graph must contain at least one source and one output. There
+can be optional components in the middle to process the data.
 
-The config file contains components.
+Alloy is a dataflow engine. River is similar but different to terraform
+configuration syntax. It is not Terraform HCL.
+
+River is hierarchical, declarative, and strongly typed. Designed specifically
+for Alloy, apparently. Designed for pipelines.
 
 Each module is a different type of component. The components correspond to `Go`
 packages.
@@ -22,7 +22,7 @@ packages.
 <controller>.<exporter>.<component_type> "<instance_name>" { ... }
 ```
 
-or:
+Or:
 
 ```
 <package>.<subsystem>.<component_type> "<instance_name>" { ... }

@@ -11,12 +11,16 @@ export PS4='+ ts=$(date +%FT%T%z) line=${LINENO} cmd='
 ACTION="${1:-}"
 LIST="${QUIET_LIST:-/etc/sleep-hours/containers.list}"
 
+# this log function prints 1 row of logs only.
 log() {
   # Uniform logfmt (no quotes around values)
+  # shift 4 removes the first 4 args from the $@ variable, so that $@ doesnt print $1, $2, $3,$4
   local level="$1" container="$2" event="$3" reason="$4"; shift 4
-  printf 'ts=%s level=%s action=%s container=%s event=%s reason=%s' \
-    "$(date +%FT%T%z)" "$level" "${ACTION:-unknown}" "${container:-_}" "$event" "$reason"
+  # no new-line char after this first part
+  # the string placeholders (%s) order (in the first half of the row) matches the order to the variables (in double quotes) in the second half of the row
+  printf 'ts=%s level=%s container=%s action=%s event=%s reason=%s' "$(date +%FT%T%z)" "$level" "${container:-_}" "${ACTION:-unknown}" "$event" "$reason"
   for kv in "$@"; do printf ' %s' "$kv"; done
+  # the only new-line char
   printf '\n'
 }
 
@@ -109,6 +113,7 @@ handle_one() {
     fi
 
     local out rc
+    # pause the docker container
     if out="$("$DOCKER_BIN" pause "$name" 2>&1)"; then
       status="$(inspect_running_paused "$name")"
       if [[ -n "$status" ]]; then
@@ -130,6 +135,7 @@ handle_one() {
     fi
 
     local out rc
+    # unpause the docker container
     if out="$("$DOCKER_BIN" unpause "$name" 2>&1)"; then
       status="$(inspect_running_paused "$name")"
       if [[ -n "$status" ]]; then

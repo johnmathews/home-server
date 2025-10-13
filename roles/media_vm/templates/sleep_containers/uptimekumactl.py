@@ -65,8 +65,8 @@ def main():
     url = os.environ.get("KUMA_URL")
     user = os.environ.get("KUMA_USERNAME")
     pwd  = os.environ.get("KUMA_PASSWORD")
-    insecure = os.environ.get("KUMA_INSECURE","0") == "1"
     map_file = os.environ.get("KUMA_MAP_FILE","")
+    # insecure = os.environ.get("KUMA_INSECURE","0") == "1"
 
     if not url or not user or not pwd:
         logfmt(level="error", system="kumactl", event="missing_env", url=bool(url), username=bool(user), password=bool(pwd))
@@ -83,7 +83,8 @@ def main():
     try:
         # Lazy import so normal runs of your script don't fail if python deps missing
         from uptime_kuma_api import UptimeKumaApi
-        api = UptimeKumaApi(url, ssl_verify=not insecure)
+        # api = UptimeKumaApi(url, ssl_verify=not insecure)
+        api = UptimeKumaApi(url)
         api.login(user, pwd)
 
         mid = find_monitor_id(api, args.container, mapping)
@@ -94,17 +95,17 @@ def main():
 
         if args.action == "pause":
             res = api.pause_monitor(mid)  # {'msg': 'Paused Successfully.'}
-            logfmt(level="info", system="kumactl", event="paused", container=args.container, monitor_id=mid, msg=res.get("msg","ok"))
+            logfmt(level="info", system="kumactl", container=args.container, event="paused", monitor_id=mid, msg=res.get("msg","ok"))
         else:
             res = api.resume_monitor(mid)
-            logfmt(level="info", system="kumactl", event="resumed", container=args.container, monitor_id=mid, msg=res.get("msg","ok"))
+            logfmt(level="info", system="kumactl", container=args.container, event="resumed", monitor_id=mid, msg=res.get("msg","ok"))
 
         api.disconnect()
         sys.exit(0)
 
     except Exception as e:
         # Avoid quotes; compress spaces
-        logfmt(level="error", system="kumactl", event="exception", container=args.container, err=str(e))
+        logfmt(level="error", system="kumactl", container=args.container, event="exception", err=str(e))
         sys.exit(1)
 
 if __name__ == "__main__":
