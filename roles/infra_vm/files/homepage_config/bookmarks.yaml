@@ -62,6 +62,9 @@
     - Uptime Kuma:
         - abbr:
           href: http://192.168.2.106:3001
+    - TrueNas Alloy:
+        - abbr:
+          href: http://192.168.2.104:12345
     - Infra Alloy:
         - abbr: 
           href: http://192.168.2.106:12345

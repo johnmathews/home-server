@@ -129,15 +129,20 @@
   delegate_to: localhost
   become: false
 
-
-- name: Install node exporter 
-  import_tasks: node_exporter.yml
-  tags: [metrics]
-
 - name: Set up script to unlock datasets using key server 
   import_tasks: key_server.yml
-  tags: [key]
+  tags: key
 
 - name: Set up script to spindown HDDs if idle 
   import_tasks: spindown_hdds.yml
-  tags: [hdds]
+  tags: hdds
+
+- name: Copy alloy configuration file 
+  import_tasks: alloy.yml
+  tags: alloy 
+
+# seems dodgy to do this this way in truenas. use a container instead.
+# - name: Install node exporter 
+#   import_tasks: node_exporter.yml
+#   tags: metrics
+

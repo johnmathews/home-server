@@ -4,4 +4,4 @@
     dest: /mnt/swift/scripts/spindown_hdds.sh
     mode: '0755'
     owner: root
-    group: root   # ‘wheel’ might not exist on SCALE; root is safe
+    group: root   # ‘wheel’ might not exist on SCALE

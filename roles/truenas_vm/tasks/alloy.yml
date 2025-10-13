@@ -1,0 +1,24 @@
+- name: Create directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+  loop:
+    - mnt/swift/apps/alloy"
+  tags: alloy
+
+- name: Upload alloy config files 
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: '0644'
+  loop:
+    - alloy:
+      src: files/config.alloy
+      dest: /mnt/swift/apps/alloy/config.alloy 
+  become: true
+  tags: alloy
