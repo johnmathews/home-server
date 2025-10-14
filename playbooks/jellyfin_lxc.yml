@@ -14,3 +14,5 @@
       tags: [shares]
     - role: jellyfin_lxc
       tags: [jelly]
+
+    # nfs vars in /host_vars

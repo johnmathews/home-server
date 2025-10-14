@@ -14,3 +14,5 @@
       tags: [shares]
     - role: immich_lxc
       tags: [immich]
+
+  # nfs vars in /host_vars

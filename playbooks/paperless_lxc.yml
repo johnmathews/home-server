@@ -14,3 +14,6 @@
       tags: shares
     - role: paperless_lxc
       tags: paperless
+
+
+  # nfs vars in /host_vars

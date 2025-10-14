@@ -12,6 +12,7 @@
       tags: infra_vm
 
   vars:
+    # nfs vars in /host_vars
     proxmox_node_name: proxmox
     ciuser: "{{ vm_defaults.ciuser }}"
     ssh_key: "{{ vm_defaults.ssh_key }}"
