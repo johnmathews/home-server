@@ -269,7 +269,7 @@
 
     - BookLore:
         href: https://books.itsa.pizza
-        siteMonitor: http://192.168.2.105:6060
+        # siteMonitor: http://192.168.2.105:6060
         description: Books
         icon: sh-booklore
 
@@ -299,26 +299,26 @@
 
     - Radarr:
         href: https://radarr.itsa.pizza
-        siteMonitor: http://192.168.2.105:7878
+        # siteMonitor: http://192.168.2.105:7878
         description: Movie Manager
         icon: radarr
-        widget:
-          type: radarr
-          url: http://192.168.2.105:7878
-          key: "{{ vault_radarr_key }}"
-          fields: [wanted, missing, movies, queued]
-          enableQueue: false
+        # widget:
+        #   type: radarr
+        #   url: http://192.168.2.105:7878
+        #   key: "{{ vault_radarr_key }}"
+        #   fields: [wanted, missing, movies, queued]
+        #   enableQueue: false
 
     - Sonarr:
         href: https://sonarr.itsa.pizza/
-        siteMonitor: http://192.168.2.105:8989/
+        # siteMonitor: http://192.168.2.105:8989/
         description: TV Series Manager
         icon: sonarr
-        widget:
-          type: sonarr
-          url: http://192.168.2.105:8989/
-          key: "{{ vault_sonarr_key }}"
-          enableQueue: false
+        # widget:
+        #   type: sonarr
+        #   url: http://192.168.2.105:8989/
+        #   key: "{{ vault_sonarr_key }}"
+        #   enableQueue: false
 
     - Gluetun:
         href: http://192.168.2.105:8000/v1/publicip/ip
@@ -332,7 +332,7 @@
 
     - Prowlarr:
         href: http://prowlarr.itsa.pizza
-        siteMonitor: http://192.168.2.105:9696
+        # siteMonitor: http://192.168.2.105:9696
         description: Indexer Manager
         icon: prowlarr
         widget:
@@ -342,35 +342,35 @@
 
     - Bazarr:
         href: http://bazarr.itsa.pizza
-        siteMonitor: http://192.168.2.105:6767
+        # siteMonitor: http://192.168.2.105:6767
         description: Subtitles
         icon: bazarr
-        widget:
-          type: bazarr
-          url: http://192.168.2.105:6767
-          key: "{{vault_bazarr_key}}"
+        # widget:
+        #   type: bazarr
+        #   url: http://192.168.2.105:6767
+        #   key: "{{vault_bazarr_key}}"
 
     - SABnzbd:
         href: http://sabnzbd.itsa.pizza
-        siteMonitor: http://192.168.2.105:8081/
+        # siteMonitor: http://192.168.2.105:8081/
         description: Usenet download client
         icon: sabnzbd
-        widget:
-          type: sabnzbd
-          url: http://192.168.2.105:8081/
-          key: "{{ vault_sabnzbd_key }}"
+        # widget:
+        #   type: sabnzbd
+        #   url: http://192.168.2.105:8081/
+        #   key: "{{ vault_sabnzbd_key }}"
 
     - qBittorrent:
         href: http://qbittorrent.itsa.pizza
-        siteMonitor: http://192.168.2.105:8080
+        # siteMonitor: http://192.168.2.105:8080
         description: Downloader
         icon: https://cdn.jsdelivr.net/gh/selfhst/icons/svg/qbittorrent.svg
-        widget:
-          type: qbittorrent
-          url: http://192.168.2.105:8080
-          username: admin
-          password: "{{ vault_qbittorrent_password }}"
-          enableLeechProgress: true
+        # widget:
+        #   type: qbittorrent
+        #   url: http://192.168.2.105:8080
+        #   username: admin
+        #   password: "{{ vault_qbittorrent_password }}"
+        #   enableLeechProgress: true
 
 - Usenet:
     - NZBGeek.info:

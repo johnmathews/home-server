@@ -15,6 +15,8 @@
     - role: media_vm
       tags: [media]
 
+# nfs vars in host_vars/
+
   vars:
     proxmox_node_name: proxmox
     ciuser: "{{ vm_defaults.ciuser }}"

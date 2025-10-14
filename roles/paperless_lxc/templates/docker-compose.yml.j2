@@ -11,10 +11,10 @@ services:
       - '--path.rootfs=/host'
       - '--collector.textfile'
       - '--collector.textfile.directory=/textfile'
-    network_mode: host
     ports:
       - "9100:9100"
-    pid: host
+    # pid: host # not needed if we mount `/:/host` and use `--path.rootfs=/host`
+    # network_mode: host # this exposes the default service port (9100) on all interfaces. too broad, we only want it accessible by prom.
     restart: unless-stopped
     volumes:
       - '/:/host:ro,rslave'

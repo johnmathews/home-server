@@ -1,2 +1,29 @@
 proxmox_node_name: proxmox
 proxmox_host: pve
+
+
+nfs_shares:
+  - name: books 
+    target: /mnt/tank/books
+    mountpoint: /mnt/nfs/books
+  - name: immich 
+    target: /mnt/tank/immich
+    mountpoint: /mnt/nfs/immich
+  - name: library
+    target: /mnt/tank/library
+    mountpoint: /mnt/nfs/library
+  - name: media
+    target: /mnt/tank/media
+    mountpoint: /mnt/nfs/media
+  - name: movies 
+    target: /mnt/tank/movies
+    mountpoint: /mnt/nfs/movies
+  - name: paperless 
+    target: /mnt/tank/paperless
+    mountpoint: /mnt/nfs/paperless
+  - name: photos 
+    target: /mnt/tank/photos
+    mountpoint: /mnt/nfs/photos
+  - name: youtube-kids
+    target: /mnt/tank/youtube-kids
+    mountpoint: /mnt/nfs/youtube-kids

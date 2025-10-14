@@ -1,4 +1,3 @@
-# Global defaults
 nfs_client_packages:
   - nfs-common
   - acl
@@ -9,15 +8,28 @@ nfs_user_name: nfs_user
 nfs_user_uid: 1001
 nfs_user_gid: 1001
 
+
+#  NFS options: 
+#
+#  hard vs soft (default):
+#    - soft mounts trade data integrity for responsiveness, while hard mounts trade responsiveness for data integrity.
+#    - soft - if host disappears or network goes down, then the client gracefully cancels the IO and remain responsive, but a partially written file, or db entry is possible. data structures could become inconsistent and you get weird errors.
+#    - hard - if host disappears or network goes down, the client waits forever and could become unresponsive until the host (NAS) is back online. but the IO op will resume and data will be written.
+#  _netdev: wait for network stack before trying to mount.
+#  nofail: dont block boot if the mount fails.
+#  retrans: retry only n times before declaring a request as failed
+#  timeo: timeout of n*0.1 seconds before retry. prevent long blocking hangs if network issues.
+#  x-systemd.automount: lazy mount the share only when first accessed.
+#  x-systemd.idle-timeout: unmounts the share automatically after n seconds of inactivity. works with x-systemd.automount. recommended if the share is not constantly used. Saves power and avoids stale NFS handles.
+
 nfs_opts_items:
-  - _netdev
+  - _netdev 
   - hard
-  - nofail
-  - proto=tcp
-  - retrans=2
-  - timeo=150
+  - nofail 
+  - retrans=3 
+  - timeo=50 
   - vers=4.2
-  - x-systemd.automount
-  - x-systemd.idle-timeout=60s
+  - x-systemd.automount 
+  - x-systemd.idle-timeout=60s 
 
 nfs_opts_default: "{{ nfs_opts_items | join(',') }}"

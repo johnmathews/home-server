@@ -5,6 +5,23 @@
 
 services:
 
+  # used by share_drive_probe service
+  node_exporter:
+    image: quay.io/prometheus/node-exporter:latest
+    container_name: node_exporter
+    command:
+      - '--path.rootfs=/host'
+      - '--collector.textfile'
+      - '--collector.textfile.directory=/textfile'
+    ports:
+      - "9100:9100"
+    restart: unless-stopped
+    # pid: host # not needed if we mount `/:/host` and use `--path.rootfs=/host`
+    # network_mode: host # this exposes the default service port (9100) on all interfaces. too broad, we only want it accessible by prom.
+    volumes:
+      - '/:/host:ro,rslave'
+      - '/var/lib/node_exporter/textfile_collector:/textfile:ro'
+
   # node exporter is running outside docker.
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
@@ -25,6 +42,7 @@ services:
       - /var/lib/docker/:/var/lib/docker:ro
     privileged: true  # required for some metrics
 
+  # for the proxmox backup server HDD
   disk-status-exporter:
     image: ghcr.io/johnmathews/disk_status_exporter:latest
     container_name: disk_status_exporter
@@ -35,6 +53,7 @@ services:
       - /dev:/dev:ro
     privileged: true  # recommended to access /dev/sdX and run smartctl
 
+  # prometheus metrics about the UPS
   nut_exporter:
     image: ghcr.io/druggeri/nut_exporter:sha-9e58f9c
     container_name: nut_exporter
@@ -45,9 +64,7 @@ services:
       - NUT_EXPORTER_SERVERPORT=3493
       - NUT_EXPORTER_USERNAME=readonly
       - NUT_EXPORTER_PASSWORD="{{ vault_nut_mon_pass }}"
-
-      # Optional: export more variables (comma-separated)
       - NUT_EXPORTER_VARIABLES=battery.charge,battery.runtime,battery.voltage,battery.voltage.nominal,input.voltage,input.voltage.nominal,output.voltage,output.voltage.nominal,ups.load,ups.status
       - NUT_EXPORTER__LOG_LEVEL=info
     ports:
-      - "9199:9199"   # Prometheus will scrape this
+      - "9199:9199"   # Prometheus scrape

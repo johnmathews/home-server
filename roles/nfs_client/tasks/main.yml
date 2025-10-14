@@ -1,12 +1,12 @@
 - name: Install client packages
-  become: yes
+  become: true
   apt:
     name: "{{ nfs_client_packages }}"
     state: present
     update_cache: yes
 
 - name: Ensure /mnt/nfs exists
-  become: yes
+  become: true
   file:
     path: /mnt/nfs
     state: directory
@@ -57,12 +57,12 @@
     state: present
 
 - name: systemd daemon-reload
-  become: yes
+  become: true
   systemd:
     daemon_reload: true
 
 - name: Enable+start systemd automount units (VMs only)
-  become: yes
+  become: true
   when: nfs_can_systemd_automount
   loop: "{{ nfs_shares }}"
   loop_control: { label: "{{ item.name }}" }
@@ -72,7 +72,7 @@
     state: started
 
 - name: Show systemd automount status
-  become: yes
+  become: true
   loop: "{{ nfs_shares }}"
   loop_control:
     label: "{{ item.name }}"
@@ -85,7 +85,7 @@
   include_tasks: autofs.yml
 
 - name: Trigger first access
-  become: yes
+  become: true
   loop: "{{ nfs_shares }}"
   loop_control: { label: "{{ item.name }}" }
   command: "bash -lc 'timeout 5s ls -d {{ item.mountpoint }}/{{ item.name }} >/dev/null 2>&1 || true'"
@@ -93,7 +93,7 @@
   failed_when: false
 
 - name: Show mount status (per mount)
-  become: yes
+  become: true
   loop: "{{ nfs_shares }}"
   loop_control:
     label: "{{ item.name }}"

@@ -1,10 +1,10 @@
 - name: systemd daemon-reload
-  become: yes
+  become: true
   systemd:
     daemon_reload: yes
 
 - name: Restart autofs
-  become: yes
+  become: true
   listen: Restart autofs
   systemd:
     name: autofs

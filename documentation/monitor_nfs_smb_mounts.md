@@ -1,15 +1,24 @@
+## Setup and Deployment (Ansible)
+
+Add the role `share_drive_probe` to the hosts playbook. It has the tag `shares`.
+
+Deploy it to an individual host using `make <host> tags=shares` or to all hosts
+by `make site tags=shares`.
+
+Ensure that `node-exporter` is also running (usually as a docker container)
+because it collects the .prom file created by the `share_drive_probe` service
+and placed at `/var/lib/nodeExporter/textfile_creator`.
+
+In `inventory.ini` there is a `share_drive_clients` section.
+
+## Background
+
 It is useful to have a chart in Grafana showing which NFS and SMB share drives
 are alive. This also enables alerting if they go down.
 
 This is implemented by running `share_drive_probe` - a systemd service (not a
 container!) on each VM or LXC that writes Prometheus metrics to the
 node_exporter text_file location.
-
-Deploy it to an individual host using `make <host> tags=shares` or to all hosts
-by `make site tags=shares`.
-
-The Ansible role `share_drive_probe` is added to each playbook. It has the tag
-`shares`. In `inventory.ini` there is a `share_drive_clients` section.
 
 A systemd timer `share_drive_probe.timer` calls a one-shot service
 `share_drive_probe.service`. The service calls a shell script
@@ -43,7 +52,7 @@ ls -l /usr/local/bin/share_drive_probe.sh
 cat /usr/local/bin/share_drive_probe.sh
 ```
 
-## Outputs 
+## Outputs
 
 ### View Prometheus metrics file
 
@@ -67,6 +76,7 @@ journalctl -u share-drive-probe.timer -u share-drive-probe.service --since "10 m
 ```
 
 ### View logs from the last run:
+
 ```
 sudo systemctl status share-drive-probe.service
 ```
@@ -111,5 +121,3 @@ journalctl -xeu share-drive-probe.service
 systemctl list-units 'mount-nfs-*.service' 'mnt-nfs-*.mount'
 systemctl list-timers share-drive-probe.timer
 ```
-
-

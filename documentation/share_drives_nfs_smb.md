@@ -1,5 +1,19 @@
 [TOC]
 
+## Setup a new NFS Share without Ansible
+
+1. Create the directory to mount onto `mkdir -p /mnt/nfs/books`
+2. Add the mount in `etc/fstab`:
+   `192.168.2.104:/mnt/tank/books  /mnt/nfs/books  nfs  nofail,_netdev,x-systemd.automount,retrans=2,timeo=5  0  0`
+3. Reload systemd: `systemctl daemon-reload`
+4. Restart remote-fs: `systemctl restart remote-fs.target`
+5. Check the status of the systemd unit: `systemctl status mnt-nfs--books.automount`
+6. `ls` the share drive to trigger it and check it reads correctly - you should see the drive contents.
+
+## Setup monitoring for a new NFS share
+
+
+
 ## TrueNAS
 
 TrueNAS can be a bit buggy. Toggle the individual share to refresh the
@@ -53,7 +67,8 @@ sudo mount -t cifs //192.168.2.104/media /mnt/media/media -o credentials=/etc/sm
 
 See documentation `Monitor NFS and SMB mounts` for more info.
 
-The probe is a systemd service and writes results into the node_exporter text file location.
+The probe is a systemd service and writes results into the node_exporter text
+file location.
 
 ## Clients
 
