@@ -57,18 +57,6 @@ smb_opts_items:
   - retrans=3
 smb_opts: "{{ smb_opts_items | join(',') }}"
 
-
-nfs_opts_items:
-  - _netdev
-  - hard
-  - nofail
-  - retrans=2
-  - timeo=150
-  - vers=4.2
-  - x-systemd.automount
-  - x-systemd.idle-timeout=60s
-nfs_opts: "{{ nfs_opts_items | join(',') }}"
-
 # sleep docker containers during quiet hours and pause uptime-kuma monitors
 uptime_kuma_url: "http://192.168.2.106:3001"
 uptime_kuma_user: "john"

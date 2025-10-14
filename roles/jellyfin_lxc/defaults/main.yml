@@ -10,17 +10,3 @@ smb_server: 192.168.2.104
 truenas_ip: "192.168.2.104"
 
 docker_compose_dir: "/srv/apps"
-
-nfs_opts_items:
-  - _netdev
-  - hard
-  - nofail
-  - proto=tcp
-  - retrans=2
-  - timeo=150
-  - vers=4.2
-  - x-systemd.automount
-  - x-systemd.idle-timeout=60s
-
-nfs_opts: "{{ nfs_opts_items | join(',') }}"
-

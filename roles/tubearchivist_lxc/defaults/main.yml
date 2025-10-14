@@ -17,17 +17,3 @@ ta_username: john
 # smb_shares:
 #   - name: youtube-kids
 #     target: /mnt/youtube-kids
-
-nfs_opts_items:
-  - _netdev
-  - hard
-  - nofail
-  - proto=tcp
-  - retrans=2
-  - timeo=150
-  - vers=4.2
-  - x-systemd.automount
-  - x-systemd.idle-timeout=60s
-
-nfs_opts: "{{ nfs_opts_items | join(',') }}"
-
