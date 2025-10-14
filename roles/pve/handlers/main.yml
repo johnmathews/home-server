@@ -61,3 +61,13 @@
   ansible.builtin.systemd:
     name: hd-idle
     state: restarted
+
+- name: restart alloy
+  community.docker.docker_compose_v2:
+    project_src: "{{ docker_compose_dir }}"
+    services:
+      - alloy
+    state: present
+    recreate: always
+    dependencies: true
+  become: false

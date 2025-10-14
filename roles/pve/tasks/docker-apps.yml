@@ -30,11 +30,6 @@
     enabled: yes
     state: started
 
-- name: Install CIFS utilities
-  apt:
-    name: cifs-utils
-    state: present
-
 - name: Install Docker Compose plugin
   apt:
     name: docker-compose-plugin
@@ -44,6 +39,33 @@
   file:
     path: /srv/apps
     state: directory
+
+
+- name: Create base app directories for containers
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+  loop:
+    - /srv/apps/alloy
+
+- name: Upload config files 
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ puid }}"
+    group: "{{ guid }}"
+    mode: '0644'
+  loop:
+    - alloy:
+      src: files/config.alloy
+      dest: /srv/apps/alloy/config.alloy 
+  become: true
+  tags: alloy 
+  notify: 
+    - restart alloy
 
 - name: Deploy docker-compose.yml
   template:

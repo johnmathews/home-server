@@ -4,8 +4,47 @@
 ---
 
 services:
+  alloy:
+    image: grafana/alloy:latest
+    container_name: alloy
+    restart: unless-stopped
+    environment:
+      LOKI_WRITE_ENDPOINT: "http://192.168.2.106:3100/loki/api/v1/push"
+      NODE_HOSTNAME: "pve"
+      LOG_LEVEL: "warn"
+    volumes:
+      # config 
+      - ./alloy:/etc/alloy:ro 
+      # docker 
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      # journalctl  
+      - /var/log/journal:/var/log/journal:ro
+      - /run/log/journal:/run/log/journal:ro
+      - /etc/machine-id:/etc/machine-id:ro
+    command: >
+      run --server.http.listen-addr=0.0.0.0:12345
+      --storage.path=/var/lib/alloy/data
+      /etc/alloy/config.alloy
+    ports:
+      - "12345:12345"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
 
-  # used by share_drive_probe service
+  # for the proxmox backup server HDD
+  disk-status-exporter:
+    image: ghcr.io/johnmathews/disk_status_exporter:latest
+    container_name: disk_status_exporter
+    restart: always
+    ports:
+      - "9635:9635"
+    volumes:
+      - /dev:/dev:ro
+    privileged: true  # recommended to access /dev/sdX and run smartctl
+
   node_exporter:
     image: quay.io/prometheus/node-exporter:latest
     container_name: node_exporter
@@ -22,7 +61,6 @@ services:
       - '/:/host:ro,rslave'
       - '/var/lib/node_exporter/textfile_collector:/textfile:ro'
 
-  # node exporter is running outside docker.
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
     container_name: cadvisor
@@ -41,17 +79,6 @@ services:
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
     privileged: true  # required for some metrics
-
-  # for the proxmox backup server HDD
-  disk-status-exporter:
-    image: ghcr.io/johnmathews/disk_status_exporter:latest
-    container_name: disk_status_exporter
-    restart: always
-    ports:
-      - "9635:9635"
-    volumes:
-      - /dev:/dev:ro
-    privileged: true  # recommended to access /dev/sdX and run smartctl
 
   # prometheus metrics about the UPS
   nut_exporter:

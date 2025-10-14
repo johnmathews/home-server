@@ -6,9 +6,10 @@
   hosts: proxmox
   become: true
   roles:
-    - role: nfs_client
-      tags: nfs
-    - role: share_drive_probe 
-      tags: shares
+    # its safer to mount NFS shares directly into priviliged LXCs 
+    # - role: nfs_client
+    #   tags: nfs
+    # - role: share_drive_probe 
+    #   tags: shares
     - role: pve 
       tags: pve

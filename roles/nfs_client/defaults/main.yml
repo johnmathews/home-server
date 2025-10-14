@@ -5,8 +5,10 @@ nfs_client_packages:
 truenas_ip: "192.168.2.104"
 
 nfs_user_name: nfs_user
+nfs_group_name: nfs_group
 nfs_user_uid: 1001
 nfs_user_gid: 1001
+nfs_group_gid: 1001
 
 
 #  NFS options: 
@@ -28,8 +30,7 @@ nfs_opts_items:
   - nofail 
   - retrans=3 
   - timeo=50 
-  - vers=4.2
   - x-systemd.automount 
-  - x-systemd.idle-timeout=60s 
+  - x-systemd.idle-timeout=180s 
 
 nfs_opts_default: "{{ nfs_opts_items | join(',') }}"

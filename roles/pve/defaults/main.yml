@@ -12,10 +12,12 @@ ipmi_exporter_version: "1.10.0"
 ipmi_exporter_install_dir: "/opt/ipmi_exporter"
 ipmi_exporter_listen_port: 9290
 
+
 # node_exporter
-node_exporter_version: "1.9.1"
-node_exporter_install_dir: "/opt/node_exporter"
-node_exporter_listen_port: 9100
+# use container instead
+# node_exporter_version: "1.9.1"
+# node_exporter_install_dir: "/opt/node_exporter"
+# node_exporter_listen_port: 9100
 
 #smartmon
 smartmon_exporter_version: "0.11.0"
@@ -55,3 +57,8 @@ nut_admin_pass: "{{ vault_nut_admin_pass }}"
 nut_mon_user: "monuser"
 nut_mon_pass: "{{ vault_nut_mon_pass }}"
 
+
+# alloy container
+puid: 1001
+guid: 1001
+pgid: 1001
