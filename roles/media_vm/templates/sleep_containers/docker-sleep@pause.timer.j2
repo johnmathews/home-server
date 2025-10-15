@@ -5,7 +5,7 @@ Description=Pause media containers at {{ docker_quiet_hours_start }} and retry p
 
 [Timer]
 OnCalendar={{ docker_quiet_hours_start }} Europe/Amsterdam
-OnUnitActiveSec={{ docker_quiet_pause_retry_minutes | default(10) }}min
+; OnUnitActiveSec={{ docker_quiet_pause_retry_minutes | default(10) }}min
 Persistent=false
 Unit=docker-sleep@pause.service
 
