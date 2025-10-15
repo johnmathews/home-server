@@ -1,0 +1,26 @@
+# vim: ft=yaml
+
+---
+
+# Static settings. We keep this lean; most routing lives in dynamic/*.yml
+entryPoints:
+  web:
+    address: ":80"
+
+api:
+  dashboard: true   # Secure this via Cloudflare Access or bind only on a private hostname
+
+log:
+  level: INFO
+
+accessLog: {}
+
+providers:
+  file:
+    directory: /etc/traefik/dynamic
+    watch: true
+
+# If any backend uses a self-signed cert (when you later switch to HTTPS backends),
+# define a transport you can opt into per-service:
+serversTransport:
+  insecureSkipVerify: true

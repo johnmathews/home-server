@@ -55,39 +55,27 @@ services:
     image: traefik:v3.1
     container_name: traefik
     restart: unless-stopped
+    environment:
+      - TZ=Europe/Amsterdam
     command:
-      # Entry points
+      # Only HTTP locally; Cloudflare Tunnel will connect over HTTP
       - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-      # Enable Docker provider
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      # Enable dashboard (optional; secure it!)
-      - "--api.dashboard=true"
+      # Use file provider (we'll mount dynamic config files)
+      - "--providers.file.directory=/etc/traefik/dynamic"
+      - "--providers.file.watch=true"
       # Logs
       - "--log.level=INFO"
       - "--accesslog=true"
+      # Optional dashboard (HTTP on /dashboard) – keep it disabled or protect behind CF Access
+      - "--api.dashboard=true"
+      # Enable Docker provider
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
       # Enable Prometheus metrics (optional)
       - "--metrics.prometheus=true"
     ports:
       - "80:80"
-      - "443:443"
-    networks:
-      - proxy
     volumes:
-      # So Traefik can discover other containers and their labels
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      # Persistent configuration (for middlewares, etc.)
-      - ./traefik:/etc/traefik
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.api.rule=Host(`traefik.itsa.pizza`)"
-      - "traefik.http.routers.api.service=api@internal"
-      - "traefik.http.routers.api.entrypoints=websecure"
-      - "traefik.http.routers.api.middlewares=auth"
-      - "traefik.http.middlewares.auth.basicauth.users=john:$$apr1$$ZpQ0mWkz$$Px2qV3IZAdVvQmC4mhrHc1" # use `htpasswd`
-
-networks:
-  proxy:
-    name: proxy
-    external: true
+      # Static + dynamic config files (no docker.sock needed on this host)
+      - ./traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./traefik/dynamic:/etc/traefik/dynamic:ro
