@@ -41,7 +41,7 @@ services:
     command:
       - '--path.rootfs=/host'
       - '--collector.textfile.directory=/textfile'
-    network_mode: host
+    # network_mode: host
     ports:
       - "9100:9100"
     pid: host
@@ -66,7 +66,6 @@ services:
       - 8000:8000/tcp # control server port
     volumes:
       - /srv/media/config/gluetun:/gluetun
-      # - /srv/media/config/gluetun/auth:/gluetun/auth/
     healthcheck:
       test: ["CMD", "wget", "-qO-", "https://ifconfig.me"]
       interval: 90s
@@ -104,15 +103,19 @@ services:
       - /mnt/media/library/downloads:/downloads
       - /mnt/media/library:/media
     restart: always
+    depends_on:
+      sabnzbd:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS --connect-timeout 2 http://127.0.0.1:8080/ >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
 
   sabnzbd:
     image: lscr.io/linuxserver/sabnzbd:latest
     container_name: sabnzbd
-    healthcheck:
-      test: ["CMD", "wget", "-qO-", "https://ifconfig.me"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -124,25 +127,40 @@ services:
       - /mnt/media/library/downloads:/downloads
       - /mnt/media/library:/library
     network_mode: "service:gluetun"
+    depends_on:
+        gluetun:
+          condition: service_healthy
     logging:
       driver: json-file
       options:
         max-size: "10m"
         max-file: "3"
     restart: always
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >
+          apikey=$$(awk -F' = ' '/^api_key/ {print $$2}' /config/sabnzbd.ini);
+          # normalize base: strip leading slash if present, then add trailing slash when non-empty
+          [ -n "$$base" ] && base="$${base#/}/" || base="";
+          curl -fsS "http://127.0.0.1:8080/$${base}api?mode=version&output=json&apikey=$$apikey" >/dev/null || exit 1
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
 
-  hometube:
-    image: ghcr.io/egalitarianmonkey/hometube:latest
-    container_name: hometube
-    ports:
-      - "8501:8501"
-    environment:
-      - TZ=Europe/Amsterdam
-      - PORT=8501
-    volumes:
-      - /mnt/media/media/Video/YouTube Videos:/data/Videos
-      - /srv/media/config/hometube/cookies:/config # Cookies folder
-    restart: unless-stopped
+  # hometube:
+  #   image: ghcr.io/egalitarianmonkey/hometube:latest
+  #   container_name: hometube
+  #   ports:
+  #     - "8501:8501"
+  #   environment:
+  #     - TZ=Europe/Amsterdam
+  #     - PORT=8501
+  #   volumes:
+  #     - /mnt/media/media/Video/YouTube Videos:/data/Videos
+  #     - /srv/media/config/hometube/cookies:/config # Cookies folder
+  #   restart: unless-stopped
 
   filebrowser:
     image: filebrowser/filebrowser:latest

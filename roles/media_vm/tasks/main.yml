@@ -46,7 +46,6 @@
     state: directory
     mode: '0755'
 
-# 6. Apply base directory ownership early
 - name: Ensure required directories exist with correct ownership
   ansible.builtin.file:
     path: "{{ item }}"
@@ -87,7 +86,6 @@
     mode: '0755'
   tags: gluetun
 
-# 7. Handle qBittorrent config prep before container starts
 - name: Re-create qbittorrent config directory
   file:
     path: "{{ media_stack_base_dir }}/config/qBittorrent"
@@ -109,7 +107,6 @@
   when: reset_qbittorrent_config | default(false)
   tags: qbittorrent
 
-# 9. Copy docker compose files
 - name: Copy docker-compose.yml
   template:
     src: templates/docker-compose.yml.j2
@@ -165,6 +162,7 @@
     group: "{{ media_stack_user }}"
   loop:
     - /srv/media/.env
+  notify: restart media stack
   tags: docker
 
 - name: Ensure Radarr config directory has correct UID/GID
@@ -185,31 +183,9 @@
     group: "{{ guid }}"
     mode: '0755'
 
-- name: Check if docker-compose.yml exists
-  stat:
-    path: /srv/media/docker-compose.yml
-  register: compose_file
-  tags: docker
-
-- name: Fail if docker-compose.yml is missing
-  fail:
-    msg: "docker-compose.yml not found in /srv/media"
-  when: not compose_file.stat.exists
-  tags: docker
-
 - name: Set permissions of file browser config directory
   ansible.builtin.command: chown -R 1000:1000 "{{ media_stack_base_dir }}/config/filebrowser"
   become: true
-
-# 11. Start Docker stack (only after config + paths are ready)
-- name: Start media stack containers
-  community.docker.docker_compose_v2:
-    project_src: "{{ media_stack_base_dir }}"
-    state: present
-    recreate: always
-    remove_orphans: true
-  become: false
-  tags: docker
 
 - import_tasks: sleep_docker_containers.yml
   tags: sleep

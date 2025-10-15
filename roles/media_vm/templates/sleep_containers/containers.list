@@ -1,6 +1,10 @@
-qbittorrent
-sabnzbd
-sonarr
-radarr
 bazarr
 booklore
+booklore-mariadb
+filebrowser
+jellyseerr
+prowlarr
+qbittorrent
+radarr
+sabnzbd
+sonarr
