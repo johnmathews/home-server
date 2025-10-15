@@ -33,13 +33,13 @@ http:
     immich-svc:
       loadBalancer:
         servers:
-          - url: "http://192.168.2.214:2283"     # Immich (from your notes)
+          - url: "http://192.168.2.113:2283" 
         passHostHeader: true
 
     jelly-svc:
       loadBalancer:
         servers:
-          - url: "http://192.168.2.XXX:8096"     # TODO: set Jellyfin LXC IP
+          - url: "http://192.168.2.110:8096"
         passHostHeader: true
 
   middlewares:

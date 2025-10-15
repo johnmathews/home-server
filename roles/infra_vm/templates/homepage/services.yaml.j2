@@ -412,6 +412,13 @@
           url: http://192.168.2.111
           username: john
           password: '{{ vault_adguard_password }}'
+    - Traefik:
+        href: https://traefik.itsa.pizza/dashboard/#/
+        siteMonitor: https://traefik.itsa.pizza/dashboard/#/
+        icon: traefik
+        widget:
+          type: traefik
+          url: http://192.168.2.108
     - Dozzle:
         href: http://dozzle.itsa.pizza
         siteMonitor: http://192.168.2.106:9999

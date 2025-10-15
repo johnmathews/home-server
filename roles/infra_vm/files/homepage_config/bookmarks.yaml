@@ -50,6 +50,9 @@
     - TrueNAS:
         - abbr: 
           href: http://192.168.2.104
+    - Traefik:
+        - abbr:
+          href: http://192.168.2.108/dashboard/
     - Grafana:
         - abbr: 
           href: http://192.168.2.106:3000
@@ -89,6 +92,9 @@
     - Paperless Alloy:
         - abbr: 
           href: http://192.168.2.117:12345
+    - Traefik Alloy:
+        - abbr: 
+          href: http://192.168.2.108:12345
 
 - Other Apps:
     - Home Assistant:
