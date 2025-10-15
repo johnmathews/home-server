@@ -10,7 +10,6 @@ nfs_user_uid: 1001
 nfs_user_gid: 1001
 nfs_group_gid: 1001
 
-
 #  NFS options: 
 #
 #  hard vs soft (default):
@@ -24,6 +23,7 @@ nfs_group_gid: 1001
 #  x-systemd.automount: lazy mount the share only when first accessed.
 #  x-systemd.idle-timeout: unmounts the share automatically after n seconds of inactivity. works with x-systemd.automount. recommended if the share is not constantly used. Saves power and avoids stale NFS handles.
 
+# do we want x-systemd.automount on LXCs?
 nfs_opts_items:
   - _netdev 
   - hard
