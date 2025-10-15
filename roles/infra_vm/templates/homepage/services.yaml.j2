@@ -1,214 +1,183 @@
-# vim: ft=yaml
-# infra_vm/files/homepage_config/services.yaml
-
----
-
 # For configuration options and examples, please see:
 # https://gethomepage.dev/configs/services/
-
-
-- Monitoring: 
-  - "":
-     widget:
-       type: iframe
-       src: https://uptime.itsa.pizza/status/paused
-       classes: h-screen
-  - "":
-     widget:
-       type: iframe
-       src: https://uptime.itsa.pizza/status/apps
-       classes: h-screen
-
-  - "":
-     widget:
-       type: iframe
-       src: https://uptime.itsa.pizza/status/monitoring
-       classes: h-screen
-
-
+- Monitoring:
+    - '':
+        widget:
+          type: iframe
+          src: https://uptime.itsa.pizza/status/paused
+          classes: h-screen
+    - '':
+        widget:
+          type: iframe
+          src: https://uptime.itsa.pizza/status/apps
+          classes: h-screen
+    - '':
+        widget:
+          type: iframe
+          src: https://uptime.itsa.pizza/status/monitoring
+          classes: h-screen
 - Charts:
-
-  # Logs 
-  - "":
-     widget:
-       type: iframe
-       src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/home-server?timezone=browser%3Fkiosk&refresh=10s&panelId=36&__feature.dashboardSceneSolo
-       referrerPolicy: same-origin # optional, no default
-       allowPolicy: autoplay; fullscreen; gamepad # optional, no default
-       allowFullscreen: true # optional, default: true
-
-  # Spindown table 
-  - "":
-     widget:
-       type: iframe
-       src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/home-server?timezone=browser%3Fkiosk&refresh=10s&panelId=29&__feature.dashboardSceneSolo
-       referrerPolicy: same-origin # optional, no default
-       allowPolicy: autoplay; fullscreen; gamepad # optional, no default
-       allowFullscreen: true # optional, default: true
-
-  # Time OL 
-  - "":
-     widget:
-       type: iframe
-       src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/home-server?timezone=browser%3Fkiosk&refresh=10s&panelId=33&__feature.dashboardSceneSolo
-       referrerPolicy: same-origin # optional, no default
-       allowPolicy: autoplay; fullscreen; gamepad # optional, no default
-       allowFullscreen: true # optional, default: true
-
-  # Power 
-  - "":
-     widget:
-       type: iframe
-       src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/home-server?timezone=browser%3Fkiosk&refresh=10s&panelId=7&__feature.dashboardSceneSolo
-       referrerPolicy: same-origin # optional, no default
-       allowPolicy: autoplay; fullscreen; gamepad # optional, no default
-       allowFullscreen: true # optional, default: true
-
-  # HDD states
-  - "":
-     widget:
-       type: iframe
-       src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/home-server?timezone=browser%kiosk=tv&refresh=10s&panelId=23&__feature.dashboardSceneSolo
-       referrerPolicy: same-origin
-       allowPolicy: autoplay; fullscreen; gamepad
-       allowFullscreen: true
-
-  # Network I/O  
-  - "":
-     widget:
-       type: iframe
-       src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/home-server?timezone=browser%kiosk=tv&refresh=10s&panelId=19&__feature.dashboardSceneSolo
-       referrerPolicy: same-origin
-       allowPolicy: autoplay; fullscreen; gamepad
-       allowFullscreen: true
-
-  # CPU Total
-  - "":
-     widget:
-       type: iframe
-       src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/home-server?timezone=browser%kiosk=tv&refresh=10s&panelId=1&__feature.dashboardSceneSolo
-       referrerPolicy: same-origin
-       allowPolicy: autoplay; fullscreen; gamepad
-       allowFullscreen: true
-
-  # CPU per VM 
-  - "":
-     widget:
-       type: iframe
-       src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/home-server?timezone=browser%kiosk=tv&refresh=10s&panelId=10&__feature.dashboardSceneSolo
-       referrerPolicy: same-origin
-       allowPolicy: autoplay; fullscreen; gamepad
-       allowFullscreen: true
-
-  # CPU per Container
-  - "":
-     widget:
-       type: iframe
-       src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/home-server?timezone=browser%kiosk=tv&refresh=10s&panelId=21&__feature.dashboardSceneSolo
-       referrerPolicy: same-origin
-       allowPolicy: autoplay; fullscreen; gamepad
-       allowFullscreen: true
-
-  # Memory Total 
-  - "":
-     widget:
-       type: iframe
-       src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/home-server?timezone=browser%3Fkiosk&refresh=10s&panelId=2&__feature.dashboardSceneSolo
-       referrerPolicy: same-origin
-       allowPolicy: autoplay; fullscreen; gamepad
-       allowFullscreen: true
-
-  # Memory per VM/LXC
-  - "":
-     widget:
-       type: iframe
-       src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/home-server?timezone=browser%kiosk=tv&refresh=10s&panelId=11&__feature.dashboardSceneSolo
-       referrerPolicy: same-origin
-       allowPolicy: autoplay; fullscreen; gamepad
-       allowFullscreen: true
-
-  # Memory per Container 
-  - "":
-     widget:
-       type: iframe
-       src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/home-server?timezone=browser%kiosk=tv&refresh=10s&panelId=22&__feature.dashboardSceneSolo
-       referrerPolicy: same-origin # optional, no default
-       allowPolicy: autoplay; fullscreen; gamepad # optional, no default
-       allowFullscreen: true # optional, default: true
-
-  # Temperatures 
-  - "":
-     widget:
-       type: iframe
-       src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/home-server?timezone=browser%3Fkiosk&refresh=10s&panelId=4&__feature.dashboardSceneSolo
-       referrerPolicy: same-origin # optional, no default
-       allowPolicy: autoplay; fullscreen; gamepad # optional, no default
-       allowFullscreen: true # optional, default: true
-
-  # Fans 
-  - "":
-     widget:
-       type: iframe
-       src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/home-server?timezone=browser%3Fkiosk&refresh=10s&panelId=3&__feature.dashboardSceneSolo
-       referrerPolicy: same-origin # optional, no default
-       allowPolicy: autoplay; fullscreen; gamepad # optional, no default
-       allowFullscreen: true # optional, default: true
-
-  # # PSU Runtime
-  # - "":
-  #    widget:
-  #      type: iframe
-  #      src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/home-server?timezone=browser%kiosk=tv&refresh=10s&panelId=26&__feature.dashboardSceneSolo
-  #      referrerPolicy: same-origin
-  #      allowPolicy: autoplay; fullscreen; gamepad
-  #      allowFullscreen: true
-  # # PSU Load
-  # - "":
-  #    widget:
-  #      type: iframe
-  #      src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/home-server?timezone=browser%kiosk=tv&refresh=10s&panelId=27&__feature.dashboardSceneSolo
-  #      referrerPolicy: same-origin
-  #      allowPolicy: autoplay; fullscreen; gamepad
-  #      allowFullscreen: true
-  # # PSU Charge
-  # - "":
-  #    widget:
-  #      type: iframe
-  #      src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/home-server?timezone=browser%kiosk=tv&refresh=10s&panelId=24&__feature.dashboardSceneSolo
-  #      referrerPolicy: same-origin
-  #      allowPolicy: autoplay; fullscreen; gamepad
-  #      allowFullscreen: true
-
-  - Grafana:
-      href: https://charts.itsa.pizza/d/dekkfibh9454wb/home-server?from=now-24h&to=now&timezone=browser%3Fkiosk&refresh=10s
-      siteMonitor: http://192.168.2.106:3000
-      icon: grafana
-      widget:
-        type: grafana
-        fields: [""]
-        url: http://192.168.2.106:3000
-        username: "{{ vault_grafana_username }}"
-        password: "{{ vault_grafana_password }}"
-
-- More Charts: 
-  # Summary Table 
-  - "":
-     widget:
-       type: iframe
-       src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/home-server?timezone=browser%3Fkiosk&refresh=10s&panelId=18&__feature.dashboardSceneSolo
-       referrerPolicy: same-origin # optional, no default
-       allowPolicy: autoplay; fullscreen; gamepad # optional, no default
-       allowFullscreen: true # optional, default: true
-
-
+    # Logs 
+    - '':
+        widget:
+          type: iframe
+          src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/home-server?timezone=browser%3Fkiosk&refresh=10s&panelId=36&__feature.dashboardSceneSolo
+          referrerPolicy: same-origin # optional, no default
+          allowPolicy: autoplay; fullscreen; gamepad # optional, no default
+          allowFullscreen: true # optional, default: true
+          # Spindown table 
+    - '':
+        widget:
+          type: iframe
+          src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/home-server?timezone=browser%3Fkiosk&refresh=10s&panelId=29&__feature.dashboardSceneSolo
+          referrerPolicy: same-origin # optional, no default
+          allowPolicy: autoplay; fullscreen; gamepad # optional, no default
+          allowFullscreen: true # optional, default: true
+          # Time OL 
+    - '':
+        widget:
+          type: iframe
+          src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/home-server?timezone=browser%3Fkiosk&refresh=10s&panelId=33&__feature.dashboardSceneSolo
+          referrerPolicy: same-origin # optional, no default
+          allowPolicy: autoplay; fullscreen; gamepad # optional, no default
+          allowFullscreen: true # optional, default: true
+          # Power 
+    - '':
+        widget:
+          type: iframe
+          src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/home-server?timezone=browser%3Fkiosk&refresh=10s&panelId=7&__feature.dashboardSceneSolo
+          referrerPolicy: same-origin # optional, no default
+          allowPolicy: autoplay; fullscreen; gamepad # optional, no default
+          allowFullscreen: true # optional, default: true
+          # HDD states
+    - '':
+        widget:
+          type: iframe
+          src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/home-server?timezone=browser%kiosk=tv&refresh=10s&panelId=23&__feature.dashboardSceneSolo
+          referrerPolicy: same-origin
+          allowPolicy: autoplay; fullscreen; gamepad
+          allowFullscreen: true
+          # Network I/O  
+    - '':
+        widget:
+          type: iframe
+          src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/home-server?timezone=browser%kiosk=tv&refresh=10s&panelId=19&__feature.dashboardSceneSolo
+          referrerPolicy: same-origin
+          allowPolicy: autoplay; fullscreen; gamepad
+          allowFullscreen: true
+          # CPU Total
+    - '':
+        widget:
+          type: iframe
+          src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/home-server?timezone=browser%kiosk=tv&refresh=10s&panelId=1&__feature.dashboardSceneSolo
+          referrerPolicy: same-origin
+          allowPolicy: autoplay; fullscreen; gamepad
+          allowFullscreen: true
+          # CPU per VM 
+    - '':
+        widget:
+          type: iframe
+          src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/home-server?timezone=browser%kiosk=tv&refresh=10s&panelId=10&__feature.dashboardSceneSolo
+          referrerPolicy: same-origin
+          allowPolicy: autoplay; fullscreen; gamepad
+          allowFullscreen: true
+          # CPU per Container
+    - '':
+        widget:
+          type: iframe
+          src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/home-server?timezone=browser%kiosk=tv&refresh=10s&panelId=21&__feature.dashboardSceneSolo
+          referrerPolicy: same-origin
+          allowPolicy: autoplay; fullscreen; gamepad
+          allowFullscreen: true
+          # Memory Total 
+    - '':
+        widget:
+          type: iframe
+          src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/home-server?timezone=browser%3Fkiosk&refresh=10s&panelId=2&__feature.dashboardSceneSolo
+          referrerPolicy: same-origin
+          allowPolicy: autoplay; fullscreen; gamepad
+          allowFullscreen: true
+          # Memory per VM/LXC
+    - '':
+        widget:
+          type: iframe
+          src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/home-server?timezone=browser%kiosk=tv&refresh=10s&panelId=11&__feature.dashboardSceneSolo
+          referrerPolicy: same-origin
+          allowPolicy: autoplay; fullscreen; gamepad
+          allowFullscreen: true
+          # Memory per Container 
+    - '':
+        widget:
+          type: iframe
+          src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/home-server?timezone=browser%kiosk=tv&refresh=10s&panelId=22&__feature.dashboardSceneSolo
+          referrerPolicy: same-origin # optional, no default
+          allowPolicy: autoplay; fullscreen; gamepad # optional, no default
+          allowFullscreen: true # optional, default: true
+          # Temperatures 
+    - '':
+        widget:
+          type: iframe
+          src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/home-server?timezone=browser%3Fkiosk&refresh=10s&panelId=4&__feature.dashboardSceneSolo
+          referrerPolicy: same-origin # optional, no default
+          allowPolicy: autoplay; fullscreen; gamepad # optional, no default
+          allowFullscreen: true # optional, default: true
+          # Fans 
+    - '':
+        widget:
+          type: iframe
+          src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/home-server?timezone=browser%3Fkiosk&refresh=10s&panelId=3&__feature.dashboardSceneSolo
+          referrerPolicy: same-origin # optional, no default
+          allowPolicy: autoplay; fullscreen; gamepad # optional, no default
+          allowFullscreen: true # optional, default: true
+          #  # PSU Runtime
+          # - "":
+          #    widget:
+          #      type: iframe
+          #      src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/home-server?timezone=browser%kiosk=tv&refresh=10s&panelId=26&__feature.dashboardSceneSolo
+          #      referrerPolicy: same-origin
+          #      allowPolicy: autoplay; fullscreen; gamepad
+          #      allowFullscreen: true
+          #  # PSU Load
+          # - "":
+          #    widget:
+          #      type: iframe
+          #      src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/home-server?timezone=browser%kiosk=tv&refresh=10s&panelId=27&__feature.dashboardSceneSolo
+          #      referrerPolicy: same-origin
+          #      allowPolicy: autoplay; fullscreen; gamepad
+          #      allowFullscreen: true
+          #  # PSU Charge
+          # - "":
+          #    widget:
+          #      type: iframe
+          #      src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/home-server?timezone=browser%kiosk=tv&refresh=10s&panelId=24&__feature.dashboardSceneSolo
+          #      referrerPolicy: same-origin
+          #      allowPolicy: autoplay; fullscreen; gamepad
+          #      allowFullscreen: true
+    - Grafana:
+        href: https://charts.itsa.pizza/d/dekkfibh9454wb/home-server?from=now-24h&to=now&timezone=browser%3Fkiosk&refresh=10s
+        siteMonitor: http://192.168.2.106:3000
+        icon: grafana
+        widget:
+          type: grafana
+          fields: ['']
+          url: http://192.168.2.106:3000
+          username: '{{ vault_grafana_username }}'
+          password: '{{ vault_grafana_password }}'
+- More Charts:
+    # Summary Table 
+    - '':
+        widget:
+          type: iframe
+          src: https://charts.itsa.pizza/d-solo/dekkfibh9454wb/home-server?timezone=browser%3Fkiosk&refresh=10s&panelId=18&__feature.dashboardSceneSolo
+          referrerPolicy: same-origin # optional, no default
+          allowPolicy: autoplay; fullscreen; gamepad # optional, no default
+          allowFullscreen: true # optional, default: true
 # media
 - Media:
-
     - Open-WebUI:
         href: http://192.168.2.119:3000
         siteMonitor: http://192.168.2.119:3000
         icon: https://cdn.jsdelivr.net/gh/selfhst/icons/svg/open-webui.svg
-
     - Jellyfin:
         href: https://jelly.itsa.pizza
         siteMonitor: http://192.168.2.110:8096
@@ -217,13 +186,12 @@
         widget:
           type: jellyfin
           url: http://192.168.2.110:8096
-          key: "{{ vault_jellyfin_key }}"
+          key: '{{ vault_jellyfin_key }}'
           enableBlocks: true # optional, defaults to false
           enableNowPlaying: false # optional, defaults to true
           enableUser: true # optional, defaults to false
           showEpisodeNumber: false # optional, defaults to false
           expandOneStreamToTwoRows: false # optional, defaults to true
-
     - Tubearchivist:
         href: https://tube.itsa.pizza
         siteMonitor: https://tube.itsa.pizza
@@ -232,8 +200,7 @@
         widget:
           type: tubearchivist
           url: http://192.168.2.116:8000
-          key: "{{ vault_tubearchivist_key }}"
-
+          key: '{{ vault_tubearchivist_key }}'
     - Jellyseerr:
         href: https://seerr.itsa.pizza
         siteMonitor: http://192.168.2.105:5055/
@@ -242,37 +209,31 @@
         widget:
           type: jellyseerr
           url: http://192.168.2.105:5055/
-          key: "{{ vault_jellyseerr_key }}"
-
+          key: '{{ vault_jellyseerr_key }}'
     - Immich:
         href: http://immich.itsa.pizza
         siteMonitor: http://192.168.2.113:2283
-        description: photos 
+        description: photos
         icon: immich
-
     # - Mealie:
     #     href: http://192.168.2.109:9000
     #     siteMonitor: http://192.168.2.109:9000
     #     description: Meal Planner
     #     icon: mealie
     #     showStats: true
-
     - File Browser:
         href: http://192.168.2.105:8082
         siteMonitor: http://192.168.2.105:8082
         icon: filebrowser
-
     - HomeTube:
         href: http://192.168.2.105:8501
         # siteMonitor: http://192.168.2.105:8501
         icon: http://192.168.2.105:8501/favicon.ico
-
     - BookLore:
         href: https://books.itsa.pizza
         # siteMonitor: http://192.168.2.105:6060
         description: Books
         icon: sh-booklore
-
     - Paperless:
         href: https://paperless.itsa.pizza
         siteMonitor: http://192.168.2.117:8000
@@ -282,8 +243,7 @@
         widget:
           type: paperlessngx
           url: http://192.168.2.117:8000
-          key: "{{ vault_paperless_key }}"
-
+          key: '{{ vault_paperless_key }}'
     # - Tunarr:
     #     href: http://tunarr.itsa.pizza
     #     siteMonitor: http://192.168.2.110:8000
@@ -296,7 +256,6 @@
     #     description: TV channels 
     #     icon: tunarr
     #     showStats: true
-
     - Radarr:
         href: https://radarr.itsa.pizza
         # siteMonitor: http://192.168.2.105:7878
@@ -308,7 +267,6 @@
         #   key: "{{ vault_radarr_key }}"
         #   fields: [wanted, missing, movies, queued]
         #   enableQueue: false
-
     - Sonarr:
         href: https://sonarr.itsa.pizza/
         # siteMonitor: http://192.168.2.105:8989/
@@ -319,7 +277,6 @@
         #   url: http://192.168.2.105:8989/
         #   key: "{{ vault_sonarr_key }}"
         #   enableQueue: false
-
     - Gluetun:
         href: http://192.168.2.105:8000/v1/publicip/ip
         siteMonitor: http://192.168.2.105:8000/v1/publicip/ip
@@ -328,8 +285,7 @@
         widget:
           type: gluetun
           url: http://192.168.2.105:8000
-          key: "{{ vault_gluetun_password }}"
-
+          key: '{{ vault_gluetun_password }}'
     - Prowlarr:
         href: http://prowlarr.itsa.pizza
         # siteMonitor: http://192.168.2.105:9696
@@ -338,8 +294,7 @@
         widget:
           type: prowlarr
           url: http://192.168.2.105:9696
-          key: "{{ vault_prowlarr_api_key }}"
-
+          key: '{{ vault_prowlarr_api_key }}'
     - Bazarr:
         href: http://bazarr.itsa.pizza
         # siteMonitor: http://192.168.2.105:6767
@@ -349,7 +304,6 @@
         #   type: bazarr
         #   url: http://192.168.2.105:6767
         #   key: "{{vault_bazarr_key}}"
-
     - SABnzbd:
         href: http://sabnzbd.itsa.pizza
         # siteMonitor: http://192.168.2.105:8081/
@@ -359,7 +313,6 @@
         #   type: sabnzbd
         #   url: http://192.168.2.105:8081/
         #   key: "{{ vault_sabnzbd_key }}"
-
     - qBittorrent:
         href: http://qbittorrent.itsa.pizza
         # siteMonitor: http://192.168.2.105:8080
@@ -371,32 +324,27 @@
         #   username: admin
         #   password: "{{ vault_qbittorrent_password }}"
         #   enableLeechProgress: true
-
 - Usenet:
     - NZBGeek.info:
         href: https://nzbgeek.info/dashboard.php
         siteMonitor: https://nzbgeek.info/dashboard.php
         description: Indexer
         icon: https://nzbgeek.info/favicon.ico
-
     - Usenet.farm:
         href: https://usenet.farm/members.html
         siteMonitor: https://usenet.farm/members.html
         description: Usenet Provider
         icon: si-swisscows
-
     - Usenet Express:
         href: https://members.usenetexpress.com/bytes-history
         siteMonitor: https://members.usenetexpress.com/member
         description: Usenet Provider
         icon: https://usenetexpress.com/favicon.ico
-
     - Accounts:
         href: https://app.addy.io
         siteMonitor: https://app.addy.io
         description: Email address aliases
         icon: https://app.addy.io/favicon.ico
-
 - Notes:
     - Mullvad:
         description: 22 January 2026 07:51
@@ -408,8 +356,6 @@
         description: 26 November 10:48
     - Usage Metrics:
         description: sabnzbd > settings > servers
-
-
 - Infra:
     - Grafana:
         href: https://charts.itsa.pizza/d/dekkfibh9454wb/home-server?from=now-24h&to=now&timezone=browser%3Fkiosk&refresh=10s
@@ -417,21 +363,14 @@
         icon: grafana
         widget:
           type: grafana
-          fields: ["dashboards", "datasources"]
+          fields: [dashboards, datasources]
           url: http://192.168.2.106:3000
-          username: "{{ vault_grafana_username }}"
-          password: "{{ vault_grafana_password }}"
-
-    - Alloy:
-        href: https://alloy.itsa.pizza
-        siteMonitor: http://192.168.2.106:12345
-        icon: alloy
-
+          username: '{{ vault_grafana_username }}'
+          password: '{{ vault_grafana_password }}'
     - Loki:
         href: http://192.168.2.106:3100/loki/api/v1/status/buildinfo
         siteMonitor: http://192.168.2.106:3100/loki/api/v1/status/buildinfo
         icon: loki
-
     - Prometheus:
         href: http://prometheus.itsa.pizza
         siteMonitor: http://192.168.2.115:9090
@@ -440,17 +379,15 @@
         widget:
           type: prometheus
           url: http://192.168.2.115:9090
-
     - Uptime Kuma:
         href: https://uptime.itsa.pizza
         siteMonitor: http://192.168.2.106:3001
         description: Monitoring
-        icon: si-uptimekuma 
+        icon: si-uptimekuma
         widget:
           type: uptimekuma
           url: http://192.168.2.106:3001
           slug: monitoring
-
     - Portainer:
         href: http://portainer.itsa.pizza
         siteMonitor: http://192.168.2.106:9000
@@ -460,32 +397,11 @@
           type: portainer
           url: http://192.168.2.106:9000
           env: 5
-          key: "{{ vault_portainer_key }}"
-
-    - VaultWarden:
-        href: https://passwords.itsa.pizza
-        siteMonitor: https://192.168.2.13:8000
-        icon: vaultwarden
-
+          key: '{{ vault_portainer_key }}'
     - File Browser:
         href: http://192.168.2.106:8082
         siteMonitor: http://192.168.2.106:8082
         icon: filebrowser
-
-
-    - Home Assistant:
-        href: https://home.itsa.pizza
-        siteMonitor: http://192.168.2.102:8123
-        description: Home automation
-        icon: home-assistant
-        widget:
-          type: homeassistant
-          url: http://192.168.2.102:8123
-          key: "{{ vault_homeassistant_access_token }}"
-          custom:
-            - state: sensor.tech_shelf_power
-              label: server shelf
-
     - AdGuard:
         href: http://adguard.itsa.pizza
         siteMonitor: http://192.168.2.111
@@ -495,26 +411,46 @@
           type: adguard
           url: http://192.168.2.111
           username: john
-          password: "{{ vault_adguard_password }}"
-
+          password: '{{ vault_adguard_password }}'
     - Dozzle:
         href: http://dozzle.itsa.pizza
         siteMonitor: http://192.168.2.106:9999
         description: containers
         icon: dozzle
-
     - iPerf3:
         href: http://192.168.2.106:5201
         # siteMonitor: http://192.168.2.106:5201
         description: wifi speed test
         icon: iperf3
-
+    - MySpeed:
+        href: http://speed.itsa.pizza
+        siteMonitor: http://192.168.2.112:5216/
+        description: Network Speed
+        icon: myspeed
+        widget:
+          type: myspeed
+          url: http://192.168.2.112:5216/
+    - VaultWarden:
+        href: https://passwords.itsa.pizza
+        siteMonitor: https://192.168.2.13:8000
+        icon: vaultwarden
+    - Home Assistant:
+        href: https://home.itsa.pizza
+        siteMonitor: http://192.168.2.102:8123
+        description: Home automation
+        icon: home-assistant
+        widget:
+          type: homeassistant
+          url: http://192.168.2.102:8123
+          key: '{{ vault_homeassistant_access_token }}'
+          custom:
+            - state: sensor.tech_shelf_power
+              label: server shelf
 - External:
     - Pushover:
         href: https://pushover.net/
         siteMonitor: https://pushover.net/
         icon: pushover
-
 - NAS:
     - TrueNAS:
         href: https://nas.itsa.pizza
@@ -524,15 +460,13 @@
           type: truenas
           url: http://192.168.2.104
           username: truenas_admin
-          password: "{{ vault_truenas_password }}"
+          password: '{{ vault_truenas_password }}'
           enablePools: true # optional, defaults to false
           nasType: scale
-
     - File Browser (NAS):
         href: https://nas-files.itsa.pizza
         siteMonitor: http://192.168.2.104:30051
         icon: filebrowser
-
 - PVE:
     - Proxmox:
         href: https://proxmox.itsa.pizza
@@ -542,9 +476,8 @@
         widget:
           type: proxmox
           url: https://192.168.2.214:8006
-          username: "{{ vault_proxmox_api_token_id }}" 
-          password: "{{ vault_proxmox_api_token_secret }}"
-
+          username: '{{ vault_proxmox_api_token_id }}'
+          password: '{{ vault_proxmox_api_token_secret }}'
     - Proxmox Backup Server:
         href: https://pbs.itsa.pizza
         siteMonitor: https://192.168.2.200:8007
@@ -553,33 +486,20 @@
         widget:
           type: proxmoxbackupserver
           url: https://192.168.2.200:8007
-          username: "{{ vault_proxmox_backup_api_token_id }}" 
-          password: "{{ vault_proxmox_backup_api_token_secret }}"
-
+          username: '{{ vault_proxmox_backup_api_token_id }}'
+          password: '{{ vault_proxmox_backup_api_token_secret }}'
 - Hardware:
-    - MySpeed:
-        href: http://speed.itsa.pizza
-        siteMonitor: http://192.168.2.112:5216/
-        description: Network Speed
-        icon: myspeed
-        widget:
-          type: myspeed
-          url: http://192.168.2.112:5216/
-
     - Router:
         href: http://192.168.2.254/
         siteMonitor: http://192.168.2.254/
         icon: router
-
     - MegaRAC SP-X (local):
         href: https://192.168.2.213
         siteMonitor: https://192.168.2.213
-        description: SBC 
+        description: SBC
         icon: mdi-Server
-
     - MegaRAC SP-X:
         href: https://bmc.itsa.pizza
         siteMonitor: https://192.168.2.213
-        description: SBC 
+        description: SBC
         icon: mdi-Server
-
