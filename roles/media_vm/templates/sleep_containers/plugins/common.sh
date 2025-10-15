@@ -9,6 +9,16 @@ BUSY_BLOCKIO_NONZERO="${BUSY_BLOCKIO_NONZERO:-1}" # 1 => any non-zero BlockIO is
 CURL_TIMEOUT_S="${CURL_TIMEOUT_S:-5}"             # HTTP timeout in seconds
 CURL_INSECURE="${CURL_INSECURE:-0}"               # 1 => -k
 
+plugin_note() {
+  # usage: plugin_note <container> <event> <kvs...>
+  # falls back to echo if log_debug is unavailable
+  if command -v log_debug >/dev/null 2>&1; then
+    log_debug "$1" plugin "$2" "${@:3}"
+  else
+    echo "level=debug container=$1 event=plugin reason=$2 ${*:3}"
+  fi
+}
+
 http_get() {
   # Usage: http_get <url> [header1] [header2] ...
   # Echos body; returns non-zero on failure
