@@ -42,3 +42,11 @@ Environment=QBIT_PASS=notapassword
 Environment=QBIT_COOKIE_DIR=/run/sleep-hours
 
 Environment=GRACE_DIR=/usr/local/lib/sleep-hours/plugins
+
+# 1 - any activity blocks
+# Environment=BUSY_BLOCKIO_NONZERO=0
+
+Environment=BUSY_CPU_PCT=2.0
+Environment=IO_SAMPLE_S=5
+Environment=BUSY_READ_BPS=65536
+Environment=BUSY_WRITE_BPS=65536

@@ -1,0 +1,93 @@
+# vim: ft=yaml
+# traefik_lxc/files/docker-compose.yml
+
+---
+
+services:
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    restart: always
+    ports:
+      - "18080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    command:
+      - --housekeeping_interval=15s
+      - --max_housekeeping_interval=15s
+      - --global_housekeeping_interval=15s
+    privileged: true  # required for some metrics
+
+  alloy:
+    image: grafana/alloy:latest
+    container_name: alloy
+    restart: unless-stopped
+    environment:
+      LOKI_WRITE_ENDPOINT: "http://192.168.2.106:3100/loki/api/v1/push"
+      NODE_HOSTNAME: "traefik"
+      LOG_LEVEL: "warn"
+    volumes:
+      # config 
+      - ./alloy:/etc/alloy:ro 
+      # docker 
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      # journalctl  
+      - /var/log/journal:/var/log/journal:ro
+      - /run/log/journal:/run/log/journal:ro
+      - /etc/machine-id:/etc/machine-id:ro
+    command: >
+      run --server.http.listen-addr=0.0.0.0:12345
+      --storage.path=/var/lib/alloy/data
+      /etc/alloy/config.alloy
+    ports:
+      - "12345:12345"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  traefik:
+    image: traefik:v3.1
+    container_name: traefik
+    restart: unless-stopped
+    command:
+      # Entry points
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      # Enable Docker provider
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      # Enable dashboard (optional; secure it!)
+      - "--api.dashboard=true"
+      # Logs
+      - "--log.level=INFO"
+      - "--accesslog=true"
+      # Enable Prometheus metrics (optional)
+      - "--metrics.prometheus=true"
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - proxy
+    volumes:
+      # So Traefik can discover other containers and their labels
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      # Persistent configuration (for middlewares, etc.)
+      - ./traefik:/etc/traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.api.rule=Host(`traefik.itsa.pizza`)"
+      - "traefik.http.routers.api.service=api@internal"
+      - "traefik.http.routers.api.entrypoints=websecure"
+      - "traefik.http.routers.api.middlewares=auth"
+      - "traefik.http.middlewares.auth.basicauth.users=john:$$apr1$$ZpQ0mWkz$$Px2qV3IZAdVvQmC4mhrHc1" # use `htpasswd`
+
+networks:
+  proxy:
+    name: proxy
+    external: true

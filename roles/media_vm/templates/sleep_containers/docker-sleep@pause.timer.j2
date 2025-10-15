@@ -1,11 +1,15 @@
 # vim: ft=systemd
 
 [Unit]
-Description=Pause media containers at {{ docker_quiet_hours_start }} and retry periodically during quiet hours
+Description=Begin pausing media containers at {{ docker_quiet_hours_start_hour }}:00 and retry periodically during quiet hours
 
 [Timer]
-OnCalendar={{ docker_quiet_hours_start }} Europe/Amsterdam
-; OnUnitActiveSec={{ docker_quiet_pause_retry_minutes | default(10) }}min
+# Evening (start .. 23:xx), every 15 min:
+OnCalendar=*-*-* {{ docker_quiet_hours_start_hour }}..23:0/15:00 Europe/Amsterdam
+
+# After midnight (00:xx .. end), every 15 min:
+OnCalendar=*-*-* 00..{{ docker_quiet_hours_end_hour }}:0/15:00 Europe/Amsterdam
+
 Persistent=false
 Unit=docker-sleep@pause.service
 

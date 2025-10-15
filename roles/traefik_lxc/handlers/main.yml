@@ -2,7 +2,33 @@
 
 ---
 
-- name: Restart Traefik
-  ansible.builtin.service:
-    name: traefik
-    state: restarted
+- name: restart docker compose stack
+  community.docker.docker_compose_v2:
+    project_src: "{{ docker_compose_dir }}"
+    state: present
+    recreate: always
+    dependencies: true
+    remove_orphans: true
+  become: false
+
+- name: restart traefik
+  community.docker.docker_compose_v2:
+    project_src: "{{ docker_compose_dir }}"
+    services:
+      - traefik
+    state: present
+    recreate: always
+    dependencies: true
+    remove_orphans: true
+  become: false
+
+- name: restart alloy
+  community.docker.docker_compose_v2:
+    project_src: "{{ docker_compose_dir }}"
+    services:
+      - alloy
+    state: present
+    recreate: always
+    dependencies: true
+    remove_orphans: true
+  become: false

@@ -2,44 +2,34 @@
 
 ---
 
-- name: Ensure /etc/traefik exists
-  file:
-    path: /etc/traefik
+- name: Create base app directories for containers
+  ansible.builtin.file:
+    path: "{{ item }}"
     state: directory
-    owner: root
-    group: root
     mode: '0755'
-
-- name: Ensure /etc/traefik/conf.d/ exists
-  file:
-    path: /etc/traefik/conf.d/
-    state: directory
     owner: root
     group: root
-    mode: '0755'
+  loop:
+    - "{{ docker_compose_dir }}/alloy"
+    - "{{ docker_compose_dir }}/traefik"
 
-- name: Upload traefik.yaml config
-  copy:
-    src: files/traefik_config.yaml
-    dest: /etc/traefik/traefik.yaml
-    owner: root
-    group: root
-    mode: '0644'
-  notify: Restart Traefik
 
-- name: Ensure /etc/traefik/conf.d/ exists
-  file:
-    path: /etc/traefik/conf.d
-    state: directory
-    owner: root
-    group: root
-    mode: '0755'
-
-- name: Upload providers.yml config
+- name: Template Traefik config
   template:
-    src: templates/providers.yml.j2
-    dest: /etc/traefik/conf.d/providers.yaml
+    src: prometheus/prometheus.yml.j2
+    dest: "{{ docker_compose_dir }}/prometheus/prometheus.yml"
+    owner: root
+    group: docker
+    mode: '0644'
+  notify: restart prometheus
+
+
+- name: Copy docker-compose.yml
+  template:
+    src: templates/docker-compose.yml.j2
+    dest: "{{ docker_compose_dir }}/docker-compose.yml"
+    mode: '0644'
     owner: root
     group: root
-    mode: '0644'
-  notify: Restart Traefik
+  notify: 
+    - restart docker compose stack

@@ -1,0 +1,8 @@
+TZ: Europe/Amsterdam
+
+proxmox_api_user: "api@pve"
+docker_compose_dir: "/srv/apps"
+docker_user: john
+
+puid: 1001
+guid: 1001
