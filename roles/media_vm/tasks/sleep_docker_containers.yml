@@ -210,16 +210,41 @@
     regexp: '^#!.*python'
     line: '#!/opt/uptimekumactl/venv/bin/python3'
 
-# OPTIONAL: Env file for KUMA_* secrets/params (referenced by your systemd unit via EnvironmentFile=)
-# Define these in group_vars/host_vars or vault:
-# kuma_url, kuma_username, kuma_password, kuma_insecure (0/1), kuma_map_file (path or omit)
-# - name: Deploy Uptime Kuma env file
-#   become: true
-#   ansible.builtin.template:
-#     src: templates/sleep_containers/kuma.env.j2
-#     dest: /etc/sleep-hours/kuma.env
-#     owner: root
-#     group: root
-#     mode: '0640'
-#   notify: restart sleep-hours timers
-#   when: kuma_url is defined and kuma_username is defined and kuma_password is defined
+- name: Ensure graceful-shutdown-logic directory exists
+  become: true
+  file:
+    path: /usr/local/lib/sleep-hours/graceful-shutdown-logic
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Install graceful shutdown common helper
+  become: true
+  copy:
+    src: templates/sleep_containers/graceful-shutdown-logic/common.sh
+    dest: /usr/local/lib/sleep-hours/graceful-shutdown-logic/common.sh
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Install graceful shutdown plugins
+  become: true
+  with_items:
+    - default.sh
+    - filebrowser.sh
+    - qbittorrent.sh
+    - sabnzbd.sh
+    - radarr.sh
+    - sonarr.sh
+    - prowlarr.sh
+    - jellyseerr.sh
+    - bazarr.sh
+    - booklore.sh
+    - booklore-mariadb.sh
+  copy:
+    src: "templates/sleep_containers/graceful-shutdown-logic/{{ item }}"
+    dest: "/usr/local/lib/sleep-hours/graceful-shutdown-logic/{{ item }}"
+    owner: root
+    group: root
+    mode: '0644'

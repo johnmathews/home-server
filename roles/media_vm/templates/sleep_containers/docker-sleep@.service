@@ -23,3 +23,20 @@ Environment=KUMA_USERNAME="{{ uptime_kuma_user }}"
 Environment=KUMA_PASSWORD="{{ vault_uptime_kuma_password }}"
 Environment=KUMA_INSECURE=0
 Environment=KUMA_MAP_FILE=/etc/sleep-hours/kuma.map
+
+Environment=SAB_URL=http://127.0.0.1:8081
+Environment=SAB_API_KEY="{{ vault_sabnzbd_key }}"
+
+Environment=RADARR_URL=http://127.0.0.1:7878
+Environment=RADARR_API_KEY="{{ vault_radarr_key }}"
+
+Environment=SONARR_URL=http://127.0.0.1:8989
+Environment=SONARR_API_KEY="{{ vault_sonarr_key }}"
+
+Environment=CURL_TIMEOUT_S=5
+Environment=CURL_INSECURE=0
+
+Environment=QBIT_URL=http://127.0.0.1:8080
+Environment=QBIT_USER=admin
+Environment=QBIT_PASS=notapassword
+Environment=QBIT_COOKIE_DIR=/run/sleep-hours
