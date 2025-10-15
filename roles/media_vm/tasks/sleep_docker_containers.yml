@@ -210,10 +210,10 @@
     regexp: '^#!.*python'
     line: '#!/opt/uptimekumactl/venv/bin/python3'
 
-- name: Ensure graceful-shutdown-logic directory exists
+- name: Ensure plugin directory exists
   become: true
   file:
-    path: /usr/local/lib/sleep-hours/graceful-shutdown-logic
+    path: /usr/local/lib/sleep-hours/plugins
     state: directory
     owner: root
     group: root
@@ -222,8 +222,8 @@
 - name: Install graceful shutdown common helper
   become: true
   copy:
-    src: templates/sleep_containers/graceful-shutdown-logic/common.sh
-    dest: /usr/local/lib/sleep-hours/graceful-shutdown-logic/common.sh
+    src: templates/sleep_containers/plugins/common.sh
+    dest: /usr/local/lib/sleep-hours/plugins/common.sh
     owner: root
     group: root
     mode: '0644'
@@ -243,8 +243,8 @@
     - booklore.sh
     - booklore-mariadb.sh
   copy:
-    src: "templates/sleep_containers/graceful-shutdown-logic/{{ item }}"
-    dest: "/usr/local/lib/sleep-hours/graceful-shutdown-logic/{{ item }}"
+    src: "templates/sleep_containers/plugins/{{ item }}"
+    dest: "/usr/local/lib/sleep-hours/plugins/{{ item }}"
     owner: root
     group: root
     mode: '0644'

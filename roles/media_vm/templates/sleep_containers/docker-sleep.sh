@@ -101,7 +101,6 @@ DOCKER_BIN="$(command -v docker || true)"
 [[ -x "${DOCKER_BIN:-}" ]] || fail_early docker_not_found "PATH=$PATH" 1
 
 # -------- grace logic plugins --------
-GRACE_DIR="${GRACE_DIR:-/usr/local/lib/sleep-hours/graceful-shutdown-logic}"
 common_loaded=0
 load_common() {
   if (( common_loaded == 0 )) && [[ -r "${GRACE_DIR}/common.sh" ]]; then
