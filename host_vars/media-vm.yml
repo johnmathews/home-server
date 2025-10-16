@@ -14,3 +14,6 @@ nfs_shares:
   - name: media
     mountpoint: /mnt/nfs/media
     target: /mnt/tank/media
+  - name: books
+    mountpoint: /mnt/nfs/books
+    target: /mnt/tank/books

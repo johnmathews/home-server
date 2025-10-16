@@ -6,3 +6,9 @@ nfs_shares:
   - name: immich
     mountpoint: /mnt/nfs/immich
     target: /mnt/tank/immich
+  - name: movies
+    mountpoint: /mnt/nfs/movies
+    target: /mnt/tank/movies
+  - name: photos
+    mountpoint: /mnt/nfs/photos
+    target: /mnt/tank/photos
