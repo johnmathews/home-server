@@ -12,10 +12,18 @@ services:
       - "18080:8080"
     volumes:
       - /:/rootfs:ro
-      - /var/run:/var/run:ro
       - /sys:/sys:ro
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
       - /var/lib/docker/:/var/lib/docker:ro
-    privileged: true  # required for some metrics
+      - /var/run:/var/run:ro
+    privileged: false  # required for some metrics, but `true` makes it scan /dev/** and in an LXC /dev/series/by-id does not exist.
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
 
   alloy:
     image: grafana/alloy:latest
