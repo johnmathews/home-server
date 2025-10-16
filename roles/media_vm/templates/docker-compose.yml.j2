@@ -197,8 +197,9 @@ services:
     volumes:
       - /srv/media/config/booklore/data:/app/data
       - /srv/media/config/booklore/books:/books
-      - /mnt/media/library:/library
-      - /mnt/media/media:/media
+      - /mnt/nfs/library:/library
+      - /mnt/nfs/media:/media
+      - /mnt/nfs/books:/books
     restart: unless-stopped
 
   booklore-mariadb:

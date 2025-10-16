@@ -2,6 +2,10 @@
 
 ---
 
+# for nfs tasks, see playbooks/media_vm.yml tag=nfs
+# for share_drive_probe tasks, see playbooks/media_vm.yml tag=share
+# for quiet_hours and pausing docker containers at night, see tasks/sleep_docker_containers.yml tags=sleep
+
 - name: Gather facts for media-vm
   ansible.builtin.setup: {}
 
@@ -38,7 +42,7 @@
   tags: docker
 
 - import_tasks: mount-smb.yml
-  tags: [mount, smb]
+  tags: smb
 
 - name: Create media stack base directory
   file:
