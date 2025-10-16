@@ -44,16 +44,24 @@ groups:
           )
 
   - name: disk-spindown
-    interval: 30s   # set to your scrape interval (e.g., 15s/30s)
+    interval: 15s
     rules:
-      # 1) Boolean standby indicator (0/1), includes shortdev label
       - record: disk:standby:bool
-        expr: (label_replace(disk_power_state_value{type="hdd"}, "shortdev", "$1", "device", "/dev/(.+)") == bool 0)
+        expr: |
+          (
+            label_replace(
+              label_replace(
+                disk_power_state{type="hdd"},
+                "shortdev", "$1", "device", "/dev/(.+)"
+              ),
+              "disk_id", "$1", "device_id", ".*/([^/]+)$"
+            ) == bool 0
+          )
 
       # 2) Spindown event: 1 only when transitioning into standby (non-zero -> 0), else 0
       #    offset must be on a vector selector; using the recorded vector makes this clean.
       - record: disk:spindown_event:1
-        expr: clamp_min(disk:standby:bool - disk:standby:bool offset 30s, 0)
+        expr: clamp_min(disk:standby:bool - disk:standby:bool offset 15s, 0)
 
   - name: ups_mains_rules
     interval: 3m

@@ -13,8 +13,8 @@
     - "{{ docker_compose_dir }}/alloy"
     - "{{ docker_compose_dir }}/traefik/dynamic"
 
-- name: Template Alloy config
-  template:
+- name: Copy Alloy config
+  copy:
     src: files/config.alloy
     dest: "{{ docker_compose_dir }}/alloy/config.alloy"
     owner: root

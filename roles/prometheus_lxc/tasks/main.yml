@@ -13,6 +13,7 @@
     - "{{ docker_compose_dir }}/alloy"
     - "{{ docker_compose_dir }}/prometheus"
     - "{{ docker_compose_dir }}/prometheus/rules"
+  tags: prometheus
 
 
 - name: Ensure Prometheus data directory is owned by UID/GID 65534
@@ -22,6 +23,7 @@
     recurse: yes
     owner: "65534"
     group: "65534"
+  tags: prometheus
 
 - name: Template Prometheus config
   template:
@@ -31,6 +33,7 @@
     group: docker
     mode: '0644'
   notify: restart prometheus
+  tags: prometheus
 
 - name: Copy UPS Prometheus rules
   ansible.builtin.template:
@@ -40,6 +43,7 @@
     group: docker
     mode: '0644'
   notify: restart prometheus
+  tags: prometheus
 
 - name: Upload alloy config files 
   copy:
@@ -53,7 +57,7 @@
       src: templates/config.alloy
       dest: /srv/apps/alloy/config.alloy 
   become: true
-  tags: [docker, alloy] 
+  tags: alloy
   notify: 
     - restart alloy
 
@@ -65,5 +69,6 @@
     mode: '0644'
     owner: root
     group: root
+  tags: docker
   notify: 
     - restart docker compose stack
