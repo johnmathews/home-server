@@ -6,6 +6,11 @@
 entryPoints:
   web:
     address: ":80"
+    transport:
+      respondingTimeouts:
+        readTimeout: 600s
+        idleTimeout: 600s
+        writeTimeout: 600s
 
 api:
   dashboard: true   # Secure this via Cloudflare Access or bind only on a private hostname

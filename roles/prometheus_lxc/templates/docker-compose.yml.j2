@@ -72,3 +72,23 @@ services:
       - "--storage.tsdb.retention.size=12GB"
       - "--storage.tsdb.retention.time=100d"
     restart: always
+
+
+  node_exporter:
+    image: quay.io/prometheus/node-exporter:latest
+    container_name: node_exporter
+    command:
+      - '--path.rootfs=/host'
+      - '--collector.textfile.directory=/textfile'
+    ports:
+      - "9100:9100"
+    pid: host
+    restart: unless-stopped
+    volumes:
+      - '/:/host:ro,rslave'
+      - '/var/lib/node_exporter/textfile_collector:/textfile:ro'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"

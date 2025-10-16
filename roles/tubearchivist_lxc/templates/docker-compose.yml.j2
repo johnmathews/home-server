@@ -41,7 +41,6 @@ services:
     command:
       - '--path.rootfs=/host'
       - '--collector.textfile.directory=/textfile'
-    network_mode: host
     ports:
       - "9100:9100"
     pid: host

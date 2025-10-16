@@ -15,7 +15,6 @@
     - "{{ docker_compose_dir }}/prometheus/rules"
   tags: prometheus
 
-
 - name: Ensure Prometheus data directory is owned by UID/GID 65534
   ansible.builtin.file:
     path: "{{ docker_compose_dir }}/prometheus/data"

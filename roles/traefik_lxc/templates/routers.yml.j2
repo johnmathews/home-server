@@ -1,3 +1,4 @@
+# traefik_lxc/files/traefik/dynamic/routers.yml
 # vim: ft=yml
 
 ---
@@ -8,6 +9,7 @@ http:
       rule: Host(`immich.itsa.pizza`)
       entryPoints: [web]
       service: immich-svc
+      priority: 100 # outrank generic rules
       middlewares:
         - security-headers
         - immich-login-rl
@@ -21,19 +23,17 @@ http:
         - jelly-login-rl
 
     traefik-dash:
-      # rule: Host(`traefik.itsa.pizza`)
-      rule: PathPrefix(`/dashboard`) || PathPrefix(`/api`)
+      rule: Host(`traefik.itsa.pizza`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))
       entryPoints: [web]
       service: api@internal
       middlewares:
         - security-headers
 
   services:
-    # Replace the URLs with your real backend IPs/ports:
     immich-svc:
       loadBalancer:
         servers:
-          - url: "http://192.168.2.113:2283" 
+          - url: "http://192.168.2.113:2283"
         passHostHeader: true
 
     jelly-svc:
@@ -43,24 +43,19 @@ http:
         passHostHeader: true
 
   middlewares:
-    # Mild rate limits for login endpoints (tune as you wish)
     immich-login-rl:
       rateLimit:
-        average: 60    # requests/minute
+        average: 60
         burst: 30
+
     jelly-login-rl:
       rateLimit:
         average: 60
         burst: 30
 
-    # Sensible security headers for browsers (Cloudflare still terminates TLS to the user)
     security-headers:
       headers:
         referrerPolicy: "strict-origin-when-cross-origin"
         contentTypeNosniff: true
         browserXssFilter: true
         frameDeny: true
-        # If you later serve HTTPS to LAN clients via Traefik, you can enable HSTS here.
-        # stsSeconds: 31536000
-        # stsIncludeSubdomains: true
-        # stsPreload: true

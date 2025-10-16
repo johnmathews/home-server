@@ -8,24 +8,6 @@
     state: present
     update_cache: yes
 
-# - name: Create directory for SMB credentials
-#   ansible.builtin.file:
-#     path: /etc/smb
-#     state: directory
-#     mode: '0750'
-#     owner: root
-#     group: root
-
-# - name: Create SMB credentials file
-#   ansible.builtin.copy:
-#     dest: /etc/smb/.smbcredentials
-#     owner: root
-#     group: root
-#     mode: '0600'
-#     content: |
-#       username={{ smb_username }}
-#       password={{ vault_smb_username_password }}
-
 - name: Ensure {{ app_name }} system group exists with fixed GID
   ansible.builtin.group:
     name: "{{ app_name }}"
@@ -42,41 +24,6 @@
     shell: /usr/sbin/nologin
     create_home: no
     state: present
-
-# - name: Remove legacy fstab lines for paperless share
-#   ansible.builtin.lineinfile:
-#     path: /etc/fstab
-#     state: absent
-#     regexp: '^//{{ smb_server | regex_escape }}/paperless[ \t]+/mnt/paperless[ \t]+cifs[ \t]+'
-#   tags: paperless_fstab
-
-# - name: Ensure fstab entry for smb share is present
-#   ansible.posix.mount:
-#     path: /mnt/paperless
-#     src: "//{{ smb_server }}/"
-#     fstype: cifs
-#     opts: "credentials=/etc/smb/.smbcredentials,uid={{ puid }},gid={{ pgid }},dir_mode=0770,file_mode=0660,iocharset=utf8,cache=strict,noserverino,rw,_netdev,noatime,vers=3.1.1"
-#     state: present
-#   tags: open_webui_fstab
-
-# - name: Ensure mountpoints exists
-#   ansible.builtin.file:
-#     path: "{{ item.target }}"
-#     state: directory
-#     owner: root
-#     group: root
-#     mode: '0755'
-#   loop: "{{ smb_shares }}"
-
-# - name: Mount or remount share
-#   ansible.posix.mount:
-#     path: "{{ item.target }} "
-#     src: "//{{ smb_server }}/{{ item.name }}"
-#     fstype: cifs
-#     opts: "credentials=/etc/smb/.smbcredentials,uid={{ puid }},gid={{ pgid }},dir_mode=0770,file_mode=0660,iocharset=utf8,cache=strict,noserverino,rw,_netdev,noatime,vers=3.1.1"
-#     state: mounted
-#   tags: open_webui_fstab
-#   loop: "{{ smb_shares }}"
 
 - name: Create base app directories
   ansible.builtin.file:
@@ -105,6 +52,7 @@
     mode: '0600'
   notify:
     - restart all containers
+  tags: docker 
 
 - name: Upload alloy config files 
   copy:
@@ -118,7 +66,7 @@
       src: templates/config.alloy
       dest: /srv/apps/alloy/config.alloy 
   become: true
-  tags: [docker, alloy] 
+  tags: alloy 
   notify: 
     - restart alloy
 
@@ -129,5 +77,6 @@
     mode: '0644'
     owner: root
     group: root
+  tags: docker 
   notify:
     - restart all containers

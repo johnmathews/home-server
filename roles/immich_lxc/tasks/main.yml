@@ -27,7 +27,7 @@
     - /srv/apps/immich/
     - /srv/apps/immich/postgres
     - /srv/apps/alloy
-  tags: [docker, alloy] 
+  tags: alloy, immich
 
 - name: Deploy .env file template 
   template:
@@ -36,7 +36,7 @@
     owner: root
     group: root
     mode: '0644'
-  tags: [docker] 
+  tags: docker 
 
 - name: Upload alloy config files 
   copy:
@@ -50,7 +50,7 @@
       src: templates/config.alloy
       dest: /srv/apps/alloy/config.alloy 
   become: true
-  tags: [docker, alloy] 
+  tags: alloy 
   notify: restart alloy
 
 - name: Copy Docker Compose file
@@ -61,4 +61,4 @@
     group: root
     mode: '0644'
   notify: restart docker compose stack
-  tags: [docker, alloy] 
+  tags: docker 
