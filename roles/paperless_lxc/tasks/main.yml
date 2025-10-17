@@ -7,13 +7,13 @@
     name: cifs-utils
     state: present
     update_cache: yes
-
 - name: Ensure paperless system group exists with fixed GID
   ansible.builtin.group:
     name: paperless
     gid: "{{ pgid }}"
     system: yes
     state: present
+  tags: paperless
 
 - name: Ensure paperless system user exists with fixed UID/GID
   ansible.builtin.user:
@@ -24,6 +24,7 @@
     shell: /usr/sbin/nologin
     create_home: no
     state: present
+  tags: paperless
 
 - name: Create base app directories for containers
   ansible.builtin.file:
@@ -48,7 +49,7 @@
     group: 999
     mode: '0700'
   notify: restart all containers
-  tags: docker
+  tags: paperless
   loop:
     - /srv/apps/paperless/data
     - /srv/apps/paperless/pgdata
@@ -59,8 +60,7 @@
     src: .env.j2
     dest: "{{ docker_compose_dir }}/.env"
     mode: '0600'
-  notify:
-    - restart paperless
+  notify: restart paperless
   tags: docker
 
 - name: Upload config files 
@@ -74,13 +74,9 @@
     - alloy:
       src: templates/config.alloy
       dest: /srv/apps/alloy/config.alloy 
-    - promtail:
-      src: templates/promtail-config.yml
-      dest: /srv/apps/promtail/config.yml
   become: true
-  tags: [docker, alloy] 
-  notify: 
-    - restart alloy
+  tags: alloy
+  notify: restart alloy
 
 - name: Copy docker-compose.yml
   ansible.builtin.template:
@@ -90,3 +86,4 @@
     owner: root
     group: root
   tags: docker
+  notify: restart all containers

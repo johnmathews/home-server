@@ -12,7 +12,9 @@
   community.docker.docker_compose_v2:
     project_src: "{{ docker_compose_dir }}"
     services:
-      - paperless
+      - paperless-db
+      - paperless-webserver
+      - paperless-broker
     state: present
     recreate: always
     dependencies: true

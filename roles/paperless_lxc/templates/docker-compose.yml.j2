@@ -4,6 +4,57 @@
 ---
 
 services:
+  paperless-db:
+    container_name: paperless-db
+    image: docker.io/library/postgres:17
+    restart: always
+    volumes:
+      - "{{ docker_compose_dir }}/paperless/pgdata:/var/lib/postgresql/data"
+    environment:
+      POSTGRES_DB: paperless
+      POSTGRES_USER: paperless
+      POSTGRES_PASSWORD: paperless
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+
+  paperless-webserver:
+    container_name: paperless-webserver
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    restart: always
+    depends_on:
+      - paperless-db
+      - paperless-broker
+    ports:
+      - "8000:8000"
+    volumes:
+      - "{{ docker_compose_dir }}/paperless/data:/usr/src/paperless/data"
+      - "/mnt/nfs/paperless/media:/usr/src/paperless/media"
+      - "/mnt/nfs/paperless/export:/usr/src/paperless/export"
+      - "/mnt/nfs/paperless/consume:/usr/src/paperless/consume"
+    env_file: .env
+    environment:
+      PAPERLESS_REDIS: redis://paperless-broker:6379
+      PAPERLESS_DBHOST: paperless-db
+      PAPERLESS_TRAIN_TASK_CRON: "*/20 10-20 * * *"
+      PAPERLESS_INDEX_TASK_CRON: "*/20 10-20 * * *"
+      PUID: ${PUID}
+      PGID: ${PGID}
+      USERMAP_UID: ${PUID}
+      USERMAP_GID: ${PGID}
+      TZ: ${TZ}
+
+  paperless-broker:
+    container_name: paperless-broker
+    image: docker.io/library/redis:8
+    restart: always
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - "{{ docker_compose_dir }}//paperless/redisdata:/data"
+
   node_exporter:
     image: quay.io/prometheus/node-exporter:latest
     container_name: node_exporter
@@ -50,45 +101,6 @@ services:
         max-size: "10m"
         max-file: "5"
 
-  paperless-db:
-    container_name: paperless-db
-    image: docker.io/library/postgres:17
-    restart: always
-    volumes:
-      - "{{ docker_compose_dir }}/paperless/pgdata:/var/lib/postgresql/data"
-    environment:
-      POSTGRES_DB: paperless
-      POSTGRES_USER: paperless
-      POSTGRES_PASSWORD: paperless
-      PUID: ${PUID}
-      PGID: ${PGID}
-      TZ: ${TZ}
-
-  paperless-webserver:
-    container_name: paperless-webserver
-    image: ghcr.io/paperless-ngx/paperless-ngx:latest
-    restart: always
-    depends_on:
-      - paperless-db
-      - paperless-broker
-    ports:
-      - "8000:8000"
-    volumes:
-      - "{{ docker_compose_dir }}/paperless/data:/usr/src/paperless/data"
-      - "/mnt/nfs/paperless/media:/usr/src/paperless/media"
-      - "/mnt/nfs/paperless/export:/usr/src/paperless/export"
-      - "/mnt/nfs/paperless/consume:/usr/src/paperless/consume"
-    env_file: .env
-    environment:
-      PAPERLESS_REDIS: redis://paperless-broker:6379
-      PAPERLESS_DBHOST: paperless-db
-      PAPERLESS_TRAIN_TASK_CRON: "*/20 10-20 * * *"
-      PAPERLESS_INDEX_TASK_CRON: "*/20 10-20 * * *"
-      PUID: ${PUID}
-      PGID: ${PGID}
-      USERMAP_UID: ${PUID}
-      USERMAP_GID: ${PGID}
-      TZ: ${TZ}
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
@@ -110,17 +122,6 @@ services:
       options:
         max-size: "10m"
         max-file: "5"
-
-  paperless-broker:
-    container_name: paperless-broker
-    image: docker.io/library/redis:8
-    restart: always
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-    volumes:
-      - "{{ docker_compose_dir }}//paperless/redisdata:/data"
 
 volumes:
   promtail_positions: {}

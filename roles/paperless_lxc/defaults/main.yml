@@ -7,9 +7,3 @@ docker_user: john
 puid: 1001
 guid: 1001
 pgid: 1001
-
-# smb_username: smb_user
-# smb_server: 192.168.2.104
-# smb_shares:
-#   - name: paperless
-#     target: /mnt/paperless
