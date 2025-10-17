@@ -181,14 +181,16 @@ services:
     image: booklore/booklore:latest
     container_name: booklore
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=Etc/UTC
-      # - DATABASE_URL=jdbc:mariadb://mariadb:3306/booklore # Only modify this if you're familiar with JDBC and your database setup
+      - USER_ID=1001
+      - GROUP_ID=1001
+      - PUID=1001
+      - PGID=1001
+      - TZ=Europe/Amsterdam
+      - BOOKLORE_PORT=6060
       - DATABASE_URL=jdbc:mariadb://booklore-mariadb:3306/booklore
-      - DATABASE_USERNAME=booklore # Must match MYSQL_USER defined in the mariadb container
-      - DATABASE_PASSWORD=your_secure_password # Use a strong password; must match MYSQL_PASSWORD defined in the mariadb container 
-      - SWAGGER_ENABLED=false # Enable or disable Swagger UI (API docs). Set to 'true' to allow access; 'false' to block access (recommended for production).
+      - DATABASE_USERNAME=booklore
+      - DATABASE_PASSWORD=${BOOKLORE_DB_PASSWORD}
+    env_file: .env
     depends_on:
       booklore-mariadb:
         condition: service_healthy
@@ -197,22 +199,26 @@ services:
     volumes:
       - /srv/media/config/booklore/data:/app/data
       - /srv/media/config/booklore/books:/books
-      - /mnt/nfs/library:/library
-      - /mnt/nfs/media:/media
-      - /mnt/nfs/books:/books
+      - /srv/media/config/booklore/bookdrop:/bookdrop
+      - /mnt/nfs/books:/nfs/books
+      - /mnt/nfs/library:/nfs/library:ro
+      - /mnt/nfs/media:/nfs/media:ro
+
+
     restart: unless-stopped
 
   booklore-mariadb:
     image: lscr.io/linuxserver/mariadb:11.4.5
     container_name: booklore-mariadb
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=Etc/UTC
-      - MYSQL_ROOT_PASSWORD=super_secure_password # Use a strong password for the database's root user, should be different from MYSQL_PASSWORD
+      - PUID=1001
+      - PGID=1001
+      - TZ=Europe/Amsterdam
+      - MYSQL_ROOT_PASSWORD=${BOOKLORE_DB_ROOT_PASSWORD}
       - MYSQL_DATABASE=booklore
-      - MYSQL_USER=booklore # Must match DATABASE_USERNAME defined in the booklore container
-      - MYSQL_PASSWORD=your_secure_password # Use a strong password; must match DATABASE_PASSWORD defined in the booklore container
+      - MYSQL_USER=booklore
+      - MYSQL_PASSWORD=${BOOKLORE_DB_PASSWORD}
+    env_file: .env
     volumes:
       - /srv/media/config/booklore/mariadb/config:/config
     restart: unless-stopped

@@ -1,3 +1,7 @@
+## Ansible
+
+There is a task called `share_drive_probe`. It's added to all the playbooks.
+
 ## Setup and Deployment (Ansible)
 
 Add the role `share_drive_probe` to the hosts playbook. It has the tag `shares`.
