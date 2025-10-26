@@ -1,0 +1,11 @@
+# vim: ft=systemd
+
+[Unit]
+Description=Unpause media containers at {{ docker_quiet_hours_end }}
+
+[Timer]
+OnCalendar={{ docker_quiet_hours_end }} Europe/Amsterdam
+Persistent=false
+
+[Install]
+WantedBy=timers.target

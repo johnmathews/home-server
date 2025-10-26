@@ -1,0 +1,19 @@
+# vim: ft=systemd
+
+[Unit]
+Description=Begin pausing media containers at {{ docker_quiet_hours_start_hour }}:00 and retry periodically during quiet hours
+
+[Timer]
+
+# because start_hour is now midnight (00), quiet_hours doesnt span two days, therefore we only need one OnCalendar directive.
+# Evening (start .. 23:xx), every 15 min:
+# OnCalendar=*-*-* {{ docker_quiet_hours_start_hour }}..23:0/15:00 Europe/Amsterdam
+
+# Midnight - 08:00 (00:xx .. end), every 15 min:
+OnCalendar=*-*-* {{ docker_quiet_hours_start_hour }}..{{ docker_quiet_hours_end_hour }}:0/15:00 Europe/Amsterdam
+
+Persistent=false
+Unit=docker-sleep@pause.service
+
+[Install]
+WantedBy=timers.target
