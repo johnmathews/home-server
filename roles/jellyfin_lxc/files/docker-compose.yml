@@ -1,9 +1,5 @@
 # jellyfin_lxc/files/docker-compose.yml
-
----
-
 services:
-
   alloy:
     image: grafana/alloy:latest
     container_name: alloy
@@ -14,7 +10,7 @@ services:
       LOG_LEVEL: "warn"
     volumes:
       # config 
-      - ./alloy:/etc/alloy:ro 
+      - ./alloy:/etc/alloy:ro
       # docker 
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
@@ -23,9 +19,8 @@ services:
       - /run/log/journal:/run/log/journal:ro
       - /etc/machine-id:/etc/machine-id:ro
     command: >
-      run --server.http.listen-addr=0.0.0.0:12345
-      --storage.path=/var/lib/alloy/data
-      /etc/alloy/config.alloy
+      run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
+
     ports:
       - "12345:12345"
     logging:
@@ -33,11 +28,11 @@ services:
       options:
         max-size: "10m"
         max-file: "5"
-
   jellyfin:
     image: jellyfin/jellyfin
     container_name: jellyfin
     restart: always
+    init: true
     mem_limit: 8g
     mem_reservation: 4g
     ports:
@@ -47,28 +42,45 @@ services:
       - JELLYFIN_PublishedServerUrl=http://192.168.2.110:8096
       - PUID=1001
       - PGID=1001
+    group_add:
+      - "video"
     devices:
-      - /dev/dri:/dev/dri
+      - /dev/dri/renderD128:/dev/dri/renderD128
+      - /dev/dri/card0:/dev/dri/card0
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    # devices:
+    #   - /dev/dri:/dev/dri
+
     volumes:
+      - type: tmpfs
+        target: /transcode
+        tmpfs:
+          size: 4g
       - /srv/apps/jellyfin/plugins/tubearchivist_metadata:/config/plugins/TubeArchivistMetadataKids_1.3.19.0
       - /srv/apps/jellyfin/appdata:/config
       - /srv/apps/jellyfin/cache:/cache
       - /mnt/nfs/library:/library # kids shows, family movies, etc
       - /mnt/nfs/media:/media # youtube videos, photography videos
-      - /mnt/nfs/youtube-kids:/youtube-kids # tubearchivist lib must be readonly
+      - /mnt/nfs/youtube-kids:/youtube-kids:ro # tubearchivist lib must be readonly
     logging:
       driver: json-file
       options:
         max-size: "10m"
         max-file: "10"
-    privileged: true
+    # privileged: true
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS --connect-timeout 2 http://127.0.0.1:8096/ >/dev/null || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
       start_period: 30s
-
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
     container_name: cadvisor
@@ -81,7 +93,7 @@ services:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
       - /var/lib/docker/:/var/lib/docker:ro
       - /var/run:/var/run:ro
-    privileged: false  # required for some metrics, but `true` makes it scan /dev/** and in an LXC /dev/series/by-id does not exist.
+    privileged: false # required for some metrics, but `true` makes it scan /dev/** and in an LXC /dev/series/by-id does not exist.
     security_opt:
       - no-new-privileges:true
     logging:
@@ -89,14 +101,12 @@ services:
       options:
         max-size: "10m"
         max-file: "5"
-
   node_exporter:
     image: quay.io/prometheus/node-exporter:latest
     container_name: node_exporter
     command:
       - '--path.rootfs=/host'
       - '--collector.textfile.directory=/textfile'
-    network_mode: host
     ports:
       - "9100:9100"
     pid: host
@@ -104,4 +114,3 @@ services:
     volumes:
       - '/:/host:ro,rslave'
       - '/var/lib/node_exporter/textfile_collector:/textfile:ro'
-

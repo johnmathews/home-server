@@ -4,6 +4,36 @@
 ---
 
 services:
+
+  traefik:
+    image: traefik:v3.1
+    container_name: traefik
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Amsterdam
+    command:
+      # Only HTTP locally; Cloudflare Tunnel will connect over HTTP
+      - "--entrypoints.web.address=:80"
+      # Use file provider (we'll mount dynamic config files)
+      - "--providers.file.directory=/etc/traefik/dynamic"
+      - "--providers.file.watch=true"
+      # Logs
+      - "--log.level=INFO"
+      - "--accesslog=true"
+      # Optional dashboard (HTTP on /dashboard) – keep it disabled or protect behind CF Access
+      - "--api.dashboard=true"
+      # Enable Docker provider
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      # Enable Prometheus metrics (optional)
+      - "--metrics.prometheus=true"
+    ports:
+      - "80:80"
+    volumes:
+      # Static + dynamic config files (no docker.sock needed on this host)
+      - ./traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./traefik/dynamic:/etc/traefik/dynamic:ro
+
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
     container_name: cadvisor
@@ -54,32 +84,3 @@ services:
       options:
         max-size: "10m"
         max-file: "5"
-
-  traefik:
-    image: traefik:v3.1
-    container_name: traefik
-    restart: unless-stopped
-    environment:
-      - TZ=Europe/Amsterdam
-    command:
-      # Only HTTP locally; Cloudflare Tunnel will connect over HTTP
-      - "--entrypoints.web.address=:80"
-      # Use file provider (we'll mount dynamic config files)
-      - "--providers.file.directory=/etc/traefik/dynamic"
-      - "--providers.file.watch=true"
-      # Logs
-      - "--log.level=INFO"
-      - "--accesslog=true"
-      # Optional dashboard (HTTP on /dashboard) – keep it disabled or protect behind CF Access
-      - "--api.dashboard=true"
-      # Enable Docker provider
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      # Enable Prometheus metrics (optional)
-      - "--metrics.prometheus=true"
-    ports:
-      - "80:80"
-    volumes:
-      # Static + dynamic config files (no docker.sock needed on this host)
-      - ./traefik/traefik.yml:/etc/traefik/traefik.yml:ro
-      - ./traefik/dynamic:/etc/traefik/dynamic:ro
