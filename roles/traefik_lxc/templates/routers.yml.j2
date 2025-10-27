@@ -27,7 +27,7 @@ http:
         - security-headers
         - jelly-login-rl
     traefik-api-local:
-      rule: PathPrefix(`/api`) || PathPrefix(`/dashboard`)
+      rule: Host(`traefik.itsa.pizza`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
       entryPoints: [web]
       service: api@internal
       priority: 500

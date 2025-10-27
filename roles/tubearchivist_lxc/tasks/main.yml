@@ -1,13 +1,9 @@
 # roles/jellyfin_lxc/tasks/main.yml
-
----
-
 - name: Ensure cifs-utils is installed
   ansible.builtin.apt:
     name: cifs-utils
     state: present
     update_cache: yes
-
 - name: Create base app directories for containers
   ansible.builtin.file:
     path: "{{ item }}"
@@ -18,10 +14,9 @@
   loop:
     - /srv/apps/alloy
   tags: alloy, docker
-  notify: 
+  notify:
     - restart alloy
-
-- name: Upload alloy config files 
+- name: Upload alloy config files
   copy:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
@@ -31,13 +26,11 @@
   loop:
     - alloy:
       src: templates/config.alloy
-      dest: /srv/apps/alloy/config.alloy 
+      dest: /srv/apps/alloy/config.alloy
   become: true
-  tags: [docker, alloy] 
-  notify: 
+  tags: [docker, alloy]
+  notify:
     - restart alloy
-
-# Copy environment and compose files
 - name: Copy docker-compose.yml
   template:
     src: templates/docker-compose.yml.j2
@@ -45,6 +38,8 @@
     mode: '0644'
     owner: root
     group: root
-  notify: 
+  notify:
     - restart docker compose stack
   tags: docker, alloy
+- import_tasks: sleep_docker_containers.yml
+  tags: sleep

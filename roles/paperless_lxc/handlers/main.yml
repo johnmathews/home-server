@@ -1,13 +1,10 @@
----
-
-- name: restart all containers 
+- name: restart all containers
   community.docker.docker_compose_v2:
     project_src: "{{ docker_compose_dir }}"
     state: present
     recreate: always
     dependencies: true
   become: false
-
 - name: restart paperless
   community.docker.docker_compose_v2:
     project_src: "{{ docker_compose_dir }}"
@@ -19,7 +16,6 @@
     recreate: always
     dependencies: true
   become: false
-
 - name: restart alloy
   community.docker.docker_compose_v2:
     project_src: "{{ docker_compose_dir }}"
@@ -29,7 +25,6 @@
     recreate: always
     dependencies: true
   become: false
-
 - name: restart promtail
   community.docker.docker_compose_v2:
     project_src: "{{ docker_compose_dir }}"
@@ -39,3 +34,11 @@
     recreate: always
     dependencies: true
   become: false
+- name: restart sleep-hours timers
+  become: true
+  systemd:
+    name: "{{ item }}"
+    state: restarted
+  loop:
+    - docker-sleep@pause.timer
+    - docker-sleep@unpause.timer
