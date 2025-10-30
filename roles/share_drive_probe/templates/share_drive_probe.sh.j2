@@ -5,8 +5,8 @@ set -u -o pipefail  # (no -e globally; we handle errors per-mount)
 
 # ---------- CONFIG (via env / Ansible template) ----------
 TZ="${SDP_TZ:-Europe/Amsterdam}"
-RO_START="${SDP_RO_START:-22:00}"              # read-only start time
-RO_END="${SDP_RO_END:-10:00}"                  # read-only end time
+RO_START="${SDP_RO_START}"              # read-only start time
+RO_END="${SDP_RO_END}"                  # read-only end time
 PROBE_MODE_DEFAULT="${SDP_MODE:-auto}"         # auto|rw|ro
 
 TARGETS_FILE="{{ share_drive_probe_targets_file }}"

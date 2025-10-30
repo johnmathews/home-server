@@ -10,12 +10,12 @@ vm_defaults:
   ciuser: "john"
   ssh_key: "~/.ssh/id_ed25519.pub"
   gateway: "192.168.2.254"
+# share drive probe (used in tasks/infra_vm/templates/homepage/services.yml and tasks/share_drive_probe)
+share_drive_probe_quiet_hours_start: "23:30"
+share_drive_probe_quiet_hours_end: "08:15"
 # quiet hours - sleep docker containers at night so that HDDs spin down
 docker_quiet_hours_start_hour: "01"
 docker_quiet_hours_try_until_hour: "06" # used in docker-sleep@pause.timer
-docker_quiet_hours_end: "08:00" # used in docker-sleep@unpause.timer
+docker_quiet_hours_end: "08:15" # used in docker-sleep@unpause.timer
 uptime_kuma_url: "http://192.168.2.106:3001" # pause the uptime monitor when the container is paused
 uptime_kuma_user: "john"
-# share drive probe (used in tasks/infra_vm/templates/homepage/services.yml and tasks/share_drive_probe)
-share_drive_probe_quiet_hours_start: "23:30"
-share_drive_probe_quiet_hours_end: "09:15"

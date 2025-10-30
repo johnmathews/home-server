@@ -1,12 +1,9 @@
 # roles/truenas_vm/tasks/main.yml
----
-
 - name: Set ISO directory path
   set_fact:
     iso_dir: "{{ playbook_dir }}/../iso-images"
   delegate_to: localhost
   become: false
-
 - name: Ensure ISO directory exists
   file:
     path: "{{ iso_dir }}"
@@ -14,7 +11,6 @@
     mode: '0755'
   delegate_to: localhost
   become: false
-
 - name: Find TrueNAS ISO file
   find:
     paths: "{{ iso_dir }}"
@@ -23,20 +19,17 @@
   register: found_isos
   delegate_to: localhost
   become: false
-
 - name: Fail if no ISO is found
   fail:
     msg: "No TrueNAS ISO found in {{ iso_dir }}. Please download it and place it there."
   when: found_isos.matched == 0
   delegate_to: localhost
   become: false
-
 - name: Sort ISOs by filename (descending)
   set_fact:
     latest_iso: "{{ (found_isos.files | sort(attribute='path') | reverse)[0] }}"
   delegate_to: localhost
   become: false
-
 - name: Ensure ISO directory exists on Proxmox
   file:
     path: /var/lib/vz/template/iso
@@ -44,7 +37,6 @@
     mode: '0755'
   delegate_to: pve
   become: true
-
 - name: Upload latest TrueNAS ISO to Proxmox using rsync
   ansible.posix.synchronize:
     src: "{{ latest_iso.path }}"
@@ -52,7 +44,6 @@
     mode: push
   delegate_to: localhost
   become: false
-
 - name: Authenticate with Proxmox API
   uri:
     url: "https://{{ hostvars[inventory_hostname]['ansible_host'] }}:8006/api2/json/access/ticket"
@@ -65,14 +56,12 @@
   register: proxmox_auth
   delegate_to: localhost
   become: false
-
 - name: Ensure ISO directory exists on Proxmox
   file:
     path: /var/lib/vz/template/iso
     state: directory
     mode: '0755'
   delegate_to: "{{ inventory_hostname }}"
-
 - name: Check if TrueNAS VM (ID 200) already exists
   uri:
     url: "https://{{ hostvars[inventory_hostname]['ansible_host'] }}:8006/api2/json/nodes/{{ hostvars[inventory_hostname]['proxmox_node_name'] }}/qemu/200/status/current"
@@ -85,11 +74,9 @@
   failed_when: truenas_status.status not in [200, 404, 500]
   delegate_to: localhost
   become: false
-
 - name: Set truenas_exists fact
   set_fact:
     truenas_exists: "{{ truenas_status.status == 200 }}"
-
 - name: Create TrueNAS VM (only if not present)
   community.general.proxmox_kvm:
     api_user: root@pam
@@ -114,7 +101,6 @@
   when: not truenas_exists
   delegate_to: localhost
   become: false
-
 - name: Set boot order to disk only and remove ISO (if installed)
   community.general.proxmox_kvm:
     api_user: root@pam
@@ -128,21 +114,12 @@
   when: truenas_installed | default(false)
   delegate_to: localhost
   become: false
-
-- name: Set up script to unlock datasets using key server 
+- name: Set up script to unlock datasets using key server
   import_tasks: key_server.yml
   tags: key
-
-- name: Set up script to spindown HDDs if idle 
+- name: Set up script to spindown HDDs if idle
   import_tasks: spindown_hdds.yml
   tags: hdds
-
-- name: Copy alloy configuration file 
+- name: Copy alloy configuration file
   import_tasks: alloy.yml
-  tags: alloy 
-
-# seems dodgy to do this this way in truenas. use a container instead.
-# - name: Install node exporter 
-#   import_tasks: node_exporter.yml
-#   tags: metrics
-
+  tags: alloy
