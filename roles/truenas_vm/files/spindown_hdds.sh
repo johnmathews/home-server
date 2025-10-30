@@ -18,10 +18,12 @@ PATH=/usr/sbin:/usr/bin:/sbin:/bin
 
 # ---------- CONFIG ----------
 # Pair each device with a friendly label: "<by-id>|<label>"
+# original 3TB backup disk "/dev/disk/by-id/ata-ST3000DM007-1WY10G_ZFN19YRG|backup"
 TARGETS=(
-	"/dev/disk/by-id/ata-ST3000DM007-1WY10G_ZFN19YRG|backup"
-	"/dev/disk/by-id/ata-ST8000VN004-3CP101_WWZ5AS90|tank"
-	"/dev/disk/by-id/ata-ST8000VN004-3CP101_WWZ5TZSF|tank"
+  "/dev/disk/by-id/ata-ST8000VN004-3CP101_WWZ5AS90|backup"
+  "/dev/disk/by-id/ata-ST8000VN004-3CP101_WWZ5TZSF|backup"
+  "/dev/disk/by-id/ata-ST16000NT001-3LV101_K3S04BKQ|tank"
+  "/dev/disk/by-id/ata-ST16000NT001-3LV101_ZR5GK5G9|tank"
 )
 
 SAMPLE_DURATION=240                          # seconds for iostat sampling
@@ -52,16 +54,16 @@ MKDIR=/usr/bin/mkdir
 
 # ---------- COLORS ----------
 if [[ -z "${NO_COLOR:-}" ]]; then
-	C_RESET=$'\033[0m'
-	C_DIM=$'\033[2m'
-	C_BOLD=$'\033[1m'
-	C_INFO=$'\033[36m' # cyan
-	C_WARN=$'\033[33m' # yellow
-	C_ERR=$'\033[31m'  # red
-	C_OK=$'\033[32m'   # green
-	C_NOTE=$'\033[35m' # magenta
+  C_RESET=$'\033[0m'
+  C_DIM=$'\033[2m'
+  C_BOLD=$'\033[1m'
+  C_INFO=$'\033[36m' # cyan
+  C_WARN=$'\033[33m' # yellow
+  C_ERR=$'\033[31m'  # red
+  C_OK=$'\033[32m'   # green
+  C_NOTE=$'\033[35m' # magenta
 else
-	C_RESET= C_DIM= C_BOLD= C_INFO= C_WARN= C_ERR= C_OK= C_NOTE=
+  C_RESET= C_DIM= C_BOLD= C_INFO= C_WARN= C_ERR= C_OK= C_NOTE=
 fi
 
 HAD_ERROR=0
@@ -69,10 +71,10 @@ HAD_ERROR=0
 ts() { "$DATE" "+%F %T"; }
 
 _log() {
-	# $1=color  $2=level  $3=message
-	local color="$1" lvl="$2" msg="$3"
-	# Timestamp + level padded to width 5
-	printf "[%s] %s%-5s%s %s\n" "$(ts)" "$color" "$lvl" "$C_RESET" "$msg" | "$TEE" -a "$LOG_FILE"
+  # $1=color  $2=level  $3=message
+  local color="$1" lvl="$2" msg="$3"
+  # Timestamp + level padded to width 5
+  printf "[%s] %s%-5s%s %s\n" "$(ts)" "$color" "$lvl" "$C_RESET" "$msg" | "$TEE" -a "$LOG_FILE"
 }
 
 log() { _log "$C_INFO" "INFO" "$*"; }
@@ -82,39 +84,39 @@ log_ok() { _log "$C_OK" "OK" "$*"; }
 log_note() { _log "$C_NOTE" "NOTE" "$*"; }
 
 die() {
-	HAD_ERROR=1
-	log_err "$*"
-	exit 1
+  HAD_ERROR=1
+  log_err "$*"
+  exit 1
 }
 
 # ---------- ERROR/EXIT TRAPS ----------
 on_err() {
-	local exit_code=$?
-	local line=${BASH_LINENO[0]:-?}
-	local cmd=${BASH_COMMAND:-?}
+  local exit_code=$?
+  local line=${BASH_LINENO[0]:-?}
+  local cmd=${BASH_COMMAND:-?}
 
-	HAD_ERROR=1
-	log_err "Aborted with exit code ${exit_code}"
-	log_err "Failing command: ${C_BOLD}${cmd}${C_RESET}"
-	log_err "At line: ${line} in ${BASH_SOURCE[1]:-main}"
+  HAD_ERROR=1
+  log_err "Aborted with exit code ${exit_code}"
+  log_err "Failing command: ${C_BOLD}${cmd}${C_RESET}"
+  log_err "At line: ${line} in ${BASH_SOURCE[1]:-main}"
 
-	# Mini stack (skip this function & trap frame)
-	local i
-	for ((i = 1; i < ${#FUNCNAME[@]}; i++)); do
-		local fn="${FUNCNAME[$i]}"
-		local src="${BASH_SOURCE[$i]}"
-		local lno="${BASH_LINENO[$((i - 1))]}"
-		[[ -n "$fn" ]] || fn="main"
-		log_note "  at ${fn} (${src}:${lno})"
-	done
-	exit "$exit_code"
+  # Mini stack (skip this function & trap frame)
+  local i
+  for ((i = 1; i < ${#FUNCNAME[@]}; i++)); do
+    local fn="${FUNCNAME[$i]}"
+    local src="${BASH_SOURCE[$i]}"
+    local lno="${BASH_LINENO[$((i - 1))]}"
+    [[ -n "$fn" ]] || fn="main"
+    log_note "  at ${fn} (${src}:${lno})"
+  done
+  exit "$exit_code"
 }
 
 on_exit() {
-	if [[ $HAD_ERROR -eq 0 ]]; then
+  if [[ $HAD_ERROR -eq 0 ]]; then
     echo | "$TEE" -a "$LOG_FILE"
-		log_ok "Spindown script complete. Exiting."
-	fi
+    log_ok "Spindown script complete. Exiting."
+  fi
 }
 
 trap on_err ERR
@@ -125,7 +127,7 @@ trap on_exit EXIT
 "$MKDIR" -p "$STAMP_DIR" || die "Cannot create stamp dir: $STAMP_DIR"
 
 for bin in "$AWK" "$BASENAME" "$DATE" "$FLOCK" "$GREP" "$HDPARM" "$IOSTAT" "$SMARTCTL" "$TEE" "$ZPOOL" "$NICE" "$IONICE" "$READLINK" "$STAT" "$TAIL" "$TOUCH" "$MKDIR"; do
-	[[ -x "$bin" ]] || die "Required binary missing: $bin"
+  [[ -x "$bin" ]] || die "Required binary missing: $bin"
 done
 
 [[ $EUID -eq 0 ]] || die "Run as root."
@@ -134,8 +136,8 @@ done
 exec {LOCKFD}>"$LOCK_FILE" || die "Cannot open lock file $LOCK_FILE"
 "$FLOCK" -n "$LOCKFD" || {
   echo | "$TEE" -a "$LOG_FILE"
-	log_note "Another run is active; exiting."
-	exit 0
+  log_note "Another run is active; exiting."
+  exit 0
 }
 
 # Small jitter so multiple cron hosts don't collide (max 10s)
@@ -164,113 +166,113 @@ done
 
 # Abort if any ZFS scrub/resilver is running
 if "$ZPOOL" status 2>/dev/null | "$GREP" -Eq "scan: (resilver|scrub) in progress"; then
-	log_warn "ZFS scan in progress; skipping spindown."
-	exit 0
+  log_warn "ZFS scan in progress; skipping spindown."
+  exit 0
 fi
 
 # ---------- MAIN LOOP ----------
 for pair in "${TARGETS[@]}"; do
-	IFS='|' read -r devid label <<<"$pair"
+  IFS='|' read -r devid label <<<"$pair"
 
-	if [[ ! -e "$devid" ]]; then
-		log_warn "${label}: device not found [$devid]; skipping."
-		continue
-	fi
+  if [[ ! -e "$devid" ]]; then
+    log_warn "${label}: device not found [$devid]; skipping."
+    continue
+  fi
 
-	realnode=$("$READLINK" -f "$devid")
-	sdnode=$("$BASENAME" "$realnode")
-	if [[ -z "${sdnode:-}" || ! -e "$realnode" ]]; then
-		log_warn "${label}: could not resolve block node for [$devid]; skipping."
-		continue
-	fi
+  realnode=$("$READLINK" -f "$devid")
+  sdnode=$("$BASENAME" "$realnode")
+  if [[ -z "${sdnode:-}" || ! -e "$realnode" ]]; then
+    log_warn "${label}: could not resolve block node for [$devid]; skipping."
+    continue
+  fi
 
-	# Rotational check (skip SSDs)
-	rota="/sys/block/${sdnode}/queue/rotational"
-	if [[ ! -f "$rota" ]]; then
-		log_warn "${label} [$devid] (${sdnode}): no rotational attribute; skipping."
-		continue
-	fi
-	if [[ "$(<"$rota")" != "1" ]]; then
-		log_note "${label} [$devid] (${sdnode}): non-rotational (SSD); skipping."
-		continue
-	fi
+  # Rotational check (skip SSDs)
+  rota="/sys/block/${sdnode}/queue/rotational"
+  if [[ ! -f "$rota" ]]; then
+    log_warn "${label} [$devid] (${sdnode}): no rotational attribute; skipping."
+    continue
+  fi
+  if [[ "$(<"$rota")" != "1" ]]; then
+    log_note "${label} [$devid] (${sdnode}): non-rotational (SSD); skipping."
+    continue
+  fi
 
-	# Already in standby?
+  # Already in standby?
   rc=0
   "$NICE" -n 10 "$IONICE" -c3 "$SMARTCTL" -n standby -i "$devid" >/dev/null 2>&1 || rc=$?
 
   case "$rc" in
-    0) ;;  # OK, proceed
-    2)
-      echo | "$TEE" -a "$LOG_FILE"
-      log_note "${label} (${sdnode}): already in standby; skipping."
-      continue
-      ;;
-    *)
-      echo | "$TEE" -a "$LOG_FILE"
-      log_warn "${label}: smartctl returned rc=$rc (non-fatal); continuing."
-      ;;
+  0) ;; # OK, proceed
+  2)
+    echo | "$TEE" -a "$LOG_FILE"
+    log_note "${label} (${sdnode}): already in standby; skipping."
+    continue
+    ;;
+  *)
+    echo | "$TEE" -a "$LOG_FILE"
+    log_warn "${label}: smartctl returned rc=$rc (non-fatal); continuing."
+    ;;
   esac
 
-	if [[ $rc -eq 0 ]]; then
-		# Skip if a SMART self-test is running (won’t wake due to -n standby)
-		if "$NICE" -n 10 "$IONICE" -c3 "$SMARTCTL" -n standby -c "$devid" 2>/dev/null | "$GREP" -qi "Self-test routine in progress"; then
-			log_note "${label} (${sdnode}): SMART self-test running; skipping."
-			continue
-		fi
-	fi
+  if [[ $rc -eq 0 ]]; then
+    # Skip if a SMART self-test is running (won’t wake due to -n standby)
+    if "$NICE" -n 10 "$IONICE" -c3 "$SMARTCTL" -n standby -c "$devid" 2>/dev/null | "$GREP" -qi "Self-test routine in progress"; then
+      log_note "${label} (${sdnode}): SMART self-test running; skipping."
+      continue
+    fi
+  fi
 
-	# Anti-thrash cooldown
-	stamp="$STAMP_DIR/${sdnode}.stamp"
-	if [[ $COOLDOWN_SECS -gt 0 && -f "$stamp" ]]; then
-		last=$("$STAT" -c %Y "$stamp" 2>/dev/null || echo 0)
-		now=$("$DATE" +%s)
-		if ((now - last < COOLDOWN_SECS)); then
-			log_note "${label} (${sdnode}): cooldown active $((now - last))s < ${COOLDOWN_SECS}s; skipping."
-			continue
-		fi
-	fi
+  # Anti-thrash cooldown
+  stamp="$STAMP_DIR/${sdnode}.stamp"
+  if [[ $COOLDOWN_SECS -gt 0 && -f "$stamp" ]]; then
+    last=$("$STAT" -c %Y "$stamp" 2>/dev/null || echo 0)
+    now=$("$DATE" +%s)
+    if ((now - last < COOLDOWN_SECS)); then
+      log_note "${label} (${sdnode}): cooldown active $((now - last))s < ${COOLDOWN_SECS}s; skipping."
+      continue
+    fi
+  fi
 
-	# Sample iostat and read final %util
-	echo | "$TEE" -a "$LOG_FILE"
-	log "${label} (${sdnode}): sampling I/O for ${SAMPLE_DURATION}s…"
-	util_line="$(
-		"$NICE" -n 10 "$IONICE" -c3 \
-			"$IOSTAT" -d -x -y "$sdnode" "$SAMPLE_DURATION" 2 2>/dev/null |
-			"$GREP" -E "^[[:space:]]*$sdnode[[:space:]]" | "$TAIL" -n1 || true
-	)"
+  # Sample iostat and read final %util
+  echo | "$TEE" -a "$LOG_FILE"
+  log "${label} (${sdnode}): sampling I/O for ${SAMPLE_DURATION}s…"
+  util_line="$(
+    "$NICE" -n 10 "$IONICE" -c3 \
+      "$IOSTAT" -d -x -y "$sdnode" "$SAMPLE_DURATION" 2 2>/dev/null |
+      "$GREP" -E "^[[:space:]]*$sdnode[[:space:]]" | "$TAIL" -n1 || true
+  )"
 
-	if [[ -z "$util_line" ]]; then
-		util="0.00"
-		log_warn "${label}: no iostat line captured; treating as idle."
-	else
-		util=$("$AWK" '{print $(NF)+0}' <<<"$util_line")
-	fi
-	log "${label} (${sdnode}): ${C_BOLD}${util}% utilisation${C_RESET}"
+  if [[ -z "$util_line" ]]; then
+    util="0.00"
+    log_warn "${label}: no iostat line captured; treating as idle."
+  else
+    util=$("$AWK" '{print $(NF)+0}' <<<"$util_line")
+  fi
+  log "${label} (${sdnode}): ${C_BOLD}${util}% utilisation${C_RESET}"
 
-	# ZFS-aware guard: if reads/writes non-zero, skip
-	devlabel_byid="$("$BASENAME" "$devid")"
-	devlabel_sdx="$sdnode"
-	devlabel_real="$("$BASENAME" "$realnode")"
-	if "$NICE" -n 10 "$IONICE" -c3 "$ZPOOL" iostat -v -p 1 1 2>/dev/null |
-		"$AWK" -v d1="$devlabel_byid" -v d2="$devlabel_sdx" -v d3="$devlabel_real" '
+  # ZFS-aware guard: if reads/writes non-zero, skip
+  devlabel_byid="$("$BASENAME" "$devid")"
+  devlabel_sdx="$sdnode"
+  devlabel_real="$("$BASENAME" "$realnode")"
+  if "$NICE" -n 10 "$IONICE" -c3 "$ZPOOL" iostat -v -p 1 1 2>/dev/null |
+    "$AWK" -v d1="$devlabel_byid" -v d2="$devlabel_sdx" -v d3="$devlabel_real" '
        { name=$1; r=$(NF-1)+0; w=$(NF)+0; if (index(name,d1)||index(name,d2)||index(name,d3)) if (r+w>0) act=1 }
        END{ exit act?0:1 }'; then
-		log_note "${label} (${sdnode}): zpool iostat shows activity; skipping."
-		continue
-	fi
+    log_note "${label} (${sdnode}): zpool iostat shows activity; skipping."
+    continue
+  fi
 
-	# Compare as numbers: spin down if util < threshold
-	if "$AWK" -v u="$util" -v t="$UTIL_THRESHOLD" 'BEGIN{exit !(u < t)}'; then
-		log_warn "${label} (${sdnode}): Spinning down…"
-		if "$HDPARM" -y "$devid" >/dev/null 2>&1; then
-			log_ok "${label} (${sdnode}): disk in standby."
-			"$TOUCH" "$stamp" || true
-		else
-			log_err "${label} (${sdnode}): hdparm -y failed; backing off."
-			"$TOUCH" "$stamp" || true
-		fi
-	else
-		log_note "${label} (${sdnode}): utilisation >= ${UTIL_THRESHOLD}%, skipping spindown."
-	fi
+  # Compare as numbers: spin down if util < threshold
+  if "$AWK" -v u="$util" -v t="$UTIL_THRESHOLD" 'BEGIN{exit !(u < t)}'; then
+    log_warn "${label} (${sdnode}): Spinning down…"
+    if "$HDPARM" -y "$devid" >/dev/null 2>&1; then
+      log_ok "${label} (${sdnode}): disk in standby."
+      "$TOUCH" "$stamp" || true
+    else
+      log_err "${label} (${sdnode}): hdparm -y failed; backing off."
+      "$TOUCH" "$stamp" || true
+    fi
+  else
+    log_note "${label} (${sdnode}): utilisation >= ${UTIL_THRESHOLD}%, skipping spindown."
+  fi
 done

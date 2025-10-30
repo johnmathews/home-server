@@ -7,9 +7,3 @@ puid: 1001
 guid: 1001
 tubearchivist_host: "https://tube.itsa.pizza 192.168.2.116:8000"
 ta_username: john
-# sleep docker containers during quiet hours and pause uptime-kuma monitors
-uptime_kuma_url: "http://192.168.2.106:3001"
-uptime_kuma_user: "john"
-docker_quiet_hours_start_hour: "01"
-docker_quiet_hours_end_hour: "07"
-docker_quiet_hours_end: "07:45" # needed for the unpause timer

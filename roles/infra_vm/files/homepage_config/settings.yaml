@@ -1,83 +1,70 @@
 # infra_vm/files/homepage_config/settings.yaml
-
----
-
 # For configuration options and examples, please see:
 # # https://gethomepage.dev/configs/settings/
-
 title: Home Server
 description: Media and Infra Apps
-
 theme: light # or dark
 fullWidth: false
 # maxGroupColumns: 8 # default is 4 for services, 6 for bookmarks, max 8
 
-useEqualHeights: false 
-
+useEqualHeights: false
 layout:
-
   Media:
     tab: Media
     style: row
     columns: 3
-
   Usenet:
     tab: Media
     initiallyCollapsed: false
     style: row
     columns: 4
-
   Infra:
     tab: Infra
     style: row
     columns: 4
-
   External:
     tab: Infra
     style: row
     columns: 4
-
   PVE:
     tab: Infra
     initiallyCollapsed: false
     style: row
     columns: 3
-
   Hardware:
     tab: Infra
     initiallyCollapsed: false
     style: row
     columns: 3
-
   NAS:
     tab: NAS
     initiallyCollapsed: false
     style: row
     columns: 3
-
   Charts:
     tab: Charts
     style: row
     columns: 3
-
   More Charts:
     tab: Charts
     style: row
     columns: 1
     initiallyCollapsed: false
-
   Monitoring:
     tab: Monitoring
     initiallyCollapsed: false
     style: row
     columns: 2
-
-  Notes:
+  Media Notes:
     tab: Notes
     initiallyCollapsed: false
     style: row
     columns: 6
-
+  System Notes:
+    tab: Notes
+    initiallyCollapsed: false
+    style: row
+    columns: 6
 providers:
   openweathermap: openweathermapapikey
   weatherapi: weatherapiapikey

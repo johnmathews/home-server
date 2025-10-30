@@ -346,7 +346,7 @@
         siteMonitor: https://app.addy.io
         description: Email address aliases
         icon: https://app.addy.io/favicon.ico
-- Notes:
+- Media Notes:
     - Mullvad:
         description: 22 January 2026 07:51
     - Usenet.farm:
@@ -357,6 +357,11 @@
         description: 26 November 10:48
     - Usage Metrics:
         description: sabnzbd > settings > servers
+- System Notes:
+    - Share Drive Probe:
+        description: "{{ share_drive_probe_quiet_hours_start }} - {{ share_drive_probe_quiet_hours_end }}"
+    - Quiet Hours:
+        description: "{{ docker_quiet_hours_start_hour }}:00 - {{ docker_quiet_hours_end }}\n- Bazarr\n- Booklore- mariadb\n- Booklore\n- Jellyseerr\n- Paperless\n- Prowlarr\n- Radarr\n- Sabnzbd\n- Sonarr\n- TubeArchivist\n- qBittorrent"
 - Infra:
     - Grafana:
         href: https://charts.itsa.pizza/d/dekkfibh9454wb/home-server?from=now-24h&to=now&timezone=browser%3Fkiosk&refresh=10s

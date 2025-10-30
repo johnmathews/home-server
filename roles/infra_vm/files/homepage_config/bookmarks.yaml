@@ -1,16 +1,12 @@
 # infra_vm/files/homepage_config/bookmarks.yaml
-
----
-
 # For configuration options and examples, please see:
 # https://gethomepage.dev/configs/bookmarks
-
 - Media Apps:
     - Jellyfin:
-        - abbr: 
+        - abbr:
           href: http://192.168.2.110:8096
     - Jellyseer:
-        - abbr: 
+        - abbr:
           href: http://192.168.2.105:5055
     - Paperless:
         - abbr:
@@ -19,22 +15,22 @@
         - abbr:
           href: http://192.168.2.116:8000
     - Hometube:
-        - abbr: 
+        - abbr:
           href: http://192.168.2.105:8501/
     - Sonarr:
-        - abbr: 
+        - abbr:
           href: http://192.168.2.105:8989
     - Radarr:
-        - abbr: 
+        - abbr:
           href: http://192.168.2.105:7878
     - Sabnzbd:
-        - abbr: 
+        - abbr:
           href: http://192.168.2.105:8081
     - qBittorrent:
-        - abbr: 
+        - abbr:
           href: http://192.168.2.105:8080
     - Gluetun:
-        - abbr: 
+        - abbr:
           href: http://192.168.2.105:8000/v1/publicip/ip
     - BookLore:
         - abbr:
@@ -45,22 +41,15 @@
     - Tunarr:
         - abbr:
           href: http://192.168.2.110:8000
-
-- Infra Services:
-    - TrueNAS:
-        - abbr: 
-          href: http://192.168.2.104
-    - Traefik:
-        - abbr:
-          href: http://192.168.2.108/dashboard/
+- Observability:
     - Grafana:
-        - abbr: 
+        - abbr:
           href: http://192.168.2.106:3000
     - Loki:
-        - abbr: 
+        - abbr:
           href: http://192.168.2.106:3100/config
     - Prometheus:
-        - abbr: 
+        - abbr:
           href: http://192.168.2.115:9090
     - Uptime Kuma:
         - abbr:
@@ -69,47 +58,51 @@
         - abbr:
           href: http://192.168.2.104:12345
     - Infra Alloy:
-        - abbr: 
+        - abbr:
           href: http://192.168.2.106:12345
     - Media Alloy:
-        - abbr: 
+        - abbr:
           href: http://192.168.2.105:12345
     - Tube Alloy:
-        - abbr: 
+        - abbr:
           href: http://192.168.2.116:12345
     - Prometheus Alloy:
-        - abbr: 
+        - abbr:
           href: http://192.168.2.115:12345
     - Immich Alloy:
-        - abbr: 
+        - abbr:
           href: http://192.168.2.113:12345
     - Open-UI Alloy:
-        - abbr: 
+        - abbr:
           href: http://192.168.2.119:12345
     - Jellyfin Alloy:
-        - abbr: 
+        - abbr:
           href: http://192.168.2.110:12345
     - Paperless Alloy:
-        - abbr: 
+        - abbr:
           href: http://192.168.2.117:12345
     - Traefik Alloy:
-        - abbr: 
+        - abbr:
           href: http://192.168.2.108:12345
-
 - Other Apps:
+    - TrueNAS:
+        - abbr:
+          href: http://192.168.2.104
+    - Traefik:
+        - abbr:
+          href: http://192.168.2.108/dashboard/
     - Home Assistant:
-        - abbr: 
+        - abbr:
           href: http://192.168.2.102:8123
     - AdGuard:
-        - abbr: 
+        - abbr:
           href: http://192.168.2.111
     - VaultWarden:
         - abbr:
           href: https://192.168.2.13:8000
-
 - Hardware_:
     - ProxMox:
-        - abbr: 
+        - abbr:
           href: http://192.168.2.214:8006
     - PBS:
         - abbr:
@@ -120,8 +113,7 @@
     - Router:
         - abbr:
           href: http://192.168.2.254
-
 - Docs:
-  - Proxmox Scripts:
-    - abbr: 
-      href: https://community-scripts.github.io/ProxmoxVE/scripts
+    - Proxmox Scripts:
+        - abbr:
+          href: https://community-scripts.github.io/ProxmoxVE/scripts

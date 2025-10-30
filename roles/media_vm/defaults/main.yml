@@ -1,28 +1,21 @@
 # media_vm/defaults/main.yml
 
 # defaults/main.yml has the lowest priority. host_vars/media-vm.yml has highest priority.
-
 # Changing this will require you to `cd /src/media && docker compose logs qbittorrent` 
 # to get the new temp password. Then in qBittorrent set the old password again
 reset_qbittorrent_config: false
 # qbittorrent_password_hash: 16c5e9c9b842bd6bf78aafa66643304e0cfe2586
 
 TZ: Europe/Amsterdam
-
 proxmox_api_host: "{{ hostvars['pve']['ansible_host'] }}"
-
 media_stack_base_dir: /srv/media
 media_stack_mount_dir: /mnt/media
-
 media_stack_user: john
 media_stack_group: john
-
 puid: 1001
 guid: 1001
-
 # tubearchivist_host: "http://192.168.2.105:8002"
 # ta_username: john
-
 media_stack_services:
   jellyfin_port: 8096
   qbittorrent_port: 8080
@@ -30,10 +23,8 @@ media_stack_services:
   radarr_port: 7878
   jackett_port: 9117
   bazarr_port: 6767
-
 smb_media_vm_username: media_vm
 smb_server: 192.168.2.104
-
 smb_opts_items:
   - credentials=/etc/smb-media-credentials
   - uid={{ puid }}
@@ -56,10 +47,3 @@ smb_opts_items:
   - timeo=60,
   - retrans=3
 smb_opts: "{{ smb_opts_items | join(',') }}"
-
-# sleep docker containers during quiet hours and pause uptime-kuma monitors
-uptime_kuma_url: "http://192.168.2.106:3001"
-uptime_kuma_user: "john"
-docker_quiet_hours_start_hour: "01"
-docker_quiet_hours_end_hour: "07"
-docker_quiet_hours_end: "07:45" # needed for the unpause timer

@@ -138,18 +138,6 @@ services:
       timeout: 5s
       retries: 3
       start_period: 60s
-  # hometube:
-  #   image: ghcr.io/egalitarianmonkey/hometube:latest
-  #   container_name: hometube
-  #   ports:
-  #     - "8501:8501"
-  #   environment:
-  #     - TZ=Europe/Amsterdam
-  #     - PORT=8501
-  #   volumes:
-  #     - /mnt/nfs/media/Video/YouTube Videos:/data/Videos
-  #     - /srv/media/config/hometube/cookies:/config # Cookies folder
-  #   restart: unless-stopped
   filebrowser:
     image: filebrowser/filebrowser:latest
     container_name: filebrowser

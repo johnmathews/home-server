@@ -1,7 +1,4 @@
 # vim: ft=yaml
-
----
-
 groups:
   - name: share_drives.probe_mounts.derived
     rules:
@@ -10,15 +7,14 @@ groups:
         expr: time() - share_drive_probe_state_change_timestamp_seconds
       - record: share_drive_probe_last_run_age_seconds
         expr: time() - share_drive_probe_last_run_timestamp_seconds
-
       # Booleans
       - record: share_drive_is_ok
         expr: share_drive_probe_state == 1
       - record: share_drive_is_down
         expr: share_drive_probe_state == 0
+      # if share is OFF in trueNAS, -1 is returned 
       - record: share_drive_probe_returns_error
         expr: share_drive_probe_state == -1
-
       # Enriched state (define this ONCE)
       - record: share_drive_probe_state_enriched
         expr: |
@@ -30,7 +26,6 @@ groups:
             ),
             "mount_name", "$1", "mount", ".*/([^/]+)$"
           )
-
       # Enriched age (new) – labels match the enriched state
       - record: share_drive_probe_current_state_age_seconds_enriched
         expr: |
@@ -42,7 +37,6 @@ groups:
             ),
             "mount_name", "$1", "mount", ".*/([^/]+)$"
           )
-
   - name: disk-spindown
     interval: 15s
     rules:
@@ -57,12 +51,10 @@ groups:
               "disk_id", "$1", "device_id", ".*/([^/]+)$"
             ) == bool 0
           )
-
       # 2) Spindown event: 1 only when transitioning into standby (non-zero -> 0), else 0
       #    offset must be on a vector selector; using the recorded vector makes this clean.
       - record: disk:spindown_event:1
         expr: clamp_min(disk:standby:bool - disk:standby:bool offset 15s, 0)
-
   - name: ups_mains_rules
     interval: 3m
     rules:
@@ -71,29 +63,24 @@ groups:
         expr: |
           timestamp(network_ups_tools_ups_status{flag="OB"})
           and on(instance) (network_ups_tools_ups_status{flag="OB"} == 1)
-
       # Last time OB was 1 in the lookback window (0 if never)
       - record: ups_last_ob_timestamp_seconds
         expr: |
           max by(instance) (max_over_time(ups_ob_ts_seconds[60d]))
           or on(instance) (0 * group without(flag) (network_ups_tools_ups_status{flag="OB"}))
-
       # Timestamps only when OL==1
       - record: ups_ol_ts_seconds
         expr: |
           timestamp(network_ups_tools_ups_status{flag="OL"})
           and on(instance) (network_ups_tools_ups_status{flag="OL"} == bool 1)
-
       # First time we saw OL=1 in the window
       - record: ups_first_ol_timestamp_seconds
         expr: |
           min by(instance) (min_over_time(ups_ol_ts_seconds[60d]))
-
       # Boolean: have we seen any OB=1 in the window?
       - record: ups_ob_seen_window_60d
         expr: |
           max by(instance) (max_over_time(network_ups_tools_ups_status{flag="OB"}[60d])) > bool 0
-
       # Days since last OB (lower bound when never seen OB in window)
       - record: ups_days_since_last_ob_lower_bound
         expr: |
