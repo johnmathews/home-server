@@ -3,7 +3,10 @@
 - The service is updated and deployed using Ansible.
 - The tasks live in `tasks/sleep_docker_containers.yml`
 
+`make site tags=sleep`
 `make media tags=sleep`
+`make paperless tags=sleep`
+`make tube tags=sleep`
 
 ## Context
 
@@ -27,7 +30,6 @@ Pausing a docker container does not stop it, but it does prevent disk IO.
 
 The state of the container is unaffected (RAM remains allocated, PIDs stay open,
 file/socket state is unchanged.
-
 
 ## Variables
 

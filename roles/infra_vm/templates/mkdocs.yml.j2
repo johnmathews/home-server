@@ -1,8 +1,6 @@
 # vim: ft=yaml
-
 site_name: Home Server Documentation
 site_url: https://docs.itsa.pizza
-
 theme:
   name: material
   palette:
@@ -10,22 +8,21 @@ theme:
   features:
     - content.code.copy
     - navigation.instant
-    - navigation.indexes 
+    - navigation.indexes
     - navigation.tracking
     - navigation.top
-
 markdown_extensions:
   - admonition
   - toc
   - tables
-
 plugins:
   - search
-
 nav:
   - Paperless: paperless.md
+  - Traefik: traefik.md
   - Share Drive Management (NFS, SMB): share_drives_nfs_smb.md
   - Build commands: ansible_build_commands.md
+  - HDDs: disks.md
   - Quiet Hours: quiet_hours.md
   - River: river.md
   - SystemD: systemd.md
@@ -35,6 +32,5 @@ nav:
   - Key Server: key_server.md
   - Adguard + Unbound: adguard-unbound.md
   - Cloudflared: cloudflared.md
-  - HDDs: disks.md
   - iperf3-speedtest: iperf3-speedtest.md
   - media_vm + qbittorrent: media_vm_qbittorrent.md

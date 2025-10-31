@@ -362,6 +362,8 @@
         description: "{{ share_drive_probe_quiet_hours_start }} - {{ share_drive_probe_quiet_hours_end }}"
     - Quiet Hours:
         description: "{{ docker_quiet_hours_start_hour }}:00 - {{ docker_quiet_hours_end }}\n- Bazarr\n- Booklore- mariadb\n- Booklore\n- Jellyseerr\n- Paperless\n- Prowlarr\n- Radarr\n- Sabnzbd\n- Sonarr\n- TubeArchivist\n- qBittorrent"
+    - Spin Down Hard Disks:
+        description: "\nProxmox HDDs: spundown using hd-idle.\n\nTrueNAS HDDs: spundown using /mnt/switft/scripts/spindown_hdds.sh.\n\nExecuted on hours 0-4,12-22.\n\ndocs.itsa.pizza/disks."
 - Infra:
     - Grafana:
         href: https://charts.itsa.pizza/d/dekkfibh9454wb/home-server?from=now-24h&to=now&timezone=browser%3Fkiosk&refresh=10s
