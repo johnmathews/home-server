@@ -1,12 +1,10 @@
-smb_shares:
-  - name: library 
-    target: /mnt/media/library
-    mountpoint: /mnt/media/library 
-  - name: media 
-    target: /mnt/media/media
-    mountpoint: /mnt/media/media 
-
-
+# smb_shares:
+#   - name: library 
+#     target: /mnt/media/library
+#     mountpoint: /mnt/media/library 
+#   - name: media 
+#     target: /mnt/media/media
+#     mountpoint: /mnt/media/media 
 nfs_shares:
   - name: library
     mountpoint: /mnt/nfs/library
