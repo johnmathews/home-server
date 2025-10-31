@@ -1,6 +1,8 @@
 # infra_vm/files/homepage_config/bookmarks.yaml
+
 # For configuration options and examples, please see:
 # https://gethomepage.dev/configs/bookmarks
+
 - Media Apps:
     - Jellyfin:
         - abbr:
@@ -41,6 +43,7 @@
     - Tunarr:
         - abbr:
           href: http://192.168.2.110:8000
+
 - Observability:
     - Grafana:
         - abbr:
@@ -84,6 +87,7 @@
     - Traefik Alloy:
         - abbr:
           href: http://192.168.2.108:12345
+
 - Other Apps:
     - TrueNAS:
         - abbr:
@@ -100,6 +104,7 @@
     - VaultWarden:
         - abbr:
           href: https://192.168.2.13:8000
+
 - Hardware_:
     - ProxMox:
         - abbr:
@@ -113,7 +118,11 @@
     - Router:
         - abbr:
           href: http://192.168.2.254
+
 - Docs:
+    - Server:
+        - abbr:
+          href: https://docs.itsa.pizza
     - Proxmox Scripts:
         - abbr:
           href: https://community-scripts.github.io/ProxmoxVE/scripts

@@ -4,8 +4,11 @@
 - The tasks live in `tasks/sleep_docker_containers.yml`
 
 `make site tags=sleep`
+
 `make media tags=sleep`
+
 `make paperless tags=sleep`
+
 `make tube tags=sleep`
 
 ## Context
