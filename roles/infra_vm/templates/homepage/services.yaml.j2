@@ -375,6 +375,10 @@
           url: http://192.168.2.106:3000
           username: "{{ vault_grafana_username }}"
           password: "{{ vault_grafana_password }}"
+    - Documentation:
+        href: https://docs.itsa.pizza
+        siteMonitor: http://192.168.2.106:8000
+        icon: si-materialformkdocs
     - Loki:
         href: http://192.168.2.106:3100/loki/api/v1/status/buildinfo
         siteMonitor: http://192.168.2.106:3100/loki/api/v1/status/buildinfo

@@ -104,6 +104,9 @@
     - VaultWarden:
         - abbr:
           href: https://192.168.2.13:8000
+    - Docs:
+        - abbr:
+          href: http://192.168.2.106:8000
 
 - Hardware_:
     - ProxMox:
