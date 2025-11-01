@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # vim: ft=sh
+# shellcheck shell=bash
 
-set -u -o pipefail  # (no -e globally; we handle errors per-mount)
+set -u -o pipefail  
 
 # ---------- CONFIG (via env / Ansible template) ----------
 TZ="${SDP_TZ:-Europe/Amsterdam}"
@@ -16,8 +17,11 @@ METRIC_FILE="${TEXTFILE_DIR}/share_drive_probe.prom"
 OP_TIMEOUT="{{ share_drive_probe_op_timeout }}"
 
 AUTOFS_WAKE="{{ share_drive_probe_autofs_wake | default('true') | lower }}"
+
+# shellcheck disable=SC1064,SC1065,SC1072,SC1073,SC1083
 AUTOFS_POLL_COUNT={{ share_drive_probe_autofs_poll_count | default(30) }}
 AUTOFS_POLL_SLEEP_SEC={{ share_drive_probe_autofs_poll_sleep_sec | default('0.1') }}
+# shellcheck enable=SC1064,SC1065,SC1072,SC1073,SC1083
 
 HOST="$(hostname)"
 EPOCH_NOW="$(date +%s)"

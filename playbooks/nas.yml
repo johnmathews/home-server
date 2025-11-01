@@ -16,5 +16,5 @@
     iso_filename: TrueNAS-SCALE-24.10.2.1.iso
 
   roles:
-    - role: truenas_vm
-      tags: truenas
+    - role: nas
+      tags: truenas,nas

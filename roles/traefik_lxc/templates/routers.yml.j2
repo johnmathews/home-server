@@ -26,6 +26,14 @@ http:
       middlewares:
         - security-headers
         - jelly-login-rl
+    traefik-ip:
+      rule: Host(`192.168.2.108`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))
+      entryPoints: [web]
+      service: api@internal
+      priority: 600
+      middlewares:
+        - local-only
+        - security-headers # optional; remove if it causes UI issues
     traefik-api-local:
       rule: Host(`traefik.itsa.pizza`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
       entryPoints: [web]
