@@ -54,8 +54,10 @@
     - /srv/apps/paperless/pgdata
     - /srv/apps/paperless/redisdata
 
+# not needed - only the other clients need the SMB share. the LXC can use only the NFS share
 - name: create smb share
   import_tasks: mount-smb.yml
+  when: false
   tags: smb
 
 - name: create environment file from template
