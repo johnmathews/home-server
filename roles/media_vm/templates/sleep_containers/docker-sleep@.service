@@ -10,6 +10,9 @@ Type=oneshot
 # Run as root unless your service account is in the docker group
 ExecStart=/usr/local/bin/docker-sleep.sh %i
 
+Environment=QUIET_HOURS_START={{ docker_quiet_hours_start }}
+Environment=QUIET_HOURS_END={{ docker_quiet_hours_end }}
+
 Environment=QUIET_LOG_LEVEL=debug
 Environment=QUIET_CMD_TIMEOUT_S=15
 Environment=QUIET_RETRIES=3

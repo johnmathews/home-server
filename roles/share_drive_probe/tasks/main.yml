@@ -1,7 +1,5 @@
 # share_drive_probe/tasks/main.yml
 
----
-
 - name: Ensure config and metrics directories exist
   file:
     path: "{{ item }}"
@@ -12,7 +10,6 @@
   loop:
     - "{{ share_drive_probe_conf_dir }}"
     - "{{ share_drive_probe_textfile_dir }}"
-
 
 - name: Ensure textfile collector directory permissions are correct
   file:
@@ -68,7 +65,7 @@
     owner: root
     group: root
     mode: '0755'
-  notify: 
+  notify:
     - reload daemon
     - run share-drive-probe service
     - restart share-drive-probe timer
@@ -78,7 +75,7 @@
     src: templates/share_drive_probe.service.j2
     dest: /etc/systemd/system/share-drive-probe.service
     mode: '0644'
-  notify: 
+  notify:
     - reload daemon
     - run share-drive-probe service
 
@@ -90,4 +87,3 @@
   notify:
     - reload daemon
     - restart share-drive-probe timer
-

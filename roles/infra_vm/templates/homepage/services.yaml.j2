@@ -366,7 +366,7 @@
     - Share Drive Probe:
         description: "{{ share_drive_probe_quiet_hours_start }} - {{ share_drive_probe_quiet_hours_end }}\ndocs.itsa.pizza/monitor_nfs_smb_mounts"
     - Spin Down Hard Disks:
-        description: "12am - 7am\ndocs.itsa.pizza/disks.\n\nProxmox HDDs: spundown using hd-idle.\n\nTrueNAS HDDs: spundown using /mnt/switft/scripts/spindown_hdds.sh."
+        description: "12am - 7am\ndocs.itsa.pizza/disks.\n\nProxmox HDDs: spundown using tool hd-idle.\n\nTrueNAS HDDs: spundown using script /mnt/switft/scripts/spindown_hdds.sh."
     - Quiet Hours:
         description: "{{ docker_quiet_hours_start_hour }}:00 - {{ docker_quiet_hours_end }}\ndocs.itsa.pizza/quiet_hours\n\n- Bazarr\n- Booklore- mariadb\n- Booklore\n- Jellyseerr\n- Paperless\n- Prowlarr\n- Radarr\n- Sabnzbd\n- Sonarr\n- TubeArchivist\n- qBittorrent"
     - TrueNAS Disks:

@@ -57,7 +57,7 @@
 # not needed - only the other clients need the SMB share. the LXC can use only the NFS share
 - name: create smb share
   import_tasks: mount-smb.yml
-  when: false
+  when: false # never run
   tags: smb
 
 - name: create environment file from template

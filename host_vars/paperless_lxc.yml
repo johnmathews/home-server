@@ -1,7 +1,3 @@
-smb_shares:
-  - name: paperless
-    mountpoint: /mnt/paperless
-    target: /mnt/paperless
 nfs_shares:
   - name: paperless
     mountpoint: /mnt/nfs/paperless
