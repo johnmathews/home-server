@@ -128,8 +128,8 @@ scrape_configs:
     static_configs:
       - targets: ['192.168.2.214:9633']
         labels: {hostname: 'proxmox'}
-      - targets: ['192.168.2.104:9633']
-        labels: {hostname: 'truenas'}
+        # - targets: ['192.168.2.104:9633'] # stops hdd spin down.
+        #   labels: {hostname: 'truenas'}
     relabel_configs:
       - source_labels: [__address__]
         regex: '([^:]+)(?::\d+)?'
@@ -150,7 +150,7 @@ scrape_configs:
         regex: '([^:]+)(?::\d+)?'
         target_label: host
         replacement: '$1'
-  - job_name: 'disk_power_exporter'
+  - job_name: 'disk_power_status_exporter'
     metrics_path: /metrics
     scrape_interval: 30s
     scrape_timeout: 15s

@@ -5,6 +5,7 @@
     recreate: always
     dependencies: true
   become: false
+
 - name: restart paperless
   community.docker.docker_compose_v2:
     project_src: "{{ docker_compose_dir }}"
@@ -16,6 +17,7 @@
     recreate: always
     dependencies: true
   become: false
+
 - name: restart alloy
   community.docker.docker_compose_v2:
     project_src: "{{ docker_compose_dir }}"
@@ -25,15 +27,7 @@
     recreate: always
     dependencies: true
   become: false
-- name: restart promtail
-  community.docker.docker_compose_v2:
-    project_src: "{{ docker_compose_dir }}"
-    services:
-      - promtail
-    state: present
-    recreate: always
-    dependencies: true
-  become: false
+
 - name: restart sleep-hours timers
   become: true
   systemd:

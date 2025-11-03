@@ -1,6 +1,3 @@
-# smb_shares:
-#   - name: immich 
-#     target: /mnt/immich
 nfs_shares:
   - name: immich
     mountpoint: /mnt/nfs/immich

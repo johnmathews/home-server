@@ -4,6 +4,8 @@ There is a task called `share_drive_probe`. It's added to all the playbooks.
 
 ## Setup and Deployment (Ansible)
 
+`make site tags=shares`
+
 Add the role `share_drive_probe` to the hosts playbook. It has the tag `shares`.
 
 Deploy it to an individual host using `make <host> tags=shares` or to all hosts

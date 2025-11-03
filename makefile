@@ -41,7 +41,7 @@ LIMIT_ARG := $(if $(strip $(LIMIT)),--limit $(LIMIT),)
 ANSIBLE_OPTS := $(TAGS_ARG) $(SKIP_ARG) $(LIMIT_ARG) $(EXTRA)
 
 # Declare all available commands as .PHONY (always run)
-.PHONY: all site truenas cloud_image media help
+.PHONY: all site nas cloud_image media help
 
 
 all: site

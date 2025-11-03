@@ -1,17 +1,20 @@
 # roles/paperless_lxc/tasks/main.yml
-- name: Ensure cifs-utils is installed
+
+- name: ensure cifs-utils is installed
   ansible.builtin.apt:
     name: cifs-utils
     state: present
     update_cache: yes
-- name: Ensure paperless system group exists with fixed GID
+
+- name: ensure paperless system group exists with fixed gid
   ansible.builtin.group:
     name: paperless
     gid: "{{ pgid }}"
     system: yes
     state: present
   tags: paperless
-- name: Ensure paperless system user exists with fixed UID/GID
+
+- name: ensure paperless system user exists with fixed uid/gid
   ansible.builtin.user:
     name: paperless
     uid: "{{ puid }}"
@@ -21,7 +24,8 @@
     create_home: no
     state: present
   tags: paperless
-- name: Create base app directories for containers
+
+- name: create base app directories for containers
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
@@ -35,7 +39,8 @@
     - /srv/apps/alloy
     - /srv/apps/promtail
   tags: docker
-- name: Ensure correct directory ownership
+
+- name: ensure correct directory ownership
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
@@ -48,14 +53,20 @@
     - /srv/apps/paperless/data
     - /srv/apps/paperless/pgdata
     - /srv/apps/paperless/redisdata
-- name: Create environment file from template
+
+- name: create smb share
+  import_tasks: mount-smb.yml
+  tags: smb
+
+- name: create environment file from template
   ansible.builtin.template:
     src: .env.j2
     dest: "{{ docker_compose_dir }}/.env"
     mode: '0600'
   notify: restart paperless
   tags: docker
-- name: Upload config files
+
+- name: upload config files
   copy:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
@@ -69,7 +80,8 @@
   become: true
   tags: alloy
   notify: restart alloy
-- name: Copy docker-compose.yml
+
+- name: copy docker-compose.yml
   ansible.builtin.template:
     src: templates/docker-compose.yml.j2
     dest: "{{ docker_compose_dir }}/docker-compose.yml"
