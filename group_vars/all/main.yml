@@ -14,8 +14,8 @@ vm_defaults:
 share_drive_probe_quiet_hours_start: "23:55"
 share_drive_probe_quiet_hours_end: "08:00"
 # quiet hours - sleep docker containers at night so that HDDs spin down
-docker_quiet_hours_start_hour: "00"
 docker_quiet_hours_start: "00:00" # used in docker-sleep@.service
+docker_quiet_hours_start_hour: "00"
 docker_quiet_hours_end: "08:00" # used in docker-sleep@unpause.timer
 docker_quiet_hours_try_until_hour: "06" # used in docker-sleep@pause.timer
 uptime_kuma_url: "http://192.168.2.106:3001" # pause the uptime monitor when the container is paused

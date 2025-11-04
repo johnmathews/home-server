@@ -351,7 +351,7 @@
         href: https://docs.itsa.pizza
         siteMonitor: http://192.168.2.106:8000
         icon: si-materialformkdocs
-- Media Notes:
+- Media_:
     - Mullvad:
         description: 22 January 2026 07:51
     - Usenet.farm:
@@ -362,15 +362,33 @@
         description: 26 November 10:48
     - Usage Metrics:
         description: sabnzbd > settings > servers
-- System Notes:
+- System_:
     - Share Drive Probe:
         description: "{{ share_drive_probe_quiet_hours_start }} - {{ share_drive_probe_quiet_hours_end }}\ndocs.itsa.pizza/monitor_nfs_smb_mounts"
     - Spin Down Hard Disks:
-        description: "12am - 7am\ndocs.itsa.pizza/disks.\n\nProxmox HDDs: spundown using tool hd-idle.\n\nTrueNAS HDDs: spundown using script /mnt/switft/scripts/spindown_hdds.sh."
+        description: "Hourly\ndocs.itsa.pizza/disks.\n\nProxmox HDDs: spundown using tool hd-idle.\n\nTrueNAS HDDs: spundown using script /mnt/switft/scripts/spindown_hdds.sh."
     - Quiet Hours:
         description: "{{ docker_quiet_hours_start_hour }}:00 - {{ docker_quiet_hours_end }}\ndocs.itsa.pizza/quiet_hours\n\n- Bazarr\n- Booklore- mariadb\n- Booklore\n- Jellyseerr\n- Paperless\n- Prowlarr\n- Radarr\n- Sabnzbd\n- Sonarr\n- TubeArchivist\n- qBittorrent"
-    - TrueNAS Disks:
+- Proxmox Backup:
+    - Backup:
+        description: "12pm\npaused\n\nKeep:\nlast:14\ndaily:21\nweekly:5\nmonthly:12\nyearly:3"
+    - Verification:
+        description: "3pm\nReverify after 30 days"
+    - Pruning:
+        description: "4pm\nDuration: a few seconds\n\nKeep:\ndaily:14\nweekly:1\nmonthly:3\nyearly:2"
+    - Garbage Collection:
+        description: "5pm\nDuration: 1hr 20m"
+- TrueNAS_:
+    - Disk Power Management:
         description: "tank:\n- 1hr standby\n- max. power usage w/ standby\n\nbackup:\n- 20m standby\n- max. power usage w/ standby"
+    - Snapshots and Replication:
+        description: "tank: 11am daily\nswitft: 12pm daily"
+    - Cloud Sync Tasks:
+        description: "6pm daily"
+    - Scrub Tasks:
+        description: "On the first sunday at least 35 days after the previous scrub\ntank: 10am\nswift: 4pm\nbackup: 5pm"
+    - SMART tests:
+        description: "backup and tank\nshort: 12pm Sundays\nlong: 10am First day of the month"
 - Infra:
     - Grafana:
         href: https://charts.itsa.pizza/d/dekkfibh9454wb/home-server?from=now-24h&to=now&timezone=browser%3Fkiosk&refresh=10s

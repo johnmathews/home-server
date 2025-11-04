@@ -60,12 +60,22 @@ layout:
     initiallyCollapsed: false
     style: row
     columns: 6
-  Media Notes:
+  Media_:
     tab: Notes
     initiallyCollapsed: false
     style: row
     columns: 6
-  System Notes:
+  System_:
+    tab: Notes
+    initiallyCollapsed: false
+    style: row
+    columns: 6
+  Proxmox Backup:
+    tab: Notes
+    initiallyCollapsed: false
+    style: row
+    columns: 6
+  TrueNAS_:
     tab: Notes
     initiallyCollapsed: false
     style: row
