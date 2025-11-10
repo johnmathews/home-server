@@ -370,14 +370,14 @@
     - Quiet Hours:
         description: "{{ docker_quiet_hours_start_hour }}:00 - {{ docker_quiet_hours_end }}\ndocs.itsa.pizza/quiet_hours\n\n- Bazarr\n- Booklore- mariadb\n- Booklore\n- Jellyseerr\n- Paperless\n- Prowlarr\n- Radarr\n- Sabnzbd\n- Sonarr\n- TubeArchivist\n- qBittorrent"
 - Proxmox Backup:
-    - Backup:
-        description: "12pm\npaused\n\nKeep:\nlast:14\ndaily:21\nweekly:5\nmonthly:12\nyearly:3"
-    - Verification:
-        description: "3pm\nReverify after 30 days"
     - Pruning:
-        description: "4pm\nDuration: a few seconds\n\nKeep:\ndaily:14\nweekly:1\nmonthly:3\nyearly:2"
+        description: "10am\nDuration: a few seconds\n\nKeep:\ndaily:14\nweekly:1\nmonthly:3\nyearly:2"
     - Garbage Collection:
-        description: "5pm\nDuration: 1hr 20m"
+        description: "11am\nDuration: 1hr - 1hr 20m"
+    - Verification:
+        description: "1pm\nDuration: 3hr30\nReverify after 30 days"
+    - Backup:
+        description: "5pm\npaused\n\nKeep:\nlast:14\ndaily:21\nweekly:5\nmonthly:12\nyearly:3"
 - TrueNAS_:
     - Disk Power Management:
         description: "tank:\n- 1hr standby\n- max. power usage w/ standby\n\nbackup:\n- 20m standby\n- max. power usage w/ standby"

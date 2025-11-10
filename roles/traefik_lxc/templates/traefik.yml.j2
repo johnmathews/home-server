@@ -1,11 +1,17 @@
 # vim: ft=yaml
 
----
 
 # Static settings. We keep this lean; most routing lives in dynamic/*.yml
 entryPoints:
   web:
     address: ":80"
+    forwardedHeaders:
+      insecure: false
+      trustedIPs:
+        - 192.168.0.0/16
+        - 10.0.0.0/8
+        - 172.16.0.0/12
+        - 127.0.0.1/32
     transport:
       respondingTimeouts:
         readTimeout: 600s
@@ -13,7 +19,7 @@ entryPoints:
         writeTimeout: 600s
 
 api:
-  dashboard: true   # Secure this via Cloudflare Access or bind only on a private hostname
+  dashboard: true # Secure this via Cloudflare Access or bind only on a private hostname
 
 log:
   level: INFO

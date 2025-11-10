@@ -1,5 +1,6 @@
 # traefik_lxc/files/traefik/dynamic/routers.yml
 # vim: ft=yaml
+
 http:
   routers:
     immich:
@@ -24,6 +25,7 @@ http:
       entryPoints: [web]
       service: jelly-svc
       middlewares:
+        - force-https-proto
         - security-headers
         - jelly-login-rl
     traefik-ip:

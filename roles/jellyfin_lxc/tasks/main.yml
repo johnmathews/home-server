@@ -1,58 +1,56 @@
 # roles/jellyfin_lxc/tasks/main.yml
 
----
-
 - name: Ensure cifs-utils is installed
   ansible.builtin.apt:
     name: cifs-utils
     state: present
     update_cache: yes
 
-- name: Create directory for SMB credentials
-  ansible.builtin.file:
-    path: /etc/smb
-    state: directory
-    mode: '0750'
-    owner: root
-    group: root
+# - name: Create directory for SMB credentials
+#   ansible.builtin.file:
+#     path: /etc/smb
+#     state: directory
+#     mode: '0750'
+#     owner: root
+#     group: root
 
-- name: Create SMB credentials file
-  ansible.builtin.copy:
-    dest: "/etc/smb/.smbcredentials"
-    content: |
-      username={{ smb_username }}
-      password={{ vault_smb_username_password }}
-    owner: root
-    group: root
-    mode: '0600'
+# - name: Create SMB credentials file
+#   ansible.builtin.copy:
+#     dest: "/etc/smb/.smbcredentials"
+#     content: |
+#       username={{ smb_username }}
+#       password={{ vault_smb_username_password }}
+#     owner: root
+#     group: root
+#     mode: '0600'
 
-- name: Persist SMB mount in /etc/fstab
-  ansible.builtin.lineinfile:
-    path: /etc/fstab
-    regexp: '^//{{ smb_server }}/{{ item.name }}[ \t]+'
-    line: "//{{ smb_server }}/{{ item.name }} {{ item.target }} cifs credentials=/etc/smb/.smbcredentials,iocharset=utf8,noperm,nofail,noauto,x-systemd.automount,x-systemd.device-timeout=10,_netdev,vers=3.1.1 0 0"
-    state: present
-    create: yes
-  loop: "{{ smb_shares }}"
-  notify: restart docker
+# - name: Persist SMB mount in /etc/fstab
+#   ansible.builtin.lineinfile:
+#     path: /etc/fstab
+#     regexp: '^//{{ smb_server }}/{{ item.name }}[ \t]+'
+#     line: "//{{ smb_server }}/{{ item.name }} {{ item.target }} cifs credentials=/etc/smb/.smbcredentials,iocharset=utf8,noperm,nofail,noauto,x-systemd.automount,x-systemd.device-timeout=10,_netdev,vers=3.1.1 0 0"
+#     state: present
+#     create: yes
+#   loop: "{{ smb_shares }}"
+#   notify: restart docker
 
-- name: Create local mount point
-  ansible.builtin.file:
-    path: "{{ item.target }}"
-    state: directory
-    mode: '0755'
-  loop: "{{ smb_shares }}"
-  notify: restart docker
+# - name: Create local mount point
+#   ansible.builtin.file:
+#     path: "{{ item.target }}"
+#     state: directory
+#     mode: '0755'
+#   loop: "{{ smb_shares }}"
+#   notify: restart docker
 
-- name: Mount SMB shares
-  mount:
-    path: "{{ item.target }}"
-    src: "//{{ smb_server }}/{{ item.name }}"
-    fstype: cifs
-    opts: credentials=/etc/smb/.smbcredentials,iocharset=utf8,noperm,nofail,vers=3.1.1
-    state: mounted
-  loop: "{{ smb_shares }}"
-  notify: restart docker
+# - name: Mount SMB shares
+#   mount:
+#     path: "{{ item.target }}"
+#     src: "//{{ smb_server }}/{{ item.name }}"
+#     fstype: cifs
+#     opts: credentials=/etc/smb/.smbcredentials,iocharset=utf8,noperm,nofail,vers=3.1.1
+#     state: mounted
+#   loop: "{{ smb_shares }}"
+#   notify: restart docker
 
 - name: Create base app directories for containers
   ansible.builtin.file:
@@ -66,9 +64,9 @@
     - /srv/apps/jellyfin/cache
     - /srv/apps/alloy
   notify: restart docker
-  tags: [docker, alloy] 
+  tags: [docker, alloy]
 
-- name: Upload alloy config files 
+- name: Upload alloy config files
   copy:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
@@ -78,10 +76,20 @@
   loop:
     - alloy:
       src: files/config.alloy
-      dest: /srv/apps/alloy/config.alloy 
+      dest: /srv/apps/alloy/config.alloy
   become: true
-  tags: [docker, alloy] 
+  tags: docker,alloy
   notify: restart alloy
+
+- name: Copy dockerfile
+  ansible.builtin.copy:
+    src: dockerfile
+    dest: /srv/apps/dockerfile
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart docker
+  tags: docker
 
 - name: Copy Docker Compose file
   ansible.builtin.copy:
@@ -91,4 +99,4 @@
     group: root
     mode: '0644'
   notify: restart docker
-  tags: [docker, alloy] 
+  tags: docker,alloy

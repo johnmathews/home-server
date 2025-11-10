@@ -19,8 +19,7 @@ services:
       - /run/log/journal:/run/log/journal:ro
       - /etc/machine-id:/etc/machine-id:ro
     command: >
-      run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
-
+      run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy #magic___^_^___line
     ports:
       - "12345:12345"
     logging:
@@ -29,14 +28,17 @@ services:
         max-size: "10m"
         max-file: "5"
   jellyfin:
-    image: jellyfin/jellyfin
+    # image: jellyfin/jellyfin
+    # dockerfile uses the official image and adds yt-dlp 
+    image: ./jellyfin-custom
     container_name: jellyfin
     restart: always
     init: true
     mem_limit: 8g
     mem_reservation: 4g
     ports:
-      - "8096:8096"
+      - 8096:8096/tcp
+      - 7359:7359/udp
     environment:
       - TZ=Europe/Amsterdam
       - JELLYFIN_PublishedServerUrl=http://192.168.2.110:8096
@@ -51,9 +53,6 @@ services:
       - ALL
     security_opt:
       - no-new-privileges:true
-    # devices:
-    #   - /dev/dri:/dev/dri
-
     volumes:
       - type: tmpfs
         target: /transcode
@@ -81,6 +80,7 @@ services:
       nofile:
         soft: 65536
         hard: 65536
+
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
     container_name: cadvisor
@@ -101,6 +101,7 @@ services:
       options:
         max-size: "10m"
         max-file: "5"
+
   node_exporter:
     image: quay.io/prometheus/node-exporter:latest
     container_name: node_exporter
