@@ -12,8 +12,6 @@
 
 ## Setup monitoring for a new NFS share
 
-
-
 ## TrueNAS
 
 TrueNAS can be a bit buggy. Toggle the individual share to refresh the
@@ -23,12 +21,9 @@ connection or update settings. Or toggle the entire service.
 
 1. Create a directory to mount the NFS share into, if its a VM. If its an LXC
    then `autofs` is used and you don't need to.
-2. Mount the share: `sudo mount -t nfs <TrueNas IP>:/<Full path> <target dir>`
-
-- `sudo mount -t nfs 192.168.2.104:/mnt/tank/paperless /mnt/nfs/paperless`
-
-3. Enter credentials when asked
-4. run `du -h -d 3` to check the file tree of the external drive.
+1. Mount the share: `sudo mount -t nfs <TrueNas IP>:/<Full path> <target dir>`
+1. Enter credentials when asked
+1. run `du -h -d 3` to check the file tree of the external drive.
 
 ## Debugging tips
 
@@ -52,14 +47,15 @@ service.
 
 - manually mount:
 
-```
+```bash
 sudo mount -t cifs //192.168.2.104/media /mnt/media/media -o credentials=/etc/smb-media-credentials,uid=1001,gid=1001,vers=3.1.1
 
 `du -h -d 3`
 ```
 
 - see available shares:
-  ```
+
+  ```bash
   smbclient -L //192.168.2.104 -U media_vm
   ```
 
@@ -70,26 +66,19 @@ See documentation `Monitor NFS and SMB mounts` for more info.
 The probe is a systemd service and writes results into the node_exporter text
 file location.
 
-## Clients
+## Mount Commands
 
-### Immich
+### NFS
 
-- NFS ok
+- `sudo mount -t nfs 192.168.2.104:/mnt/tank/books /mnt/nfs/books`
+- `sudo mount -t nfs 192.168.2.104:/mnt/tank/immich /mnt/nfs/immich`
+- `sudo mount -t nfs 192.168.2.104:/mnt/tank/library /mnt/nfs/library`
+- `sudo mount -t nfs 192.168.2.104:/mnt/tank/media /mnt/nfs/media`
+- `sudo mount -t nfs 192.168.2.104:/mnt/tank/movies /mnt/nfs/movies`
+- `sudo mount -t nfs 192.168.2.104:/mnt/tank/paperless /mnt/nfs/paperless`
+- `sudo mount -t nfs 192.168.2.104:/mnt/tank/photos /mnt/nfs/photos`
+- `sudo mount -t nfs 192.168.2.104:/mnt/tank/youtube-kids /mnt/nfs/youtube-kids`
 
-### Jellyfin
+### SMB
 
-- SMB for `media` and `library`
-- NFS ok
-
-### Media VM
-
-- SMB ok
-- NFS ok
-
-### Paperless
-
-- NFS ok
-
-### TubeArchivist
-
-- NFS ok
+...

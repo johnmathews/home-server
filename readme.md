@@ -56,7 +56,6 @@ recognised and a driver is attached to it.
 ## Setup
 
 1.  Install Proxmox from USB
-
     1. Remove and reinsert the drive after the installer starts. It will say its
        looking for something.
     1. Install operating systems on the M.2 Drive.
@@ -231,7 +230,6 @@ recognised and a driver is attached to it.
     Reserved IP: `192.168.2.104`
 
     [Local Login](http://192.168.2.104/ui/sessions/signin)
-
     - You need to manually download the ISO file and place it in the correct
       directory. TrueNAS require an email address.
     - Run `make TrueNAS`. This runs an Ansible play
@@ -258,7 +256,6 @@ recognised and a driver is attached to it.
     Proxmox user, group and api token.
 
     Local logins:
-
     - [Sonarr](http://192.168.2.105:8989/)
     - [Radarr](http://192.168.2.105:7878/)
     - [File Browser](http://192.168.2.105:8081/login?redirect=/files/)
@@ -268,7 +265,6 @@ recognised and a driver is attached to it.
     - [Jackett](http://192.168.2.105:9117/)
 
       Advanced Settings:
-
       - VMID: `105`
       - Machine Type: `q35`
       - Disk Size: `32GB`
@@ -366,7 +362,6 @@ script. This VM will host the monitoring and dashboard applications.
 2.  Then run the post install
     [helper script](https://community-scripts.github.io/ProxmoxVE/scripts?id=post-pbs-install)
     to set up an LXC.
-
     - Run it from a shell on the PBS LXC.
     - Answer `yes` to just about everything, like when you installed Proxmox.
     - Then assign it a static IP address and connect on port 8007.

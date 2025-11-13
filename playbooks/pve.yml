@@ -1,6 +1,5 @@
 # playbooks/proxmox_node.yml
 
----
 
 - name: Proxmox node
   hosts: proxmox
@@ -11,5 +10,5 @@
     #   tags: nfs
     # - role: share_drive_probe 
     #   tags: shares
-    - role: pve 
+    - role: pve
       tags: pve

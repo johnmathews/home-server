@@ -30,7 +30,10 @@ services:
   jellyfin:
     # image: jellyfin/jellyfin
     # dockerfile uses the official image and adds yt-dlp 
-    image: ./jellyfin-custom
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    image: jellyfin-with-yt-dlp:latest
     container_name: jellyfin
     restart: always
     init: true

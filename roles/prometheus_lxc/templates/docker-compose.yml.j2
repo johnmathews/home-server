@@ -1,7 +1,6 @@
 # vim: ft=yaml
 # jellyfin_lxc/files/docker-compose.yml
 
----
 
 services:
   cadvisor:
@@ -16,7 +15,7 @@ services:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
       - /var/lib/docker/:/var/lib/docker:ro
       - /var/run:/var/run:ro
-    privileged: false  # required for some metrics, but `true` makes it scan /dev/** and in an LXC /dev/series/by-id does not exist.
+    privileged: false # required for some metrics, but `true` makes it scan /dev/** and in an LXC /dev/series/by-id does not exist.
     security_opt:
       - no-new-privileges:true
     logging:
@@ -35,7 +34,7 @@ services:
       LOG_LEVEL: "warn"
     volumes:
       # config 
-      - ./alloy:/etc/alloy:ro 
+      - ./alloy:/etc/alloy:ro
       # docker 
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
@@ -44,9 +43,7 @@ services:
       - /run/log/journal:/run/log/journal:ro
       - /etc/machine-id:/etc/machine-id:ro
     command: >
-      run --server.http.listen-addr=0.0.0.0:12345
-      --storage.path=/var/lib/alloy/data
-      /etc/alloy/config.alloy
+      run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
     ports:
       - "12345:12345"
     logging:
@@ -69,10 +66,9 @@ services:
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--storage.tsdb.path=/prometheus"
-      - "--storage.tsdb.retention.size=12GB"
+      - "--storage.tsdb.retention.size=18GB"
       - "--storage.tsdb.retention.time=100d"
     restart: always
-
 
   node_exporter:
     image: quay.io/prometheus/node-exporter:latest
