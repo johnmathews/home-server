@@ -2,7 +2,9 @@
 
 ## Project Purpose
 
-Ansible playbooks and roles for provisioning a Proxmox-based home server with VMs/LXCs for storage (TrueNAS), media streaming (Jellyfin, Sonarr, Radarr, qBittorrent), monitoring (Prometheus, Grafana), and other services. Automates deployment, configuration, and updates using a Makefile-driven workflow.
+Ansible playbooks and roles for provisioning a Proxmox-based home server with VMs/LXCs for storage (TrueNAS), media
+streaming (Jellyfin, Sonarr, Radarr, qBittorrent), monitoring (Prometheus, Grafana), and other services. Automates
+deployment, configuration, and updates using a Makefile-driven workflow.
 
 ## Architecture & Structure
 
