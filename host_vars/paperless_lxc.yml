@@ -23,3 +23,8 @@ sleep_hours_kuma_map:
 sleep_hours_plugins:
   - default.sh
   - paperless-graceful.sh
+
+# NFS/SMB share control (enable after 30+ successful STOP/START cycles)
+sleep_hours_nfs_smb_enabled: false
+sleep_hours_nfs_shares:
+  - tank/paperless

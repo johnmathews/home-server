@@ -1,0 +1,38 @@
+---
+# TrueNAS NFS/SMB share control deployment
+# Deploys truenas-shares.sh script and configuration
+
+- name: Install truenas-shares.sh script
+  ansible.builtin.copy:
+    src: truenas-shares.sh
+    dest: /usr/local/bin/truenas-shares.sh
+    mode: '0755'
+    owner: root
+    group: root
+  when: sleep_hours_enabled | bool
+  tags: ['sleep-hours-nfs']
+
+- name: Create /etc/sleep-hours/truenas.conf if NFS/SMB control enabled
+  ansible.builtin.template:
+    src: truenas.conf.j2
+    dest: /etc/sleep-hours/truenas.conf
+    mode: '0600'
+    owner: root
+    group: root
+  when:
+    - sleep_hours_enabled | bool
+    - sleep_hours_nfs_smb_enabled | bool
+  tags: ['sleep-hours-nfs']
+
+- name: Create NFS shares list file if NFS/SMB control enabled
+  ansible.builtin.template:
+    src: truenas-nfs-shares.list.j2
+    dest: /etc/sleep-hours/truenas-nfs-shares.list
+    mode: '0644'
+    owner: root
+    group: root
+  when:
+    - sleep_hours_enabled | bool
+    - sleep_hours_nfs_smb_enabled | bool
+    - sleep_hours_nfs_shares | length > 0
+  tags: ['sleep-hours-nfs']

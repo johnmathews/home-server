@@ -35,6 +35,15 @@ sleep_hours_docker_stop_timeout_s: 30
 # Docker log lines to include in error messages (configurable verbosity)
 sleep_hours_docker_log_lines: 5
 
-# Future NFS/SMB integration flags
-sleep_hours_disable_nfs_smb: false
-sleep_hours_enable_nfs_smb: false
+# NFS/SMB share control (TrueNAS API integration)
+sleep_hours_nfs_smb_enabled: false  # Feature toggle (OFF by default, enable after 30+ cycles)
+sleep_hours_nfs_shares: []          # List of dataset paths to control
+# Example: ["tank/paperless", "tank/media"]
+
+# TrueNAS API configuration
+sleep_hours_truenas_api_url: "https://192.168.2.104"
+sleep_hours_truenas_api_key: "{{ vault_truenas_api_key }}"  # From vault
+
+# Health check configuration
+sleep_hours_container_health_timeout_s: 60  # Max wait for container health (seconds)
+sleep_hours_container_health_interval_s: 2  # Poll interval (seconds)

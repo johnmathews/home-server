@@ -261,6 +261,54 @@ show_docker_logs() {
    fi
 }
 
+# -------- NFS/SMB share control --------
+manage_nfs_smb_shares() {
+   local action="$1" shares="${2:-}" containers="${3:-}"
+   
+   # Skip if no truenas config file exists (feature disabled)
+   [[ ! -f /etc/sleep-hours/truenas.conf ]] && return 0
+   
+   # Source configuration
+   # shellcheck source=/dev/null
+   . /etc/sleep-hours/truenas.conf
+   
+   # Read shares from file if not provided
+   if [[ -z "$shares" && -f /etc/sleep-hours/truenas-nfs-shares.list ]]; then
+     shares=$(grep -v '^#' /etc/sleep-hours/truenas-nfs-shares.list | tr '\n' ' ')
+   fi
+   
+   [[ -z "$shares" ]] && return 0
+   
+   msg "Controlling NFS/SMB shares..."
+   
+   case "$action" in
+   disable)
+     if /usr/local/bin/truenas-shares.sh disable "$shares" 2>&1 | while IFS= read -r line; do msg "$line"; done; then
+       log_info "_" nfs_smb disable_success "shares=$shares"
+       return 0
+     else
+       local rc=$?
+       log_warn "_" nfs_smb disable_failed "shares=$shares rc=$rc"
+       # Don't fail - share control is nice-to-have, not critical
+       return 0
+     fi
+     ;;
+   enable)
+     if /usr/local/bin/truenas-shares.sh enable "$shares" "$containers" 2>&1 | while IFS= read -r line; do msg "$line"; done; then
+       log_info "_" nfs_smb enable_success "shares=$shares"
+       return 0
+     else
+       local rc=$?
+       log_warn "_" nfs_smb enable_failed "shares=$shares rc=$rc"
+       # Don't fail - share control is nice-to-have, not critical
+       return 0
+     fi
+     ;;
+   esac
+   
+   return 0
+}
+
 kuma_notify() {
    local act="$1" name="$2"
    if out="$(/usr/local/bin/kumactl.py "$act" --container "$name" 2>&1)"; then
@@ -296,6 +344,12 @@ done < <(get_containers)
 
 msg "Processing $container_count container(s)..."
 msg ""
+
+# For PAUSE/STOP: disable shares BEFORE pausing containers
+if [[ "$ACTION" == "pause" || "$ACTION" == "stop" ]]; then
+  manage_nfs_smb_shares disable
+  msg ""
+fi
 
 handle_one() {
   local name="$1"
@@ -470,6 +524,21 @@ while IFS= read -r raw; do
    [[ -z "$name" || "$name" =~ ^# ]] && continue
    handle_one "$name"
 done < <(get_containers)
+
+# For UNPAUSE/START: enable shares AFTER containers are running
+if [[ "$ACTION" == "unpause" || "$ACTION" == "start" ]]; then
+  msg ""
+  # Build list of containers for health checking
+  local container_list=""
+  while IFS= read -r raw; do
+    name="$(trim_line "$raw")"
+    [[ -z "$name" || "$name" =~ ^# ]] && continue
+    [[ -n "$container_list" ]] && container_list="$container_list "
+    container_list="$container_list$name"
+  done < <(get_containers)
+  manage_nfs_smb_shares enable "" "$container_list"
+  msg ""
+fi
 
 msg ""
 msg "Summary: total=$total changed=$changed skipped=$skipped failed=$failed"

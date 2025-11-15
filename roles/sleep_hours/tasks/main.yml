@@ -20,6 +20,5 @@
     - name: Install plugins
       ansible.builtin.include_tasks: install_plugins.yml
 
-    - name: Configure NFS/SMB control (future)
-      ansible.builtin.include_tasks: nfs_smb_control.yml
-      when: sleep_hours_disable_nfs_smb or sleep_hours_enable_nfs_smb
+    - name: Deploy NFS/SMB share control
+      ansible.builtin.include_tasks: nfs_smb_deploy.yml
