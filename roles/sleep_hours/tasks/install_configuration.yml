@@ -1,5 +1,29 @@
 ---
-- name: Install containers list
+- name: Install pause containers list
+  become: true
+  ansible.builtin.template:
+    src: containers.list.j2
+    dest: /etc/sleep-hours/containers.pause.list
+    owner: root
+    group: root
+    mode: '0644'
+  vars:
+    container_list: "{{ sleep_hours_containers }}"
+  notify: Restart sleep-hours timers
+
+- name: Install stop containers list
+  become: true
+  ansible.builtin.template:
+    src: containers.list.j2
+    dest: /etc/sleep-hours/containers.stop.list
+    owner: root
+    group: root
+    mode: '0644'
+  vars:
+    container_list: "{{ sleep_hours_stop_containers }}"
+  notify: Restart sleep-hours timers
+
+- name: Install legacy containers list (for backward compatibility)
   become: true
   ansible.builtin.template:
     src: containers.list.j2
@@ -7,6 +31,8 @@
     owner: root
     group: root
     mode: '0644'
+  vars:
+    container_list: "{{ sleep_hours_containers }}"
   notify: Restart sleep-hours timers
 
 - name: Install Uptime Kuma container→monitor map

@@ -1,0 +1,14 @@
+# vim: ft=systemd
+
+[Unit]
+Description=Stop containers at {{ docker_quiet_hours_start_hour }}:00, retry every 1 minute during quiet hours
+
+[Timer]
+# Retry every 1 minute during quiet hours
+OnCalendar=*-*-* {{ docker_quiet_hours_start_hour }}..{{ docker_quiet_hours_try_until_hour }}:0/1:00 Europe/Amsterdam
+
+Persistent=false
+Unit=docker-sleep@stop.service
+
+[Install]
+WantedBy=timers.target

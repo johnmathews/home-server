@@ -8,13 +8,18 @@ sleep_hours_enabled: true
 sleep_hours_pause_hour: 2
 sleep_hours_unpause_hour: 6
 
-sleep_hours_containers:
+# Use STOP instead of PAUSE for paperless (graceful shutdown for databases)
+sleep_hours_containers: []
+sleep_hours_stop_containers:
   - paperless-webserver
-  - paperless-db
   - paperless-broker
+  - paperless-db
 
 sleep_hours_kuma_map:
   paperless-webserver: 36
+  paperless-db: 36
+  paperless-broker: 36
 
 sleep_hours_plugins:
   - default.sh
+  - paperless-graceful.sh

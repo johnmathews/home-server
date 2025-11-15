@@ -29,6 +29,46 @@
     mode: '0644'
   notify: Restart sleep-hours timers
 
+- name: Install stop service
+  become: true
+  ansible.builtin.template:
+    src: docker-sleep@stop.service
+    dest: /etc/systemd/system/docker-sleep@stop.service
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart sleep-hours timers
+
+- name: Install start service
+  become: true
+  ansible.builtin.template:
+    src: docker-sleep@start.service
+    dest: /etc/systemd/system/docker-sleep@start.service
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart sleep-hours timers
+
+- name: Install stop timer
+  become: true
+  ansible.builtin.template:
+    src: docker-sleep@stop.timer.j2
+    dest: /etc/systemd/system/docker-sleep@stop.timer
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart sleep-hours timers
+
+- name: Install start timer
+  become: true
+  ansible.builtin.template:
+    src: docker-sleep@start.timer.j2
+    dest: /etc/systemd/system/docker-sleep@start.timer
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart sleep-hours timers
+
 - name: Enable and start timers
   become: true
   ansible.builtin.systemd:
@@ -39,3 +79,5 @@
   loop:
     - docker-sleep@pause.timer
     - docker-sleep@unpause.timer
+    - docker-sleep@stop.timer
+    - docker-sleep@start.timer

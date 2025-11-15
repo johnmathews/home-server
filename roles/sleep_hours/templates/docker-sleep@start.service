@@ -1,0 +1,23 @@
+# vim: ft=systemd
+
+[Unit]
+Description=Start %i Docker containers
+Wants=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/docker-sleep.sh start
+
+Environment=QUIET_LOG_LEVEL=debug
+Environment=QUIET_CMD_TIMEOUT_S=15
+Environment=QUIET_RETRIES=3
+Environment=QUIET_RETRY_DELAY_S=2
+
+Environment=KUMA_URL="{{ uptime_kuma_url }}"
+Environment=KUMA_USERNAME="{{ uptime_kuma_user }}"
+Environment=KUMA_PASSWORD="{{ vault_uptime_kuma_password }}"
+Environment=KUMA_INSECURE=0
+Environment=KUMA_MAP_FILE=/etc/sleep-hours/kuma.map
+
+Environment=GRACE_DIR=/usr/local/lib/sleep-hours/plugins

@@ -1,0 +1,14 @@
+# vim: ft=systemd
+
+[Unit]
+Description=Start stopped containers at {{ docker_quiet_hours_end_hour }}:00
+
+[Timer]
+# Start containers at wake time, retry every 15 minutes if it fails
+OnCalendar=*-*-* {{ docker_quiet_hours_end_hour }}..23:0/15:00 Europe/Amsterdam
+
+Persistent=false
+Unit=docker-sleep@start.service
+
+[Install]
+WantedBy=timers.target

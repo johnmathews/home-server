@@ -9,7 +9,13 @@ export PS4='+ ts=$(date +%FT%T%z) line=${LINENO} cmd='
 [[ "${QUIET_DEBUG:-0}" == "1" ]] && set -x
 
 ACTION="${1:-}"
-LIST="${QUIET_LIST:-/etc/sleep-hours/containers.list}"
+
+# Select list file based on action
+if [[ "$ACTION" == "stop" || "$ACTION" == "start" ]]; then
+  LIST="${QUIET_LIST:-/etc/sleep-hours/containers.stop.list}"
+else
+  LIST="${QUIET_LIST:-/etc/sleep-hours/containers.list}"
+fi
 
 # -------- logging with levels --------
 # QUIET_LOG_LEVEL: debug|info|warn|error (default info)
@@ -96,12 +102,12 @@ is_within_quiet_window() {
 
 # -------- validate action --------
 case "$ACTION" in
-pause | unpause) ;;
-*) fail_early usage "usage=$0 {pause|unpause}" 2 ;;
+pause | unpause | stop | start) ;;
+*) fail_early usage "usage=$0 {pause|unpause|stop|start}" 2 ;;
 esac
 
-# Skip work if outside window for pause
-if [[ "$ACTION" == "pause" ]] && ! is_within_quiet_window; then
+# Skip work if outside window for pause/stop
+if [[ "$ACTION" == "pause" || "$ACTION" == "stop" ]] && ! is_within_quiet_window; then
   _log info _ window outside "start=${QUIET_START:-na} end=${QUIET_END:-na}"
   exit 0
 fi
@@ -276,64 +282,124 @@ handle_one() {
   log_debug "$name" inspect before "$pre"
 
   if [[ "$ACTION" == "pause" ]]; then
-    if [[ "$state_before" != "running" ]]; then
-      log_info "$name" skipped not_running "$pre"
-      ((skipped += 1))
-      return 0
-    fi
+     if [[ "$state_before" != "running" ]]; then
+       log_info "$name" skipped not_running "$pre"
+       ((skipped += 1))
+       return 0
+     fi
 
-    # --- GRACEFUL BUSY CHECK ---
-    if is_busy "$name"; then
-      log_info "$name" skipped busy_detected "$pre"
-      ((skipped += 1))
-      return 0
-    fi
+     # --- GRACEFUL BUSY CHECK ---
+     if is_busy "$name"; then
+       log_info "$name" skipped busy_detected "$pre"
+       ((skipped += 1))
+       return 0
+     fi
 
-    local start_container
-    start_container=$(date +%s)
-    if with_retries "docker_pause:$name" "$DOCKER_BIN" pause "$name" >/dev/null; then
-      if verify_state "$name" "paused"; then
-        local status2
-        status2="$(inspect_fields "$name")"
-        read -r r2 p2 h2 <<<"$status2"
-        log_info "$name" changed paused "$pre" state_after="$(normalize_state "$r2" "$p2")" health_after="$h2" duration_s="$(($(date +%s) - start_container))"
-        ((changed += 1))
-        kuma_notify pause "$name"
-      else
-        log_warn "$name" failed verify_pause "$pre"
-        ((failed += 1))
-      fi
-    else
-      log_err "$name" failed pause_error "$pre"
-      ((failed += 1))
-    fi
+     local start_container
+     start_container=$(date +%s)
+     if with_retries "docker_pause:$name" "$DOCKER_BIN" pause "$name" >/dev/null; then
+       if verify_state "$name" "paused"; then
+         local status2
+         status2="$(inspect_fields "$name")"
+         read -r r2 p2 h2 <<<"$status2"
+         log_info "$name" changed paused "$pre" state_after="$(normalize_state "$r2" "$p2")" health_after="$h2" duration_s="$(($(date +%s) - start_container))"
+         ((changed += 1))
+         kuma_notify pause "$name"
+       else
+         log_warn "$name" failed verify_pause "$pre"
+         ((failed += 1))
+       fi
+     else
+       log_err "$name" failed pause_error "$pre"
+       ((failed += 1))
+     fi
 
-  else # unpause
-    if [[ "$state_before" != "paused" ]]; then
-      log_info "$name" skipped not_paused "$pre"
-      ((skipped += 1))
-      return 0
-    fi
+   elif [[ "$ACTION" == "unpause" ]]; then
+     if [[ "$state_before" != "paused" ]]; then
+       log_info "$name" skipped not_paused "$pre"
+       ((skipped += 1))
+       return 0
+     fi
 
-    local start_container
-    start_container=$(date +%s)
-    if with_retries "docker_unpause:$name" "$DOCKER_BIN" unpause "$name" >/dev/null; then
-      if verify_state "$name" "running"; then
-        local status2
-        status2="$(inspect_fields "$name")"
-        read -r r2 p2 h2 <<<"$status2"
-        log_info "$name" changed unpaused "$pre" state_after="$(normalize_state "$r2" "$p2")" health_after="$h2" duration_s="$(($(date +%s) - start_container))"
-        ((changed += 1))
-        kuma_notify resume "$name"
-      else
-        log_warn "$name" failed verify_unpause "$pre"
-        ((failed += 1))
-      fi
-    else
-      log_err "$name" failed unpause_error "$pre"
-      ((failed += 1))
-    fi
-  fi
+     local start_container
+     start_container=$(date +%s)
+     if with_retries "docker_unpause:$name" "$DOCKER_BIN" unpause "$name" >/dev/null; then
+       if verify_state "$name" "running"; then
+         local status2
+         status2="$(inspect_fields "$name")"
+         read -r r2 p2 h2 <<<"$status2"
+         log_info "$name" changed unpaused "$pre" state_after="$(normalize_state "$r2" "$p2")" health_after="$h2" duration_s="$(($(date +%s) - start_container))"
+         ((changed += 1))
+         kuma_notify resume "$name"
+       else
+         log_warn "$name" failed verify_unpause "$pre"
+         ((failed += 1))
+       fi
+     else
+       log_err "$name" failed unpause_error "$pre"
+       ((failed += 1))
+     fi
+
+   elif [[ "$ACTION" == "stop" ]]; then
+     if [[ "$state_before" != "running" ]]; then
+       log_info "$name" skipped not_running_stop "$pre"
+       ((skipped += 1))
+       return 0
+     fi
+
+     # --- GRACEFUL BUSY CHECK FOR STOP ---
+     if is_busy "$name"; then
+       log_info "$name" deferred busy_stop "$pre"
+       ((skipped += 1))
+       return 1  # Signal retry
+     fi
+
+     local STOP_TIMEOUT="${DOCKER_STOP_TIMEOUT_S:-30}"
+     local start_container
+     start_container=$(date +%s)
+     if with_retries "docker_stop:$name" "$DOCKER_BIN" stop --time="$STOP_TIMEOUT" "$name" >/dev/null; then
+       if verify_state "$name" "exited"; then
+         local status2
+         status2="$(inspect_fields "$name")"
+         read -r r2 p2 h2 <<<"$status2"
+         log_info "$name" changed stopped "$pre" state_after="$(normalize_state "$r2" "$p2")" health_after="$h2" duration_s="$(($(date +%s) - start_container))"
+         ((changed += 1))
+         kuma_notify pause "$name"
+       else
+         log_warn "$name" failed verify_stop "$pre"
+         ((failed += 1))
+       fi
+     else
+       log_err "$name" failed stop_error "$pre"
+       ((failed += 1))
+     fi
+
+   elif [[ "$ACTION" == "start" ]]; then
+     if [[ "$state_before" != "exited" ]]; then
+       log_info "$name" skipped not_exited "$pre"
+       ((skipped += 1))
+       return 0
+     fi
+
+     local start_container
+     start_container=$(date +%s)
+     if with_retries "docker_start:$name" "$DOCKER_BIN" start "$name" >/dev/null; then
+       if verify_state "$name" "running"; then
+         local status2
+         status2="$(inspect_fields "$name")"
+         read -r r2 p2 h2 <<<"$status2"
+         log_info "$name" changed started "$pre" state_after="$(normalize_state "$r2" "$p2")" health_after="$h2" duration_s="$(($(date +%s) - start_container))"
+         ((changed += 1))
+         kuma_notify resume "$name"
+       else
+         log_warn "$name" failed verify_start "$pre"
+         ((failed += 1))
+       fi
+     else
+       log_err "$name" failed start_error "$pre"
+       ((failed += 1))
+     fi
+   fi
 }
 
 while IFS= read -r raw; do
