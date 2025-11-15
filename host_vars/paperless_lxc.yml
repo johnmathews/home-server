@@ -2,3 +2,19 @@ nfs_shares:
   - name: paperless
     mountpoint: /mnt/nfs/paperless
     target: /mnt/tank/paperless
+
+# Sleep Hours Configuration
+sleep_hours_enabled: true
+sleep_hours_pause_hour: 2
+sleep_hours_unpause_hour: 6
+
+sleep_hours_containers:
+  - paperless-webserver
+  - paperless-db
+  - paperless-broker
+
+sleep_hours_kuma_map:
+  paperless-webserver: 36
+
+sleep_hours_plugins:
+  - default.sh

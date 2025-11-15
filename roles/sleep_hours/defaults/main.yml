@@ -1,0 +1,30 @@
+---
+# Sleep Hours Feature Configuration Defaults
+# Override these in host_vars/<hostname>.yml
+
+# Feature toggle - set to true to enable sleep hours on a host
+sleep_hours_enabled: false
+
+# Pause time (hour to pause containers, 0-23)
+sleep_hours_pause_hour: 2
+
+# Unpause time (hour to resume containers, 0-23)
+sleep_hours_unpause_hour: 6
+
+# List of containers to pause/unpause
+# MUST be overridden in host_vars - empty list is safe but non-functional
+sleep_hours_containers: []
+
+# Mapping of containers to Uptime Kuma monitor IDs
+# Format: { "container_name": monitor_id, ... }
+# MUST be overridden in host_vars - empty dict is safe but non-functional
+sleep_hours_kuma_map: {}
+
+# Graceful shutdown plugins to install
+# default.sh is always recommended, add others as needed
+sleep_hours_plugins:
+  - default.sh
+
+# Future NFS/SMB integration flags
+sleep_hours_disable_nfs_smb: false
+sleep_hours_enable_nfs_smb: false

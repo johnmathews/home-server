@@ -8,3 +8,43 @@ nfs_shares:
   - name: books
     mountpoint: /mnt/nfs/books
     target: /mnt/tank/books
+
+# Sleep Hours Configuration
+sleep_hours_enabled: true
+sleep_hours_pause_hour: 2
+sleep_hours_unpause_hour: 6
+
+sleep_hours_containers:
+  - sabnzbd
+  - qbittorrent
+  - prowlarr
+  - bazarr
+  - radarr
+  - sonarr
+  - jellyseerr
+  - booklore
+  - booklore-mariadb
+
+sleep_hours_kuma_map:
+  sabnzbd: 37
+  qbittorrent: 38
+  prowlarr: 39
+  bazarr: 40
+  radarr: 41
+  sonarr: 42
+  jellyseerr: 44
+  booklore: 45
+  booklore-mariadb: 46
+
+sleep_hours_plugins:
+  - default.sh
+  - qbittorrent.sh
+  - sabnzbd.sh
+  - radarr.sh
+  - sonarr.sh
+  - prowlarr.sh
+  - jellyseerr.sh
+  - bazarr.sh
+  - filebrowser.sh
+  - booklore.sh
+  - booklore-mariadb.sh

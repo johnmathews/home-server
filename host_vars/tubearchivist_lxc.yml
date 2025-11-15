@@ -2,3 +2,19 @@ nfs_shares:
   - name: youtube-kids
     mountpoint: /mnt/nfs/youtube-kids
     target: /mnt/tank/youtube-kids
+
+# Sleep Hours Configuration
+sleep_hours_enabled: true
+sleep_hours_pause_hour: 2
+sleep_hours_unpause_hour: 6
+
+sleep_hours_containers:
+  - tubearchivist
+  - archivist-es
+  - archivist-redis
+
+sleep_hours_kuma_map:
+  tubearchivist: 43
+
+sleep_hours_plugins:
+  - default.sh

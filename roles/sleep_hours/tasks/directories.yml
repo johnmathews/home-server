@@ -1,0 +1,27 @@
+---
+- name: Ensure sleep-hours config directory exists
+  become: true
+  ansible.builtin.file:
+    path: /etc/sleep-hours
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Ensure uptimekumactl venv directory exists
+  become: true
+  ansible.builtin.file:
+    path: /opt/uptimekumactl
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Ensure plugin directory exists
+  become: true
+  ansible.builtin.file:
+    path: /usr/local/lib/sleep-hours/plugins
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'

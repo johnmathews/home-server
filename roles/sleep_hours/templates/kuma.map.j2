@@ -1,0 +1,3 @@
+{%- for container, monitor_id in sleep_hours_kuma_map.items() | sort %}
+{{ container }} {{ monitor_id }}
+{% endfor -%}

@@ -1,0 +1,26 @@
+---
+- name: Install docker-sleep script
+  become: true
+  ansible.builtin.copy:
+    src: docker-sleep.sh
+    dest: /usr/local/bin/docker-sleep.sh
+    owner: root
+    group: root
+    mode: '0755'
+  notify: Restart sleep-hours timers
+
+- name: Install uptimekumactl CLI
+  become: true
+  ansible.builtin.copy:
+    src: uptimekumactl.py
+    dest: /usr/local/bin/kumactl.py
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Rewrite kumactl shebang to use venv python
+  become: true
+  ansible.builtin.lineinfile:
+    path: /usr/local/bin/kumactl.py
+    regexp: '^#!.*python'
+    line: '#!/opt/uptimekumactl/venv/bin/python3'

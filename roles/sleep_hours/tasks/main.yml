@@ -1,0 +1,25 @@
+---
+- name: Configure sleep-hours
+  when: sleep_hours_enabled
+  block:
+    - name: Create directories
+      ansible.builtin.include_tasks: directories.yml
+
+    - name: Install scripts
+      ansible.builtin.include_tasks: install_scripts.yml
+
+    - name: Install systemd units
+      ansible.builtin.include_tasks: install_systemd.yml
+
+    - name: Install configuration files
+      ansible.builtin.include_tasks: install_configuration.yml
+
+    - name: Setup Python venv
+      ansible.builtin.include_tasks: install_python_venv.yml
+
+    - name: Install plugins
+      ansible.builtin.include_tasks: install_plugins.yml
+
+    - name: Configure NFS/SMB control (future)
+      ansible.builtin.include_tasks: nfs_smb_control.yml
+      when: sleep_hours_disable_nfs_smb or sleep_hours_enable_nfs_smb

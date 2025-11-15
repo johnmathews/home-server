@@ -1,0 +1,20 @@
+---
+- name: Install containers list
+  become: true
+  ansible.builtin.template:
+    src: containers.list.j2
+    dest: /etc/sleep-hours/containers.list
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart sleep-hours timers
+
+- name: Install Uptime Kuma container→monitor map
+  become: true
+  ansible.builtin.template:
+    src: kuma.map.j2
+    dest: /etc/sleep-hours/kuma.map
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart sleep-hours timers

@@ -1,0 +1,41 @@
+---
+- name: Install systemd service (templated @ service)
+  become: true
+  ansible.builtin.template:
+    src: docker-sleep@.service
+    dest: /etc/systemd/system/docker-sleep@.service
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart sleep-hours timers
+
+- name: Install pause timer
+  become: true
+  ansible.builtin.template:
+    src: docker-sleep@pause.timer.j2
+    dest: /etc/systemd/system/docker-sleep@pause.timer
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart sleep-hours timers
+
+- name: Install unpause timer
+  become: true
+  ansible.builtin.template:
+    src: docker-sleep@unpause.timer.j2
+    dest: /etc/systemd/system/docker-sleep@unpause.timer
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart sleep-hours timers
+
+- name: Enable and start timers
+  become: true
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    enabled: true
+    state: started
+    daemon_reload: true
+  loop:
+    - docker-sleep@pause.timer
+    - docker-sleep@unpause.timer

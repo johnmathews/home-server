@@ -1,0 +1,19 @@
+---
+- name: Install graceful shutdown common helper
+  become: true
+  ansible.builtin.copy:
+    src: plugins/common.sh
+    dest: /usr/local/lib/sleep-hours/plugins/common.sh
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Install graceful shutdown plugins
+  become: true
+  ansible.builtin.copy:
+    src: "plugins/{{ item }}"
+    dest: "/usr/local/lib/sleep-hours/plugins/{{ item }}"
+    owner: root
+    group: root
+    mode: '0644'
+  loop: "{{ sleep_hours_plugins }}"
