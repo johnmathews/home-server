@@ -54,9 +54,6 @@
       {%- for t in (nfs_shares | default([])) -%}
       {{ t.mountpoint }},{{ t.target }}
       {% endfor -%}
-      {%- for t in (smb_shares | default([])) -%}
-      {{ t.mountpoint }},{{ t.target }}
-      {% endfor -%}
 
 - name: Install probe script
   template:
