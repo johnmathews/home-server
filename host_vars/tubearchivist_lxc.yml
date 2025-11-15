@@ -18,3 +18,5 @@ sleep_hours_kuma_map:
 
 sleep_hours_plugins:
   - default.sh
+
+ sleep_hours_nfs_smb_enabled: true

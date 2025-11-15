@@ -48,3 +48,5 @@ sleep_hours_plugins:
   - filebrowser.sh
   - booklore.sh
   - booklore-mariadb.sh
+
+ sleep_hours_nfs_smb_enabled: false
