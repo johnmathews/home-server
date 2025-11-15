@@ -49,4 +49,4 @@ sleep_hours_plugins:
   - booklore.sh
   - booklore-mariadb.sh
 
- sleep_hours_nfs_smb_enabled: false
+sleep_hours_nfs_smb_enabled: false
