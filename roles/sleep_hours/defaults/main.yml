@@ -30,7 +30,7 @@ sleep_hours_plugins:
   - default.sh
 
 # Docker stop timeout in seconds (graceful shutdown window)
-docker_stop_timeout_s: 30
+sleep_hours_docker_stop_timeout_s: 30
 
 # Future NFS/SMB integration flags
 sleep_hours_disable_nfs_smb: false

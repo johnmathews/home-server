@@ -16,7 +16,7 @@ Environment=QUIET_LOG_LEVEL=debug
 Environment=QUIET_CMD_TIMEOUT_S=15
 Environment=QUIET_RETRIES=3
 Environment=QUIET_RETRY_DELAY_S=2
-Environment=DOCKER_STOP_TIMEOUT_S=30
+Environment=DOCKER_STOP_TIMEOUT_S={{ sleep_hours_docker_stop_timeout_s }}
 
 Environment=KUMA_URL="{{ uptime_kuma_url }}"
 Environment=KUMA_USERNAME="{{ uptime_kuma_user }}"
