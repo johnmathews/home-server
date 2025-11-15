@@ -25,6 +25,5 @@ sleep_hours_plugins:
   - paperless-graceful.sh
 
 # NFS/SMB share control (enable after 30+ successful STOP/START cycles)
+# Shares are automatically derived from nfs_shares above
 sleep_hours_nfs_smb_enabled: false
-sleep_hours_nfs_shares:
-  - tank/paperless

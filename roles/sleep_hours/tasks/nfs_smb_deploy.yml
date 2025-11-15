@@ -24,7 +24,7 @@
     - sleep_hours_nfs_smb_enabled | bool
   tags: ['sleep-hours-nfs']
 
-- name: Create NFS shares list file if NFS/SMB control enabled
+- name: Create NFS shares list file if NFS/SMB control enabled and shares exist
   ansible.builtin.template:
     src: truenas-nfs-shares.list.j2
     dest: /etc/sleep-hours/truenas-nfs-shares.list
@@ -34,5 +34,5 @@
   when:
     - sleep_hours_enabled | bool
     - sleep_hours_nfs_smb_enabled | bool
-    - sleep_hours_nfs_shares | length > 0
+    - (sleep_hours_nfs_shares | default([]) | length > 0) or (nfs_shares | default([]) | length > 0)
   tags: ['sleep-hours-nfs']

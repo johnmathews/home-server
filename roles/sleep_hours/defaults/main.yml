@@ -1,28 +1,13 @@
 ---
 # Sleep Hours Feature Configuration Defaults
-# Override these in host_vars/<hostname>.yml
+# Most settings are overridden in host_vars/<hostname>.yml
 
 # Feature toggle - set to true to enable sleep hours on a host
 sleep_hours_enabled: false
 
-# Pause time (hour to pause containers, 0-23)
+# Pause/unpause times (hour in 24-hour format, 0-23)
 sleep_hours_pause_hour: 2
-
-# Unpause time (hour to resume containers, 0-23)
 sleep_hours_unpause_hour: 6
-
-# List of containers to pause/unpause
-# MUST be overridden in host_vars - empty list is safe but non-functional
-sleep_hours_containers: []
-
-# List of containers to stop/start (graceful shutdown)
-# Override in host_vars for database-heavy services like paperless
-sleep_hours_stop_containers: []
-
-# Mapping of containers to Uptime Kuma monitor IDs
-# Format: { "container_name": monitor_id, ... }
-# MUST be overridden in host_vars - empty dict is safe but non-functional
-sleep_hours_kuma_map: {}
 
 # Graceful shutdown plugins to install
 # default.sh is always recommended, add others as needed
@@ -37,12 +22,10 @@ sleep_hours_docker_log_lines: 5
 
 # NFS/SMB share control (TrueNAS API integration)
 sleep_hours_nfs_smb_enabled: false  # Feature toggle (OFF by default, enable after 30+ cycles)
-sleep_hours_nfs_shares: []          # List of dataset paths to control
-# Example: ["tank/paperless", "tank/media"]
 
 # TrueNAS API configuration
 sleep_hours_truenas_api_url: "https://192.168.2.104"
-sleep_hours_truenas_api_key: "{{ vault_truenas_api_key }}"  # From vault
+sleep_hours_truenas_api_key: "{{ vault_truenas_api_key }}"
 
 # Health check configuration
 sleep_hours_container_health_timeout_s: 60  # Max wait for container health (seconds)

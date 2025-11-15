@@ -345,12 +345,6 @@ done < <(get_containers)
 msg "Processing $container_count container(s)..."
 msg ""
 
-# For PAUSE/STOP: disable shares BEFORE pausing containers
-if [[ "$ACTION" == "pause" || "$ACTION" == "stop" ]]; then
-  manage_nfs_smb_shares disable
-  msg ""
-fi
-
 handle_one() {
   local name="$1"
   ((total += 1))
@@ -524,6 +518,13 @@ while IFS= read -r raw; do
    [[ -z "$name" || "$name" =~ ^# ]] && continue
    handle_one "$name"
 done < <(get_containers)
+
+# For PAUSE/STOP: disable shares AFTER pausing/stopping containers
+if [[ "$ACTION" == "pause" || "$ACTION" == "stop" ]]; then
+  msg ""
+  manage_nfs_smb_shares disable
+  msg ""
+fi
 
 # For UNPAUSE/START: enable shares AFTER containers are running
 if [[ "$ACTION" == "unpause" || "$ACTION" == "start" ]]; then

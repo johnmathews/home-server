@@ -1,4 +1,4 @@
-nfs_shares:
+nzfs_shares:
   - name: immich
     mountpoint: /mnt/nfs/immich
     target: /mnt/tank/immich
