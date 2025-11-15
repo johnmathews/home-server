@@ -1,18 +1,7 @@
 ---
 # Sleep Hours Feature Configuration Defaults
-# Most settings are overridden in host_vars/<hostname>.yml
-
-# Feature toggle - set to true to enable sleep hours on a host
-sleep_hours_enabled: false
-
-# Pause/unpause times (hour in 24-hour format, 0-23)
-sleep_hours_pause_hour: 2
-sleep_hours_unpause_hour: 6
-
-# Graceful shutdown plugins to install
-# default.sh is always recommended, add others as needed
-sleep_hours_plugins:
-  - default.sh
+# Note: Most settings are in host_vars/<hostname>.yml
+# This file only contains values that are truly shared across all hosts
 
 # Docker stop timeout in seconds (graceful shutdown window)
 sleep_hours_docker_stop_timeout_s: 30
@@ -20,10 +9,7 @@ sleep_hours_docker_stop_timeout_s: 30
 # Docker log lines to include in error messages (configurable verbosity)
 sleep_hours_docker_log_lines: 5
 
-# NFS/SMB share control (TrueNAS API integration)
-sleep_hours_nfs_smb_enabled: false  # Feature toggle (OFF by default, enable after 30+ cycles)
-
-# TrueNAS API configuration
+# TrueNAS API configuration (for Phase 3)
 sleep_hours_truenas_api_url: "https://192.168.2.104"
 sleep_hours_truenas_api_key: "{{ vault_truenas_api_key }}"
 

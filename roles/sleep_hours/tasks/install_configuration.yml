@@ -8,7 +8,8 @@
     group: root
     mode: '0644'
   vars:
-    container_list: "{{ sleep_hours_containers }}"
+    container_list: "{{ sleep_hours_containers | default([]) }}"
+  when: sleep_hours_containers is defined and sleep_hours_containers | length > 0
   notify: Restart sleep-hours timers
 
 - name: Install stop containers list
@@ -20,7 +21,8 @@
     group: root
     mode: '0644'
   vars:
-    container_list: "{{ sleep_hours_stop_containers }}"
+    container_list: "{{ sleep_hours_stop_containers | default([]) }}"
+  when: sleep_hours_stop_containers is defined and sleep_hours_stop_containers | length > 0
   notify: Restart sleep-hours timers
 
 - name: Install legacy containers list (for backward compatibility)
@@ -32,7 +34,8 @@
     group: root
     mode: '0644'
   vars:
-    container_list: "{{ sleep_hours_containers }}"
+    container_list: "{{ sleep_hours_containers | default([]) }}"
+  when: sleep_hours_containers is defined and sleep_hours_containers | length > 0
   notify: Restart sleep-hours timers
 
 - name: Install Uptime Kuma container→monitor map
@@ -43,4 +46,5 @@
     owner: root
     group: root
     mode: '0644'
+  when: sleep_hours_kuma_map is defined and sleep_hours_kuma_map | length > 0
   notify: Restart sleep-hours timers
