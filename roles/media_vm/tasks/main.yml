@@ -169,6 +169,6 @@
   become: true
 
 - name: Configure sleep hours
-  include_role:
+  import_role:
     name: sleep_hours
   tags: sleep
