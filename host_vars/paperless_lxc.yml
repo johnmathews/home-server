@@ -8,8 +8,8 @@ sleep_hours_enabled: true
 sleep_hours_pause_hour: 2
 sleep_hours_unpause_hour: 6
 
-# Graceful shutdown with STOP instead of PAUSE (safer for databases)
-sleep_hours_stop_containers:
+# Containers to manage during sleep hours (will be stopped then restarted)
+sleep_hours_containers:
   - paperless-webserver
   - paperless-broker
   - paperless-db
@@ -25,6 +25,7 @@ sleep_hours_plugins:
   - default.sh
   - paperless-graceful.sh
 
-# NFS/SMB share control via TrueNAS API (enable after 30+ successful STOP/START cycles)
+# NFS/SMB share control via TrueNAS API
 # Shares are automatically derived from nfs_shares above
-sleep_hours_nfs_smb_enabled: false
+# Disables NFS/SMB shares before stopping containers, re-enables after restart
+sleep_hours_nfs_smb_enabled: true
