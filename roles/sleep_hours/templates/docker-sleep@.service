@@ -2,13 +2,18 @@
 
 [Unit]
 Description=Quiet hours: %i Docker containers
-Wants=docker.service
+Requires=docker.service
 After=docker.service
 
 [Service]
 Type=oneshot
 # Run as root unless your service account is in the docker group
 ExecStart=/usr/local/bin/docker-sleep.sh %i
+
+# Timeout to prevent service from hanging indefinitely
+# Must be larger than max retry time + operation time
+TimeoutStartSec=300
+TimeoutStopSec=30
 
 Environment=QUIET_HOURS_START={{ docker_quiet_hours_start }}
 Environment=QUIET_HOURS_END={{ docker_quiet_hours_end }}
@@ -49,6 +54,10 @@ Environment=GRACE_DIR=/usr/local/lib/sleep-hours/plugins
 # Pushover notifications for container failures
 Environment=PUSHOVER_USER_KEY="{{ vault_pushover_user_key }}"
 Environment=PUSHOVER_API_TOKEN="{{ vault_pushover_api_token }}"
+Environment=PUSHOVER_TIMEOUT_S=5
+
+# TrueNAS API timeout
+Environment=TRUENAS_API_TIMEOUT_S=10
 
 # 1 - any activity blocks
 # Environment=BUSY_BLOCKIO_NONZERO=0
