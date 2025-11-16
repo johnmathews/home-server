@@ -530,7 +530,7 @@ fi
 if [[ "$ACTION" == "unpause" || "$ACTION" == "start" ]]; then
   msg ""
   # Build list of containers for health checking
-  local container_list=""
+  container_list=""
   while IFS= read -r raw; do
     name="$(trim_line "$raw")"
     [[ -z "$name" || "$name" =~ ^# ]] && continue
