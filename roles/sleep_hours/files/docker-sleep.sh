@@ -351,14 +351,32 @@ pushover_notify() {
 }
 
 verify_state() {
-  local name="$1" expect="$2"
-  local status running paused health
-  status="$(inspect_fields "$name")" || true
-  [[ -z "$status" ]] && return 1
-  read -r running paused health <<<"$status"
-  local cur
-  cur="$(normalize_state "$running" "$paused")"
-  [[ "$cur" == "$expect" ]]
+   local name="$1" expect="$2"
+   local status running paused health
+   status="$(inspect_fields "$name")" || true
+   [[ -z "$status" ]] && return 1
+   read -r running paused health <<<"$status"
+   local cur
+   cur="$(normalize_state "$running" "$paused")"
+   [[ "$cur" == "$expect" ]]
+}
+
+validate_containers() {
+   local invalid_count=0
+   while IFS= read -r raw; do
+      name="$(trim_line "$raw")"
+      [[ -z "$name" || "$name" =~ ^# ]] && continue
+      status="$(inspect_fields "$name")" || true
+      if [[ -z "$status" ]]; then
+         log_warn "$name" validation failed "likely_typo_in_configuration"
+         ((invalid_count += 1))
+      fi
+   done < <(get_containers)
+   
+   if [[ $invalid_count -gt 0 ]]; then
+      msg "⚠ WARNING: Found $invalid_count container(s) that do not exist - check configuration for typos"
+      msg ""
+   fi
 }
 
 total=0 changed=0 skipped=0 failed=0
@@ -374,17 +392,22 @@ done < <(get_containers)
 msg "Processing $container_count container(s)..."
 msg ""
 
+# Validate containers before processing
+validate_containers
+msg ""
+
 handle_one() {
   local name="$1"
   ((total += 1))
 
-  local status running paused health
-  status="$(inspect_fields "$name")" || true
-  if [[ -z "$status" ]]; then
-    log_warn "$name" skipped not_found
-    ((skipped += 1))
-    return 0
-  fi
+   local status running paused health
+   status="$(inspect_fields "$name")" || true
+   if [[ -z "$status" ]]; then
+     log_warn "$name" skipped not_found "hint=check_container_name_for_typos"
+     msg "  ⚠ WARNING: $name not found - check configuration for typos"
+     ((skipped += 1))
+     return 0
+   fi
   read -r running paused health <<<"$status"
   local state_before
   state_before="$(normalize_state "$running" "$paused")"
