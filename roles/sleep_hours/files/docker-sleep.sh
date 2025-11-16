@@ -16,6 +16,45 @@ case "$ACTION" in
   stop|start) LIST="${QUIET_LIST:-/etc/sleep-hours/containers.stop.list}" ;;
 esac
 
+# Validate required tools and environment variables early
+validate_environment() {
+   local errors=0
+   
+   # Check for required commands
+   for cmd in docker timeout; do
+      if ! command -v "$cmd" >/dev/null 2>&1; then
+         printf 'ERROR: Required command not found: %s\n' "$cmd" >&2
+         ((errors += 1))
+      fi
+   done
+   
+   # Validate numeric environment variables
+   if [[ -n "${QUIET_CMD_TIMEOUT_S:-}" ]]; then
+      if ! [[ "$QUIET_CMD_TIMEOUT_S" =~ ^[0-9]+$ ]]; then
+         printf 'ERROR: QUIET_CMD_TIMEOUT_S must be a positive integer, got: %s\n' "$QUIET_CMD_TIMEOUT_S" >&2
+         ((errors += 1))
+      fi
+   fi
+   
+   if [[ -n "${DOCKER_STOP_TIMEOUT_S:-}" ]]; then
+      if ! [[ "$DOCKER_STOP_TIMEOUT_S" =~ ^[0-9]+$ ]]; then
+         printf 'ERROR: DOCKER_STOP_TIMEOUT_S must be a positive integer, got: %s\n' "$DOCKER_STOP_TIMEOUT_S" >&2
+         ((errors += 1))
+      fi
+   fi
+   
+   if [[ -n "${IO_SAMPLE_S:-}" ]]; then
+      if ! [[ "$IO_SAMPLE_S" =~ ^[0-9]+$ ]] || [[ "$IO_SAMPLE_S" -eq 0 ]]; then
+         printf 'ERROR: IO_SAMPLE_S must be a positive integer, got: %s\n' "$IO_SAMPLE_S" >&2
+         ((errors += 1))
+      fi
+   fi
+   
+   if [[ $errors -gt 0 ]]; then
+      exit 1
+   fi
+}
+
 # -------- logging with levels --------
 # QUIET_LOG_LEVEL: debug|info|warn|error (default info)
 _log_level="${QUIET_LOG_LEVEL:-info}"
@@ -74,6 +113,49 @@ DOCKER_LOG_LINES="${DOCKER_LOG_LINES:-5}"
 HAS_TIMEOUT=0
 if command -v timeout >/dev/null 2>&1; then HAS_TIMEOUT=1; fi
 
+# -------- process locking --------
+# Prevent concurrent executions of the same action to avoid race conditions
+LOCK_DIR="${LOCK_DIR:-/run/sleep-hours}"
+LOCK_FILE="${LOCK_DIR}/docker-sleep-${ACTION}.lock"
+
+acquire_lock() {
+   # Create lock directory if needed
+   mkdir -p "$LOCK_DIR" 2>/dev/null || true
+   
+   # Try to acquire exclusive lock using flock (atomic operation)
+   if command -v flock >/dev/null 2>&1; then
+      exec {lock_fd}>"$LOCK_FILE" 2>/dev/null || return 1
+      if ! flock -n "$lock_fd" 2>/dev/null; then
+         _log warn "_" lock "already_running" "action=$ACTION"
+         msg "WARNING: Another $ACTION operation is already running, waiting..."
+         flock "$lock_fd"  # Wait for lock
+      fi
+      _log debug "_" lock "acquired" "action=$ACTION"
+      return 0
+   else
+      # Fallback: simple file-based lock if flock unavailable
+      if [[ -f "$LOCK_FILE" ]]; then
+         local lock_pid
+         lock_pid=$(cat "$LOCK_FILE" 2>/dev/null) || return 1
+         if kill -0 "$lock_pid" 2>/dev/null; then
+            _log warn "_" lock "already_running_pid=$lock_pid" "action=$ACTION"
+            return 1
+         fi
+      fi
+      echo "$$" > "$LOCK_FILE" 2>/dev/null || return 1
+      return 0
+   fi
+}
+
+release_lock() {
+   if [[ -f "$LOCK_FILE" ]]; then
+      rm -f "$LOCK_FILE" 2>/dev/null || true
+   fi
+}
+
+# Ensure lock is released on exit
+trap 'release_lock' EXIT
+
 # Optional quiet-hours window guard (skip work if we're outside)
 QUIET_START="${QUIET_HOURS_START:-${docker_quiet_hours_start:-}}"
 QUIET_END="${QUIET_HOURS_END:-${docker_quiet_hours_end:-}}"
@@ -105,11 +187,19 @@ is_within_quiet_window() {
   fi
 }
 
-# -------- validate action --------
+# -------- validate action and environment --------
 case "$ACTION" in
 pause | unpause | stop | start) ;;
 *) fail_early usage "usage=$0 {pause|unpause|stop|start}" 2 ;;
 esac
+
+# Validate environment at startup
+validate_environment
+
+# Acquire lock to prevent concurrent execution
+if ! acquire_lock; then
+   fail_early lock_failed "Could not acquire lock for action=$ACTION" 1
+fi
 
 # Skip work if outside window for pause/stop
 if [[ "$ACTION" == "pause" || "$ACTION" == "stop" ]] && ! is_within_quiet_window; then
@@ -280,30 +370,46 @@ manage_nfs_smb_shares() {
    
    msg "Controlling NFS/SMB shares..."
    
-   case "$action" in
-   disable)
-     if /usr/local/bin/truenas-shares.sh disable "$shares" 2>&1 | while IFS= read -r line; do msg "$line"; done; then
-       log_info "_" nfs_smb disable_success "shares=$shares"
-       return 0
-     else
-       local rc=$?
-       log_warn "_" nfs_smb disable_failed "shares=$shares rc=$rc"
-       # Don't fail - share control is nice-to-have, not critical
-       return 0
-     fi
-     ;;
-   enable)
-     if /usr/local/bin/truenas-shares.sh enable "$shares" "$containers" 2>&1 | while IFS= read -r line; do msg "$line"; done; then
-       log_info "_" nfs_smb enable_success "shares=$shares"
-       return 0
-     else
-       local rc=$?
-       log_warn "_" nfs_smb enable_failed "shares=$shares rc=$rc"
-       # Don't fail - share control is nice-to-have, not critical
-       return 0
-     fi
-     ;;
-   esac
+    case "$action" in
+    disable)
+      # Capture output and exit code separately to avoid masking exit status in pipe
+      local tmpfile rc
+      tmpfile="$(mktemp /tmp/sleep-hours-nfs.XXXXXX)" || fail_early tmpfile "failed to create temp file"
+      /usr/local/bin/truenas-shares.sh disable "$shares" >"$tmpfile" 2>&1
+      rc=$?
+      # Output captured messages
+      while IFS= read -r line; do msg "$line"; done < "$tmpfile"
+      rm -f "$tmpfile"
+      
+      if [[ $rc -eq 0 ]]; then
+        log_info "_" nfs_smb disable_success "shares=$shares"
+        return 0
+      else
+        log_warn "_" nfs_smb disable_failed "shares=$shares rc=$rc"
+        # Don't fail - share control is nice-to-have, not critical
+        return 0
+      fi
+      ;;
+    enable)
+      # Capture output and exit code separately to avoid masking exit status in pipe
+      local tmpfile rc
+      tmpfile="$(mktemp /tmp/sleep-hours-nfs.XXXXXX)" || fail_early tmpfile "failed to create temp file"
+      /usr/local/bin/truenas-shares.sh enable "$shares" "$containers" >"$tmpfile" 2>&1
+      rc=$?
+      # Output captured messages
+      while IFS= read -r line; do msg "$line"; done < "$tmpfile"
+      rm -f "$tmpfile"
+      
+      if [[ $rc -eq 0 ]]; then
+        log_info "_" nfs_smb enable_success "shares=$shares"
+        return 0
+      else
+        log_warn "_" nfs_smb enable_failed "shares=$shares rc=$rc"
+        # Don't fail - share control is nice-to-have, not critical
+        return 0
+      fi
+      ;;
+    esac
    
    return 0
 }
@@ -321,27 +427,27 @@ kuma_notify() {
 }
 
 pushover_notify() {
-    # Send Pushover notification for container failures
-    # Usage: pushover_notify "title" "message"
-    local title="$1" message="$2"
-    
-    # Check if Pushover credentials are configured
-    [[ -z "${PUSHOVER_USER_KEY:-}" || -z "${PUSHOVER_API_TOKEN:-}" ]] && return 0
-    
-    # URL encode message (simple version - replaces spaces with +)
-    local encoded_msg="${message// /+}"
-    
-    # Send to Pushover API
-    local pushover_url="https://api.pushover.net/1/messages.json"
-    local response
-    
-    response="$(curl -sS \
-      --form-string "token=${PUSHOVER_API_TOKEN}" \
-      --form-string "user=${PUSHOVER_USER_KEY}" \
-      --form-string "title=${title}" \
-      --form-string "message=${message}" \
-      --form-string "priority=1" \
-      "${pushover_url}" 2>&1)" || true
+     # Send Pushover notification for container failures
+     # Usage: pushover_notify "title" "message"
+     local title="$1" message="$2"
+     
+     # Check if Pushover credentials are configured
+     [[ -z "${PUSHOVER_USER_KEY:-}" || -z "${PUSHOVER_API_TOKEN:-}" ]] && return 0
+     
+     # URL encode message (simple version - replaces spaces with +)
+     local encoded_msg="${message// /+}"
+     
+     # Send to Pushover API with timeout
+     local pushover_url="https://api.pushover.net/1/messages.json"
+     local response pushover_timeout="${PUSHOVER_TIMEOUT_S:-5}"
+     
+     response="$(timeout "$pushover_timeout" curl -sS --max-time "$pushover_timeout" \
+       --form-string "token=${PUSHOVER_API_TOKEN}" \
+       --form-string "user=${PUSHOVER_USER_KEY}" \
+       --form-string "title=${title}" \
+       --form-string "message=${message}" \
+       --form-string "priority=1" \
+       "${pushover_url}" 2>&1)" || true
     
     if echo "$response" | grep -q '"status":1'; then
       log_info "_" pushover notification_sent "title=$title"
