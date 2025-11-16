@@ -8,8 +8,8 @@
     group: root
     mode: '0644'
   vars:
-    container_list: "{{ sleep_hours_containers | default([]) }}"
-  when: sleep_hours_containers is defined and sleep_hours_containers | length > 0
+    container_list: "{{ sleep_hours_pause_containers | default([]) }}"
+  when: sleep_hours_pause_containers is defined and sleep_hours_pause_containers | length > 0
   notify: Restart sleep-hours timers
 
 - name: Install stop containers list
@@ -21,22 +21,15 @@
     group: root
     mode: '0644'
   vars:
-    container_list: "{{ sleep_hours_containers | default([]) }}"
-  when: sleep_hours_containers is defined and sleep_hours_containers | length > 0
+    container_list: "{{ sleep_hours_stop_containers | default([]) }}"
+  when: sleep_hours_stop_containers is defined and sleep_hours_stop_containers | length > 0
   notify: Restart sleep-hours timers
 
-- name: Install legacy containers list (for backward compatibility)
+- name: Remove legacy containers list
   become: true
-  ansible.builtin.template:
-    src: containers.list.j2
-    dest: /etc/sleep-hours/containers.list
-    owner: root
-    group: root
-    mode: '0644'
-  vars:
-    container_list: "{{ sleep_hours_containers | default([]) }}"
-  when: sleep_hours_containers is defined and sleep_hours_containers | length > 0
-  notify: Restart sleep-hours timers
+  ansible.builtin.file:
+    path: /etc/sleep-hours/containers.list
+    state: absent
 
 - name: Install Uptime Kuma container→monitor map
   become: true

@@ -11,11 +11,10 @@ export PS4='+ ts=$(date +%FT%T%z) line=${LINENO} cmd='
 ACTION="${1:-}"
 
 # Select list file based on action
-if [[ "$ACTION" == "stop" || "$ACTION" == "start" ]]; then
-  LIST="${QUIET_LIST:-/etc/sleep-hours/containers.stop.list}"
-else
-  LIST="${QUIET_LIST:-/etc/sleep-hours/containers.list}"
-fi
+case "$ACTION" in
+  pause|unpause) LIST="${QUIET_LIST:-/etc/sleep-hours/containers.pause.list}" ;;
+  stop|start) LIST="${QUIET_LIST:-/etc/sleep-hours/containers.stop.list}" ;;
+esac
 
 # -------- logging with levels --------
 # QUIET_LOG_LEVEL: debug|info|warn|error (default info)

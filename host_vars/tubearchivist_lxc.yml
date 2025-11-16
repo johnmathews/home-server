@@ -8,7 +8,8 @@ sleep_hours_enabled: true
 sleep_hours_pause_hour: 2
 sleep_hours_unpause_hour: 6
 
-sleep_hours_containers:
+# Containers to pause (lightweight freeze, fast resume)
+sleep_hours_pause_containers:
   - tubearchivist
   - archivist-es
   - archivist-redis
