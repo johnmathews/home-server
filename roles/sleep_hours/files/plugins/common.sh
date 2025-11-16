@@ -12,29 +12,41 @@ BUSY_WRITE_BPS="${BUSY_WRITE_BPS:-65536}"        # 64 KiB/s default
 
 # Parse "4.88MB" or "512kB" or "0B" into integer bytes
 _to_bytes() {
-  # input like "4.88MB" "512kB" "0B"
-  local v="${1:-0B}"
-  # normalize units to upper-case KiB/MiB/GiB assumptions
-  # docker prints kB/MB/GB; treat kB as 1024, MB as 1024^2, GB as 1024^3
-  v="$(echo "$v" | tr '[:space:]' '_' )"
-  # number part
-  local num unit
-  num="$(echo "$v" | sed -E 's/^([0-9]+(\.[0-9]+)?)?.*/\1/')" ; num="${num:-0}"
-  unit="$(echo "$v" | sed -E 's/^[0-9]+(\.[0-9]+)?(.*)$/\2/' | tr '[:lower:]' '[:upper:]')"
+   # input like "4.88MB" "512kB" "0B"
+   local v="${1:-0B}"
+   
+   # Trim whitespace
+   v="$(echo "$v" | xargs)"
+   [[ -z "$v" ]] && { echo "0"; return 0; }
+   
+   # Extract number part - must start with digit
+   local num unit
+   if [[ "$v" =~ ^([0-9]+(\.[0-9]+)?)(.*)$ ]]; then
+     num="${BASH_REMATCH[1]}"
+     unit="${BASH_REMATCH[3]}"
+   else
+     # No number found - return 0
+     echo "0"
+     return 0
+   fi
+   
+    # Normalize unit to upper-case, remove spaces/underscores
+    unit="$(echo "$unit" | sed 's/[[:space:]_]//g' | tr '[:lower:]' '[:upper:]')"
+    [[ -z "$unit" ]] && unit="B"
 
-  # default: bytes
-  local mul=1
-  case "$unit" in
-    B|'' ) mul=1 ;;
-    KB|KIB|KIB/S|K|K/S|_KB|_KIB) mul=1024 ;;
-    MB|MIB|M|M/S|_MB|_MIB)       mul=$((1024*1024)) ;;
-    GB|GIB|G|G/S|_GB|_GIB)       mul=$((1024*1024*1024)) ;;
-    TB|TIB|T|T/S|_TB|_TIB)       mul=$((1024*1024*1024*1024)) ;;
-    */*)                         mul=1 ;;  # safety
-  esac
+   # default: bytes
+   local mul=1
+   case "$unit" in
+     B ) mul=1 ;;
+     KB|KIB|K ) mul=1024 ;;
+     MB|MIB|M ) mul=$((1024*1024)) ;;
+     GB|GIB|G ) mul=$((1024*1024*1024)) ;;
+     TB|TIB|T ) mul=$((1024*1024*1024*1024)) ;;
+     * ) mul=1 ;;  # unknown unit, treat as bytes
+   esac
 
-  # awk to do float*num
-  awk -v n="$num" -v m="$mul" 'BEGIN{printf "%.0f\n", n*m}'
+   # Use awk for float multiplication to handle decimals
+   awk -v n="$num" -v m="$mul" 'BEGIN{printf "%.0f\n", int(n)*m + int((n-int(n))*m)}'
 }
 
 # Read one stats line for a container: "<name> <cpu%> <read> / <write>"
@@ -42,9 +54,12 @@ _to_bytes() {
 _read_stats_line() {
    local name="$1"
    # Example docker stats line: qbittorrent 0.63% 4.88MB / 3.77MB
-   local line
-   # Add timeout (5 seconds) to docker stats to prevent hanging
-   line="$(timeout 5 "$DOCKER_BIN" stats --no-stream --format '{{.Name}} {{.CPUPerc}} {{.BlockIO}}' 2>/dev/null | awk -v n="$name" '$1==n {print; exit}')" || true
+   local line stats_timeout=5
+   
+   # Add timeout with KILL signal to prevent hanging zombie processes
+   # Use --preserve-status to get the actual exit code
+   line="$(timeout --preserve-status -s KILL "$stats_timeout" "$DOCKER_BIN" stats --no-stream "$name" --format '{{.Name}} {{.CPUPerc}} {{.BlockIO}}' 2>/dev/null)" || true
+   
    if [[ -z "$line" ]]; then
      echo ""
      return 1
@@ -74,18 +89,25 @@ check_busy_generic() {
     echo "source=generic_stats_unavailable"
     return 1
   }
-  cpu1_raw="$(echo "$s1" | awk '{print $1}')"
-  r1_raw="$(echo "$s1"   | awk '{print $2}')"
-  w1_raw="$(echo "$s1"   | awk '{print $3}')"
+   cpu1_raw="$(echo "$s1" | awk '{print $1}')"
+   r1_raw="$(echo "$s1"   | awk '{print $2}')"
+   w1_raw="$(echo "$s1"   | awk '{print $3}')"
 
-  # CPU% as float without '%'
-  local cpu1; cpu1="$(echo "${cpu1_raw%%%}" | tr -d '%')"
-  # Early CPU decision (single-sample is fine for CPU)
-  awk -v c="${cpu1:-0}" -v th="$BUSY_CPU_PCT" 'BEGIN{exit !(c>=th)}'
-  if [[ $? -eq 0 ]]; then
-    echo "source=generic cpu_pct=${cpu1} cpu_threshold=${BUSY_CPU_PCT} read_bps=0 write_bps=0 read_bps_threshold=${BUSY_READ_BPS} write_bps_threshold=${BUSY_WRITE_BPS} sample_s=${IO_SAMPLE_S}"
-    return 0
-  fi
+   # CPU% as float without '%' - validate format
+   local cpu1
+   if [[ "$cpu1_raw" =~ %$ ]]; then
+     cpu1="${cpu1_raw%%%}"  # Remove trailing %
+     cpu1="$(echo "$cpu1" | grep -oE '^[0-9]+(\.[0-9]+)?$')"  # Validate format
+     [[ -z "$cpu1" ]] && cpu1="0"
+   else
+     cpu1="0"
+   fi
+   
+   # Early CPU decision (single-sample is fine for CPU)
+   if awk -v c="$cpu1" -v th="$BUSY_CPU_PCT" 'BEGIN{exit !(c>=th)}'; then
+     echo "source=generic cpu_pct=${cpu1} cpu_threshold=${BUSY_CPU_PCT} read_bps=0 write_bps=0 read_bps_threshold=${BUSY_READ_BPS} write_bps_threshold=${BUSY_WRITE_BPS} sample_s=${IO_SAMPLE_S}"
+     return 0
+   fi
 
   # Sleep to establish IO delta
   sleep "${IO_SAMPLE_S}"
