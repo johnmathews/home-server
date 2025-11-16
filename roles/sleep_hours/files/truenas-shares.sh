@@ -82,66 +82,102 @@ fail_early() {
 
 # Make authenticated curl request to TrueNAS API
 api_call() {
-  local method="$1" endpoint="$2" data="${3:-}"
-  local url="${TRUENAS_API_URL}${endpoint}"
-  local attempt=1
+   local method="$1" endpoint="$2" data="${3:-}"
+   local url="${TRUENAS_API_URL}${endpoint}"
+   local attempt=1
+   local curl_timeout="${TRUENAS_API_TIMEOUT_S:-10}"
 
-  [[ -z "$TRUENAS_API_KEY" ]] && fail_early api_auth "TRUENAS_API_KEY not set" 1
+   [[ -z "$TRUENAS_API_KEY" ]] && fail_early api_auth "TRUENAS_API_KEY not set" 1
 
-  while :; do
-    local output
-    if [[ -z "$data" ]]; then
-      output=$(curl -s -X "$method" "$url" \
-        -H "Authorization: Bearer ${TRUENAS_API_KEY}" \
-        -H "Content-Type: application/json" \
-        2>&1)
-    else
-      output=$(curl -s -X "$method" "$url" \
-        -H "Authorization: Bearer ${TRUENAS_API_KEY}" \
-        -H "Content-Type: application/json" \
-        -d "$data" \
-        2>&1)
-    fi
-    local rc=$?
+   while :; do
+     local output
+     if [[ -z "$data" ]]; then
+       output=$(curl -s --max-time "$curl_timeout" -X "$method" "$url" \
+         -H "Authorization: Bearer ${TRUENAS_API_KEY}" \
+         -H "Content-Type: application/json" \
+         2>&1)
+     else
+       output=$(curl -s --max-time "$curl_timeout" -X "$method" "$url" \
+         -H "Authorization: Bearer ${TRUENAS_API_KEY}" \
+         -H "Content-Type: application/json" \
+         -d "$data" \
+         2>&1)
+     fi
+     local rc=$?
 
-    if [[ $rc -eq 0 ]]; then
-      echo "$output"
-      return 0
-    else
-      log_warn "_" api_call "curl_failed" "method=$method endpoint=$endpoint attempt=$attempt rc=$rc"
-      if [[ $attempt -ge $API_RETRIES ]]; then
-        return $rc
-      fi
-      attempt=$((attempt + 1))
-      sleep "$API_RETRY_DELAY_S"
-    fi
-  done
+     if [[ $rc -eq 0 ]]; then
+       echo "$output"
+       return 0
+     else
+       log_warn "_" api_call "curl_failed" "method=$method endpoint=$endpoint attempt=$attempt rc=$rc"
+       if [[ $attempt -ge $API_RETRIES ]]; then
+         log_err "_" api_call "failed_after_retries" "method=$method endpoint=$endpoint attempts=$API_RETRIES"
+         return $rc
+       fi
+       attempt=$((attempt + 1))
+       sleep "$API_RETRY_DELAY_S"
+     fi
+   done
 }
 
 # Get NFS share ID by path
 get_nfs_share_id() {
-  local dataset="$1"
-  local response
-  response=$(api_call GET "/nfs/share" 2>/dev/null) || return 1
-  
-  # Parse JSON to find share with matching path
-  local share_id
-  share_id=$(echo "$response" | grep -o '"id":[0-9]*' | head -1 | grep -o '[0-9]*' || echo "")
-  
-  [[ -n "$share_id" ]] && echo "$share_id" || return 1
+   local dataset="$1"
+   local response rc
+   response=$(api_call GET "/nfs/share")
+   rc=$?
+   
+   if [[ $rc -ne 0 ]]; then
+     log_err "$dataset" nfs_share_api_failed "could not fetch NFS shares"
+     return 1
+   fi
+   
+   # Parse JSON to find share with matching path using jq if available
+   local share_id
+   if command -v jq >/dev/null 2>&1; then
+     share_id=$(echo "$response" | jq -r ".[] | select(.path==\"$dataset\") | .id" 2>/dev/null | head -1)
+   else
+     # Fallback to grep if jq unavailable
+     log_warn "$dataset" jq_unavailable "falling back to grep parsing"
+     share_id=$(echo "$response" | grep -o '"id":[0-9]*' | head -1 | grep -o '[0-9]*' || echo "")
+   fi
+   
+   if [[ -z "$share_id" ]] || [[ "$share_id" == "null" ]]; then
+     log_warn "$dataset" nfs_share_not_found "share ID not found in response"
+     return 1
+   fi
+   echo "$share_id"
+   return 0
 }
 
 # Get SMB share ID by path
 get_smb_share_id() {
-  local dataset="$1"
-  local response
-  response=$(api_call GET "/smb/share" 2>/dev/null) || return 1
-  
-  # Parse JSON to find share with matching path
-  local share_id
-  share_id=$(echo "$response" | grep -o '"id":[0-9]*' | head -1 | grep -o '[0-9]*' || echo "")
-  
-  [[ -n "$share_id" ]] && echo "$share_id" || return 1
+   local dataset="$1"
+   local response rc
+   response=$(api_call GET "/smb/share")
+   rc=$?
+   
+   if [[ $rc -ne 0 ]]; then
+     log_err "$dataset" smb_share_api_failed "could not fetch SMB shares"
+     return 1
+   fi
+   
+   # Parse JSON to find share with matching path using jq if available
+   local share_id
+   if command -v jq >/dev/null 2>&1; then
+     share_id=$(echo "$response" | jq -r ".[] | select(.path==\"$dataset\") | .id" 2>/dev/null | head -1)
+   else
+     # Fallback to grep if jq unavailable
+     log_warn "$dataset" jq_unavailable "falling back to grep parsing"
+     share_id=$(echo "$response" | grep -o '"id":[0-9]*' | head -1 | grep -o '[0-9]*' || echo "")
+   fi
+   
+   if [[ -z "$share_id" ]] || [[ "$share_id" == "null" ]]; then
+     log_warn "$dataset" smb_share_not_found "share ID not found in response"
+     return 1
+   fi
+   echo "$share_id"
+   return 0
 }
 
 # Disable NFS share by ID
