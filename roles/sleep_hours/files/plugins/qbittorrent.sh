@@ -1,5 +1,10 @@
 # qBittorrent "busy" check with automatic WebUI login.
 # Busy if active download/upload speed > 0 via /api/v2/transfer/info
+# Validate common.sh was sourced
+if [[ "${COMMON_SH_LOADED:-0}" != "1" ]]; then
+   echo "ERROR: common.sh must be sourced before this plugin" >&2
+   exit 1
+fi
 #
 # Requires (set in systemd Environment= or an EnvironmentFile=):
 #   QBIT_URL      (e.g., http://127.0.0.1:8080)

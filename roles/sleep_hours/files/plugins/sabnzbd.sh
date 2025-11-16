@@ -1,5 +1,10 @@
 # Optional API (if you later set SAB_URL + SAB_API_KEY):
 #   export SAB_URL="http://127.0.0.1:8081"
+# Validate common.sh was sourced
+if [[ "${COMMON_SH_LOADED:-0}" != "1" ]]; then
+   echo "ERROR: common.sh must be sourced before this plugin" >&2
+   exit 1
+fi
 #   export SAB_API_KEY="xxxxxxxxxxxxxxxxxxxx"
 # Busy if queue not empty OR speed > 0
 _sab_api_busy() {

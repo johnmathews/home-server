@@ -110,8 +110,11 @@ QUIET_RETRY_DELAY_S="${QUIET_RETRY_DELAY_S:-2}"
 QUIET_CMD_TIMEOUT_S="${QUIET_CMD_TIMEOUT_S:-15}"
 DOCKER_LOG_LINES="${DOCKER_LOG_LINES:-5}"
 
+# Check for timeout command (use command -v or which for compatibility)
 HAS_TIMEOUT=0
-if command -v timeout >/dev/null 2>&1; then HAS_TIMEOUT=1; fi
+if command -v timeout >/dev/null 2>&1 || which timeout >/dev/null 2>&1; then 
+   HAS_TIMEOUT=1
+fi
 
 # -------- process locking --------
 # Prevent concurrent executions of the same action to avoid race conditions
@@ -271,20 +274,30 @@ is_busy() {
 
 # -------- container source --------
 get_containers() {
-  if [[ "${LIST}" == "-" ]]; then
-    "$DOCKER_BIN" ps --filter "label=quiet-hours=true" --format '{{.Names}}'
-  else
-    [[ -r "$LIST" ]] || fail_early list_missing "path=$LIST" 1
-    cat -- "$LIST"
-  fi
+   if [[ "${LIST}" == "-" ]]; then
+     "$DOCKER_BIN" ps --filter "label=quiet-hours=true" --format '{{.Names}}'
+   else
+     [[ -r "$LIST" ]] || fail_early list_missing "path=$LIST cannot be read (check permissions)" 1
+     # Use direct read to catch permission changes between check and use
+     cat -- "$LIST" 2>/dev/null || fail_early list_read "failed to read $LIST" 1
+   fi
 }
 
 # -------- helpers --------
+is_comment_or_empty() {
+   # Check if line is a comment or empty (more explicit than regex)
+   # Lines starting with # are comments, empty or whitespace-only lines are skipped
+   local line="$1"
+   [[ -z "$line" ]] && return 0  # empty line
+   [[ "${line:0:1}" == "#" ]] && return 0  # comment line
+   return 1  # not a comment or empty
+}
+
 trim_line() {
-  local s="${1%$'\r'}"
-  s="${s#"${s%%[![:space:]]*}"}"
-  s="${s%"${s##*[![:space:]]}"}"
-  printf '%s' "$s"
+   local s="${1%$'\r'}"
+   s="${s#"${s%%[![:space:]]*}"}"
+   s="${s%"${s##*[![:space:]]}"}"
+   printf '%s' "$s"
 }
 
 inspect_fields() {
@@ -340,14 +353,15 @@ with_retries() {
 }
 
 show_docker_logs() {
-   local name="$1"
-   local lines="${2:-$DOCKER_LOG_LINES}"
-   if lines_out="$("$DOCKER_BIN" logs --tail "$lines" "$name" 2>&1)"; then
-     msg "Docker logs (last $lines lines):"
-     printf '  %s\n' "$lines_out"
-   else
-     msg "Could not retrieve Docker logs for $name"
-   fi
+    local name="$1"
+    local lines="${2:-$DOCKER_LOG_LINES}"
+    if lines_out="$("$DOCKER_BIN" logs --tail "$lines" "$name" 2>&1)"; then
+      msg "Docker logs (last $lines lines):"
+      # Use safe printf to avoid format string injection
+      printf '%s\n' "$lines_out" | sed 's/^/  /'
+    else
+      msg "Could not retrieve Docker logs for $name"
+    fi
 }
 
 # -------- NFS/SMB share control --------
@@ -415,15 +429,18 @@ manage_nfs_smb_shares() {
 }
 
 kuma_notify() {
-    local act="$1" name="$2"
-    if out="$(/usr/local/bin/kumactl.py "$act" --container "$name" 2>&1)"; then
-      echo "$out"
-      log_info "$name" notified kuma_ok action="$act"
-    else
-      local rc=$?
-      [[ -n "$out" ]] && echo "$out"
-      log_warn "$name" notified kuma_failed action="$act" rc="$rc"
-    fi
+     local act="$1" name="$2"
+     if out="$(/usr/local/bin/kumactl.py "$act" --container "$name" 2>&1)"; then
+       echo "$out"
+       log_info "$name" notified kuma_ok action="$act"
+       return 0
+     else
+       local rc=$?
+       [[ -n "$out" ]] && echo "$out"
+       log_warn "$name" notified kuma_failed action="$act" rc="$rc"
+       msg "  ⚠ WARNING: Uptime Kuma notification failed for $name (will continue)"
+       return $rc
+     fi
 }
 
 pushover_notify() {
@@ -469,10 +486,10 @@ verify_state() {
 
 validate_containers() {
    local invalid_count=0
-   while IFS= read -r raw; do
-      name="$(trim_line "$raw")"
-      [[ -z "$name" || "$name" =~ ^# ]] && continue
-      status="$(inspect_fields "$name")" || true
+    while IFS= read -r raw; do
+       name="$(trim_line "$raw")"
+       is_comment_or_empty "$name" && continue
+       status="$(inspect_fields "$name")" || true
       if [[ -z "$status" ]]; then
          log_warn "$name" validation failed "likely_typo_in_configuration"
          ((invalid_count += 1))
@@ -491,7 +508,7 @@ container_count=0
 # Count containers first to display accurate total
 while IFS= read -r raw; do
    name="$(trim_line "$raw")"
-   [[ -z "$name" || "$name" =~ ^# ]] && continue
+   is_comment_or_empty "$name" && continue
    ((container_count += 1))
 done < <(get_containers)
 
@@ -503,17 +520,19 @@ validate_containers
 msg ""
 
 handle_one() {
-  local name="$1"
-  ((total += 1))
+   local name="$1"
 
-   local status running paused health
-   status="$(inspect_fields "$name")" || true
-   if [[ -z "$status" ]]; then
-     log_warn "$name" skipped not_found "hint=check_container_name_for_typos"
-     msg "  ⚠ WARNING: $name not found - check configuration for typos"
-     ((skipped += 1))
-     return 0
-   fi
+    local status running paused health
+    status="$(inspect_fields "$name")" || true
+    if [[ -z "$status" ]]; then
+      log_warn "$name" skipped not_found "hint=check_container_name_for_typos"
+      msg "  ⚠ WARNING: $name not found - check configuration for typos"
+      ((skipped += 1))
+      return 0
+    fi
+    
+    # Only count as total if container actually exists
+    ((total += 1))
   read -r running paused health <<<"$status"
   local state_before
   state_before="$(normalize_state "$running" "$paused")"
@@ -544,10 +563,10 @@ handle_one() {
           status2="$(inspect_fields "$name")"
           read -r r2 p2 h2 <<<"$status2"
           local duration=$(($(date +%s) - start_container))
-          log_info "$name" changed paused "$pre" state_after="$(normalize_state "$r2" "$p2")" health_after="$h2" duration_s="$duration"
-          msg "  ✓ $name paused (${duration}s)"
-          ((changed += 1))
-          kuma_notify pause "$name"
+           log_info "$name" changed paused "$pre" state_after="$(normalize_state "$r2" "$p2")" health_after="$h2" duration_s="$duration"
+           msg "  ✓ $name paused (${duration}s)"
+           ((changed += 1))
+           kuma_notify pause "$name" || true  # Log errors but don't block
          else
            log_warn "$name" failed verify_pause "$pre"
            msg "  ✗ FAILED: $name pause verification failed"
@@ -582,7 +601,7 @@ handle_one() {
           log_info "$name" changed unpaused "$pre" state_after="$(normalize_state "$r2" "$p2")" health_after="$h2" duration_s="$duration"
           msg "  ✓ $name unpaused (${duration}s)"
           ((changed += 1))
-          kuma_notify resume "$name"
+          kuma_notify resume "$name" || true  # Log errors but don't block
         else
           log_warn "$name" failed verify_unpause "$pre"
           msg "  ✗ FAILED: $name unpause verification failed"
@@ -624,7 +643,7 @@ handle_one() {
           log_info "$name" changed stopped "$pre" state_after="$(normalize_state "$r2" "$p2")" health_after="$h2" duration_s="$duration"
           msg "  ✓ $name stopped gracefully (${STOP_TIMEOUT}s timeout, ${duration}s total)"
           ((changed += 1))
-          kuma_notify pause "$name"
+          kuma_notify pause "$name" || true  # Log errors but don't block
          else
            log_warn "$name" failed verify_stop "$pre"
            msg "  ✗ FAILED: $name stop verification failed"
@@ -659,7 +678,7 @@ handle_one() {
           log_info "$name" changed started "$pre" state_after="$(normalize_state "$r2" "$p2")" health_after="$h2" duration_s="$duration"
           msg "  ✓ $name started (${duration}s)"
           ((changed += 1))
-          kuma_notify resume "$name"
+          kuma_notify resume "$name" || true  # Log errors but don't block
         else
           log_warn "$name" failed verify_start "$pre"
           msg "  ✗ FAILED: $name start verification failed"
@@ -677,7 +696,7 @@ handle_one() {
 
 while IFS= read -r raw; do
    name="$(trim_line "$raw")"
-   [[ -z "$name" || "$name" =~ ^# ]] && continue
+   is_comment_or_empty "$name" && continue
    handle_one "$name"
 done < <(get_containers)
 
@@ -693,10 +712,10 @@ if [[ "$ACTION" == "unpause" || "$ACTION" == "start" ]]; then
   msg ""
   # Build list of containers for health checking
   container_list=""
-  while IFS= read -r raw; do
-    name="$(trim_line "$raw")"
-    [[ -z "$name" || "$name" =~ ^# ]] && continue
-    [[ -n "$container_list" ]] && container_list="$container_list "
+   while IFS= read -r raw; do
+     name="$(trim_line "$raw")"
+     is_comment_or_empty "$name" && continue
+     [[ -n "$container_list" ]] && container_list="$container_list "
     container_list="$container_list$name"
   done < <(get_containers)
   manage_nfs_smb_shares enable "" "$container_list"

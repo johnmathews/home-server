@@ -2,6 +2,9 @@
 
 DOCKER_BIN="$(command -v docker || echo docker)"
 
+# Validate that this file is properly sourced (used by other plugins)
+COMMON_SH_LOADED=1
+
 # Tunables (seconds + thresholds)
 BUSY_CPU_PCT="${BUSY_CPU_PCT:-1.0}"             # >= => busy
 IO_SAMPLE_S="${IO_SAMPLE_S:-2}"                  # seconds between samples
@@ -49,16 +52,30 @@ _to_bytes() {
    awk -v n="$num" -v m="$mul" 'BEGIN{printf "%.0f\n", int(n)*m + int((n-int(n))*m)}'
 }
 
+# Check if docker stats supports --no-stream (added in Docker 19.03)
+_docker_supports_no_stream() {
+   if "$DOCKER_BIN" stats --help 2>/dev/null | grep -q "no-stream"; then
+      return 0
+   fi
+   return 1
+}
+
 # Read one stats line for a container: "<name> <cpu%> <read> / <write>"
 # Prints: "cpu_raw read_raw write_raw" (space-separated)
 _read_stats_line() {
-   local name="$1"
-   # Example docker stats line: qbittorrent 0.63% 4.88MB / 3.77MB
-   local line stats_timeout=5
-   
-   # Add timeout with KILL signal to prevent hanging zombie processes
-   # Use --preserve-status to get the actual exit code
-   line="$(timeout --preserve-status -s KILL "$stats_timeout" "$DOCKER_BIN" stats --no-stream "$name" --format '{{.Name}} {{.CPUPerc}} {{.BlockIO}}' 2>/dev/null)" || true
+    local name="$1"
+    # Example docker stats line: qbittorrent 0.63% 4.88MB / 3.77MB
+    local line stats_timeout=5
+    
+    # Add timeout with KILL signal to prevent hanging zombie processes
+    # Use --preserve-status to get the actual exit code
+    # Try with --no-stream first (Docker 19.03+), fall back to piping with head
+    if _docker_supports_no_stream; then
+       line="$(timeout --preserve-status -s KILL "$stats_timeout" "$DOCKER_BIN" stats --no-stream "$name" --format '{{.Name}} {{.CPUPerc}} {{.BlockIO}}' 2>/dev/null)" || true
+    else
+       # Older Docker: use head -2 to get stats and skip header
+       line="$(timeout --preserve-status -s KILL "$stats_timeout" "$DOCKER_BIN" stats "$name" --format '{{.Name}} {{.CPUPerc}} {{.BlockIO}}' 2>/dev/null | tail -1)" || true
+    fi
    
    if [[ -z "$line" ]]; then
      echo ""
@@ -152,7 +169,16 @@ check_busy_generic() {
     return 0
   fi
 
-  # Idle
-  echo "source=generic cpu_pct=${cpu1} cpu_threshold=${BUSY_CPU_PCT} read_bps=${read_bps} write_bps=${write_bps} read_bps_threshold=${BUSY_READ_BPS} write_bps_threshold=${BUSY_WRITE_BPS} sample_s=${IO_SAMPLE_S}"
-  return 1
+   # Idle
+   echo "source=generic cpu_pct=${cpu1} cpu_threshold=${BUSY_CPU_PCT} read_bps=${read_bps} write_bps=${write_bps} read_bps_threshold=${BUSY_READ_BPS} write_bps_threshold=${BUSY_WRITE_BPS} sample_s=${IO_SAMPLE_S}"
+   return 1
+}
+
+# Validation helper for plugins - ensure common.sh is loaded
+validate_common_sh_loaded() {
+   if [[ "${COMMON_SH_LOADED:-0}" != "1" ]]; then
+      echo "ERROR: common.sh not loaded properly" >&2
+      return 1
+   fi
+   return 0
 }

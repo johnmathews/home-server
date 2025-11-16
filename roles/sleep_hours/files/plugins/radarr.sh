@@ -1,5 +1,10 @@
 # Radarr: busy if queue has items
 # Requires:
+# Validate common.sh was sourced
+if [[ "${COMMON_SH_LOADED:-0}" != "1" ]]; then
+   echo "ERROR: common.sh must be sourced before this plugin" >&2
+   exit 1
+fi
 #   RADARR_URL (e.g., http://127.0.0.1:7878)
 #   RADARR_API_KEY
 # Optional:

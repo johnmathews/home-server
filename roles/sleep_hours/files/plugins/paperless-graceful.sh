@@ -1,5 +1,10 @@
 # Paperless-specific graceful shutdown plugin
 # Detects if paperless-webserver is busy with active HTTP requests
+# Validate common.sh was sourced
+if [[ "${COMMON_SH_LOADED:-0}" != "1" ]]; then
+   echo "ERROR: common.sh must be sourced before this plugin" >&2
+   exit 1
+fi
 
 check_busy() {
   local name="$1"
