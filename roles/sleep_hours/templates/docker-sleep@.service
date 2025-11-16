@@ -46,6 +46,10 @@ Environment=QBIT_COOKIE_DIR=/run/sleep-hours
 
 Environment=GRACE_DIR=/usr/local/lib/sleep-hours/plugins
 
+# Pushover notifications for container failures
+Environment=PUSHOVER_USER_KEY="{{ vault_pushover_user_key }}"
+Environment=PUSHOVER_API_TOKEN="{{ vault_pushover_api_token }}"
+
 # 1 - any activity blocks
 # Environment=BUSY_BLOCKIO_NONZERO=0
 

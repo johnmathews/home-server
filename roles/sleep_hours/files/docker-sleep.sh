@@ -309,15 +309,45 @@ manage_nfs_smb_shares() {
 }
 
 kuma_notify() {
-   local act="$1" name="$2"
-   if out="$(/usr/local/bin/kumactl.py "$act" --container "$name" 2>&1)"; then
-     echo "$out"
-     log_info "$name" notified kuma_ok action="$act"
-   else
-     local rc=$?
-     [[ -n "$out" ]] && echo "$out"
-     log_warn "$name" notified kuma_failed action="$act" rc="$rc"
-   fi
+    local act="$1" name="$2"
+    if out="$(/usr/local/bin/kumactl.py "$act" --container "$name" 2>&1)"; then
+      echo "$out"
+      log_info "$name" notified kuma_ok action="$act"
+    else
+      local rc=$?
+      [[ -n "$out" ]] && echo "$out"
+      log_warn "$name" notified kuma_failed action="$act" rc="$rc"
+    fi
+}
+
+pushover_notify() {
+    # Send Pushover notification for container failures
+    # Usage: pushover_notify "title" "message"
+    local title="$1" message="$2"
+    
+    # Check if Pushover credentials are configured
+    [[ -z "${PUSHOVER_USER_KEY:-}" || -z "${PUSHOVER_API_TOKEN:-}" ]] && return 0
+    
+    # URL encode message (simple version - replaces spaces with +)
+    local encoded_msg="${message// /+}"
+    
+    # Send to Pushover API
+    local pushover_url="https://api.pushover.net/1/messages.json"
+    local response
+    
+    response="$(curl -sS \
+      --form-string "token=${PUSHOVER_API_TOKEN}" \
+      --form-string "user=${PUSHOVER_USER_KEY}" \
+      --form-string "title=${title}" \
+      --form-string "message=${message}" \
+      --form-string "priority=1" \
+      "${pushover_url}" 2>&1)" || true
+    
+    if echo "$response" | grep -q '"status":1'; then
+      log_info "_" pushover notification_sent "title=$title"
+    else
+      log_warn "_" pushover notification_failed "title=$title" "response=$response"
+    fi
 }
 
 verify_state() {
@@ -389,18 +419,20 @@ handle_one() {
           msg "  ✓ $name paused (${duration}s)"
           ((changed += 1))
           kuma_notify pause "$name"
-        else
-          log_warn "$name" failed verify_pause "$pre"
-          msg "  ✗ FAILED: $name pause verification failed"
-          show_docker_logs "$name"
-          ((failed += 1))
-        fi
-      else
-        log_err "$name" failed pause_error "$pre"
-        msg "  ✗ FAILED: $name pause failed after $QUIET_RETRIES retries"
-        show_docker_logs "$name"
-        ((failed += 1))
-      fi
+         else
+           log_warn "$name" failed verify_pause "$pre"
+           msg "  ✗ FAILED: $name pause verification failed"
+           show_docker_logs "$name"
+           ((failed += 1))
+           pushover_notify "Sleep Hours Failure" "Failed to pause container: $name (verification failed)"
+         fi
+       else
+         log_err "$name" failed pause_error "$pre"
+         msg "  ✗ FAILED: $name pause failed after $QUIET_RETRIES retries"
+         show_docker_logs "$name"
+         ((failed += 1))
+         pushover_notify "Sleep Hours Failure" "Failed to pause container: $name (after $QUIET_RETRIES retries)"
+       fi
 
     elif [[ "$ACTION" == "unpause" ]]; then
       if [[ "$state_before" != "paused" ]]; then
@@ -464,18 +496,20 @@ handle_one() {
           msg "  ✓ $name stopped gracefully (${STOP_TIMEOUT}s timeout, ${duration}s total)"
           ((changed += 1))
           kuma_notify pause "$name"
-        else
-          log_warn "$name" failed verify_stop "$pre"
-          msg "  ✗ FAILED: $name stop verification failed"
-          show_docker_logs "$name"
-          ((failed += 1))
-        fi
-      else
-        log_err "$name" failed stop_error "$pre"
-        msg "  ✗ FAILED: $name stop failed after $QUIET_RETRIES retries"
-        show_docker_logs "$name"
-        ((failed += 1))
-      fi
+         else
+           log_warn "$name" failed verify_stop "$pre"
+           msg "  ✗ FAILED: $name stop verification failed"
+           show_docker_logs "$name"
+           ((failed += 1))
+           pushover_notify "Sleep Hours Failure" "Failed to stop container: $name (verification failed)"
+         fi
+       else
+         log_err "$name" failed stop_error "$pre"
+         msg "  ✗ FAILED: $name stop failed after $QUIET_RETRIES retries"
+         show_docker_logs "$name"
+         ((failed += 1))
+         pushover_notify "Sleep Hours Failure" "Failed to stop container: $name (after $QUIET_RETRIES retries)"
+       fi
 
     elif [[ "$ACTION" == "start" ]]; then
       if [[ "$state_before" != "exited" ]]; then
