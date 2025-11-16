@@ -40,14 +40,15 @@ _to_bytes() {
 # Read one stats line for a container: "<name> <cpu%> <read> / <write>"
 # Prints: "cpu_raw read_raw write_raw" (space-separated)
 _read_stats_line() {
-  local name="$1"
-  # Example docker stats line: qbittorrent 0.63% 4.88MB / 3.77MB
-  local line
-  line="$("$DOCKER_BIN" stats --no-stream --format '{{.Name}} {{.CPUPerc}} {{.BlockIO}}' 2>/dev/null | awk -v n="$name" '$1==n {print; exit}')" || true
-  if [[ -z "$line" ]]; then
-    echo ""
-    return 1
-  fi
+   local name="$1"
+   # Example docker stats line: qbittorrent 0.63% 4.88MB / 3.77MB
+   local line
+   # Add timeout (5 seconds) to docker stats to prevent hanging
+   line="$(timeout 5 "$DOCKER_BIN" stats --no-stream --format '{{.Name}} {{.CPUPerc}} {{.BlockIO}}' 2>/dev/null | awk -v n="$name" '$1==n {print; exit}')" || true
+   if [[ -z "$line" ]]; then
+     echo ""
+     return 1
+   fi
   # cpu_raw is $2; blockio is $3 $4 $5 => "<read> / <write>"
   # shellcheck disable=SC2086
   local cpu_raw read_raw slash write_raw
