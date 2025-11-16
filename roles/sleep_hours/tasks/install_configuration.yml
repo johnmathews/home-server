@@ -9,7 +9,7 @@
     mode: '0644'
   vars:
     container_list: "{{ sleep_hours_pause_containers | default([]) }}"
-  when: sleep_hours_pause_containers is defined and sleep_hours_pause_containers | length > 0
+  when: sleep_hours_enabled
   notify: Restart sleep-hours timers
 
 - name: Install stop containers list
@@ -22,7 +22,7 @@
     mode: '0644'
   vars:
     container_list: "{{ sleep_hours_stop_containers | default([]) }}"
-  when: sleep_hours_stop_containers is defined and sleep_hours_stop_containers | length > 0
+  when: sleep_hours_enabled
   notify: Restart sleep-hours timers
 
 - name: Remove legacy containers list
