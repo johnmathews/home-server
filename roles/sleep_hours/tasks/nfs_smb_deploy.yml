@@ -34,5 +34,5 @@
   when:
     - sleep_hours_enabled | bool
     - sleep_hours_nfs_smb_enabled | bool
-    - (sleep_hours_nfs_shares | default([]) | length > 0) or (nfs_shares | default([]) | length > 0)
+    - (nfs_shares | default([]) | length > 0)
   tags: ['sleep-hours-nfs']

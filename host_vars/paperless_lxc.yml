@@ -9,8 +9,9 @@ smb_shares:
   - name: paperless
     target: /mnt/paperless
 
-# NFS/SMB share control via TrueNAS API derived from nfs_shares above
-# Disables NFS/SMB shares before after containers, re-enables before restart
+# NFS/SMB share control: During quiet hours, shares are automatically disabled
+# before pausing/stopping containers, then re-enabled after resuming/starting.
+# This prevents HDD wakeups from NFS/SMB clients. Sources: nfs_shares (and smb_shares if defined)
 sleep_hours_nfs_smb_enabled: true
 sleep_hours_enabled: true
 sleep_hours_pause_hour: 2
