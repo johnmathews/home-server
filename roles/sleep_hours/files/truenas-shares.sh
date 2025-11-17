@@ -244,6 +244,8 @@ wait_for_container_health() {
   local elapsed=0
   local start_time
   start_time=$(date +%s)
+  
+  msg "  - $container: checking health..."
 
   while [[ $elapsed -lt $timeout ]]; do
     local state
@@ -255,7 +257,12 @@ wait_for_container_health() {
     if [[ "$running" == "true" && ("$health" == "healthy" || "$health" == "none") ]]; then
       local duration=$(($(date +%s) - start_time))
       log_info "$container" health "ok" "duration_s=$duration health=$health"
-      msg "  - $container: waiting (${duration}s) ✓"
+      # Clear success message distinguishing healthy vs no-health-check
+      if [[ "$health" == "healthy" ]]; then
+        msg "    ✓ $container is healthy (${duration}s)"
+      else
+        msg "    ✓ $container is running (no health check, ${duration}s)"
+      fi
       return 0
     fi
     
@@ -265,7 +272,7 @@ wait_for_container_health() {
   
   # Timeout but don't fail (container may still be starting)
   log_warn "$container" health "timeout" "waited=${timeout}s"
-  msg "  - $container: health check timeout after ${timeout}s (may still be starting)"
+  msg "    ⚠ $container: health check timeout after ${timeout}s (may still be starting)"
   return 0
 }
 
@@ -279,7 +286,10 @@ disable_shares() {
     return 0
   fi
   
-  msg "Disabling NFS/SMB shares..."
+  msg "=========================================="
+  msg "Disabling NFS/SMB Shares"
+  msg "=========================================="
+  msg "Shares to disable: $SHARES_LIST"
   msg ""
   
   for dataset in $SHARES_LIST; do
@@ -321,14 +331,20 @@ disable_shares() {
   done
   
   msg ""
-  msg "Summary: total=$((total*2)) changed=$changed skipped=$skipped failed=$failed"
+  msg "=========================================="
+  msg "Share Disable Summary"
+  msg "=========================================="
+  msg "Total operations: $((total*2))"
+  msg "Successfully changed: $changed"
+  msg "Skipped: $skipped"
+  msg "Failed: $failed"
   
   if [[ $failed -eq 0 ]]; then
-    msg "Success"
+    msg "Status: Success"
     _log info _ summary done total=$((total*2)) changed=$changed skipped=$skipped failed=$failed
     return 0
   else
-    msg "PARTIAL - some shares failed to disable"
+    msg "Status: PARTIAL - some shares failed to disable"
     _log warn _ summary done total=$((total*2)) changed=$changed skipped=$skipped failed=$failed
     return 1
   fi
@@ -342,7 +358,10 @@ enable_shares() {
     return 0
   fi
   
-  msg "Enabling NFS/SMB shares..."
+  msg "=========================================="
+  msg "Enabling NFS/SMB Shares"
+  msg "=========================================="
+  msg "Shares to enable: $SHARES_LIST"
   msg ""
   
   for dataset in $SHARES_LIST; do
@@ -383,26 +402,45 @@ enable_shares() {
     fi
   done
   
+  msg ""
+  msg "=========================================="
+  msg "Share Enable Summary"
+  msg "=========================================="
+  msg "Total operations: $((total*2))"
+  msg "Successfully changed: $changed"
+  msg "Skipped: $skipped"
+  msg "Failed: $failed"
+  
   # Health check containers if provided
   if [[ -n "$CONTAINERS_LIST" ]]; then
     msg ""
-    msg "Waiting for container health..."
+    msg "=========================================="
+    msg "Verifying Container Health"
+    msg "=========================================="
+    # Count containers for display
+    local container_count=0
+    for c in $CONTAINERS_LIST; do ((container_count += 1)); done
+    msg "Checking $container_count container(s)..."
     msg ""
     
     for container in $CONTAINERS_LIST; do
       wait_for_container_health "$container"
     done
+    
+    msg ""
+    msg "=========================================="
+    msg "Health Check Complete"
+    msg "=========================================="
   fi
   
   msg ""
-  msg "Summary: total=$((total*2)) changed=$changed skipped=$skipped failed=$failed"
   
   if [[ $failed -eq 0 ]]; then
-    msg "Success"
+    msg "Status: Success"
     _log info _ summary done total=$((total*2)) changed=$changed skipped=$skipped failed=$failed
     return 0
   else
-    msg "PARTIAL - some shares failed to enable"
+    msg "Status: PARTIAL - some shares failed to enable"
     _log warn _ summary done total=$((total*2)) changed=$changed skipped=$skipped failed=$failed
     return 1
   fi

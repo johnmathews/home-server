@@ -365,67 +365,74 @@ show_docker_logs() {
 }
 
 # -------- NFS/SMB share control --------
+# CRITICAL: This function must be called in a specific order:
+#   - During PAUSE/STOP: Shares are disabled BEFORE containers are paused/stopped (safe)
+#   - During UNPAUSE/START: Shares are enabled BEFORE containers are unpaused/started (REQUIRED)
+#
+# Containers depend on NFS/SMB shares being available to start properly.
+# If shares are not enabled before starting containers, they will fail to initialize.
 manage_nfs_smb_shares() {
-   local action="$1" shares="${2:-}" containers="${3:-}"
-   
-   # Skip if no truenas config file exists (feature disabled)
-   [[ ! -f /etc/sleep-hours/truenas.conf ]] && return 0
-   
-   # Source configuration
-   # shellcheck source=/dev/null
-   . /etc/sleep-hours/truenas.conf
-   
-   # Read shares from file if not provided
-   if [[ -z "$shares" && -f /etc/sleep-hours/truenas-nfs-shares.list ]]; then
-     shares=$(grep -v '^#' /etc/sleep-hours/truenas-nfs-shares.list | tr '\n' ' ')
-   fi
-   
-   [[ -z "$shares" ]] && return 0
-   
-   msg "Controlling NFS/SMB shares..."
-   
-    case "$action" in
-    disable)
-      # Capture output and exit code separately to avoid masking exit status in pipe
-      local tmpfile rc
-      tmpfile="$(mktemp /tmp/sleep-hours-nfs.XXXXXX)" || fail_early tmpfile "failed to create temp file"
-      /usr/local/bin/truenas-shares.sh disable "$shares" >"$tmpfile" 2>&1
-      rc=$?
-      # Output captured messages
-      while IFS= read -r line; do msg "$line"; done < "$tmpfile"
-      rm -f "$tmpfile"
-      
-      if [[ $rc -eq 0 ]]; then
-        log_info "_" nfs_smb disable_success "shares=$shares"
-        return 0
-      else
-        log_warn "_" nfs_smb disable_failed "shares=$shares rc=$rc"
-        # Don't fail - share control is nice-to-have, not critical
-        return 0
-      fi
-      ;;
-    enable)
-      # Capture output and exit code separately to avoid masking exit status in pipe
-      local tmpfile rc
-      tmpfile="$(mktemp /tmp/sleep-hours-nfs.XXXXXX)" || fail_early tmpfile "failed to create temp file"
-      /usr/local/bin/truenas-shares.sh enable "$shares" "$containers" >"$tmpfile" 2>&1
-      rc=$?
-      # Output captured messages
-      while IFS= read -r line; do msg "$line"; done < "$tmpfile"
-      rm -f "$tmpfile"
-      
-      if [[ $rc -eq 0 ]]; then
-        log_info "_" nfs_smb enable_success "shares=$shares"
-        return 0
-      else
-        log_warn "_" nfs_smb enable_failed "shares=$shares rc=$rc"
-        # Don't fail - share control is nice-to-have, not critical
-        return 0
-      fi
-      ;;
-    esac
-   
-   return 0
+    local action="$1" shares="${2:-}" containers="${3:-}"
+    
+    # Skip if no truenas config file exists (feature disabled)
+    [[ ! -f /etc/sleep-hours/truenas.conf ]] && return 0
+    
+    # Source configuration
+    # shellcheck source=/dev/null
+    . /etc/sleep-hours/truenas.conf
+    
+    # Read shares from file if not provided
+    if [[ -z "$shares" && -f /etc/sleep-hours/truenas-nfs-shares.list ]]; then
+      shares=$(grep -v '^#' /etc/sleep-hours/truenas-nfs-shares.list | tr '\n' ' ')
+    fi
+    
+    [[ -z "$shares" ]] && return 0
+    
+     case "$action" in
+     disable)
+       # Safe to disable shares before stopping containers
+       # Capture output and exit code separately to avoid masking exit status in pipe
+       local tmpfile rc
+       tmpfile="$(mktemp /tmp/sleep-hours-nfs.XXXXXX)" || fail_early tmpfile "failed to create temp file"
+       /usr/local/bin/truenas-shares.sh disable "$shares" >"$tmpfile" 2>&1
+       rc=$?
+       # Output captured messages
+       while IFS= read -r line; do msg "$line"; done < "$tmpfile"
+       rm -f "$tmpfile"
+       
+       if [[ $rc -eq 0 ]]; then
+         log_info "_" nfs_smb disable_success "shares=$shares"
+         return 0
+       else
+         log_warn "_" nfs_smb disable_failed "shares=$shares rc=$rc"
+         # Don't fail - share control is nice-to-have, not critical
+         return 0
+       fi
+       ;;
+     enable)
+       # CRITICAL: Must enable shares BEFORE unpausing/starting containers
+       # Containers will fail to start if shares are not available
+       # Capture output and exit code separately to avoid masking exit status in pipe
+       local tmpfile rc
+       tmpfile="$(mktemp /tmp/sleep-hours-nfs.XXXXXX)" || fail_early tmpfile "failed to create temp file"
+       /usr/local/bin/truenas-shares.sh enable "$shares" "$containers" >"$tmpfile" 2>&1
+       rc=$?
+       # Output captured messages
+       while IFS= read -r line; do msg "$line"; done < "$tmpfile"
+       rm -f "$tmpfile"
+       
+       if [[ $rc -eq 0 ]]; then
+         log_info "_" nfs_smb enable_success "shares=$shares"
+         return 0
+       else
+         log_warn "_" nfs_smb enable_failed "shares=$shares rc=$rc"
+         # Don't fail - share control is nice-to-have, not critical
+         return 0
+       fi
+       ;;
+     esac
+    
+    return 0
 }
 
 kuma_notify() {
@@ -694,21 +701,35 @@ handle_one() {
     fi
 }
 
+msg ""
+msg "========================================"
+msg "PHASE 1: PROCESS CONTAINERS"
+msg "========================================"
+msg ""
+
 while IFS= read -r raw; do
    name="$(trim_line "$raw")"
    is_comment_or_empty "$name" && continue
    handle_one "$name"
 done < <(get_containers)
 
-# For PAUSE/STOP: disable shares AFTER pausing/stopping containers
+# For PAUSE/STOP: control shares after pausing/stopping containers
 if [[ "$ACTION" == "pause" || "$ACTION" == "stop" ]]; then
+  msg ""
+  msg "========================================"
+  msg "PHASE 2: DISABLE NFS/SMB SHARES"
+  msg "========================================"
   msg ""
   manage_nfs_smb_shares disable
   msg ""
 fi
 
-# For UNPAUSE/START: enable shares AFTER containers are running
+# For UNPAUSE/START: control shares then verify containers
 if [[ "$ACTION" == "unpause" || "$ACTION" == "start" ]]; then
+  msg ""
+  msg "========================================"
+  msg "PHASE 2: ENABLE NFS/SMB SHARES & VERIFY HEALTH"
+  msg "========================================"
   msg ""
   # Build list of containers for health checking
   container_list=""
@@ -716,9 +737,9 @@ if [[ "$ACTION" == "unpause" || "$ACTION" == "start" ]]; then
      name="$(trim_line "$raw")"
      is_comment_or_empty "$name" && continue
      [[ -n "$container_list" ]] && container_list="$container_list "
-    container_list="$container_list$name"
-  done < <(get_containers)
-  manage_nfs_smb_shares enable "" "$container_list"
+     container_list="$container_list$name"
+   done < <(get_containers)
+   manage_nfs_smb_shares enable "" "$container_list"
   msg ""
 fi
 

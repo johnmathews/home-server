@@ -1,4 +1,4 @@
-- name: restart sleep-hours timers
+- name: Restart sleep-hours timers
   become: true
   ansible.builtin.systemd:
     name: "{{ item }}"
