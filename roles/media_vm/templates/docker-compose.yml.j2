@@ -1,6 +1,7 @@
 # vim: ft=yaml
 # media_vm/files/docker-compose.yml
 services:
+
   alloy:
     image: grafana/alloy:latest
     container_name: alloy
@@ -21,7 +22,6 @@ services:
       - /etc/machine-id:/etc/machine-id:ro
     command: >
       run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
-
     ports:
       - "12345:12345"
     logging:
@@ -29,6 +29,7 @@ services:
       options:
         max-size: "10m"
         max-file: "5"
+
   node_exporter:
     image: quay.io/prometheus/node-exporter:latest
     container_name: node_exporter
@@ -43,6 +44,7 @@ services:
     volumes:
       - '/:/host:ro,rslave'
       - '/var/lib/node_exporter/textfile_collector:/textfile:ro'
+
   gluetun:
     image: qmcgaw/gluetun
     container_name: gluetun
@@ -77,6 +79,7 @@ services:
       - OWNED_ONLY=yes
       - TZ=Europe/Amsterdam
     restart: always
+
   qbittorrent:
     image: linuxserver/qbittorrent
     container_name: qbittorrent
@@ -104,6 +107,7 @@ services:
       timeout: 5s
       retries: 3
       start_period: 20s
+
   # smb shares
   sabnzbd:
     image: lscr.io/linuxserver/sabnzbd:latest
@@ -128,16 +132,7 @@ services:
         max-size: "10m"
         max-file: "3"
     restart: always
-    healthcheck:
-      test:
-        - CMD-SHELL
-        - >
-          apikey=$$(awk -F' = ' '/^api_key/ {print $$2}' /config/sabnzbd.ini); # normalize base: strip leading slash if present, then add trailing slash when non-empty [ -n "$$base" ] && base="$${base#/}/" || base=""; curl -fsS "http://127.0.0.1:8080/$${base}api?mode=version&output=json&apikey=$$apikey" >/dev/null || exit 1
 
-      interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 60s
   filebrowser:
     image: filebrowser/filebrowser:latest
     container_name: filebrowser
@@ -152,6 +147,7 @@ services:
       - TZ=Europe/Amsterdam
       - FB_ROOT=/srv
     restart: always
+
   booklore:
     image: booklore/booklore:latest
     container_name: booklore
@@ -179,6 +175,7 @@ services:
       - /mnt/nfs/library:/nfs/library:ro
       - /mnt/nfs/media:/nfs/media:ro
     restart: unless-stopped
+
   booklore-mariadb:
     image: lscr.io/linuxserver/mariadb:11.4.5
     container_name: booklore-mariadb
@@ -199,6 +196,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+
   sonarr:
     image: linuxserver/sonarr:latest
     container_name: sonarr
@@ -216,6 +214,7 @@ services:
     ports:
       - "8989:8989"
     restart: always
+
   radarr:
     image: linuxserver/radarr:latest
     container_name: radarr
@@ -233,6 +232,7 @@ services:
     ports:
       - "7878:7878"
     restart: always
+
   flaresolverr:
     # DockerHub mirror flaresolverr/flaresolverr:latest
     image: ghcr.io/flaresolverr/flaresolverr:latest
@@ -245,6 +245,7 @@ services:
     ports:
       - "${PORT:-8191}:8191"
     restart: always
+
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr
@@ -257,6 +258,7 @@ services:
     ports:
       - "9696:9696"
     restart: always
+
   jellyseerr:
     image: fallenbagel/jellyseerr:latest
     container_name: jellyseerr
@@ -267,6 +269,7 @@ services:
     volumes:
       - /srv/media/config/jellyseer:/app/config
     restart: always
+
   bazarr:
     image: linuxserver/bazarr
     container_name: bazarr
@@ -281,6 +284,7 @@ services:
       - /srv/media/config/bazarr:/config
       - /mnt/nfs/library:/library
     restart: always
+
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
     container_name: cadvisor
