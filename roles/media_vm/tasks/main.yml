@@ -167,8 +167,3 @@
 - name: Set permissions of booklore config directory
   ansible.builtin.command: chown -R 1001:1001 "{{ media_stack_base_dir }}/config/booklore"
   become: true
-
-- name: Configure sleep hours
-  import_role:
-    name: sleep_hours
-  tags: sleep

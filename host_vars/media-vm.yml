@@ -11,6 +11,9 @@ nfs_shares:
 
 # Sleep Hours Configuration
 sleep_hours_enabled: true
+# NFS/SMB share control via TrueNAS API derived from nfs_shares above
+# Disables NFS/SMB shares before after containers, re-enables before restart
+sleep_hours_nfs_smb_enabled: false
 sleep_hours_pause_hour: 2
 sleep_hours_unpause_hour: 6
 
@@ -30,15 +33,14 @@ sleep_hours_stop_containers:
   - booklore-mariadb
 
 sleep_hours_kuma_map:
-  sabnzbd: 37
-  qbittorrent: 38
-  prowlarr: 39
-  bazarr: 40
-  radarr: 41
-  sonarr: 42
-  jellyseerr: 44
-  booklore: 45
-  booklore-mariadb: 46
+  sabnzbd: 28
+  qbittorrent: 18
+  prowlarr: 42
+  bazarr: 19
+  radarr: 15
+  sonarr: 14
+  jellyseerr: 29
+  booklore: 40
 
 sleep_hours_plugins:
   - default.sh
@@ -53,4 +55,3 @@ sleep_hours_plugins:
   - booklore.sh
   - booklore-mariadb.sh
 
-sleep_hours_nfs_smb_enabled: false

@@ -3,13 +3,16 @@ nfs_shares:
     mountpoint: /mnt/nfs/youtube-kids
     target: /mnt/tank/youtube-kids
 
-# Sleep Hours Configuration
+# Sleep Hours
 sleep_hours_enabled: true
+# NFS/SMB share control via TrueNAS API derived from nfs_shares above
+# Disables NFS/SMB shares before after containers, re-enables before restart
+sleep_hours_nfs_smb_enabled: true
 sleep_hours_pause_hour: 2
 sleep_hours_unpause_hour: 6
 
 # Containers to pause (lightweight freeze, fast resume)
-sleep_hours_pause_containers:
+sleep_hours_stop_containers:
   - tubearchivist
   - archivist-es
   - archivist-redis
@@ -20,4 +23,3 @@ sleep_hours_kuma_map:
 sleep_hours_plugins:
   - default.sh
 
-sleep_hours_nfs_smb_enabled: true

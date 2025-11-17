@@ -92,8 +92,3 @@
     group: root
   tags: docker
   notify: restart all containers
-
-- name: Configure sleep hours
-  import_role:
-    name: sleep_hours
-  tags: sleep

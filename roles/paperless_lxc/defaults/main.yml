@@ -6,6 +6,8 @@ puid: 1001
 guid: 1001
 pgid: 1001
 
+# SMB is NOT necessary. The paperless instance itself connects the the paperless datastore via NFS.
+# other clients, phones, laptops etc connect to paperless datastore via SMB, but not the paperless LXC.
 smb_media_vm_username: media_vm
 smb_server: 192.168.2.104
 smb_opts_items:
@@ -24,7 +26,3 @@ smb_opts_items:
   - x-systemd.idle-timeout=60s
   - x-systemd.mount-timeout=30s
 smb_opts: "{{ smb_opts_items | join(',') }}"
-
-# sleep docker containers during quiet hours and pause uptime-kuma monitors
-uptime_kuma_url: "http://192.168.2.106:3001"
-uptime_kuma_user: "john"

@@ -41,8 +41,3 @@
   notify:
     - restart docker compose stack
   tags: docker, alloy
-
-- name: Configure sleep hours
-  import_role:
-    name: sleep_hours
-  tags: sleep

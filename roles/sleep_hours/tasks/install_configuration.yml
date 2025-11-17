@@ -1,4 +1,3 @@
----
 - name: Install pause containers list
   become: true
   ansible.builtin.template:
@@ -10,7 +9,7 @@
   vars:
     container_list: "{{ sleep_hours_pause_containers | default([]) }}"
   when: sleep_hours_enabled
-  notify: Restart sleep-hours timers
+  notify: restart sleep-hours timers
 
 - name: Install stop containers list
   become: true
@@ -23,13 +22,7 @@
   vars:
     container_list: "{{ sleep_hours_stop_containers | default([]) }}"
   when: sleep_hours_enabled
-  notify: Restart sleep-hours timers
-
-- name: Remove legacy containers list
-  become: true
-  ansible.builtin.file:
-    path: /etc/sleep-hours/containers.list
-    state: absent
+  notify: restart sleep-hours timers
 
 - name: Install Uptime Kuma container→monitor map
   become: true
@@ -40,4 +33,4 @@
     group: root
     mode: '0644'
   when: sleep_hours_kuma_map is defined and sleep_hours_kuma_map | length > 0
-  notify: Restart sleep-hours timers
+  notify: restart sleep-hours timers

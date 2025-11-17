@@ -1,4 +1,3 @@
----
 # Sleep Hours Feature Configuration Defaults
 # Note: Most settings are in host_vars/<hostname>.yml
 # This file only contains values that are truly shared across all hosts
@@ -14,5 +13,5 @@ sleep_hours_truenas_api_url: "https://192.168.2.104"
 sleep_hours_truenas_api_key: "{{ vault_truenas_api_key }}"
 
 # Health check configuration
-sleep_hours_container_health_timeout_s: 60  # Max wait for container health (seconds)
-sleep_hours_container_health_interval_s: 2  # Poll interval (seconds)
+sleep_hours_container_health_timeout_s: 60 # Max wait for container health (seconds)
+sleep_hours_container_health_interval_s: 2 # Poll interval (seconds)
