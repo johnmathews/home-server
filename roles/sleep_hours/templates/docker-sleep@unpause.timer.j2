@@ -1,10 +1,12 @@
 # vim: ft=systemd
 
 [Unit]
-Description=Unpause media containers at {{ docker_quiet_hours_end }}
+Description=Unpause paused containers at {{ docker_quiet_hours_end }}:00
 
 [Timer]
-OnCalendar={{ docker_quiet_hours_end }} Europe/Amsterdam
+# Start containers at wake time, retry every 15 minutes if it fails
+OnCalendar=*-*-* {{ docker_quiet_hours_end_hour }}..23:0/15:00 Europe/Amsterdam
+
 Persistent=false
 
 [Install]
