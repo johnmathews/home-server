@@ -1,13 +1,18 @@
 # vim: ft=systemd
+# Consolidated service unit for all docker-sleep operations (pause, unpause, stop, start)
+# The %i parameter in ExecStart is substituted with the instance name:
+#   docker-sleep@pause.service   → %i becomes 'pause'
+#   docker-sleep@stop.service    → %i becomes 'stop'
+#   docker-sleep@start.service   → %i becomes 'start'
+#   docker-sleep@unpause.service → %i becomes 'unpause'
 
 [Unit]
-Description=Quiet hours: %i Docker containers
+Description=Docker sleep operation: %i containers
 Requires=docker.service
 After=docker.service
 
 [Service]
 Type=oneshot
-# Run as root unless your service account is in the docker group
 ExecStart=/usr/local/bin/docker-sleep.sh %i
 
 # Timeout to prevent service from hanging indefinitely
@@ -15,41 +20,54 @@ ExecStart=/usr/local/bin/docker-sleep.sh %i
 TimeoutStartSec=300
 TimeoutStopSec=30
 
-Environment=QUIET_HOURS_START={{ docker_quiet_hours_start }}
-Environment=QUIET_HOURS_END={{ docker_quiet_hours_end }}
-
+# Unified configuration for all operations
 Environment=QUIET_LOG_LEVEL=debug
 Environment=QUIET_CMD_TIMEOUT_S=15
 Environment=QUIET_RETRIES=3
 Environment=QUIET_RETRY_DELAY_S=2
-Environment=KUMA_TIMEOUT_S=10
-Environment=KUMA_RETRIES=3
-Environment=KUMA_RETRY_DELAY_S=2
 
+# Quiet hours timing (used by pause and stop operations)
+Environment=QUIET_HOURS_START={{ docker_quiet_hours_start }}
+Environment=QUIET_HOURS_END={{ docker_quiet_hours_end }}
+
+# Uptime Kuma monitoring integration
 Environment=KUMA_URL="{{ uptime_kuma_url }}"
 Environment=KUMA_USERNAME="{{ uptime_kuma_user }}"
 Environment=KUMA_PASSWORD="{{ vault_uptime_kuma_password }}"
 Environment=KUMA_INSECURE=0
 Environment=KUMA_MAP_FILE=/etc/sleep-hours/kuma.map
+Environment=KUMA_TIMEOUT_S=10
+Environment=KUMA_RETRIES=3
+Environment=KUMA_RETRY_DELAY_S=5
 
+# Docker stop timeout (used by stop operation)
+Environment=DOCKER_STOP_TIMEOUT_S={{ sleep_hours_docker_stop_timeout_s }}
+Environment=DOCKER_LOG_LINES={{ sleep_hours_docker_log_lines }}
+
+# Graceful shutdown plugin directory
+Environment=GRACE_DIR=/usr/local/lib/sleep-hours/plugins
+
+# SAB (Usenet) configuration
 Environment=SAB_URL=http://127.0.0.1:8081
 Environment=SAB_API_KEY="{{ vault_sabnzbd_key }}"
 
+# Radarr (Movies) configuration
 Environment=RADARR_URL=http://127.0.0.1:7878
 Environment=RADARR_API_KEY="{{ vault_radarr_key }}"
 
+# Sonarr (TV) configuration
 Environment=SONARR_URL=http://127.0.0.1:8989
 Environment=SONARR_API_KEY="{{ vault_sonarr_key }}"
 
+# Curl configuration for API calls
 Environment=CURL_TIMEOUT_S=5
 Environment=CURL_INSECURE=0
 
+# qBittorrent configuration
 Environment=QBIT_URL=http://127.0.0.1:8080
 Environment=QBIT_USER=admin
 Environment=QBIT_PASS=notapassword
 Environment=QBIT_COOKIE_DIR=/run/sleep-hours
-
-Environment=GRACE_DIR=/usr/local/lib/sleep-hours/plugins
 
 # Pushover notifications for container failures
 Environment=PUSHOVER_USER_KEY="{{ vault_pushover_user_key }}"
@@ -59,9 +77,7 @@ Environment=PUSHOVER_TIMEOUT_S=5
 # TrueNAS API timeout
 Environment=TRUENAS_API_TIMEOUT_S=10
 
-# 1 - any activity blocks
-# Environment=BUSY_BLOCKIO_NONZERO=0
-
+# Busy detection thresholds (used by pause and stop operations)
 Environment=BUSY_CPU_PCT=2.0
 Environment=IO_SAMPLE_S=5
 Environment=BUSY_READ_BPS=65536

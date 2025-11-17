@@ -21,9 +21,12 @@ be in standby prevents disk IO and allows the HDDs to spin down.
 
 "Quiet Hours" denotes this time period.
 
-Systemd services `docker-sleep@pause.service` and `docker-sleep@unpause.service`
-run on on a schedule defined by the variables `docker_quiet_hours_start` and
-`docker_quiet_hours_end`.
+Systemd services run on a schedule defined by the variables `docker_quiet_hours_start` and
+`docker_quiet_hours_end`. Four operations are supported:
+- `docker-sleep@pause.service` - Pause containers during quiet hours
+- `docker-sleep@unpause.service` - Resume paused containers
+- `docker-sleep@stop.service` - Stop containers during quiet hours
+- `docker-sleep@start.service` - Start stopped containers
 
 _Docker Pause_
 
@@ -54,41 +57,41 @@ Ansible vault:
 ## Template files
 
 The Ansible role uses the following files and templates, located in
-`media_vm/templates/sleep_containers`:
+`roles/sleep_hours/templates/`:
 
-- `docker-sleep@.service.j2`
+- `docker-sleep@.service` - Unified service unit template for all operations
 - `docker-sleep@pause.timer.j2`
 - `docker-sleep@unpause.timer.j2`
-- `docker-sleep.sh`
-- `uptimekumactl.py`
-- `containers.list`
-- `kuma.map`
+- `docker-sleep@stop.timer.j2`
+- `docker-sleep@start.timer.j2`
+- `docker-sleep.sh` - Main script that performs all operations
+- `uptimekumactl.py` - Uptime Kuma integration
+- `containers.list.j2` - Container list template
+- `kuma.map.j2` - Monitor mapping template
 
 ## Method
 
-- The timer units trigger their respective service unit.
+- The timer units trigger their respective service unit based on schedule.
 
-- There are two services, `docker-sleep@pause.service` and
-  `docker-sleep@unpause.service`.
+- All four operations (pause, unpause, stop, start) use a single consolidated
+  service unit template: `docker-sleep@.service`. Systemd templating automatically
+  instantiates the correct service based on the timer's `Unit=` directive.
 
-- The `@` in the filename shows that the filename is a template, and is invoked
-  with an argument. The name of the argument is placed after the `@`. Using a
-  template avoids having two files with almost identical content.
+- The `@` in the filename indicates systemd templating. The parameter after `@`
+  is passed as `%i` to the service, avoiding file duplication:
+  - `docker-sleep@pause.timer` → triggers `docker-sleep@pause.service` → `%i=pause`
+  - `docker-sleep@unpause.timer` → triggers `docker-sleep@unpause.service` → `%i=unpause`
+  - `docker-sleep@stop.timer` → triggers `docker-sleep@stop.service` → `%i=stop`
+  - `docker-sleep@start.timer` → triggers `docker-sleep@start.service` → `%i=start`
 
-- `Systemd` automatically associates a `.timer` unit with a `.service` unit of
-  the same base name.
+- The service unit calls `docker-sleep.sh %i` with the operation name.
 
-The timer unit invokes a service unit called `docker-sleep@pause.service` or
-`docker-sleep@unpause.service`.
+- `docker-sleep.sh` reads the appropriate container list and attempts to perform
+  the operation on each container. It logs its actions using `logfmt` format.
+  The `alloy` service will forward the logs to `Loki` and can be viewed in `Grafana`.
 
-- The service unit calls `docker-sleep.sh`
-
-- `docker-sleep.sh` reads `containers.list` and attempts to pause or unpause
-  each container. It logs its actions using `logfmt` format. The `alloy` service
-  will forward the logs to `Loki` and can be viewed in `Grafana`.
-
-- `docker-sleep.sh` also calls `kumactl.py` which will pause or unpause the
-  respective uptime monitor.
+- `docker-sleep.sh` also notifies Uptime Kuma monitors (via `kumactl.py`) when
+  containers are paused/resumed/stopped/started.
 
 ## Commands
 
@@ -97,6 +100,8 @@ The timer unit invokes a service unit called `docker-sleep@pause.service` or
 ```sh
 sudo systemctl start docker-sleep@pause.service
 sudo systemctl start docker-sleep@unpause.service
+sudo systemctl start docker-sleep@stop.service
+sudo systemctl start docker-sleep@start.service
 ```
 
 ### Don't run the shell script without using the service unit
@@ -109,8 +114,12 @@ environment variables that are supplied by the systemd service unit.
 ```sh
 systemctl status docker-sleep@pause.timer
 systemctl status docker-sleep@unpause.timer
+systemctl status docker-sleep@stop.timer
+systemctl status docker-sleep@start.timer
 systemctl status docker-sleep@pause.service
 systemctl status docker-sleep@unpause.service
+systemctl status docker-sleep@stop.service
+systemctl status docker-sleep@start.service
 ```
 
 ### List timers
@@ -126,12 +135,17 @@ Timers do not generate logs.
 ```sh
 journalctl --no-pager _SYSTEMD_INVOCATION_ID=$(systemctl show -p InvocationID --value docker-sleep@pause.service)
 journalctl --no-pager _SYSTEMD_INVOCATION_ID=$(systemctl show -p InvocationID --value docker-sleep@unpause.service)
+journalctl --no-pager _SYSTEMD_INVOCATION_ID=$(systemctl show -p InvocationID --value docker-sleep@stop.service)
+journalctl --no-pager _SYSTEMD_INVOCATION_ID=$(systemctl show -p InvocationID --value docker-sleep@start.service)
 ```
 
 ### View logs
 
 ```sh
+journalctl -u docker-sleep@pause.service -n 50
 journalctl -u docker-sleep@unpause.service -n 50
+journalctl -u docker-sleep@stop.service -n 50
+journalctl -u docker-sleep@start.service -n 50
 ```
 
 ## File locations
@@ -139,7 +153,11 @@ journalctl -u docker-sleep@unpause.service -n 50
 The Ansible role copies the following files to these locations:
 
 - `docker-sleep.sh` -> `/usr/local/bin/docker-sleep.sh`
+- `truenas-shares.sh` -> `/usr/local/bin/truenas-shares.sh`
+- `uptimekumactl.py` -> `/usr/local/bin/kumactl.py`
+- `containers.pause.list` -> `/etc/sleep-hours/containers.pause.list`
+- `containers.stop.list` -> `/etc/sleep-hours/containers.stop.list`
 - `kuma.map` -> `/etc/sleep-hours/kuma.map`
-- `containers.list` -> `/etc/sleep-hours/containers.list`
-- Timer Units -> `/etc/systemd/system/docker-sleep@pause.timer`
-- Service Units -> `/etc/systemd/system/docker-sleep@.service`
+- `truenas.conf` -> `/etc/sleep-hours/truenas.conf` (if NFS/SMB control enabled)
+- Timer Units -> `/etc/systemd/system/docker-sleep@*.timer`
+- Service Unit Template -> `/etc/systemd/system/docker-sleep@.service`
