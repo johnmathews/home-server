@@ -1,7 +1,6 @@
 # vim: ft=yaml
 # infra_vm/templates/docker-compose.yml
 
----
 services:
   loki:
     image: grafana/loki:latest
@@ -9,10 +8,10 @@ services:
     command: ["-config.file=/etc/loki/config.yml"]
     ports:
       - "3100:3100"
-    user: "0:0"               # writes to local volume
+    user: "0:0" # writes to local volume
     volumes:
       - ./loki/config.yml:/etc/loki/config.yml
-      - ./loki/data:/loki       # local storage
+      - ./loki/data:/loki # local storage
     restart: unless-stopped
 
   alloy:
@@ -25,7 +24,7 @@ services:
       LOG_LEVEL: "warn"
     volumes:
       # config 
-      - ./alloy:/etc/alloy:ro 
+      - ./alloy:/etc/alloy:ro
       # docker 
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
@@ -34,9 +33,7 @@ services:
       - /run/log/journal:/run/log/journal:ro
       - /etc/machine-id:/etc/machine-id:ro
     command: >
-      run --server.http.listen-addr=0.0.0.0:12345
-      --storage.path=/var/lib/alloy/data
-      /etc/alloy/config.alloy
+      run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
     ports:
       - "12345:12345"
     logging:
@@ -62,8 +59,8 @@ services:
     restart: unless-stopped
     command: -s
     ports:
-      - "5201:5201"  # TCP
-      - "5201:5201/udp"  # UDP
+      - "5201:5201" # TCP
+      - "5201:5201/udp" # UDP
 
   filebrowser:
     image: filebrowser/filebrowser:latest
@@ -148,7 +145,7 @@ services:
     ports:
       - "3001:3001"
     environment:
-      -  UPTIME_KUMA_DISABLE_FRAME_SAMEORIGIN=true
+      - UPTIME_KUMA_DISABLE_FRAME_SAMEORIGIN=true
     volumes:
       - /srv/infra/uptime_kuma/data:/app/data
     restart: always
@@ -171,6 +168,19 @@ services:
       - /srv/infra/portainer/data:/data
       - /var/run/docker.sock:/var/run/docker.sock
     restart: always
+
+  container-health-exporter:
+    image: ghcr.io/johnmathews/container-status-exporter:latest
+    container_name: container-status-exporter
+    ports:
+      - "8081:8081"
+    environment:
+      PORTAINER_URL: "http://192.168.2.106:9000"
+      PORTAINER_TOKEN: "${PORTAINER_TOKEN}"
+      SCRAPE_INTERVAL: "30"
+      LISTEN_PORT: "8081"
+      LOG_LEVEL: "INFO"
+    restart: unless-stopped
 
   atuin:
     restart: always

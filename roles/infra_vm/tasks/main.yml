@@ -1,6 +1,5 @@
 # infra_vm/tasks/main.yml
 
----
 
 - name: Install dependencies
   apt:
@@ -107,9 +106,9 @@
     group: root
     mode: '0755'
   loop:
-    - { name: grafana, path: /srv/infra/grafana }
-    - { name: loki,    path: /srv/infra/loki/data }
-    - { name: alloy,   path: /srv/infra/alloy/data }
+    - {name: grafana, path: /srv/infra/grafana}
+    - {name: loki, path: /srv/infra/loki/data}
+    - {name: alloy, path: /srv/infra/alloy/data}
   loop_control:
     label: "{{ item.path }}"
   tags: [grafana, loki, alloy]
@@ -123,28 +122,28 @@
     group: docker
     mode: '0644'
   notify: update docker compose stack
-  tags: docker 
+  tags: docker
 
 - name: Upload .env file from template
   ansible.builtin.template:
-    src: templates/.env.j2 
-    dest: /srv/infra/.env  
+    src: templates/.env.j2
+    dest: /srv/infra/.env
     owner: "{{ docker_user }}"
-    group: docker 
+    group: docker
     mode: '0600'
-  tags: atuin
+  tags: atuin,docker
 
-- name: Upload grafana config.ini 
+- name: Upload grafana config.ini
   ansible.builtin.template:
-    src: files/grafana/grafana.ini 
-    dest: /srv/infra/grafana/grafana.ini 
+    src: files/grafana/grafana.ini
+    dest: /srv/infra/grafana/grafana.ini
     owner: 472
     group: 472
     mode: '0600'
   notify: restart grafana
   tags: grafana
 
-- name: Upload alloy and loki config files 
+- name: Upload alloy and loki config files
   copy:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
@@ -154,17 +153,17 @@
   loop:
     - alloy:
       src: templates/config.alloy
-      dest: /srv/infra/alloy/config.alloy 
+      dest: /srv/infra/alloy/config.alloy
     - loki:
       src: templates/loki-config.yml
-      dest: /srv/infra/loki/config.yml 
+      dest: /srv/infra/loki/config.yml
   become: true
-  tags: [docker, loki, alloy] 
+  tags: [docker, loki, alloy]
   notify:
     - restart alloy
     - restart loki
 
-- name: Include file-browser tasks 
+- name: Include file-browser tasks
   import_tasks: file-browser.yml
   tags: file-browser
 

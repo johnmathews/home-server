@@ -54,6 +54,9 @@
     - Prometheus:
         - abbr:
           href: http://192.168.2.115:9090
+    - Container Status Exporter Endpoint:
+        - abbr:
+          href: http://192.168.2.106:8081/metrics
     - Uptime Kuma:
         - abbr:
           href: http://192.168.2.106:3001

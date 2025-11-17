@@ -112,6 +112,18 @@ scrape_configs:
         regex: '([^:]+)(?::\d+)?'
         target_label: host
         replacement: '$1'
+
+  - job_name: 'container-status'
+    scrape_interval: 30s
+    scrape_timeout: 15s
+    static_configs:
+      - targets: ['192.168.2.106:8001']
+        labels: {hostname: 'infra'}
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: '([^:]+)(?::\d+)?'
+        target_label: host
+        replacement: '$1'
   - job_name: 'ipmi'
     scrape_interval: 60s
     scrape_timeout: 15s
