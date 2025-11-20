@@ -40,21 +40,21 @@ docker compose file for any host that has NFS or SMB drives mounted.
 ### Metrics file
 
 ```sh
-ls -l /var/lib/node_exporter/textfile_collector/share_drive_probe.prom
+ls -l /var/lib/node_exporter/textfile_collector
 cat /var/lib/node_exporter/textfile_collector/share_drive_probe.prom
 ```
 
 ### Targets file
 
 ```sh
-ls -l /etc/share_drive_probe/targets.list
+ls -l /etc/share_drive_probe
 cat /etc/share_drive_probe/targets.list
 ```
 
 ### Script file
 
 ```sh
-ls -l /usr/local/bin/share_drive_probe.sh
+ls -l /usr/local/bin
 cat /usr/local/bin/share_drive_probe.sh
 ```
 
@@ -81,13 +81,13 @@ journalctl -u share-drive-probe.timer -u share-drive-probe.service --since "10 m
 
 ```
 
-### View logs from the last run:
+### View logs from the last run
 
 ```
 sudo systemctl status share-drive-probe.service
 ```
 
-### Example output:
+### Example output
 
 ```sh
 > cat /var/lib/node_exporter/textfile_collector/share_drive_probe.prom
@@ -108,7 +108,7 @@ share_drive_probe_duration_seconds{host="immich",mount="/mnt/nfs/immich",label="
 share_drive_probe_last_run_timestamp_seconds{host="immich"} 1759421849
 ```
 
-## Commands:
+## Commands
 
 ### Manual reset/start
 

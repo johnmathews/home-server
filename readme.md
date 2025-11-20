@@ -161,7 +161,7 @@ recognised and a driver is attached to it.
         resolve DNS using the Pi-hole IP.
 
 7.  Run
-    [adguard][https://community-scripts.github.io/ProxmoxVE/scripts?id=adguard]
+    [adguard](https://community-scripts.github.io/ProxmoxVE/scripts?id=adguard)
     maybe.
 
     Settings are generally the same as for pihole..
@@ -398,6 +398,7 @@ make requirements
 ```
 
 This command:
+
 - Installs Ansible and Python dependencies from `requirements.txt`
 - Downloads Ansible roles (geerlingguy.docker, geerlingguy.pip) to `./roles/`
 - Downloads Ansible collections (community.general, prometheus.prometheus) to `~/.ansible/collections/`
