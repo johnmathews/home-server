@@ -1,7 +1,5 @@
 # infra_vm/handlers/main.yml
 
----
-
 - name: Restart ipmi_exporter
   systemd:
     name: ipmi_exporter
@@ -81,3 +79,7 @@
     dependencies: true
     remove_orphans: true
   become: false
+- name: restart docker
+  ansible.builtin.service:
+    name: docker
+    state: restarted

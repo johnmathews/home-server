@@ -26,7 +26,7 @@ TARGETS=(
   "/dev/disk/by-id/ata-ST16000NT001-3LV101_ZR5GK5G9|tank"
 )
 
-SAMPLE_DURATION=480                          # seconds for iostat sampling. 2 samples are taken, the first is ignored.
+SAMPLE_DURATION=400                          # seconds for iostat sampling. 2 samples are taken, the first is ignored.
 UTIL_THRESHOLD=0.05                          # %util below this (0.1 = 0.1%) => allow spindown
 LOG_FILE="/mnt/swift/logs/spindown_hdds.log" # keep on SSD; never wakes HDDs
 COOLDOWN_SECS=600                            # 0 disables

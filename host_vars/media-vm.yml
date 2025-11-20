@@ -1,4 +1,10 @@
 nfs_shares:
+  - name: downloads
+    mountpoint: /mnt/nfs/downloads
+    target: /mnt/swift/downloads
+  - name: books
+    mountpoint: /mnt/nfs/books
+    target: /mnt/tank/books
   - name: library
     mountpoint: /mnt/nfs/library
     target: /mnt/tank/library
@@ -10,13 +16,13 @@ nfs_shares:
     target: /mnt/tank/books
 
 # Sleep Hours Configuration
-sleep_hours_enabled: true
 # NFS/SMB share control: During quiet hours, shares are automatically disabled
 # before pausing/stopping containers, then re-enabled after resuming/starting.
 # This prevents HDD wakeups from NFS/SMB clients. Sources: nfs_shares (and smb_shares if defined)
 sleep_hours_nfs_smb_enabled: false
-sleep_hours_pause_hour: 2
-sleep_hours_unpause_hour: 6
+sleep_hours_enabled: false
+sleep_hours_pause_hour: 1
+sleep_hours_unpause_hour: 7
 
 # Containers to pause (lightweight freeze, fast resume)
 sleep_hours_pause_containers:

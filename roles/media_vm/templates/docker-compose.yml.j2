@@ -95,11 +95,11 @@ services:
       - WEBUI_PASSWORD=${QBITTORRENT_PASSWORD}
     volumes:
       - /srv/media/config:/config
-      - /mnt/nfs/library/downloads:/downloads
+      - /mnt/nfs/downloads:/downloads
       - /mnt/nfs/library:/media
     restart: always
     depends_on:
-      sabnzbd:
+      gluetun:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS --connect-timeout 2 http://127.0.0.1:8080/ >/dev/null || exit 1"]
@@ -120,7 +120,7 @@ services:
       - HOST_WHITELIST=sabnzbd.itsa.pizza,192.168.2.118 # doesnt work for this image. edit sabnzbd.ini instead
     volumes:
       - /srv/media/config/sabnzbd:/config # Persistent settings
-      - /mnt/nfs/library/downloads:/downloads
+      - /mnt/nfs/downloads:/downloads
       - /mnt/nfs/library:/library
     network_mode: "service:gluetun"
     depends_on:
@@ -210,7 +210,7 @@ services:
       - /usr/local/bin:/usr/local/bin
       - /srv/media/config/sonarr:/config
       - /mnt/nfs/library:/library
-      - /mnt/nfs/library/downloads:/downloads # keep this so it understands what sabnzbd sees
+      - /mnt/nfs/downloads:/downloads # keep this so it understands what sabnzbd sees
     ports:
       - "8989:8989"
     restart: always
@@ -228,7 +228,7 @@ services:
       - /usr/local/bin:/usr/local/bin
       - /srv/media/config/radarr:/config
       - /mnt/nfs/library:/library
-      - /mnt/nfs/library/downloads:/downloads # keep this so it understands what sabnzbd sees
+      - /mnt/nfs/downloads:/downloads # keep this so it understands what sabnzbd sees
     ports:
       - "7878:7878"
     restart: always

@@ -1,6 +1,5 @@
 # infra_vm/tasks/main.yml
 
-
 - name: Install dependencies
   apt:
     name:
@@ -72,6 +71,28 @@
     append: yes
   tags: [docker]
 
+- name: Ensure Docker config directory exists
+  ansible.builtin.file:
+    path: /etc/docker
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  tags: docker
+
+- name: Configure Docker daemon min API version
+  ansible.builtin.copy:
+    dest: /etc/docker/daemon.json
+    content: |
+      {
+        "min-api-version": "1.24"
+      }
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart docker
+  tags: docker
+
 - name: Create Docker Compose directory
   file:
     path: /srv/infra
@@ -79,24 +100,7 @@
     owner: "{{ docker_user }}"
     group: docker
     mode: '0755'
-  tags: [docker]
-
-# - name: Ensure required directories exist
-#   file:
-#     path: "{{item}}"
-#     state: directory
-#     owner: root
-#     group: root
-#     mode: '0755'
-#   loop:
-#     - /srv/infra/grafana/config
-#     - /srv/infra/loki/data
-#     - /srv/infra/alloy/data
-#   tags: [grafana, loki, alloy]
-#   notify: 
-#     - restart alloy
-#     - restart loki
-#     - restart grafana
+  tags: docker
 
 - name: Ensure required directories exist (one task)
   ansible.builtin.file:

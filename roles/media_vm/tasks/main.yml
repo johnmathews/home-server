@@ -161,9 +161,11 @@
     owner: "{{ puid }}"
     group: "{{ guid }}"
     mode: '0755'
+
 - name: Set permissions of file browser config directory
-  ansible.builtin.command: chown -R 1000:1000 "{{ media_stack_base_dir }}/config/filebrowser"
+  ansible.builtin.command: chown -R 1001:1001 "{{ media_stack_base_dir }}/config/filebrowser"
   become: true
+
 - name: Set permissions of booklore config directory
   ansible.builtin.command: chown -R 1001:1001 "{{ media_stack_base_dir }}/config/booklore"
   become: true
