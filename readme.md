@@ -380,6 +380,10 @@ script. This VM will host the monitoring and dashboard applications.
 
 ## Ansible Steps
 
+### Prerequisites
+
+**Important:** Before running any Ansible playbooks, you MUST run `make requirements` to install dependencies:
+
 ```sh
 # Clone the repo and enter it
 git clone git@github.com:yourname/home-server.git
@@ -389,14 +393,30 @@ cd home-server
 uv venv
 source .venv/bin/activate
 
-# Install Python + Ansible dependencies
+# Install Python + Ansible dependencies (REQUIRED - do this first!)
 make requirements
+```
 
-# Run lint and dry-run to validate everything
+This command:
+- Installs Ansible and Python dependencies from `requirements.txt`
+- Downloads Ansible roles (geerlingguy.docker, geerlingguy.pip) to `./roles/`
+- Downloads Ansible collections (community.general, prometheus.prometheus) to `~/.ansible/collections/`
+
+### Running Playbooks
+
+After running `make requirements`, you can run playbooks:
+
+```sh
+# Validate with lint and dry-run
 make ci
 
 # Provision everything (safe to rerun)
 make site
+
+# Or provision specific targets
+make pve     # Setup Proxmox node
+make media   # Setup Media VM
+make traefik # Setup Traefik reverse proxy
 ```
 
 ## Colors and themes

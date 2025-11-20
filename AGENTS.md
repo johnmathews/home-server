@@ -9,10 +9,10 @@ deployment, configuration, and updates using a Makefile-driven workflow.
 ## Architecture & Structure
 
 - **Root**: Ansible playbooks in `/playbooks/`, roles in `/roles/`
-- **Collections**: Community Ansible collections and Prometheus collection in `/collections/`
+- **Collections**: Community Ansible collections and Prometheus collection (installed to `~/.ansible/collections/`)
 - **Configuration**: `inventory.ini` (hosts), `group_vars/all/` (global vars), `host_vars/` (per-host overrides)
 - **Documentation**: `/documentation/` directory with service-specific guides
-- **Key files**: `ansible.cfg` (roles/collections paths), `makefile` (all commands), `.ansible-lint` (lint rules)
+- **Key files**: `ansible.cfg` (roles path), `makefile` (all commands), `.ansible-lint` (lint rules), `requirements.yml` (collection versions)
 
 ## Testing & Validation
 
@@ -54,7 +54,8 @@ make site          # Execute full provisioning
 
 **Never edit:**
 
-- `/roles/geerlingguy.*/` — External roles (managed by ansible-galaxy)
-- `/collections/ansible_collections/prometheus/` — External collections
+- `/roles/geerlingguy.*/` — External roles (managed by ansible-galaxy, installed during `make requirements`)
+- `~/.ansible/collections/` — External collections (managed by ansible-galaxy, installed during `make requirements`)
 - `.ansible-lint` — Only with maintainer approval
-- `ansible.cfg`, `requirements.yml` — Core config (coordinate before changes)
+- `ansible.cfg` — Core config (coordinate before changes)
+- `requirements.yml` — Specifies collection/role versions (changes require `make requirements` to reinstall)
