@@ -1,24 +1,12 @@
-# Home Server Provisioning with Ansible
-
-2. [Setup](#setup)
-3. [Proxmox Backup Server (PBS)](<#proxmox-backup-server-(pbs)>)
-4. [Ansible Steps](#ansible-steps)
-5. [Colors and themes](#colors-and-themes)
-6. [Tuning and maintenance:](#tuning-and-maintenance:)
-   - [Makefile Targets](#makefile-targets)
+## Home Server Provisioning with Ansible
 
 This project is about setting up my home server. It contains the commands and
 Ansible playbooks used to provision a home server based on Proxmox.
 
-[Documentation](https://docs.itsa.pizza)
+Read the [documentation](https://docs.itsa.pizza).
 
 [Proxmox helper scripts](https://community-scripts.github.io/ProxmoxVE/) are
 used.
-
-It automates the setup of virtual machines and containers for services like
-storage (TrueNAS), media streaming (Jellyfin, Sonarr, Radarr, qBittorrent), home
-automation (Home Assistant), network security (Pi-hole), and remote access
-(Cloudflare Tunnel).
 
 Proxmox helper scripts are run manually, the configuration options are listed
 here.

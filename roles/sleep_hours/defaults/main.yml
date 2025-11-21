@@ -9,9 +9,9 @@ sleep_hours_docker_stop_timeout_s: 30
 sleep_hours_docker_log_lines: 5
 
 # TrueNAS API configuration (for Phase 3)
-sleep_hours_truenas_api_url: "https://192.168.2.104"
+sleep_hours_truenas_api_url: "https://192.168.2.104/api/v2.0"
 sleep_hours_truenas_api_key: "{{ vault_truenas_api_key }}"
 
 # Health check configuration
 sleep_hours_container_health_timeout_s: 60 # Max wait for a container to become healthy (seconds)
-sleep_hours_container_health_interval_s: 5 # How frequently to check if a container is healthy (Poll interval, seconds)
+sleep_hours_container_health_interval_s: 10 # How frequently to check if a container is healthy (Poll interval, seconds)

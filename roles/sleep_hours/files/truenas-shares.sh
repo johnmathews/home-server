@@ -18,6 +18,13 @@ SHARES_LIST="${2:-}"
 CONTAINERS_LIST="${3:-}"
 
 # -------- configuration --------
+# Source config file if it exists (provides TRUENAS_API_URL, TRUENAS_API_KEY, etc.)
+if [[ -f /etc/sleep-hours/truenas.conf ]]; then
+  # shellcheck source=/dev/null
+  . /etc/sleep-hours/truenas.conf
+fi
+
+# Set defaults for any variables not provided by config
 TRUENAS_IP="${TRUENAS_IP:-192.168.2.104}"
 TRUENAS_API_URL="${TRUENAS_API_URL:-https://${TRUENAS_IP}/api/v2.0}"
 TRUENAS_API_KEY="${TRUENAS_API_KEY:-}"
@@ -57,9 +64,9 @@ _log() {
   shift 4
   if should_log "$level"; then
     printf 'ts=%s level=%s resource=%s action=%s event=%s reason=%s' \
-      "$(date +%FT%T%z)" "$level" "${resource:-_}" "${ACTION:-unknown}" "$event" "$reason"
-    for kv in "$@"; do printf ' %s' "$kv"; done
-    printf '\n'
+      "$(date +%FT%T%z)" "$level" "${resource:-_}" "${ACTION:-unknown}" "$event" "$reason" >&2
+    for kv in "$@"; do printf ' %s' "$kv" >&2; done
+    printf '\n' >&2
   fi
 }
 
@@ -70,7 +77,7 @@ log_err() { _log error "$@"; }
 
 # -------- human-readable messages (plain text) --------
 msg() {
-   printf '%s\n' "$@"
+   printf '%s\n' "$@" >&2
 }
 
 fail_early() {
@@ -122,23 +129,21 @@ api_call() {
 
    [[ -z "$TRUENAS_API_KEY" ]] && fail_early api_auth "TRUENAS_API_KEY not set" 1
 
-   while :; do
-     local output
-     if [[ -z "$data" ]]; then
-       output=$(curl -s --max-time "$curl_timeout" -X "$method" "$url" \
-         -H "Authorization: Bearer ${TRUENAS_API_KEY}" \
-         -H "Content-Type: application/json" \
-         2>&1)
-     else
-       output=$(curl -s --max-time "$curl_timeout" -X "$method" "$url" \
-         -H "Authorization: Bearer ${TRUENAS_API_KEY}" \
-         -H "Content-Type: application/json" \
-         -d "$data" \
-         2>&1)
-     fi
-     local rc=$?
+    while :; do
+      local output
+      if [[ -z "$data" ]]; then
+        output=$(curl -s -k --max-time "$curl_timeout" -X "$method" "$url" \
+          -H "Authorization: Bearer ${TRUENAS_API_KEY}" \
+          -H "Content-Type: application/json")
+      else
+        output=$(curl -s -k --max-time "$curl_timeout" -X "$method" "$url" \
+          -H "Authorization: Bearer ${TRUENAS_API_KEY}" \
+          -H "Content-Type: application/json" \
+          -d "$data")
+      fi
+      local rc=$?
 
-     if [[ $rc -eq 0 ]]; then
+      if [[ $rc -eq 0 ]]; then
        # Validate JSON response
        if ! validate_json "$output"; then
          log_warn "_" api_call "invalid_json_response" "method=$method endpoint=$endpoint attempt=$attempt"
@@ -170,7 +175,7 @@ api_call() {
 get_nfs_share_id() {
    local dataset="$1"
    local response rc
-   response=$(api_call GET "/nfs/share")
+   response=$(api_call GET "/sharing/nfs")
    rc=$?
    
    if [[ $rc -ne 0 ]]; then
@@ -217,7 +222,7 @@ get_nfs_share_id() {
 get_smb_share_id() {
    local dataset="$1"
    local response rc
-   response=$(api_call GET "/smb/share")
+   response=$(api_call GET "/sharing/smb")
    rc=$?
    
    if [[ $rc -ne 0 ]]; then
@@ -265,7 +270,7 @@ verify_share_state() {
   local share_type="$1" share_id="$2" expected_state="$3" dataset="$4"
   
   local verify
-  verify=$(api_call GET "/${share_type}/share/$share_id" 2>/dev/null)
+  verify=$(api_call GET "/sharing/${share_type}/id/$share_id" 2>/dev/null)
   
   if [[ -z "$verify" ]]; then
     log_warn "$dataset" "${share_type}_verify" "failed_to_get_state" "share_id=$share_id"
@@ -295,7 +300,7 @@ disable_nfs_share() {
   local share_id="$1" dataset="$2"
   local data='{"enabled":false}'
   
-  if ! api_call PATCH "/nfs/share/$share_id" "$data" >/dev/null 2>&1; then
+  if ! api_call PUT "/sharing/nfs/id/$share_id" "$data" >/dev/null 2>&1; then
     log_warn "$dataset" nfs_disable "api_failed" "share_id=$share_id"
     return 1
   fi
@@ -315,7 +320,7 @@ enable_nfs_share() {
   local share_id="$1" dataset="$2"
   local data='{"enabled":true}'
   
-  if ! api_call PATCH "/nfs/share/$share_id" "$data" >/dev/null 2>&1; then
+  if ! api_call PUT "/sharing/nfs/id/$share_id" "$data" >/dev/null 2>&1; then
     log_warn "$dataset" nfs_enable "api_failed" "share_id=$share_id"
     return 1
   fi
@@ -335,7 +340,7 @@ disable_smb_share() {
   local share_id="$1" dataset="$2"
   local data='{"enabled":false}'
   
-  if ! api_call PATCH "/smb/share/$share_id" "$data" >/dev/null 2>&1; then
+  if ! api_call PUT "/sharing/smb/id/$share_id" "$data" >/dev/null 2>&1; then
     log_warn "$dataset" smb_disable "api_failed" "share_id=$share_id"
     return 1
   fi
@@ -355,7 +360,7 @@ enable_smb_share() {
   local share_id="$1" dataset="$2"
   local data='{"enabled":true}'
   
-  if ! api_call PATCH "/smb/share/$share_id" "$data" >/dev/null 2>&1; then
+  if ! api_call PUT "/sharing/smb/id/$share_id" "$data" >/dev/null 2>&1; then
     log_warn "$dataset" smb_enable "api_failed" "share_id=$share_id"
     return 1
   fi
