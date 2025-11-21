@@ -1,6 +1,8 @@
 # AGENTS.md
 
-Use the context7 MCP server when reading documentation or github repos etc.
+Use the context7 MCP server when reading project or tool documentation or github repos.
+
+When you output a table, do not use markdown. Instead, draw a plain ASCII table. Columns must be vertically aligned in a monospace terminal.
 
 ## Project Purpose
 
