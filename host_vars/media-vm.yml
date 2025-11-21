@@ -19,22 +19,22 @@ nfs_shares:
 # NFS/SMB share control: During quiet hours, shares are automatically disabled
 # before pausing/stopping containers, then re-enabled after resuming/starting.
 # This prevents HDD wakeups from NFS/SMB clients. Sources: nfs_shares (and smb_shares if defined)
-sleep_hours_nfs_smb_enabled: false
-sleep_hours_enabled: false
+sleep_hours_nfs_smb_enabled: true
+sleep_hours_enabled: true
 sleep_hours_pause_hour: 1
 sleep_hours_unpause_hour: 7
 
 # Containers to pause (lightweight freeze, fast resume)
-sleep_hours_pause_containers:
+# sleep_hours_pause_containers:
+
+# Containers to stop (clean shutdown, requires full restart)
+sleep_hours_stop_containers:
   - prowlarr
   - radarr
   - sonarr
   - jellyseerr
   - bazarr
   - booklore
-
-# Containers to stop (clean shutdown, requires full restart)
-sleep_hours_stop_containers:
   - sabnzbd
   - qbittorrent
   - booklore-mariadb

@@ -1,7 +1,5 @@
 # Home Server Provisioning with Ansible
 
-1. [iGPU setup](#igpu-setup)
-   - [The solution:](#the-solution:)
 2. [Setup](#setup)
 3. [Proxmox Backup Server (PBS)](<#proxmox-backup-server-(pbs)>)
 4. [Ansible Steps](#ansible-steps)
@@ -11,6 +9,8 @@
 
 This project is about setting up my home server. It contains the commands and
 Ansible playbooks used to provision a home server based on Proxmox.
+
+[Documentation](https://docs.itsa.pizza)
 
 [Proxmox helper scripts](https://community-scripts.github.io/ProxmoxVE/) are
 used.
@@ -26,32 +26,6 @@ here.
 The motherboard uses the Redfish API. You can use it to change fan profiles, but
 not to set fan RPM directly. Probably best to attach the fans to an ESP32 board
 that has temperature probes, and make it log metrics via Home Assistant.
-
-## Cloudflared tunnel
-
-Is hosted on the infra VM. Manage it on cloudflare.com
-
-## iGPU setup
-
-In BIOS, go Advanced > NBIO Common Options >
-
-- IOMMU: enabled
-- PCIe ARI Support: enabled
-- PCIe ARI Enumeration: enabled
-- GFX Configuration: UMA specified
-- UMA frame buffer size: 2Gj
-- GPU Host translation cache: Auto Advanced > PCI subsystem settings >
-- Above 4G decoding: enabled
-- Re-size BAR support: disabled
-
-This doesn't work because I cant extract the ROM file from the iGPU in Proxmox
-and then load it in the VM. A different OS image might have it already. This is
-the only blocker - I can set passthrough and assign it to the VM. but the VM
-cannot bind the iGPU to a driver, i think. Therefore, for now, run jellyfin in
-docker in Proxmox itself.
-
-You can run `lspci -k -nn -d 1002:` in proxmox to see that the iGPU is
-recognised and a driver is attached to it.
 
 ## Setup
 
@@ -250,34 +224,29 @@ recognised and a driver is attached to it.
     temporary username and password you can use to login to the web UI and
     create a username and password.
 
-    For `homarr` to use the Proxmox integration, you need to create an API user
-    and then enter the secret in the format `api@pve!<group>=<secret>`. You cant
-    just enter the secret. Follow homarr documentation about how to create the
-    Proxmox user, group and api token.
-
     Local logins:
-    - [Sonarr](http://192.168.2.105:8989/)
-    - [Radarr](http://192.168.2.105:7878/)
-    - [File Browser](http://192.168.2.105:8081/login?redirect=/files/)
-    - [JellyFin](http://192.168.2.105:8096/web/#/wizardstart.html)
-    - [qBitTorrent](http://192.168.2.105:8080/)
-    - [Bazarr](http://192.168.2.105:8080/)
-    - [Jackett](http://192.168.2.105:9117/)
+    [Sonarr](http://192.168.2.105:8989/)
+    [Radarr](http://192.168.2.105:7878/)
+    [File Browser](http://192.168.2.105:8081/login?redirect=/files/)
+    [JellyFin](http://192.168.2.105:8096/web/#/wizardstart.html)
+    [qBitTorrent](http://192.168.2.105:8080/)
+    [Bazarr](http://192.168.2.105:8080/)
+    [Jackett](http://192.168.2.105:9117/)
 
-      Advanced Settings:
-      - VMID: `105`
-      - Machine Type: `q35`
-      - Disk Size: `32GB`
-      - Disk Cache: `0 None`
-      - Host Name: `media`
-      - CPU Model: `Host`
-      - CPU Cores: `4`
-      - RAM: `8192MB`
-      - Bridge: `vmbr0`
-      - MAC Address: `02:00:00:00:01:05`
-      - VLAN: `blank`
-      - MTU Size: `blank`
-      - Storage Pool: `local-zfs`
+    Advanced Settings:
+    - VMID: `105`
+    - Machine Type: `q35`
+    - Disk Size: `32GB`
+    - Disk Cache: `0 None`
+    - Host Name: `media`
+    - CPU Model: `Host`
+    - CPU Cores: `4`
+    - RAM: `8192MB`
+    - Bridge: `vmbr0`
+    - MAC Address: `02:00:00:00:01:05`
+    - VLAN: `blank`
+    - MTU Size: `blank`
+    - Storage Pool: `local-zfs`
 
     - Make sure that in cloud-init the `IP config` isn't blank:
       - IPv4: `DHCP`
@@ -420,11 +389,6 @@ make media   # Setup Media VM
 make traefik # Setup Traefik reverse proxy
 ```
 
-## Colors and themes
-
-From [PVEThemes](https://github.com/Happyrobot33/PVEThemes) repo: -
-`git clone https://github.com/Happyrobot33/PVEThemes && cd PVEThemes && chmod +x install.sh && ./install.sh`
-
 ## Tuning and maintenance:
 
 Reduce power consumption. Save money...
@@ -439,16 +403,3 @@ Reduce power consumption. Save money...
    devices will use less power when they're not in use.
 
 3. To upgrade the OS, run `do-release-upgrade` from the console, not over SSH.
-
-### Makefile Targets
-
-```sh
-make requirements       # Install Ansible requirements
-make check              # Dry-run of full site.yml
-make site               # Run full home server provisioning
-make media              # Provision and configure Media VM
-make truenas            # Create TrueNAS VM
-make lint               # Lint all playbooks and roles
-make ci                 # Run lint + check for validation
-make clean              # Remove retry/log files
-```

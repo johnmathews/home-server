@@ -1,53 +1,6 @@
 # immich_lxc/files/docker-compose.yml
 
----
-
 services:
-  node_exporter:
-    image: quay.io/prometheus/node-exporter:latest
-    container_name: immich_node_exporter
-    command:
-      - '--path.rootfs=/host'
-      - '--collector.textfile.directory=/textfile'
-    network_mode: host
-    ports:
-      - "9100:9100"
-    pid: host
-    restart: unless-stopped
-    volumes:
-      - '/:/host:ro,rslave'
-      - '/var/lib/node_exporter/textfile_collector:/textfile:ro'
-
-  alloy:
-    image: grafana/alloy:latest
-    container_name: alloy
-    restart: unless-stopped
-    environment:
-      LOKI_WRITE_ENDPOINT: "http://192.168.2.106:3100/loki/api/v1/push"
-      NODE_HOSTNAME: "immich" 
-      LOG_LEVEL: "warn"
-    volumes:
-      # config 
-      - ./alloy:/etc/alloy:ro 
-      # docker 
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      # journalctl  
-      - /var/log/journal:/var/log/journal:ro
-      - /run/log/journal:/run/log/journal:ro
-      - /etc/machine-id:/etc/machine-id:ro
-    command: >
-      run --server.http.listen-addr=0.0.0.0:12345
-      --storage.path=/var/lib/alloy/data
-      /etc/alloy/config.alloy
-    ports:
-      - "12345:12345"
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "5"
-
   immich-server:
     container_name: immich_server
     image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
@@ -55,6 +8,7 @@ services:
     volumes:
       # Do not edit the next line. If you want to change the media storage location on your system, edit the value of UPLOAD_LOCATION in the .env file
       - ${UPLOAD_LOCATION}:/usr/src/app/upload
+      - /mnt/nfs/photos:/mnt/nfs/photos
       - /etc/localtime:/etc/localtime:ro
     env_file:
       - .env
@@ -118,9 +72,52 @@ services:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
       - /var/lib/docker/:/var/lib/docker:ro
       - /var/run:/var/run:ro
-    privileged: false  # required for some metrics, but `true` makes it scan /dev/** and in an LXC /dev/series/by-id does not exist.
+    privileged: false # required for some metrics, but `true` makes it scan /dev/** and in an LXC /dev/series/by-id does not exist.
     security_opt:
       - no-new-privileges:true
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  node_exporter:
+    image: quay.io/prometheus/node-exporter:latest
+    container_name: immich_node_exporter
+    command:
+      - '--path.rootfs=/host'
+      - '--collector.textfile.directory=/textfile'
+    network_mode: host
+    ports:
+      - "9100:9100"
+    pid: host
+    restart: unless-stopped
+    volumes:
+      - '/:/host:ro,rslave'
+      - '/var/lib/node_exporter/textfile_collector:/textfile:ro'
+
+  alloy:
+    image: grafana/alloy:latest
+    container_name: alloy
+    restart: unless-stopped
+    environment:
+      LOKI_WRITE_ENDPOINT: "http://192.168.2.106:3100/loki/api/v1/push"
+      NODE_HOSTNAME: "immich"
+      LOG_LEVEL: "warn"
+    volumes:
+      # config 
+      - ./alloy:/etc/alloy:ro
+      # docker 
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      # journalctl  
+      - /var/log/journal:/var/log/journal:ro
+      - /run/log/journal:/run/log/journal:ro
+      - /etc/machine-id:/etc/machine-id:ro
+    command: >
+      run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
+    ports:
+      - "12345:12345"
     logging:
       driver: "json-file"
       options:

@@ -2,16 +2,20 @@
 # for nfs tasks, see playbooks/media_vm.yml tag=nfs
 # for share_drive_probe tasks, see playbooks/media_vm.yml tag=share
 # for quiet_hours and pausing docker containers at night, see roles/sleep_hours role with tags=sleep
+
 - name: Gather facts for media-vm
   ansible.builtin.setup: {}
+
 - name: Ensure broken package state is fixed
   ansible.builtin.command: apt --fix-broken install -y
   changed_when: false # Optional: suppresses 'changed' output unless something is actually fixed
+
 - name: Perform dist upgrade
   ansible.builtin.apt:
     upgrade: safe
     update_cache: true
     cache_valid_time: 3600
+
 - name: Install SMB client and mount utilities
   ansible.builtin.apt:
     name:
@@ -20,10 +24,12 @@
       - qemu-guest-agent
     state: present
     update_cache: true
+
 - name: Install Docker using official role
   import_role:
     name: geerlingguy.docker
   tags: docker
+
 - name: Add user to docker group
   user:
     name: john
@@ -31,13 +37,13 @@
     append: yes
   become: true
   tags: docker
-# - import_tasks: mount-smb.yml
-#   tags: smb
+
 - name: Create media stack base directory
   file:
     path: "{{ media_stack_base_dir | dirname }}"
     state: directory
     mode: '0755'
+
 - name: Ensure required directories exist with correct ownership
   ansible.builtin.file:
     path: "{{ item }}"
@@ -50,6 +56,7 @@
     - "{{ media_stack_base_dir }}"
     - "{{ media_stack_mount_dir }}/library"
     - "{{ media_stack_mount_dir }}/media"
+
 - name: Ensure hometube config directory exists
   file:
     path: "{{ media_stack_base_dir }}/config/hometube/cookies"
@@ -58,6 +65,7 @@
     group: "{{ media_stack_user }}"
     mode: '0755'
   tags: hometube
+
 - name: Ensure alloy config directory exists
   file:
     path: "{{ media_stack_base_dir }}/config/alloy"
@@ -66,6 +74,7 @@
     group: "{{ media_stack_user }}"
     mode: '0755'
   tags: alloy
+
 - name: Ensure gluetun config directory exists
   file:
     path: "{{ media_stack_base_dir }}/config/gluetun/auth"
@@ -74,6 +83,7 @@
     group: "{{ media_stack_user }}"
     mode: '0755'
   tags: gluetun
+
 - name: Re-create qbittorrent config directory
   file:
     path: "{{ media_stack_base_dir }}/config/qBittorrent"
@@ -83,6 +93,7 @@
     mode: '0755'
   when: reset_qbittorrent_config | default(false)
   tags: qbittorrent
+
 - name: Pre-seed qBittorrent.conf if missing and not resetting
   ansible.builtin.template:
     src: qBittorrent.conf.j2
@@ -93,6 +104,7 @@
     force: false # Do not overwrite if already exists
   when: reset_qbittorrent_config | default(false)
   tags: qbittorrent
+
 - name: Copy docker-compose.yml
   template:
     src: templates/docker-compose.yml.j2
@@ -101,6 +113,7 @@
   notify:
     - restart media stack
   tags: docker
+
 - name: Upload alloy config file
   copy:
     src: "{{ item.src }}"
@@ -115,6 +128,7 @@
   become: true
   tags: [alloy]
   notify: restart alloy
+
 - name: Create environment file from template
   template:
     src: .env.j2
@@ -122,6 +136,7 @@
     mode: '0600'
   notify: restart media stack
   tags: docker
+
 - name: Create gluetun config file from template
   template:
     src: templates/gluetun/gluetun_config.toml.j2
@@ -129,6 +144,7 @@
     mode: '0600'
   notify: restart gluetun
   tags: gluetun
+
 - name: Create gluetun auth file from template
   template:
     src: templates/gluetun/gluetun_auth.toml.j2
@@ -136,6 +152,7 @@
     mode: '0600'
   notify: restart gluetun
   tags: gluetun
+
 - name: Ensure .env and docker-compose.yml are owned by "john"
   ansible.builtin.file:
     path: "{{ item }}"
@@ -145,6 +162,7 @@
     - /srv/media/.env
   notify: restart media stack
   tags: docker
+
 - name: Ensure Radarr config directory has correct UID/GID
   ansible.builtin.file:
     path: "{{ media_stack_base_dir }}/config/radarr"
@@ -153,6 +171,7 @@
     owner: "{{ puid }}"
     group: "{{ guid }}"
     mode: '0755'
+
 - name: Ensure Sonarr config directory has correct UID/GID
   ansible.builtin.file:
     path: "{{ media_stack_base_dir }}/config/sonarr"

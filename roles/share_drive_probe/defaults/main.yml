@@ -2,7 +2,7 @@
 share_drive_probe_interval: 5m
 share_drive_probe_interval_minutes: 5
 # Per-operation timeout (touch/rm), use GNU timeout syntax (e.g., 10s, 1m)
-share_drive_probe_op_timeout: 15s
+share_drive_probe_op_timeout: 30s
 # Script + config install locations
 share_drive_probe_bin: /usr/local/bin/share_drive_probe.sh
 share_drive_probe_conf_dir: /etc/share_drive_probe

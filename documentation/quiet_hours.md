@@ -161,3 +161,213 @@ The Ansible role copies the following files to these locations:
 - `truenas.conf` -> `/etc/sleep-hours/truenas.conf` (if NFS/SMB control enabled)
 - Timer Units -> `/etc/systemd/system/docker-sleep@*.timer`
 - Service Unit Template -> `/etc/systemd/system/docker-sleep@.service`
+
+## Plugin Configuration: SABnzbd
+
+The SABnzbd plugin supports robust API-based busy detection with multiple fallback mechanisms.
+
+### Environment Variables
+
+Configure the SABnzbd plugin via systemd environment variables:
+
+**Required:**
+- `SAB_URL` - SABnzbd base URL (e.g., `http://127.0.0.1:8081`)
+- `SAB_API_KEY` - SABnzbd API key (found in Config > General > Security)
+
+**Optional:**
+- `SAB_TIMEOUT_S` - API request timeout in seconds (default: 5)
+- `SAB_RETRIES` - Number of API retry attempts (default: 2)
+- `SAB_RETRY_DELAY_S` - Initial retry delay in seconds (default: 1, exponential backoff)
+- `SAB_BUSY_THRESHOLD_KBPS` - Minimum download speed to consider busy in KB/s (default: 10)
+- `SAB_CHECK_POSTPROC` - Check post-processing activity (default: 1)
+- `SAB_HEALTH_CHECK` - Validate connectivity before API calls (default: 1)
+- `CURL_INSECURE` - Allow self-signed SSL certificates (default: 0)
+
+### Busy Detection Criteria
+
+The plugin considers SABnzbd busy if any of the following conditions are true:
+
+1. **Queue Status**: Status is "Downloading" or "Fetching"
+2. **Download Speed**: Speed exceeds threshold (default 10 KB/s)
+3. **Queued Jobs**: Jobs are queued AND not paused AND data remaining
+4. **Post-Processing**: Active post-processing (Repairing, Extracting, Moving, Running)
+
+### Configuration Example
+
+Add to the systemd service unit environment:
+
+```systemd
+[Service]
+Environment="SAB_URL=http://127.0.0.1:8081"
+Environment="SAB_API_KEY=your-api-key-here"
+Environment="SAB_BUSY_THRESHOLD_KBPS=50"
+Environment="SAB_CHECK_POSTPROC=1"
+```
+
+Or use an EnvironmentFile:
+
+```bash
+# /etc/sleep-hours/sabnzbd.env
+SAB_URL=http://127.0.0.1:8081
+SAB_API_KEY=your-api-key-here
+SAB_BUSY_THRESHOLD_KBPS=50
+SAB_CHECK_POSTPROC=1
+```
+
+Then reference in systemd unit:
+
+```systemd
+[Service]
+EnvironmentFile=/etc/sleep-hours/sabnzbd.env
+```
+
+### Fallback Behavior
+
+If the SABnzbd API is unavailable (network error, invalid credentials, SABnzbd offline), the plugin automatically falls back to generic CPU/IO-based busy detection using `docker stats`.
+
+This ensures the sleep hours service continues to function even if SABnzbd is temporarily unreachable.
+
+### Logging
+
+Enable debug logging with `QUIET_DEBUG=1` to see:
+- API request/response details
+- JSON parsing results
+- Busy detection decision criteria
+- Retry attempts and failures
+
+Example:
+```bash
+QUIET_DEBUG=1 systemctl start docker-sleep@stop.service
+journalctl -u docker-sleep@stop.service -n 100
+```
+
+### API Endpoints Used
+
+- `GET /api?mode=queue&limit=0` - Lightweight queue status check
+- `GET /api?mode=history&limit=1` - Post-processing status check
+- `GET /api?mode=version` - Health check (no authentication required)
+
+### Changelog
+
+**Version 2.0** (Current)
+- Multi-criteria busy detection (queue status, speed, post-processing)
+- Retry logic with exponential backoff
+- Pure-bash JSON parsing (no jq dependency)
+- Comprehensive environment validation
+- Enhanced error handling and logging
+- Post-processing activity detection
+- Configurable busy thresholds
+
+**Version 1.0** (Legacy)
+- Basic queue check (noofslots, kbpersec)
+- Single API call with no retry
+- Crude regex-based JSON parsing
+
+## TrueNAS NFS/SMB Share Control
+
+The quiet hours system can automatically disable and re-enable TrueNAS NFS and SMB shares to prevent HDD wakeup during quiet hours.
+
+### How It Works
+
+1. **Before stopping containers:** Disable NFS/SMB shares
+2. **Stop containers:** Containers no longer accessing shares
+3. **HDDs can spin down:** No client activity, no share activity
+4. **Before starting containers:** Re-enable NFS/SMB shares
+5. **Start containers:** Containers can access shares normally
+
+### Configuration
+
+Enable in host_vars:
+
+```yaml
+# Enable NFS/SMB share control
+sleep_hours_nfs_smb_enabled: true
+
+# Define NFS shares to control
+nfs_shares:
+  - name: paperless
+    mountpoint: /mnt/nfs/paperless
+    target: /mnt/tank/paperless
+
+# Optional: SMB shares
+smb_shares:
+  - name: paperless
+    target: /mnt/paperless
+```
+
+### Script Location
+
+- Script: `/usr/local/bin/truenas-shares.sh`
+- Config: `/etc/sleep-hours/truenas.conf`
+- Share list: `/etc/sleep-hours/truenas-nfs-shares.list`
+
+### Features
+
+**Enhanced in v2.0:**
+- ✅ JSON response validation
+- ✅ Flexible path matching (handles /mnt prefix variations)
+- ✅ State verification after toggle
+- ✅ TrueNAS API health checks
+- ✅ Enhanced error logging
+- ✅ Retry logic (3 attempts, 2s delay)
+
+### Requirements
+
+- TrueNAS API key (stored in vault: `vault_truenas_api_key`)
+- jq command (for JSON parsing)
+- TrueNAS accessible at configured URL
+
+### Testing
+
+**Safe read-only test:**
+```bash
+ssh paperless-lxc
+source /etc/sleep-hours/truenas.conf
+/usr/local/bin/truenas-shares.sh status "/mnt/tank/paperless"
+```
+
+**With debug logging:**
+```bash
+QUIET_DEBUG=1 QUIET_LOG_LEVEL=debug \
+  /usr/local/bin/truenas-shares.sh status "/mnt/tank/paperless"
+```
+
+**Full test (⚠️ makes changes):**
+```bash
+# Disable shares
+/usr/local/bin/truenas-shares.sh disable "/mnt/tank/paperless"
+
+# Verify in TrueNAS UI: https://192.168.2.104 > Shares > NFS
+
+# Re-enable shares
+/usr/local/bin/truenas-shares.sh enable "/mnt/tank/paperless" "paperless-webserver"
+```
+
+### Troubleshooting
+
+**Share not found:**
+- Check path format in TrueNAS (may include or exclude /mnt)
+- Use debug mode to see API response
+- Verify share exists in TrueNAS UI
+
+**API errors:**
+- Verify TRUENAS_API_KEY is correct
+- Check TrueNAS is accessible
+- Ensure jq is installed
+
+**State verification failures:**
+- Check TrueNAS logs
+- Manually verify share state in UI
+- May indicate permissions issue
+
+**Recovery if shares stuck disabled:**
+1. Manually enable in TrueNAS UI
+2. Restart containers: `docker start <container-name>`
+3. Temporarily disable feature: `sleep_hours_nfs_smb_enabled: false`
+
+### Currently Enabled
+
+- ✅ paperless_lxc
+- ✅ tubearchivist_lxc
+- ❌ media-vm (disabled)
+

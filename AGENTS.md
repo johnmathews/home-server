@@ -1,5 +1,7 @@
 # AGENTS.md
 
+Use the context7 MCP server when reading documentation or github repos etc.
+
 ## Project Purpose
 
 Ansible playbooks and roles for provisioning a Proxmox-based home server with VMs/LXCs for storage (TrueNAS), media
