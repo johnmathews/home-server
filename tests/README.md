@@ -4,7 +4,8 @@ Comprehensive end-to-end tests for the `sleep_hours` Ansible role.
 
 ## Overview
 
-This test suite validates the sleep hours system that automatically pauses/stops Docker containers and disables TrueNAS NFS/SMB shares during quiet hours.
+This test suite validates the sleep hours system that automatically pauses/stops Docker containers and disables TrueNAS
+NFS/SMB shares during quiet hours.
 
 ### What's Tested
 
@@ -41,11 +42,13 @@ tests/
 ### Mock Servers
 
 **TrueNAS Mock API** (Python HTTP server)
+
 - Implements TrueNAS SCALE REST API v2.0
 - Tracks share state (enabled/disabled)
 - Supports failure simulation
 
 **Uptime Kuma Mock** (Python HTTP server)
+
 - Simulates monitor pause/resume
 - Validates authentication
 
@@ -116,11 +119,11 @@ QUIET_DEBUG=1 bats tests/integration/03_sleep_ending.bats
 
 Simulates the start of sleep hours.
 
-**Setup**: Running containers, enabled shares
-**Action**: `docker-sleep.sh pause|stop`
-**Expected**: Containers paused/stopped, shares disabled
+**Setup**: Running containers, enabled shares **Action**: `docker-sleep.sh pause|stop` **Expected**: Containers
+paused/stopped, shares disabled
 
 **Key Tests**:
+
 - Containers transition to paused/stopped state
 - TrueNAS shares are disabled
 - Phase execution order is correct
@@ -130,11 +133,11 @@ Simulates the start of sleep hours.
 
 Tests idempotency when already in sleep mode.
 
-**Setup**: Paused/stopped containers, disabled shares
-**Action**: `docker-sleep.sh pause|stop` (run again)
-**Expected**: No state changes, operation skipped
+**Setup**: Paused/stopped containers, disabled shares **Action**: `docker-sleep.sh pause|stop` (run again) **Expected**:
+No state changes, operation skipped
 
 **Key Tests**:
+
 - Containers remain paused/stopped
 - No unnecessary API calls
 - Summary shows `skipped=N, changed=0`
@@ -143,11 +146,11 @@ Tests idempotency when already in sleep mode.
 
 Simulates the end of sleep hours.
 
-**Setup**: Paused/stopped containers, disabled shares
-**Action**: `docker-sleep.sh unpause|start`
-**Expected**: Containers running, shares enabled
+**Setup**: Paused/stopped containers, disabled shares **Action**: `docker-sleep.sh unpause|start` **Expected**:
+Containers running, shares enabled
 
 **Key Tests**:
+
 - Containers transition to running state
 - TrueNAS shares are enabled
 - Phase execution order is correct
@@ -157,11 +160,11 @@ Simulates the end of sleep hours.
 
 Tests idempotency when already running.
 
-**Setup**: Running containers, enabled shares
-**Action**: `docker-sleep.sh unpause|start` (run again)
-**Expected**: No state changes, operation skipped
+**Setup**: Running containers, enabled shares **Action**: `docker-sleep.sh unpause|start` (run again) **Expected**: No
+state changes, operation skipped
 
 **Key Tests**:
+
 - Containers remain running
 - Shares remain enabled
 - Summary shows `skipped=N, changed=0`
@@ -171,11 +174,13 @@ Tests idempotency when already running.
 Prevents the enable/unpause bug from returning.
 
 **The Bug** (fixed 2025-11-22):
+
 - Case statement had `unpause)` instead of `enable)`
 - Result: enable action was silently ignored
 - Impact: Shares never re-enabled after sleep hours
 
 **Tests**:
+
 - `truenas-shares.sh` accepts `enable` action
 - `truenas-shares.sh` rejects `unpause` action
 - `docker-sleep.sh unpause` actually enables shares
@@ -241,22 +246,26 @@ teardown() {
 ### Available Assertions
 
 **Container States**:
+
 - `assert_container_state <name> <expected>`
 - `assert_container_paused <name>`
 - `assert_container_running <name>`
 - `assert_container_stopped <name>`
 
 **Share States**:
+
 - `assert_share_enabled <id> [type]`
 - `assert_share_disabled <id> [type]`
 
 **Log Validation**:
+
 - `assert_log_contains <pattern> <output>`
 - `assert_log_not_contains <pattern> <output>`
 - `assert_log_sequence <output> <pattern1> <pattern2> ...`
 - `assert_summary_stats <output> <total> <changed> <skipped> <failed>`
 
 **Exit Codes**:
+
 - `assert_exit_success <code>`
 - `assert_exit_failure <code>`
 
@@ -330,14 +339,14 @@ See `.github/workflows/test.yml` for GitHub Actions configuration.
 
 ```yaml
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Install dependencies
-        run: sudo apt-get install -y bats jq python3
-      - name: Run tests
-        run: ./tests/run_tests.sh
+ test:
+  runs-on: ubuntu-latest
+  steps:
+   - uses: actions/checkout@v3
+   - name: Install dependencies
+     run: sudo apt-get install -y bats jq python3
+   - name: Run tests
+     run: ./tests/run_tests.sh
 ```
 
 ## Future Enhancements

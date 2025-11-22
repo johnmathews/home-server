@@ -152,9 +152,12 @@ global_teardown() {
 
 # Per-test setup (called before each test)
 test_setup() {
-    # Ensure TEST_TMP is available (bats runs tests in subshells)
+    # Use the global TEST_TMP set by global_setup
+    # Don't create a new one with $$ since that changes per subprocess
     if [[ -z "$TEST_TMP" ]]; then
-        export TEST_TMP="/tmp/sleep-hours-test-$$"
+        # Fallback if global_setup wasn't called (shouldn't happen)
+        export TEST_TMP="/tmp/sleep-hours-test-bats"
+        mkdir -p "$TEST_TMP/config"
     fi
 
     # Ensure config directory exists for this test
@@ -165,15 +168,11 @@ test_setup() {
         cp "$FIXTURES_DIR/configs/"* "$TEST_TMP/config/" 2>/dev/null || true
     fi
 
-    # Re-export environment variables for this test
+    # Re-export environment variables for this test (bats runs in subshells)
     export CONFIG_DIR="$TEST_TMP/config"
     export TRUENAS_CONF_FILE="$TEST_TMP/config/truenas.conf"
     export TRUENAS_API_URL="http://localhost:${TRUENAS_MOCK_PORT:-8888}/api/v2.0"
     export TRUENAS_API_KEY="test-api-key-12345"
-
-    # Note: QUIET_LIST is set by docker-sleep.sh based on action
-    # But we can't override the hardcoded paths in the script easily
-    # So tests must write files to both possible locations
 
     # Clean up any leftover containers from previous tests
     cleanup_test_containers

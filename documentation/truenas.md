@@ -2,9 +2,8 @@ This document covers the disk spindown script and the disk-status-exporter app
 
 ## Disk Spindown
 
-TrueNAS HDDs in the `tank` dataset don't ever spin down by themselves. I don't
-know why, but I suspect its caused by ZFS rather than TrueNAS. I've taken the
-following measures to make spindown possible:
+TrueNAS HDDs in the `tank` dataset don't ever spin down by themselves. I don't know why, but I suspect its caused by ZFS
+rather than TrueNAS. I've taken the following measures to make spindown possible:
 
 - TrueNAS apps live on the `switft` datapool,
 - the `netdata` reporting service is masked,
@@ -12,9 +11,8 @@ following measures to make spindown possible:
   - a "metadata" VDEV
   - a "log" VDEV
 
-Therefore a script runs on a cronjob to try to spindown the disks at night. The
-script measures utilisation over a sample period and only if utilisation is
-below 0.1% is a spindown using `hdparm` implemented. See below for details.
+Therefore a script runs on a cronjob to try to spindown the disks at night. The script measures utilisation over a sample
+period and only if utilisation is below 0.1% is a spindown using `hdparm` implemented. See below for details.
 
 ### Spindown Script Deployment
 
@@ -35,9 +33,8 @@ The version line at the top of the script shows when it was last edited.
 
 ### Context
 
-Cron runs a script at hours `0`, `2`, `6`, `23` to see if any HDDs can be spun
-down. The script monitors each disk for `4 minutes` and if disk activity is
-below `0.1%` then it sends a spindown command using `hdparm`.
+Cron runs a script at hours `0`, `2`, `6`, `23` to see if any HDDs can be spun down. The script monitors each disk for
+`4 minutes` and if disk activity is below `0.1%` then it sends a spindown command using `hdparm`.
 
 If the activity threshold requirement isn't met, then spindown isn't attempted.
 
@@ -78,19 +75,17 @@ TARGETS=(
 
 ## Disk status exporter
 
-Grafana shows the spindown status of each hard disk. This is possible because a
-custom TrueNAS app queries the disks and exposes Prometheus style metrics.
+Grafana shows the spindown status of each hard disk. This is possible because a custom TrueNAS app queries the disks and
+exposes Prometheus style metrics.
 
 The custom app lives in a separate repo and is containerized using a Github action.
 
-Github repo:
-[https://github.com/johnmathews/disk_status_exporter](https://github.com/johnmathews/disk_status_exporter)
+Github repo: [https://github.com/johnmathews/disk_status_exporter](https://github.com/johnmathews/disk_status_exporter)
 
 ### Deploy
 
-- Push to the `main` branch of the Github remote. This will trigger a Github
-  action that will deploy a new version of the container to the Github Container
-  Registry (GHCR.io).
+- Push to the `main` branch of the Github remote. This will trigger a Github action that will deploy a new version of the
+  container to the Github Container Registry (GHCR.io).
 - Then update the app in the TrueNAS apps UI.
 
 ### UI
@@ -103,13 +98,11 @@ Github repo:
 
 ### Context
 
-- `disk-status-exporter` reports the power status of HDDs using the command
-  `smartctl -n standby -i <disk>`. Options are `standby`, `active or idle`,
-  `idle` or `unknown`.
+- `disk-status-exporter` reports the power status of HDDs using the command `smartctl -n standby -i <disk>`. Options are
+  `standby`, `active or idle`, `idle` or `unknown`.
 - It is a containerised FastAPI script that is managed in a separate repo.
 - It emits Prometheus metrics at `<truenas-ip>:9635/metrics`
 
 ### Logs
 
-In the TrueNAS UI, click on the app and then select
-`Details > Workloads > View Logs`
+In the TrueNAS UI, click on the app and then select `Details > Workloads > View Logs`
