@@ -1,0 +1,5 @@
+# NFS shares to control during sleep hours
+# Format: dataset path (as shown in TrueNAS)
+
+/mnt/tank/downloads
+/mnt/tank/media

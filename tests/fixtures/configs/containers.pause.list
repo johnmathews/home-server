@@ -1,0 +1,5 @@
+# Test container list for pause operations
+# These containers will be paused during sleep hours
+
+test-nginx-1
+test-nginx-2

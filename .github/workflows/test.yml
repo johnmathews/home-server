@@ -1,0 +1,54 @@
+name: Sleep Hours Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'roles/sleep_hours/**'
+      - 'tests/**'
+      - '.github/workflows/test.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'roles/sleep_hours/**'
+      - 'tests/**'
+
+jobs:
+  test:
+    name: Run Sleep Hours Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bats jq curl netcat-openbsd
+
+      - name: Verify Docker is running
+        run: docker --version
+
+      - name: Run test suite
+        run: |
+          cd tests
+          ./run_tests.sh
+
+      - name: Upload test logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-logs
+          path: /tmp/sleep-hours-test-*/logs/
+          retention-days: 7
+
+      - name: Clean up test containers
+        if: always()
+        run: |
+          docker ps -a --filter label=quiet-hours-test=true -q | xargs -r docker rm -f || true

@@ -637,38 +637,33 @@ status_shares() {
   return 0
 }
 
-# -------- validate action --------
+# -------- validate and execute action --------
 case "$ACTION" in
-disable | enable | status) ;;
-*) fail_early usage "usage=$0 {disable|enable|status} [shares] [containers]" 2 ;;
-esac
-
-# Execute action
-msg "Starting $ACTION action"
-
-# Health check TrueNAS API (skip for status command if it fails)
-if [[ "$ACTION" != "status" ]]; then
+disable)
+  msg "Starting disable action"
   if ! check_truenas_health; then
     fail_early truenas_unreachable "TrueNAS API is not accessible" 1
   fi
-else
-  # For status, just warn if health check fails
-  if ! check_truenas_health; then
-    msg "WARNING: TrueNAS API health check failed, attempting anyway..."
-  fi
-fi
-
-case "$ACTION" in
-disable)
   disable_shares
   exit $?
   ;;
-unpause)
+enable)
+  msg "Starting enable action"
+  if ! check_truenas_health; then
+    fail_early truenas_unreachable "TrueNAS API is not accessible" 1
+  fi
   enable_shares
   exit $?
   ;;
 status)
+  msg "Starting status action"
+  if ! check_truenas_health; then
+    msg "WARNING: TrueNAS API health check failed, attempting anyway..."
+  fi
   status_shares
   exit $?
+  ;;
+*)
+  fail_early usage "usage=$0 {disable|enable|status} [shares] [containers]" 2
   ;;
 esac

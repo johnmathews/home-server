@@ -11,6 +11,45 @@
 
 `make tube tags=sleep`
 
+## Testing
+
+A comprehensive test suite validates the sleep hours system using **bats** (Bash Automated Testing System).
+
+### Running Tests
+
+```bash
+# Install bats first (one-time setup)
+brew install bats-core  # macOS
+sudo apt-get install bats  # Debian/Ubuntu
+
+# Run all tests
+cd tests
+./run_tests.sh
+```
+
+### What's Tested
+
+- Container pause/unpause/stop/start workflows
+- TrueNAS NFS/SMB share enable/disable via API
+- Idempotency (running operations multiple times)
+- Phase execution order
+- Summary statistics accuracy
+- **Regression test** for the enable/unpause bug (fixed 2025-11-22)
+
+### Test Coverage
+
+- **20 integration tests** across 5 test files
+- Mock TrueNAS API server (no real TrueNAS required)
+- Mock Uptime Kuma server
+- Automated in CI/CD via GitHub Actions
+
+### Documentation
+
+- Full test documentation: `/tests/README.md`
+- Implementation details: `/tests/IMPLEMENTATION_SUMMARY.md`
+
+The test suite ensures the critical bug where shares weren't re-enabled after sleep hours can never return.
+
 ## Context
 
 Several services running as docker containers prevent HDD spindown, even when
@@ -798,7 +837,21 @@ sleep_hours_nfs_smb_enabled: true
 
 ## Version History
 
-### v2.0 (2025-11-21) - Current
+### v2.1 (2025-11-22) - Current
+
+**CRITICAL BUG FIX:**
+
+- 🐛 **FIX:** Fixed case statement mismatch in `truenas-shares.sh` that prevented shares from re-enabling after sleep hours
+  - Bug: Execution case had `unpause)` instead of `enable)`
+  - Impact: Shares were disabled during sleep hours but NEVER re-enabled when containers restarted
+  - Containers would start but couldn't access NFS/SMB mounts
+  - Affected hosts: media_vm, paperless_lxc, tubearchivist_lxc
+- 🔨 **REFACTOR:** Simplified dual case statement validation to single case statement
+  - Prevents future validation/execution mismatches
+  - Cleaner code: validates and executes in one place
+  - Follows "simple is better than complex" principle
+
+### v2.0 (2025-11-21)
 
 **TrueNAS Share Control:**
 
