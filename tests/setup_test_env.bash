@@ -152,11 +152,28 @@ global_teardown() {
 
 # Per-test setup (called before each test)
 test_setup() {
+    # Ensure TEST_TMP is available (bats runs tests in subshells)
+    if [[ -z "$TEST_TMP" ]]; then
+        export TEST_TMP="/tmp/sleep-hours-test-$$"
+    fi
+
+    # Ensure config directory exists for this test
+    mkdir -p "$TEST_TMP/config"
+
+    # Copy fixture configs if they exist and aren't already there
+    if [[ -d "$FIXTURES_DIR/configs" && ! -f "$TEST_TMP/config/truenas.conf" ]]; then
+        cp "$FIXTURES_DIR/configs/"* "$TEST_TMP/config/" 2>/dev/null || true
+    fi
+
+    # Re-export environment variables for this test
+    export CONFIG_DIR="$TEST_TMP/config"
+    export QUIET_LIST="$TEST_TMP/config/containers.pause.list"
+    export TRUENAS_CONF_FILE="$TEST_TMP/config/truenas.conf"
+    export TRUENAS_API_URL="http://localhost:${TRUENAS_MOCK_PORT:-8888}/api/v2.0"
+    export TRUENAS_API_KEY="test-api-key-12345"
+
     # Clean up any leftover containers from previous tests
     cleanup_test_containers
-
-    # Reset mock server state (TODO: add API endpoint to reset state)
-    # For now, restarting servers ensures clean state
 }
 
 # Per-test teardown (called after each test)
