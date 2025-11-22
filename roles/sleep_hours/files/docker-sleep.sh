@@ -11,9 +11,12 @@ export PS4='+ ts=$(date +%FT%T%z) line=${LINENO} cmd='
 ACTION="${1:-}"
 
 # Select list file based on action
+# Allow override via QUIET_LIST env var, otherwise use default paths
+# Support CONFIG_DIR override for testing
+CONFIG_BASE="${CONFIG_DIR:-/etc/sleep-hours}"
 case "$ACTION" in
-  pause|unpause) LIST="${QUIET_LIST:-/etc/sleep-hours/containers.pause.list}" ;;
-  stop|start) LIST="${QUIET_LIST:-/etc/sleep-hours/containers.stop.list}" ;;
+  pause|unpause) LIST="${QUIET_LIST:-$CONFIG_BASE/containers.pause.list}" ;;
+  stop|start) LIST="${QUIET_LIST:-$CONFIG_BASE/containers.stop.list}" ;;
 esac
 
 # Validate required tools and environment variables early
@@ -375,15 +378,18 @@ manage_nfs_smb_shares() {
     local action="$1" shares="${2:-}" containers="${3:-}"
     
     # Skip if no truenas config file exists (feature disabled)
-    [[ ! -f /etc/sleep-hours/truenas.conf ]] && return 0
-    
+    # Use TRUENAS_CONF_FILE if set, otherwise CONFIG_BASE
+    local truenas_conf="${TRUENAS_CONF_FILE:-$CONFIG_BASE/truenas.conf}"
+    [[ ! -f "$truenas_conf" ]] && return 0
+
     # Source configuration
     # shellcheck source=/dev/null
-    . /etc/sleep-hours/truenas.conf
-    
+    . "$truenas_conf"
+
     # Read shares from file if not provided
-    if [[ -z "$shares" && -f /etc/sleep-hours/truenas-nfs-shares.list ]]; then
-      shares=$(grep -v '^#' /etc/sleep-hours/truenas-nfs-shares.list | tr '\n' ' ')
+    local shares_list="$CONFIG_BASE/truenas-nfs-shares.list"
+    if [[ -z "$shares" && -f "$shares_list" ]]; then
+      shares=$(grep -v '^#' "$shares_list" | tr '\n' ' ')
     fi
     
     [[ -z "$shares" ]] && return 0

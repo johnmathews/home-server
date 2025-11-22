@@ -167,10 +167,13 @@ test_setup() {
 
     # Re-export environment variables for this test
     export CONFIG_DIR="$TEST_TMP/config"
-    export QUIET_LIST="$TEST_TMP/config/containers.pause.list"
     export TRUENAS_CONF_FILE="$TEST_TMP/config/truenas.conf"
     export TRUENAS_API_URL="http://localhost:${TRUENAS_MOCK_PORT:-8888}/api/v2.0"
     export TRUENAS_API_KEY="test-api-key-12345"
+
+    # Note: QUIET_LIST is set by docker-sleep.sh based on action
+    # But we can't override the hardcoded paths in the script easily
+    # So tests must write files to both possible locations
 
     # Clean up any leftover containers from previous tests
     cleanup_test_containers
