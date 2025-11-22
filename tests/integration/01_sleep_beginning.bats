@@ -18,11 +18,8 @@ teardown() {
     create_test_container "test-nginx-1" "running"
     create_test_container "test-nginx-2" "running"
 
-    # Setup: Config files
-    mkdir -p /etc/sleep-hours
-    cp "$FIXTURES_DIR/configs/truenas.conf" /etc/sleep-hours/
-    cp "$FIXTURES_DIR/configs/truenas-nfs-shares.list" /etc/sleep-hours/
-    echo -e "test-nginx-1\ntest-nginx-2" > /etc/sleep-hours/containers.pause.list
+    # Setup: Config files (use TEST_TMP which is already set up)
+    echo -e "test-nginx-1\ntest-nginx-2" > "$TEST_TMP/config/containers.pause.list"
 
     # Execute: Run pause operation
     run "$PROJECT_ROOT/roles/sleep_hours/files/docker-sleep.sh" pause

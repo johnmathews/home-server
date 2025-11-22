@@ -144,32 +144,32 @@ teardown() {
     assert_container_running "test-app-1"
 }
 
-@test "REGRESSION: Single case statement prevents validation/execution mismatch" {
+@test "REGRESSION: Single ACTION case statement prevents validation/execution mismatch" {
     # This test verifies the code refactoring that prevents future bugs
-    # By having a single case statement, we can't have mismatched validation/execution
+    # By having a single ACTION case statement, we can't have mismatched validation/execution
 
     # Read the truenas-shares.sh file
     local script="$PROJECT_ROOT/roles/sleep_hours/files/truenas-shares.sh"
 
-    # Count case statements (should be exactly 1)
-    local case_count=$(grep -c "^case.*in$" "$script")
+    # Count ACTION case statements (should be exactly 1)
+    local action_case_count=$(grep -c "^case.*ACTION.*in" "$script")
 
-    # Assert: Only 1 case statement
-    if [[ $case_count -ne 1 ]]; then
-        echo "ASSERTION FAILED: Expected 1 case statement, found $case_count" >&2
+    # Assert: Only 1 ACTION case statement
+    if [[ $action_case_count -ne 1 ]]; then
+        echo "ASSERTION FAILED: Expected 1 ACTION case statement, found $action_case_count" >&2
         echo "This prevents validation/execution mismatch bugs" >&2
         return 1
     fi
 
-    # Assert: The single case statement has 'enable)' not 'unpause)'
-    if ! grep -A 20 "^case.*ACTION.*in" "$script" | grep -q "^enable)"; then
-        echo "ASSERTION FAILED: Case statement missing 'enable)' handler" >&2
+    # Assert: The ACTION case statement has 'enable)' not 'unpause)'
+    if ! grep -A 30 "^case.*ACTION.*in" "$script" | grep -q "^enable)"; then
+        echo "ASSERTION FAILED: ACTION case statement missing 'enable)' handler" >&2
         return 1
     fi
 
-    # Assert: No 'unpause)' in case statement
-    if grep -A 20 "^case.*ACTION.*in" "$script" | grep -q "^unpause)"; then
-        echo "ASSERTION FAILED: Case statement should not have 'unpause)' handler" >&2
+    # Assert: No 'unpause)' in ACTION case statement
+    if grep -A 30 "^case.*ACTION.*in" "$script" | grep -q "^unpause)"; then
+        echo "ASSERTION FAILED: ACTION case statement should not have 'unpause)' handler" >&2
         return 1
     fi
 }

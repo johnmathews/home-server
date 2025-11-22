@@ -19,9 +19,11 @@ CONTAINERS_LIST="${3:-}"
 
 # -------- configuration --------
 # Source config file if it exists (provides TRUENAS_API_URL, TRUENAS_API_KEY, etc.)
-if [[ -f /etc/sleep-hours/truenas.conf ]]; then
+# Allow override via environment variable for testing
+TRUENAS_CONF_FILE="${TRUENAS_CONF_FILE:-/etc/sleep-hours/truenas.conf}"
+if [[ -f "$TRUENAS_CONF_FILE" ]]; then
   # shellcheck source=/dev/null
-  . /etc/sleep-hours/truenas.conf
+  . "$TRUENAS_CONF_FILE"
 fi
 
 # Set defaults for any variables not provided by config

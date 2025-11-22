@@ -89,8 +89,10 @@ setup_test_config() {
     export UPTIME_KUMA_USER="test"
     export UPTIME_KUMA_PASSWORD="test"
 
-    # Override config file paths
+    # Override config file paths (scripts check these env vars)
     export CONFIG_DIR="$TEST_TMP/config"
+    export QUIET_LIST="$TEST_TMP/config/containers.pause.list"
+    export TRUENAS_CONF_FILE="$TEST_TMP/config/truenas.conf"
 
     # Disable quiet hours window check for tests (always allow operations)
     export QUIET_HOURS_START=""
