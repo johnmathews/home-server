@@ -19,10 +19,10 @@ teardown() {
     create_test_container "test-nginx-2" "running"
 
     # Setup: Config
-    mkdir -p /etc/sleep-hours
-    cp "$FIXTURES_DIR/configs/truenas.conf" /etc/sleep-hours/
-    cp "$FIXTURES_DIR/configs/truenas-nfs-shares.list" /etc/sleep-hours/
-    echo -e "test-nginx-1\ntest-nginx-2" > /etc/sleep-hours/containers.pause.list
+    mkdir -p "$TEST_TMP/config"
+    cp "$FIXTURES_DIR/configs/truenas.conf" "$TEST_TMP/config/"
+    cp "$FIXTURES_DIR/configs/truenas-nfs-shares.list" "$TEST_TMP/config/"
+    echo -e "test-nginx-1\ntest-nginx-2" > $TEST_TMP/config/containers.pause.list
 
     # Execute: Run unpause
     run "$PROJECT_ROOT/roles/sleep_hours/files/docker-sleep.sh" unpause
@@ -47,10 +47,10 @@ teardown() {
     create_test_container "test-app-2" "running"
 
     # Setup: Config
-    mkdir -p /etc/sleep-hours
-    cp "$FIXTURES_DIR/configs/truenas.conf" /etc/sleep-hours/
-    cp "$FIXTURES_DIR/configs/truenas-nfs-shares.list" /etc/sleep-hours/
-    echo -e "test-app-1\ntest-app-2" > /etc/sleep-hours/containers.stop.list
+    mkdir -p "$TEST_TMP/config"
+    cp "$FIXTURES_DIR/configs/truenas.conf" "$TEST_TMP/config/"
+    cp "$FIXTURES_DIR/configs/truenas-nfs-shares.list" "$TEST_TMP/config/"
+    echo -e "test-app-1\ntest-app-2" > $TEST_TMP/config/containers.stop.list
 
     # Execute: Run start
     run "$PROJECT_ROOT/roles/sleep_hours/files/docker-sleep.sh" start
@@ -78,10 +78,10 @@ teardown() {
     assert_share_enabled 2 nfs
 
     # Setup: Config
-    mkdir -p /etc/sleep-hours
-    cp "$FIXTURES_DIR/configs/truenas.conf" /etc/sleep-hours/
-    cp "$FIXTURES_DIR/configs/truenas-nfs-shares.list" /etc/sleep-hours/
-    echo "test-nginx-1" > /etc/sleep-hours/containers.pause.list
+    mkdir -p "$TEST_TMP/config"
+    cp "$FIXTURES_DIR/configs/truenas.conf" "$TEST_TMP/config/"
+    cp "$FIXTURES_DIR/configs/truenas-nfs-shares.list" "$TEST_TMP/config/"
+    echo "test-nginx-1" > $TEST_TMP/config/containers.pause.list
 
     # Execute: Run unpause (containers already running, shares already enabled)
     run "$PROJECT_ROOT/roles/sleep_hours/files/docker-sleep.sh" unpause

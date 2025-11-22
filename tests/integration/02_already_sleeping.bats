@@ -19,9 +19,9 @@ teardown() {
     create_test_container "test-nginx-2" "paused"
 
     # Setup: Config
-    mkdir -p /etc/sleep-hours
-    cp "$FIXTURES_DIR/configs/truenas.conf" /etc/sleep-hours/
-    echo -e "test-nginx-1\ntest-nginx-2" > /etc/sleep-hours/containers.pause.list
+    mkdir -p "$TEST_TMP/config"
+    cp "$FIXTURES_DIR/configs/truenas.conf" "$TEST_TMP/config/"
+    echo -e "test-nginx-1\ntest-nginx-2" > $TEST_TMP/config/containers.pause.list
 
     # Execute: Run pause again
     run "$PROJECT_ROOT/roles/sleep_hours/files/docker-sleep.sh" pause
@@ -46,9 +46,9 @@ teardown() {
     create_test_container "test-app-2" "stopped"
 
     # Setup: Config
-    mkdir -p /etc/sleep-hours
-    cp "$FIXTURES_DIR/configs/truenas.conf" /etc/sleep-hours/
-    echo -e "test-app-1\ntest-app-2" > /etc/sleep-hours/containers.stop.list
+    mkdir -p "$TEST_TMP/config"
+    cp "$FIXTURES_DIR/configs/truenas.conf" "$TEST_TMP/config/"
+    echo -e "test-app-1\ntest-app-2" > $TEST_TMP/config/containers.stop.list
 
     # Execute: Run stop again
     run "$PROJECT_ROOT/roles/sleep_hours/files/docker-sleep.sh" stop
@@ -73,9 +73,9 @@ teardown() {
     create_test_container "test-paused" "paused"
 
     # Setup: Config
-    mkdir -p /etc/sleep-hours
-    cp "$FIXTURES_DIR/configs/truenas.conf" /etc/sleep-hours/
-    echo -e "test-running\ntest-paused" > /etc/sleep-hours/containers.pause.list
+    mkdir -p "$TEST_TMP/config"
+    cp "$FIXTURES_DIR/configs/truenas.conf" "$TEST_TMP/config/"
+    echo -e "test-running\ntest-paused" > $TEST_TMP/config/containers.pause.list
 
     # Execute: Run pause
     run "$PROJECT_ROOT/roles/sleep_hours/files/docker-sleep.sh" pause

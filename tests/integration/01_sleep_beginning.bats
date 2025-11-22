@@ -42,10 +42,10 @@ teardown() {
     create_test_container "test-app-2" "running"
 
     # Setup: Config files
-    mkdir -p /etc/sleep-hours
-    cp "$FIXTURES_DIR/configs/truenas.conf" /etc/sleep-hours/
-    cp "$FIXTURES_DIR/configs/truenas-nfs-shares.list" /etc/sleep-hours/
-    echo -e "test-app-1\ntest-app-2" > /etc/sleep-hours/containers.stop.list
+    mkdir -p "$TEST_TMP/config"
+    cp "$FIXTURES_DIR/configs/truenas.conf" "$TEST_TMP/config/"
+    cp "$FIXTURES_DIR/configs/truenas-nfs-shares.list" "$TEST_TMP/config/"
+    echo -e "test-app-1\ntest-app-2" > $TEST_TMP/config/containers.stop.list
 
     # Execute: Run stop operation
     run "$PROJECT_ROOT/roles/sleep_hours/files/docker-sleep.sh" stop
@@ -66,10 +66,10 @@ teardown() {
     create_test_container "test-nginx-1" "running"
 
     # Setup: Config
-    mkdir -p /etc/sleep-hours
-    cp "$FIXTURES_DIR/configs/truenas.conf" /etc/sleep-hours/
-    cp "$FIXTURES_DIR/configs/truenas-nfs-shares.list" /etc/sleep-hours/
-    echo "test-nginx-1" > /etc/sleep-hours/containers.pause.list
+    mkdir -p "$TEST_TMP/config"
+    cp "$FIXTURES_DIR/configs/truenas.conf" "$TEST_TMP/config/"
+    cp "$FIXTURES_DIR/configs/truenas-nfs-shares.list" "$TEST_TMP/config/"
+    echo "test-nginx-1" > $TEST_TMP/config/containers.pause.list
 
     # Verify shares are enabled initially
     assert_share_enabled 1 nfs
@@ -94,10 +94,10 @@ teardown() {
     # Setup
     create_test_container "test-nginx-1" "running"
 
-    mkdir -p /etc/sleep-hours
-    cp "$FIXTURES_DIR/configs/truenas.conf" /etc/sleep-hours/
-    cp "$FIXTURES_DIR/configs/truenas-nfs-shares.list" /etc/sleep-hours/
-    echo "test-nginx-1" > /etc/sleep-hours/containers.pause.list
+    mkdir -p "$TEST_TMP/config"
+    cp "$FIXTURES_DIR/configs/truenas.conf" "$TEST_TMP/config/"
+    cp "$FIXTURES_DIR/configs/truenas-nfs-shares.list" "$TEST_TMP/config/"
+    echo "test-nginx-1" > $TEST_TMP/config/containers.pause.list
 
     # Execute
     run "$PROJECT_ROOT/roles/sleep_hours/files/docker-sleep.sh" pause
@@ -116,9 +116,9 @@ teardown() {
     create_test_container "test-2" "running"
     create_test_container "test-3" "running"
 
-    mkdir -p /etc/sleep-hours
-    cp "$FIXTURES_DIR/configs/truenas.conf" /etc/sleep-hours/
-    echo -e "test-1\ntest-2\ntest-3" > /etc/sleep-hours/containers.pause.list
+    mkdir -p "$TEST_TMP/config"
+    cp "$FIXTURES_DIR/configs/truenas.conf" "$TEST_TMP/config/"
+    echo -e "test-1\ntest-2\ntest-3" > $TEST_TMP/config/containers.pause.list
 
     # Execute
     run "$PROJECT_ROOT/roles/sleep_hours/files/docker-sleep.sh" pause

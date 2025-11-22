@@ -29,8 +29,8 @@ teardown() {
     assert_share_disabled 1 nfs
 
     # Setup: Config files
-    mkdir -p /etc/sleep-hours
-    cp "$FIXTURES_DIR/configs/truenas.conf" /etc/sleep-hours/
+    mkdir -p "$TEST_TMP/config"
+    cp "$FIXTURES_DIR/configs/truenas.conf" "$TEST_TMP/config/"
 
     # Execute: Call truenas-shares.sh with 'enable' action
     run "$PROJECT_ROOT/roles/sleep_hours/files/truenas-shares.sh" enable "/mnt/tank/downloads"
@@ -52,8 +52,8 @@ teardown() {
     # The bug had 'unpause)' in the case statement
     # This should NOT be a valid action for this script
 
-    mkdir -p /etc/sleep-hours
-    cp "$FIXTURES_DIR/configs/truenas.conf" /etc/sleep-hours/
+    mkdir -p "$TEST_TMP/config"
+    cp "$FIXTURES_DIR/configs/truenas.conf" "$TEST_TMP/config/"
 
     # Execute: Call with invalid 'unpause' action
     run "$PROJECT_ROOT/roles/sleep_hours/files/truenas-shares.sh" unpause "/mnt/tank/downloads"
@@ -88,10 +88,10 @@ teardown() {
     assert_share_disabled 2 nfs
 
     # Setup: Config files
-    mkdir -p /etc/sleep-hours
-    cp "$FIXTURES_DIR/configs/truenas.conf" /etc/sleep-hours/
-    cp "$FIXTURES_DIR/configs/truenas-nfs-shares.list" /etc/sleep-hours/
-    echo "test-nginx-1" > /etc/sleep-hours/containers.pause.list
+    mkdir -p "$TEST_TMP/config"
+    cp "$FIXTURES_DIR/configs/truenas.conf" "$TEST_TMP/config/"
+    cp "$FIXTURES_DIR/configs/truenas-nfs-shares.list" "$TEST_TMP/config/"
+    echo "test-nginx-1" > $TEST_TMP/config/containers.pause.list
 
     # Execute: Run unpause
     run "$PROJECT_ROOT/roles/sleep_hours/files/docker-sleep.sh" unpause
@@ -126,10 +126,10 @@ teardown() {
     assert_share_disabled 1 nfs
 
     # Setup: Config files
-    mkdir -p /etc/sleep-hours
-    cp "$FIXTURES_DIR/configs/truenas.conf" /etc/sleep-hours/
-    cp "$FIXTURES_DIR/configs/truenas-nfs-shares.list" /etc/sleep-hours/
-    echo "test-app-1" > /etc/sleep-hours/containers.stop.list
+    mkdir -p "$TEST_TMP/config"
+    cp "$FIXTURES_DIR/configs/truenas.conf" "$TEST_TMP/config/"
+    cp "$FIXTURES_DIR/configs/truenas-nfs-shares.list" "$TEST_TMP/config/"
+    echo "test-app-1" > $TEST_TMP/config/containers.stop.list
 
     # Execute: Run start
     run "$PROJECT_ROOT/roles/sleep_hours/files/docker-sleep.sh" start
