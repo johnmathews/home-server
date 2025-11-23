@@ -28,14 +28,15 @@ n8n_webhook_url: "http://{{ inventory_hostname }}:5678/"  # Update if using reve
 # vault_n8n_encryption_key: <32_char_hex_key>  # Generate with: openssl rand -hex 16
 
 # DEPLOYMENT NOTES:
-# 1. Docker/runc compatibility: This LXC uses runc 1.2.6 (manually installed) instead of
-#    the bundled runc 1.3.3 due to a bug where runc 1.3.3 fails to start containers in
-#    LXC environments (sysctl access issue). The binary was replaced at /usr/bin/runc
-#    with a download from https://github.com/opencontainers/runc/releases/tag/v1.2.6
-#    Backup of original: /usr/bin/runc.1.3.3.bak
+# 1. Docker/runc compatibility: This LXC uses runc 1.2.6 instead of the bundled runc 1.3.3
+#    due to a bug where runc 1.3.3 fails to start containers in LXC environments (sysctl
+#    access issue). The Ansible role automatically downloads and installs runc 1.2.6 from
+#    https://github.com/opencontainers/runc/releases/tag/v1.2.6 if not already present.
+#    Backup of original bundled version: /usr/bin/runc.backup
 #
-# 2. AppArmor: This LXC runs with full AppArmor protection enabled (default profile).
-#    No special LXC config needed with runc 1.2.6.
+# 2. AppArmor: Container currently boots unconfined; adjust LXC config on Proxmox to
+#    apply a profile (e.g. "lxc.apparmor.profile = generated" and drop unnecessary
+#    device access) and prefer an unprivileged container.
 #
 # 3. Future updates: When runc 1.3.4+ or 1.4.x is released with the fix, the manually
 #    installed runc can be replaced with the version bundled in containerd.io
