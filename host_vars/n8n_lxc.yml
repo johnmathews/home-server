@@ -1,0 +1,28 @@
+# host_vars/n8n_lxc.yml
+
+# NFS shares (optional - n8n typically uses local storage)
+# Uncomment and configure if workflow file sharing is needed
+# nfs_shares:
+#   - name: workflows
+#     mountpoint: /mnt/nfs/workflows
+#     target: /mnt/tank/workflows
+
+# Sleep Hours Configuration
+# Disabled by default - n8n needs to run 24/7 for workflow automation
+sleep_hours_enabled: false
+sleep_hours_nfs_smb_enabled: false
+sleep_hours_pause_hour: 1
+sleep_hours_unpause_hour: 7
+sleep_hours_stop_containers: []
+sleep_hours_kuma_map: {}
+sleep_hours_plugins: []
+
+# n8n specific configuration
+# Note: Update these values based on your setup
+n8n_host: "n8n.example.com"  # Change to your domain
+n8n_protocol: http            # Change to https if using Traefik/reverse proxy
+n8n_webhook_url: "http://{{ inventory_hostname }}:5678/"  # Update if using reverse proxy
+
+# IMPORTANT: Add the following variables to group_vars/all/vault.yml (encrypted):
+# vault_n8n_postgres_password: <secure_password>
+# vault_n8n_encryption_key: <32_char_hex_key>  # Generate with: openssl rand -hex 16

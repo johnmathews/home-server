@@ -1,0 +1,80 @@
+# roles/n8n_lxc/tasks/main.yml
+
+- name: Ensure cifs-utils is installed
+  ansible.builtin.apt:
+    name: cifs-utils
+    state: present
+    update_cache: true
+
+- name: Create n8n system group
+  ansible.builtin.group:
+    name: "{{ n8n_group }}"
+    gid: "{{ guid }}"
+    system: true
+    state: present
+
+- name: Create n8n system user
+  ansible.builtin.user:
+    name: "{{ n8n_user }}"
+    uid: "{{ puid }}"
+    group: "{{ n8n_group }}"
+    create_home: false
+    shell: /usr/sbin/nologin
+    system: true
+    state: present
+
+- name: Create base app directories for containers
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+  loop:
+    - "{{ docker_compose_dir }}"
+    - "{{ docker_compose_dir }}/alloy"
+    - /var/lib/node_exporter/textfile_collector
+
+- name: Create n8n data directories with proper ownership
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+    owner: "{{ puid }}"
+    group: "{{ guid }}"
+  loop:
+    - "{{ docker_compose_dir }}/n8n_data"
+    - "{{ docker_compose_dir }}/postgres_data"
+
+- name: Deploy .env file from template
+  ansible.builtin.template:
+    src: templates/.env.j2
+    dest: "{{ docker_compose_dir }}/.env"
+    owner: root
+    group: root
+    mode: '0600'
+  notify:
+    - restart docker compose stack
+  tags: [docker]
+
+- name: Upload alloy config files
+  ansible.builtin.copy:
+    src: templates/config.alloy
+    dest: "{{ docker_compose_dir }}/alloy/config.alloy"
+    owner: "{{ puid }}"
+    group: "{{ guid }}"
+    mode: '0644'
+  notify:
+    - restart alloy
+  tags: [docker, alloy]
+
+- name: Copy docker-compose.yml
+  ansible.builtin.template:
+    src: templates/docker-compose.yml.j2
+    dest: "{{ docker_compose_dir }}/docker-compose.yml"
+    mode: '0644'
+    owner: root
+    group: root
+  notify:
+    - restart docker compose stack
+  tags: [docker, alloy]

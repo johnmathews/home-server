@@ -10,7 +10,12 @@
       "Bash(bats:*)",
       "Bash(./run_tests.sh)",
       "Bash(./tests/run_tests.sh:*)",
-      "Bash(bash:*)"
+      "Bash(bash:*)",
+      "mcp__MCP_DOCKER__search",
+      "mcp__MCP_DOCKER__fetch_content",
+      "Bash(git checkout:*)",
+      "mcp__MCP_DOCKER__sequentialthinking",
+      "Bash(make lint:*)"
     ],
     "deny": [],
     "ask": []

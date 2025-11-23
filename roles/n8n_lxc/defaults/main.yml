@@ -1,0 +1,34 @@
+TZ: Europe/Amsterdam
+proxmox_api_user: "api@pve"
+docker_compose_dir: /srv/apps
+n8n_user: n8n
+n8n_group: n8n
+puid: 1001
+guid: 1001
+
+# n8n specific
+n8n_version: latest
+n8n_port: 5678
+n8n_protocol: http
+n8n_host: "{{ inventory_hostname }}"
+n8n_webhook_url: "http://{{ inventory_hostname }}:{{ n8n_port }}/"
+n8n_enforce_settings_file_permissions: true
+n8n_runners_enabled: true
+
+# Database - using PostgreSQL for production
+db_type: postgresdb
+postgres_version: 16
+postgres_user: n8n
+postgres_db: n8n
+postgres_port: 5432
+
+# Node exporter
+node_exporter_version: latest
+
+# Cadvisor
+cadvisor_version: latest
+
+# Alloy
+alloy_version: latest
+loki_endpoint: "http://192.168.2.106:3100/loki/api/v1/push"
+node_hostname: "n8n"

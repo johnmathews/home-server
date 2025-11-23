@@ -19,8 +19,8 @@ nfs_shares:
 # NFS/SMB share control: During quiet hours, shares are automatically disabled
 # before pausing/stopping containers, then re-enabled after resuming/starting.
 # This prevents HDD wakeups from NFS/SMB clients. Sources: nfs_shares (and smb_shares if defined)
-sleep_hours_nfs_smb_enabled: true
-sleep_hours_enabled: true
+sleep_hours_nfs_smb_enabled: false
+sleep_hours_enabled: false
 sleep_hours_pause_hour: 1
 sleep_hours_unpause_hour: 7
 

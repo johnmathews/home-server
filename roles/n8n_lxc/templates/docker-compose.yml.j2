@@ -1,0 +1,135 @@
+# vim: ft=yaml
+# n8n_lxc/templates/docker-compose.yml.j2
+
+services:
+  postgres:
+    image: postgres:{{ postgres_version }}
+    container_name: n8n-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER={{ postgres_user }}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB={{ postgres_db }}
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -h localhost -U {{ postgres_user }} -d {{ postgres_db }}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:{{ n8n_version }}
+    container_name: n8n
+    restart: unless-stopped
+    ports:
+      - "{{ n8n_port }}:5678"
+    environment:
+      - GENERIC_TIMEZONE={{ TZ }}
+      - TZ={{ TZ }}
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS={{ n8n_enforce_settings_file_permissions }}
+      - N8N_RUNNERS_ENABLED={{ n8n_runners_enabled }}
+      - N8N_PORT=5678
+      - N8N_PROTOCOL={{ n8n_protocol }}
+      - WEBHOOK_URL={{ n8n_webhook_url }}
+      - NODE_ENV=production
+      # Database config
+      - DB_TYPE={{ db_type }}
+      - DB_POSTGRESDB_DATABASE={{ postgres_db }}
+      - DB_POSTGRESDB_HOST=postgres
+      - DB_POSTGRESDB_PORT={{ postgres_port }}
+      - DB_POSTGRESDB_USER={{ postgres_user }}
+      - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_POSTGRESDB_SCHEMA=public
+      # Encryption key (persisted via vault)
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+    volumes:
+      - ./n8n_data:/home/node/.n8n
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:5678/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  alloy:
+    image: grafana/alloy:{{ alloy_version }}
+    container_name: alloy
+    restart: unless-stopped
+    environment:
+      LOKI_WRITE_ENDPOINT: "{{ loki_endpoint }}"
+      NODE_HOSTNAME: "{{ node_hostname }}"
+      LOG_LEVEL: "warn"
+    volumes:
+      # config
+      - ./alloy:/etc/alloy:ro
+      # docker
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      # journalctl
+      - /var/log/journal:/var/log/journal:ro
+      - /run/log/journal:/run/log/journal:ro
+      - /etc/machine-id:/etc/machine-id:ro
+    command: >
+      run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
+    ports:
+      - "12345:12345"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  node_exporter:
+    image: quay.io/prometheus/node-exporter:{{ node_exporter_version }}
+    container_name: node_exporter
+    command:
+      - '--path.rootfs=/host'
+      - '--collector.textfile.directory=/textfile'
+    ports:
+      - "9100:9100"
+    pid: host
+    restart: unless-stopped
+    volumes:
+      - '/:/host:ro,rslave'
+      - '/var/lib/node_exporter/textfile_collector:/textfile:ro'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:{{ cadvisor_version }}
+    container_name: cadvisor
+    restart: unless-stopped
+    ports:
+      - "18080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /sys:/sys:ro
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /var/run:/var/run:ro
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
