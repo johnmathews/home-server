@@ -39,12 +39,19 @@
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
-    mode: '0755'
+    mode: '0777'
     owner: "{{ puid }}"
     group: "{{ guid }}"
   loop:
     - "{{ docker_compose_dir }}/n8n_data"
-    - "{{ docker_compose_dir }}/postgres_data"
+
+- name: Create postgres data directory with proper ownership
+  ansible.builtin.file:
+    path: "{{ docker_compose_dir }}/postgres_data"
+    state: directory
+    mode: '0755'
+    owner: "{{ puid }}"
+    group: "{{ guid }}"
 
 - name: Deploy .env file from template
   ansible.builtin.template:
