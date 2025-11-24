@@ -15,7 +15,12 @@
       "mcp__MCP_DOCKER__fetch_content",
       "Bash(git checkout:*)",
       "mcp__MCP_DOCKER__sequentialthinking",
-      "Bash(make lint:*)"
+      "Bash(make lint:*)",
+      "Bash(ssh n8n:*)",
+      "Bash(ssh tubearchivist_lxc:*)",
+      "Bash(ssh pve \"sed -i ''/lxc.apparmor.profile/d'' /etc/pve/lxc/103.conf && cat /etc/pve/lxc/103.conf\")",
+      "Bash(ssh root@192.168.2.103:*)",
+      "Bash(ssh root@192.168.2.214:*)"
     ],
     "deny": [],
     "ask": []

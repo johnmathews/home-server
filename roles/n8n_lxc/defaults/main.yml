@@ -8,10 +8,9 @@ guid: 1001
 
 # n8n specific
 n8n_version: latest
-n8n_port: 5678
 n8n_protocol: http
-n8n_host: "{{ inventory_hostname }}"
-n8n_webhook_url: "http://{{ inventory_hostname }}:{{ n8n_port }}/"
+n8n_host: "n8n.itsa.pizza"
+n8n_webhook_url: "https://n8n.itsa.pizza:5678/"
 n8n_enforce_settings_file_permissions: true
 n8n_runners_enabled: true
 
@@ -24,11 +23,19 @@ postgres_port: 5432
 
 # Node exporter
 node_exporter_version: latest
+node_exporter_bind_address: 127.0.0.1
 
 # Cadvisor
 cadvisor_version: latest
+cadvisor_bind_address: 127.0.0.1
 
 # Alloy
 alloy_version: latest
 loki_endpoint: "http://192.168.2.106:3100/loki/api/v1/push"
 node_hostname: "n8n"
+alloy_bind_address: 127.0.0.1
+
+# Docker daemon (disable TCP socket)
+docker_daemon_log_driver: journald
+docker_daemon_hosts:
+  - unix:///var/run/docker.sock

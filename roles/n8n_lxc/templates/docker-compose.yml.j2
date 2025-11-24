@@ -29,7 +29,7 @@ services:
     container_name: n8n
     restart: unless-stopped
     ports:
-      - "{{ n8n_port }}:5678"
+      - "5678:5678"
     environment:
       - GENERIC_TIMEZONE={{ TZ }}
       - TZ={{ TZ }}
@@ -87,7 +87,7 @@ services:
     command: >
       run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
     ports:
-      - "12345:12345"
+      - "{{ alloy_bind_address }}:12345:12345"
     logging:
       driver: "json-file"
       options:
@@ -101,7 +101,7 @@ services:
       - '--path.rootfs=/host'
       - '--collector.textfile.directory=/textfile'
     ports:
-      - "9100:9100"
+      - "{{ node_exporter_bind_address }}:9100:9100"
     pid: host
     restart: unless-stopped
     volumes:
@@ -118,7 +118,7 @@ services:
     container_name: cadvisor
     restart: unless-stopped
     ports:
-      - "18080:8080"
+      - "{{ cadvisor_bind_address }}:18080:8080"
     volumes:
       - /:/rootfs:ro
       - /sys:/sys:ro

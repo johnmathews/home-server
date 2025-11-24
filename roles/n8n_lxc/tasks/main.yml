@@ -26,7 +26,6 @@
         url: https://github.com/opencontainers/runc/releases/download/v1.2.6/runc.amd64
         dest: "{{ runc_temp_dir.path }}/runc.amd64"
         mode: '0755'
-        checksum: sha256:415dfe5a9a27dc7e5d0f0574b1e3f16b57c9f0b0ddde9db3ea06ad9d20a6e55a
 
     - name: Stop Docker service before replacing runc
       ansible.builtin.systemd:
@@ -41,7 +40,7 @@
         mode: '0755'
         force: false
 
-    - name: Replace runc with version 1.2.6
+    - name: Replace runc with new version
       ansible.builtin.copy:
         src: "{{ runc_temp_dir.path }}/runc.amd64"
         dest: /usr/bin/runc
@@ -69,20 +68,54 @@
     create: false
     backrefs: false
   loop:
-    - { key: "PermitRootLogin", value: "prohibit-password" }
-    - { key: "PasswordAuthentication", value: "no" }
-    - { key: "KbdInteractiveAuthentication", value: "no" }
+    - {key: "PermitRootLogin", value: "prohibit-password"}
+    - {key: "PasswordAuthentication", value: "no"}
+    - {key: "KbdInteractiveAuthentication", value: "no"}
   notify: restart sshd
   tags: [ssh, security]
 
-- name: Create n8n system group
+- name: Lookup existing group by gid
+  become: true
+  ansible.builtin.command: getent group {{ guid }}
+  register: gid_lookup
+  changed_when: false
+  failed_when: false
+
+- name: Rename existing group to {{ n8n_group }} if gid is taken
+  become: true
+  ansible.builtin.command: >
+    groupmod -n {{ n8n_group }} {{ gid_lookup.stdout.split(':')[0] }}
+  when:
+    - gid_lookup.rc == 0
+    - gid_lookup.stdout != ""
+    - gid_lookup.stdout.split(':')[0] != n8n_group
+
+- name: Ensure n8n system group exists with correct gid
+  become: true
   ansible.builtin.group:
     name: "{{ n8n_group }}"
     gid: "{{ guid }}"
     system: true
     state: present
 
-- name: Create n8n system user
+- name: Lookup existing user by uid
+  become: true
+  ansible.builtin.command: getent passwd {{ puid }}
+  register: uid_lookup
+  changed_when: false
+  failed_when: false
+
+- name: Rename existing user to {{ n8n_user }} if uid is taken
+  become: true
+  ansible.builtin.command: >
+    usermod -l {{ n8n_user }} {{ uid_lookup.stdout.split(':')[0] }}
+  when:
+    - uid_lookup.rc == 0
+    - uid_lookup.stdout != ""
+    - uid_lookup.stdout.split(':')[0] != n8n_user
+
+- name: Ensure n8n system user exists
+  become: true
   ansible.builtin.user:
     name: "{{ n8n_user }}"
     uid: "{{ puid }}"
