@@ -1,7 +1,7 @@
 nfs_shares:
-  - name: immich
-    mountpoint: /mnt/nfs/immich
-    target: /mnt/tank/immich
+  # - name: immich
+  #   mountpoint: /mnt/nfs/immich
+  #   target: /mnt/tank/immich
   - name: photos
     mountpoint: /mnt/nfs/photos
     target: /mnt/tank/photos

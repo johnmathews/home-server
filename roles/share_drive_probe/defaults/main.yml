@@ -2,7 +2,7 @@
 share_drive_probe_interval: 5m
 share_drive_probe_interval_minutes: 5
 # Per-operation timeout (touch/rm), use GNU timeout syntax (e.g., 10s, 1m)
-share_drive_probe_op_timeout: 30s
+share_drive_probe_op_timeout: 60s
 # Script + config install locations
 share_drive_probe_bin: /usr/local/bin/share_drive_probe.sh
 share_drive_probe_conf_dir: /etc/share_drive_probe
@@ -13,5 +13,5 @@ share_drive_probe_state_dir: /var/lib/share_drive_probe
 share_drive_probe_textfile_dir_mode: '0755'
 share_drive_probe_metrics_mode: '0644'
 share_drive_probe_autofs_wake: true
-share_drive_probe_autofs_poll_count: 10 # 10 * 0.5s = 5s max wait after wake
-share_drive_probe_autofs_poll_sleep_sec: '0.5'
+share_drive_probe_autofs_poll_count: 10 # 10 * 1s = 5s max wait after wake
+share_drive_probe_autofs_poll_sleep_sec: '1'
