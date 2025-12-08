@@ -1,0 +1,8 @@
+---
+
+- name: Setup shell environment on all clients
+  hosts: shell_environment_clients
+  become: true
+
+  roles:
+    - shell_environment

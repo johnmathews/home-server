@@ -1,0 +1,37 @@
+---
+# Oh My Zsh installation (per-user)
+
+- name: Check if Oh My Zsh already installed
+  ansible.builtin.stat:
+    path: "{{ item.split(':')[1] }}/.oh-my-zsh"
+  register: omz_installed
+  loop: "{{ target_shell_users }}"
+  become: true
+
+- name: Download Oh My Zsh installer
+  ansible.builtin.get_url:
+    url: "{{ shell_environment_omz_install_url }}"
+    dest: "/tmp/omz-install-{{ item.split(':')[0] }}.sh"
+    mode: '0755'
+  loop: "{{ target_shell_users }}"
+  when: not omz_installed.results[ansible_loop.index0].stat.exists
+  become: true
+
+- name: Install Oh My Zsh for each user
+  ansible.builtin.shell: |
+    sh /tmp/omz-install-{{ item.split(':')[0] }}.sh --unattended
+  args:
+    executable: /bin/bash
+    creates: "{{ item.split(':')[1] }}/.oh-my-zsh"
+  environment:
+    ZSH: "{{ item.split(':')[1] }}/.oh-my-zsh"
+  become: true
+  become_user: "{{ item.split(':')[0] }}"
+  loop: "{{ target_shell_users }}"
+
+- name: Clean up installer scripts
+  ansible.builtin.file:
+    path: "/tmp/omz-install-{{ item.split(':')[0] }}.sh"
+    state: absent
+  loop: "{{ target_shell_users }}"
+  become: true

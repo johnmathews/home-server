@@ -1,0 +1,13 @@
+---
+# Shell integration: combines Zsh + Oh My Zsh + P10k + Atuin
+
+- name: Deploy .zshrc with all integrations
+  ansible.builtin.template:
+    src: zshrc.j2
+    dest: "{{ item.split(':')[1] }}/.zshrc"
+    owner: "{{ item.split(':')[0] }}"
+    group: "{{ item.split(':')[0] }}"
+    mode: '0644'
+    backup: true  # Backup existing .zshrc
+  loop: "{{ target_shell_users }}"
+  become: true

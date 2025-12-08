@@ -1,0 +1,38 @@
+---
+# Shell environment orchestrator
+
+- name: Discover users with home directories
+  ansible.builtin.shell: |
+    getent passwd | awk -F: '$3 >= 1000 && $7 !~ /nologin|false/ {print $1":"$6":"$7}'
+  register: shell_users_raw
+  changed_when: false
+  when: shell_environment_shell_users | length == 0
+
+- name: Set target users (discovered or explicit)
+  ansible.builtin.set_fact:
+    target_shell_users: "{{ shell_environment_shell_users if shell_environment_shell_users | length > 0
+                            else shell_users_raw.stdout_lines | default([]) }}"
+
+- name: Install Neovim
+  ansible.builtin.import_tasks: neovim.yml
+  when: shell_environment_neovim_enabled | bool
+  tags: [neovim, editor]
+
+- name: Install and configure Zsh
+  ansible.builtin.import_tasks: zsh.yml
+  when: shell_environment_zsh_enabled | bool
+  tags: [zsh, shell]
+
+- name: Install Oh My Zsh
+  ansible.builtin.import_tasks: oh-my-zsh.yml
+  when: shell_environment_omz_enabled | bool
+  tags: [omz, oh-my-zsh, shell]
+
+- name: Install Powerlevel10k
+  ansible.builtin.import_tasks: powerlevel10k.yml
+  when: shell_environment_p10k_enabled | bool
+  tags: [p10k, powerlevel10k, theme]
+
+- name: Configure shell integration
+  ansible.builtin.import_tasks: shell-integration.yml
+  tags: [integration, shell]

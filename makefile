@@ -94,6 +94,9 @@ n8n:
 atuin:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/atuin.yml $(VAULT) $(ANSIBLE_OPTS)
 
+shell:
+	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/shell_environment.yml $(VAULT) $(ANSIBLE_OPTS)
+
 share_drive_probe:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/share_drive_probe.yml $(VAULT) $(ANSIBLE_OPTS)
 

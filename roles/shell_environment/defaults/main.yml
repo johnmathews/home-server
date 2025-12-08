@@ -1,0 +1,31 @@
+---
+# Shell environment role defaults
+
+# Neovim
+shell_environment_neovim_enabled: true
+shell_environment_neovim_config_style: "minimal"  # minimal, extended, custom
+
+# Zsh
+shell_environment_zsh_enabled: true
+shell_environment_set_default_shell: false  # Set to true in host_vars to change default shell
+
+# Oh My Zsh
+shell_environment_omz_enabled: true
+shell_environment_omz_plugins:
+  - git
+  - docker
+  - kubectl
+  - sudo
+  - history
+shell_environment_omz_install_url: "https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh"
+
+# Powerlevel10k
+shell_environment_p10k_enabled: true
+shell_environment_p10k_repo: "https://github.com/romkatv/powerlevel10k.git"
+shell_environment_p10k_style: "lean"  # lean, classic, rainbow, pure
+
+# Atuin integration
+shell_environment_atuin_integration: true
+
+# User targeting (empty = auto-discover UID >= 1000)
+shell_environment_shell_users: []

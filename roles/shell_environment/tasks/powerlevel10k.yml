@@ -1,0 +1,22 @@
+---
+# Powerlevel10k installation
+
+- name: Clone Powerlevel10k theme
+  ansible.builtin.git:
+    repo: "{{ shell_environment_p10k_repo }}"
+    dest: "{{ item.split(':')[1] }}/.oh-my-zsh/custom/themes/powerlevel10k"
+    depth: 1
+    version: master
+  become: true
+  become_user: "{{ item.split(':')[0] }}"
+  loop: "{{ target_shell_users }}"
+
+- name: Deploy Powerlevel10k config
+  ansible.builtin.template:
+    src: p10k.zsh.j2
+    dest: "{{ item.split(':')[1] }}/.p10k.zsh"
+    owner: "{{ item.split(':')[0] }}"
+    group: "{{ item.split(':')[0] }}"
+    mode: '0644'
+  loop: "{{ target_shell_users }}"
+  become: true

@@ -1,0 +1,67 @@
+# Powerlevel10k configuration for {{ ansible_hostname }}
+# Managed by Ansible - shell_environment role
+
+# Instant prompt mode
+typeset -g POWERLEVEL9K_INSTANT_PROMPT=verbose
+
+# Character set
+typeset -g POWERLEVEL9K_MODE=nerdfont-complete
+
+# Transient prompt (clean up previous prompts)
+typeset -g POWERLEVEL9K_TRANSIENT_PROMPT=always
+
+# Left prompt segments
+typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
+  context                 # user@hostname
+  dir                     # current directory
+  vcs                     # git status
+  newline                 # newline
+  prompt_char             # prompt symbol
+)
+
+# Right prompt segments
+typeset -g POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
+  status                  # exit code
+  command_execution_time  # duration
+  background_jobs         # background jobs indicator
+  direnv                  # direnv status
+  virtualenv              # python virtualenv
+  anaconda                # conda environment
+  pyenv                   # pyenv
+  nodeenv                 # node.js version
+  nvm                     # nvm
+  nodenv                  # nodenv
+  kubecontext             # kubernetes context
+  terraform               # terraform workspace
+  time                    # current time
+)
+
+# Context (user@host) settings
+typeset -g POWERLEVEL9K_CONTEXT_TEMPLATE='%n@%m'
+typeset -g POWERLEVEL9K_ALWAYS_SHOW_CONTEXT=true
+typeset -g POWERLEVEL9K_CONTEXT_PREFIX=''
+
+# Directory settings
+typeset -g POWERLEVEL9K_DIR_FOREGROUND=254
+typeset -g POWERLEVEL9K_SHORTEN_STRATEGY=truncate_to_unique
+typeset -g POWERLEVEL9K_SHORTEN_DIR_LENGTH=1
+
+# VCS (git) settings
+typeset -g POWERLEVEL9K_VCS_CLEAN_FOREGROUND=076
+typeset -g POWERLEVEL9K_VCS_UNTRACKED_FOREGROUND=014
+typeset -g POWERLEVEL9K_VCS_MODIFIED_FOREGROUND=011
+
+# Status settings
+typeset -g POWERLEVEL9K_STATUS_OK=false
+typeset -g POWERLEVEL9K_STATUS_ERROR=true
+
+# Command execution time settings
+typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD=3
+typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION=0
+
+# Time format
+typeset -g POWERLEVEL9K_TIME_FORMAT='%D{%H:%M:%S}'
+
+# Prompt character
+typeset -g POWERLEVEL9K_PROMPT_CHAR_OK_{VIINS,VICMD,VIVIS,VIOWR}_FOREGROUND=076
+typeset -g POWERLEVEL9K_PROMPT_CHAR_ERROR_{VIINS,VICMD,VIVIS,VIOWR}_FOREGROUND=196

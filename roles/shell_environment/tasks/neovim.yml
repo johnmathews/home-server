@@ -1,0 +1,30 @@
+---
+# Neovim installation and configuration
+
+- name: Install Neovim from apt
+  ansible.builtin.apt:
+    name: neovim
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+  become: true
+
+- name: Create Neovim config directory for each user
+  ansible.builtin.file:
+    path: "{{ item.split(':')[1] }}/.config/nvim"
+    state: directory
+    owner: "{{ item.split(':')[0] }}"
+    group: "{{ item.split(':')[0] }}"
+    mode: '0755'
+  loop: "{{ target_shell_users }}"
+  become: true
+
+- name: Deploy Neovim config (init.lua)
+  ansible.builtin.template:
+    src: init.lua.j2
+    dest: "{{ item.split(':')[1] }}/.config/nvim/init.lua"
+    owner: "{{ item.split(':')[0] }}"
+    group: "{{ item.split(':')[0] }}"
+    mode: '0644'
+  loop: "{{ target_shell_users }}"
+  become: true
