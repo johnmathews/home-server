@@ -1,6 +1,17 @@
 # immich_lxc/files/docker-compose.yml
 
 services:
+  image-borders:
+    container_name: image_borders
+    image: ghcr.io/johnmathews/image-borders:latest
+    profiles: ["image-borders"]
+    restart: "no"
+    volumes:
+      - /mnt/nfs/photos/finals/reference-photos:/images
+    environment:
+      - SHRINK_BORDERS_PADDING=5
+      # command: ["/images", "-p", "5"]
+
   immich-server:
     container_name: immich_server
     image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
