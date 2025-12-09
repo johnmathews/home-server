@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# Pre-push hook for Neovim config
+# Runs quality gate before pushing to remote:
+#   - Stylua formatting check
+#   - Luacheck linting
+#   - Neovim load test
+# Install: ln -s ../../scripts/pre-push .git/hooks/pre-push
+
+set -e
+
+echo "🚀 Running pre-push checks..."
+echo ""
+
+# Change to config directory
+cd "$(dirname "$0")/../.." || exit 1
+
+# Run quality gate - comprehensive validation
+if ./scripts/quality-gate; then
+  echo ""
+  echo "✅ Safe to push to remote."
+  exit 0
+else
+  echo ""
+  echo "❌ Pre-push checks failed!"
+  echo "Fix errors before pushing, or bypass with: git push --no-verify"
+  exit 1
+fi

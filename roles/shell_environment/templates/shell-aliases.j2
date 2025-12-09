@@ -1,0 +1,100 @@
+# vim: ft=zsh
+# Zsh aliases for {{ ansible_hostname }}
+# Managed by Ansible - shell_environment role
+# User: {{ item.split(':')[0] }}
+
+# Editor aliases
+alias vi='nvim'
+alias v='nvim'
+alias vim='nvim'
+
+# Navigation aliases
+alias c='cd'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias .....='cd ../../../..'
+alias -- -='cd -'
+
+# Directory listing aliases (using eza if available, fallback to ls)
+if command -v eza &> /dev/null; then
+  alias l='eza -lha --icons --git --group-directories-first'
+  alias ls='eza -lh --git --group-directories-first --icons'
+  alias la='eza -lah --git --group-directories-first --icons'
+  alias lsa='la'
+  alias lt='eza --tree --level=1'
+  alias lt1='eza --tree --level=1'
+  alias lt2='eza --tree --level=2'
+  alias ltt='lt2'
+  alias lt3='eza --tree --level=3'
+  alias lttt='lt3'
+  alias lt4='eza --tree --level=4'
+  alias ltttt='lt4'
+  alias lsd='eza --icons --long --git --tree --level=0 */'
+  alias lsda='eza --icons --long --git --tree --level=0 {*/,.*/}'
+else
+  alias ll='ls -lah'
+  alias la='ls -A'
+  alias l='ls -CF'
+fi
+
+# Docker aliases
+alias d='docker'
+alias dps='docker ps'
+alias dpsa='docker ps -a'
+alias dlog='docker logs'
+alias dexec='docker exec -it'
+alias ld='lazydocker'
+
+# Kubernetes aliases
+alias k='kubectl'
+alias kgp='kubectl get pods'
+alias kgs='kubectl get svc'
+
+# Git aliases
+alias gst='git status'
+alias glog='git log --oneline -10'
+alias gtr='git tr'
+alias gr='git remote -v update'
+
+# Grep aliases (always colored)
+alias grep='grep --color=auto'
+alias egrep='egrep --color=auto'
+alias fgrep='fgrep --color=auto'
+
+# Ansible aliases
+alias an='ansible'
+
+# Utility aliases
+alias cl='clear'
+alias b='clear'
+alias x='exit'
+alias reload='exec $SHELL -l'
+alias readme='vi readme.md'
+alias todo="grep -rHn 'TODO' --exclude='*.{.pyc,.swp,}' --exclude-dir={.git,htmlcov,}"
+
+# History and jobs
+alias shi='history'
+alias sj='jobs'
+
+# Python
+alias python='python3'
+
+# SSH (with xterm-256color for italic support)
+alias ssh='TERM=xterm-256color ssh'
+
+# Time utilities
+alias week='date +%V'
+alias timer='echo "Timer started. Stop with Ctrl-D." && date && time cat && date'
+
+# Network utilities
+alias ip='curl -4 icanhazip.com'
+alias ip4='curl -4 icanhazip.com'
+alias ip6='curl -6 icanhazip.com'
+alias localip='ip addr show | grep "inet " | grep -v 127.0.0.1 | awk "{print \$2}" | cut -d/ -f1'
+
+# Enable aliases to be sudo'ed
+alias sudo='sudo '
+
+# Local customizations (not managed by Ansible)
+[[ -f ~/.zsh_aliases.local ]] && source ~/.zsh_aliases.local

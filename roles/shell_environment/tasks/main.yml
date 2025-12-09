@@ -36,3 +36,7 @@
 - name: Configure shell integration
   ansible.builtin.import_tasks: shell-integration.yml
   tags: [integration, shell]
+
+- name: Install additional CLI tools and configurations
+  ansible.builtin.import_tasks: apps.yml
+  tags: [apps, tools]

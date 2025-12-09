@@ -20,7 +20,8 @@
       "Bash(ssh tubearchivist_lxc:*)",
       "Bash(ssh pve \"sed -i ''/lxc.apparmor.profile/d'' /etc/pve/lxc/103.conf && cat /etc/pve/lxc/103.conf\")",
       "Bash(ssh root@192.168.2.103:*)",
-      "Bash(ssh root@192.168.2.214:*)"
+      "Bash(ssh root@192.168.2.214:*)",
+      "Bash(.venv/bin/ansible-lint:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+# Complete quality gate check combining 3 critical validations:
+#   - Stylua formatting check (--check mode, suggests 'stylua .' if needed)
+#   - Luacheck linting (lua/ directory, --quiet mode)
+#   - Neovim headless load test (10s timeout, validates config loads without errors)
+# Run before committing or pushing
+
+set -e
+
+echo "🔒 Running complete quality gate..."
+echo ""
+
+cd "$(dirname "$0")/.." || exit 1
+
+# Color codes
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m'
+
+FAILED=0
+
+# Step 1: Format check
+echo "1️⃣  Checking formatting (stylua)..."
+if stylua --check . 2>&1 | grep -q "Diff"; then
+  echo -e "${RED}   ✗ Formatting check failed${NC}"
+  echo "   Run: stylua ."
+  FAILED=1
+else
+  echo -e "${GREEN}   ✓ Formatting correct${NC}"
+fi
+echo ""
+
+# Step 2: Lint
+echo "2️⃣  Running linter (luacheck)..."
+if luacheck lua/ --quiet; then
+  echo -e "${GREEN}   ✓ Luacheck passed${NC}"
+else
+  echo -e "${RED}   ✗ Luacheck failed${NC}"
+  FAILED=1
+fi
+echo ""
+
+# Step 3: Load test
+echo "3️⃣  Testing Neovim loads..."
+if timeout 10 nvim --headless "+lua print('Quality gate: OK')" +qa 2>&1 | grep -q "OK"; then
+  echo -e "${GREEN}   ✓ Neovim loads successfully${NC}"
+else
+  echo -e "${RED}   ✗ Neovim failed to load${NC}"
+  FAILED=1
+fi
+echo ""
+
+# Summary
+if [ $FAILED -eq 0 ]; then
+  echo -e "${GREEN}🎉 Quality gate passed!${NC}"
+  echo ""
+  echo "Safe to commit and push."
+  exit 0
+else
+  echo -e "${RED}❌ Quality gate failed!${NC}"
+  echo ""
+  echo "Fix errors before committing."
+  exit 1
+fi

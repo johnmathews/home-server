@@ -1,0 +1,60 @@
+---
+# Install and configure additional CLI tools and configurations
+
+- name: Install additional CLI tools
+  ansible.builtin.apt:
+    name: "{{ shell_environment_cli_tools }}"
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+  become: true
+  when: shell_environment_cli_tools_enabled | bool
+  tags: [apps, cli-tools]
+
+- name: Create SSH directory for each user
+  ansible.builtin.file:
+    path: "{{ item.split(':')[1] }}/.ssh"
+    state: directory
+    owner: "{{ item.split(':')[0] }}"
+    group: "{{ item.split(':')[0] }}"
+    mode: '0700'
+  loop: "{{ target_shell_users }}"
+  become: true
+  when: shell_environment_ssh_setup_enabled | bool
+  tags: [apps, ssh]
+
+- name: Deploy shell aliases configuration
+  ansible.builtin.template:
+    src: shell-aliases.j2
+    dest: "{{ item.split(':')[1] }}/.zsh_aliases"
+    owner: "{{ item.split(':')[0] }}"
+    group: "{{ item.split(':')[0] }}"
+    mode: '0644'
+  loop: "{{ target_shell_users }}"
+  become: true
+  when: shell_environment_aliases_enabled | bool
+  tags: [apps, aliases, shell]
+
+- name: Create custom Neovim config directory
+  ansible.builtin.file:
+    path: "{{ item.split(':')[1] }}/.config/nvim"
+    state: directory
+    owner: "{{ item.split(':')[0] }}"
+    group: "{{ item.split(':')[0] }}"
+    mode: '0755'
+  loop: "{{ target_shell_users }}"
+  become: true
+  when: shell_environment_neovim_config_style == "custom"
+  tags: [neovim, apps, editor]
+
+- name: Deploy custom Neovim config files
+  ansible.builtin.copy:
+    src: "nvim-custom/"
+    dest: "{{ item.split(':')[1] }}/.config/nvim/"
+    owner: "{{ item.split(':')[0] }}"
+    group: "{{ item.split(':')[0] }}"
+    mode: '0644'
+  loop: "{{ target_shell_users }}"
+  become: true
+  when: shell_environment_neovim_config_style == "custom"
+  tags: [neovim, apps, editor]

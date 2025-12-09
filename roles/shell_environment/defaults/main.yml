@@ -29,3 +29,15 @@ shell_environment_atuin_integration: true
 
 # User targeting (empty = auto-discover UID >= 1000)
 shell_environment_shell_users: []
+
+# CLI tools (apps.yml)
+shell_environment_cli_tools_enabled: true
+shell_environment_cli_tools:
+  - tldr
+  - htop
+
+# Shell aliases
+shell_environment_aliases_enabled: true
+
+# SSH directory setup
+shell_environment_ssh_setup_enabled: false  # User enables in host_vars if needed
