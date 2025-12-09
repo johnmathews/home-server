@@ -1,0 +1,13 @@
+nfs_shares:
+  - name: library
+    mountpoint: /mnt/nfs/library
+    target: /mnt/tank/library
+  - name: media
+    mountpoint: /mnt/nfs/media
+    target: /mnt/tank/media
+  - name: movies
+    mountpoint: /mnt/nfs/movies
+    target: /mnt/tank/movies
+  - name: photos
+    mountpoint: /mnt/nfs/photos
+    target: /mnt/tank/photos

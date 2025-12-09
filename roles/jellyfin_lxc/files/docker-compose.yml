@@ -1,5 +1,6 @@
 # jellyfin_lxc/files/docker-compose.yml
 services:
+
   alloy:
     image: grafana/alloy:latest
     container_name: alloy
@@ -30,6 +31,7 @@ services:
       options:
         max-size: "10m"
         max-file: "5"
+
   jellyfin:
     # image: jellyfin/jellyfin
     # dockerfile uses the official image and adds yt-dlp 
@@ -68,7 +70,8 @@ services:
       - /srv/apps/jellyfin/appdata:/config
       - /srv/apps/jellyfin/cache:/cache
       - /mnt/nfs/library:/library # kids shows, family movies, etc
-      - /mnt/nfs/media:/media # youtube videos, photography videos
+      - /mnt/nfs/media:/media
+      - /mnt/nfs/movies:/movies
       - /mnt/nfs/youtube-kids:/youtube-kids:ro # tubearchivist lib must be readonly
     logging:
       driver: json-file

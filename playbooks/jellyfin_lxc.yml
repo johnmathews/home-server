@@ -1,6 +1,5 @@
 # playbooks/jellyfin_lxc.yml
 
----
 
 - name: Jellyfin LXC
   hosts: jellyfin_lxc
@@ -10,9 +9,11 @@
   roles:
     - role: nfs_client
       tags: [nfs]
-    - role: share_drive_probe 
+    - role: share_drive_probe
       tags: [shares]
     - role: jellyfin_lxc
       tags: [jelly]
+    - role: shell_environment
+      tags: [shell]
 
-    # nfs vars in /host_vars
+  # nfs vars in /host_vars

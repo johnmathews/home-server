@@ -1,15 +1,13 @@
 # defaults/main.yml
 
----
-
 docker_user: john
 docker_compose_dir: /srv/infra
 
 smb_infra_vm_username: infra_vm
 
 # trueNAS
-smb_server: 192.168.2.104 
+# smb_server: 192.168.2.104
 
-smb_shares:
-  - name: logs 
-    target: /mnt/truenas/logs
+# smb_shares:
+# - name: logs 
+# target: /mnt/truenas/logs
