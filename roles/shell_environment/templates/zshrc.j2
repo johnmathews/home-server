@@ -25,6 +25,13 @@ source $ZSH/oh-my-zsh.sh
 # Load Powerlevel10k config
 [[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
 
+# Set TERM_PROGRAM for image preview support in yazi
+# When SSH'ing from kitty (even through tmux), TERM_PROGRAM isn't set
+# Default to kitty to enable graphics protocol
+if [[ -z "$TERM_PROGRAM" ]]; then
+  export TERM_PROGRAM=kitty
+fi
+
 # Load shell aliases
 [[ -f ~/.zsh_aliases ]] && source ~/.zsh_aliases
 
