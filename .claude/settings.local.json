@@ -31,7 +31,8 @@
       "Bash(ansible:*)",
       "Bash(ssh john@192.168.2.105:*)",
       "Bash(ssh:*)",
-      "Bash(xargs ls:*)"
+      "Bash(xargs ls:*)",
+      "WebSearch"
     ],
     "deny": [],
     "ask": []
