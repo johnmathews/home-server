@@ -1,6 +1,5 @@
 # playbooks/traefik_lxc.yml
 
----
 
 - name: Traefik LXC
   hosts: traefik_lxc
@@ -10,6 +9,8 @@
   roles:
     - role: traefik_lxc
       tags: traefik
+    - role: shell_environment
+      tags: shell
 
   vars:
     foo: bar

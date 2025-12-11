@@ -1,6 +1,5 @@
 # playbooks/key_server.yml
 
----
 
 - name: Key Server
   hosts: key_server
@@ -10,6 +9,8 @@
   roles:
     - role: key_server
       tags: key_server
+    - role: shell_environment
+      tags: shell
 
   vars:
     ciuser: "{{ vm_defaults.ciuser }}"

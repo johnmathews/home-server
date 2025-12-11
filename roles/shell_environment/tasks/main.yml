@@ -3,15 +3,18 @@
 
 - name: Discover users with home directories
   ansible.builtin.shell: |
+    set -o pipefail
     getent passwd | awk -F: '$3 >= 1000 && $7 !~ /nologin|false/ {print $1":"$6":"$7}'
   register: shell_users_raw
   changed_when: false
   when: shell_environment_shell_users | length == 0
+  tags: [always]
 
 - name: Set target users (discovered or explicit)
   ansible.builtin.set_fact:
     target_shell_users: "{{ shell_environment_shell_users if shell_environment_shell_users | length > 0
                             else shell_users_raw.stdout_lines | default([]) }}"
+  tags: [always]
 
 - name: Install Neovim
   ansible.builtin.import_tasks: neovim.yml

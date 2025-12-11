@@ -1,6 +1,5 @@
 # playbooks/immich_lxc.yml
 
----
 
 - name: Prometheus LXC
   hosts: prometheus_lxc
@@ -10,3 +9,5 @@
   roles:
     - role: prometheus_lxc
       tags: prometheus
+    - role: shell_environment
+      tags: shell

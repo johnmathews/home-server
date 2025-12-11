@@ -1,6 +1,5 @@
 # playbooks/infra_vm.yml
 
-
 - name: Infra VM
   hosts: infra-vm
   gather_facts: true
@@ -13,6 +12,8 @@
       tags: shares
     - role: infra_vm
       tags: infra_vm
+    - role: shell_environment
+      tags: shell
 
   vars:
     # nfs vars in /host_vars

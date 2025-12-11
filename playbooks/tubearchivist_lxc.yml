@@ -14,3 +14,5 @@
       tags: tubearchivist
     - role: sleep_hours
       tags: sleep
+    - role: shell_environment
+      tags: shell

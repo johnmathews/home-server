@@ -1,6 +1,5 @@
 # playbooks/proxmox_node.yml
 
-
 - name: Proxmox node
   hosts: proxmox
   become: true
@@ -12,3 +11,5 @@
     #   tags: shares
     - role: pve
       tags: pve
+    - role: shell_environment
+      tags: shell

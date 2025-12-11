@@ -1,6 +1,5 @@
 # playbooks/immich_lxc.yml
 
----
 
 - name: Immich LXC
   hosts: immich_lxc
@@ -9,10 +8,12 @@
 
   roles:
     - role: nfs_client
-      tags: [nfs]
-    - role: share_drive_probe 
-      tags: [shares]
+      tags: nfs
+    - role: share_drive_probe
+      tags: shares
     - role: immich_lxc
-      tags: [immich]
+      tags: immich
+    - role: shell_environment
+      tags: shell
 
   # nfs vars in /host_vars

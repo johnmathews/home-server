@@ -1,6 +1,5 @@
 # playbooks/immich_lxc.yml
 
----
 
 - name: Open WebUI LXC
   hosts: open_webui_lxc
@@ -10,3 +9,5 @@
   roles:
     - role: open_webui_lxc
       tags: open-webui
+    - role: shell_environment
+      tags: shell

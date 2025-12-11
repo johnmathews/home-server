@@ -1,6 +1,5 @@
 # playbooks/jellyfin_lxc.yml
 
-
 - name: Jellyfin LXC
   hosts: jellyfin_lxc
   gather_facts: true
@@ -8,12 +7,12 @@
 
   roles:
     - role: nfs_client
-      tags: [nfs]
+      tags: nfs
     - role: share_drive_probe
-      tags: [shares]
+      tags: shares
     - role: jellyfin_lxc
-      tags: [jelly]
+      tags: jelly
     - role: shell_environment
-      tags: [shell]
+      tags: shell
 
   # nfs vars in /host_vars

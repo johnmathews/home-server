@@ -14,6 +14,8 @@
     #   when: nfs_shares is defined and nfs_shares | length > 0
     - role: n8n_lxc
       tags: n8n
+    - role: shell_environment
+      tags: shell
 
   # - role: sleep_hours
   #   tags: sleep
