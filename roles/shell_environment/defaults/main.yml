@@ -43,9 +43,18 @@ shell_environment_cli_tools:
   - fzf
   - zoxide
   - imagemagick
+  - tree
 
 # Shell aliases
 shell_environment_aliases_enabled: true
 
 # SSH directory setup
 shell_environment_ssh_setup_enabled: false # User enables in host_vars if needed
+
+# Yazi file manager (binary installation)
+shell_environment_yazi_enabled: true
+shell_environment_yazi_version: "v0.4.2"
+shell_environment_yazi_arch: "x86_64-unknown-linux-gnu"
+shell_environment_yazi_install_dir: "/opt"
+shell_environment_yazi_bin_dir: "/usr/local/bin"
+

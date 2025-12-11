@@ -1,0 +1,35 @@
+# Yazi configuration for {{ ansible_hostname }}
+# Managed by Ansible - shell_environment role
+# User: {{ item.split(':')[0] }}
+
+[manager]
+# Show hidden files by default
+show_hidden = true
+
+[preview]
+# Image preview settings for kitty terminal
+# Kitty graphics protocol provides the best quality over SSH
+image_filter = "lanczos3"
+image_quality = 90
+
+# Use kitty graphics protocol for image previews
+# This works over SSH when using kitty terminal
+ueberzug_scale = 1
+ueberzug_offset = 0
+
+# File opener configurations
+[opener.edit]
+run = 'nvim "$@"'
+block = true
+desc = "Edit with neovim"
+
+[opener.open]
+run = 'xdg-open "$@"'
+desc = "Open with default application"
+
+# Default openers for different file types
+[open]
+rules = [
+  { mime = "text/*", use = "edit" },
+  { mime = "image/*", use = "open" },
+]

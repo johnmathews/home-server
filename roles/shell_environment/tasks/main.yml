@@ -5,6 +5,8 @@
   ansible.builtin.shell: |
     set -o pipefail
     getent passwd | awk -F: '$3 >= 1000 && $7 !~ /nologin|false/ {print $1":"$6":"$7}'
+  args:
+    executable: /bin/bash
   register: shell_users_raw
   changed_when: false
   when: shell_environment_shell_users | length == 0
@@ -20,6 +22,11 @@
   ansible.builtin.import_tasks: neovim.yml
   when: shell_environment_neovim_enabled | bool
   tags: [neovim, editor]
+
+- name: Install yazi file manager
+  ansible.builtin.import_tasks: yazi.yml
+  when: shell_environment_yazi_enabled | bool
+  tags: [yazi, file-manager, apps]
 
 - name: Install and configure Zsh
   ansible.builtin.import_tasks: zsh.yml

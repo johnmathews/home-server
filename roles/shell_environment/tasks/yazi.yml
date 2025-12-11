@@ -1,0 +1,97 @@
+---
+# Install yazi terminal file manager from prebuilt binaries
+
+- name: Ensure unzip is installed
+  ansible.builtin.apt:
+    name: unzip
+    state: present
+  become: true
+
+- name: Install image preview dependencies for yazi
+  ansible.builtin.apt:
+    name:
+      - chafa
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+  become: true
+
+- name: Check if yazi is already installed with correct version
+  ansible.builtin.stat:
+    path: "{{ shell_environment_yazi_install_dir }}/yazi-{{ shell_environment_yazi_version }}/yazi"
+  register: yazi_installed
+  changed_when: false
+
+- name: Download yazi binary archive
+  ansible.builtin.get_url:
+    url: "https://github.com/sxyazi/yazi/releases/download/{{ shell_environment_yazi_version }}/yazi-{{ shell_environment_yazi_arch }}.zip"
+    dest: "/tmp/yazi-{{ shell_environment_yazi_version }}.zip"
+    mode: '0644'
+    timeout: 60
+  become: true
+  when: not yazi_installed.stat.exists
+  register: yazi_download
+  retries: 3
+  delay: 5
+  until: yazi_download is succeeded
+
+- name: Extract yazi archive
+  ansible.builtin.unarchive:
+    src: "/tmp/yazi-{{ shell_environment_yazi_version }}.zip"
+    dest: "{{ shell_environment_yazi_install_dir }}/"
+    remote_src: true
+    creates: "{{ shell_environment_yazi_install_dir }}/yazi-{{ shell_environment_yazi_arch }}/yazi"
+  become: true
+  when: yazi_download is changed or not yazi_installed.stat.exists
+
+- name: Rename extracted directory to versioned name
+  ansible.builtin.command:
+    cmd: >-
+      mv {{ shell_environment_yazi_install_dir }}/yazi-{{ shell_environment_yazi_arch }}
+      {{ shell_environment_yazi_install_dir }}/yazi-{{ shell_environment_yazi_version }}
+    creates: "{{ shell_environment_yazi_install_dir }}/yazi-{{ shell_environment_yazi_version }}/yazi"
+  become: true
+  when: yazi_download is changed or not yazi_installed.stat.exists
+
+- name: Create symlink for yazi binary
+  ansible.builtin.file:
+    src: "{{ shell_environment_yazi_install_dir }}/yazi-{{ shell_environment_yazi_version }}/yazi"
+    dest: "{{ shell_environment_yazi_bin_dir }}/yazi"
+    state: link
+    force: true
+  become: true
+
+- name: Create symlink for ya binary
+  ansible.builtin.file:
+    src: "{{ shell_environment_yazi_install_dir }}/yazi-{{ shell_environment_yazi_version }}/ya"
+    dest: "{{ shell_environment_yazi_bin_dir }}/ya"
+    state: link
+    force: true
+  become: true
+
+- name: Remove yazi download archive  # noqa: no-handler
+  ansible.builtin.file:
+    path: "/tmp/yazi-{{ shell_environment_yazi_version }}.zip"
+    state: absent
+  become: true
+  when: yazi_download is changed
+
+- name: Create yazi config directory for each user
+  ansible.builtin.file:
+    path: "{{ item.split(':')[1] }}/.config/yazi"
+    state: directory
+    owner: "{{ item.split(':')[0] }}"
+    group: "{{ item.split(':')[0] }}"
+    mode: '0755'
+  loop: "{{ target_shell_users }}"
+  become: true
+
+- name: Deploy yazi configuration
+  ansible.builtin.template:
+    src: yazi.toml.j2
+    dest: "{{ item.split(':')[1] }}/.config/yazi/yazi.toml"
+    owner: "{{ item.split(':')[0] }}"
+    group: "{{ item.split(':')[0] }}"
+    mode: '0644'
+  loop: "{{ target_shell_users }}"
+  become: true

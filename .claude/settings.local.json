@@ -21,7 +21,17 @@
       "Bash(ssh pve \"sed -i ''/lxc.apparmor.profile/d'' /etc/pve/lxc/103.conf && cat /etc/pve/lxc/103.conf\")",
       "Bash(ssh root@192.168.2.103:*)",
       "Bash(ssh root@192.168.2.214:*)",
-      "Bash(.venv/bin/ansible-lint:*)"
+      "Bash(.venv/bin/ansible-lint:*)",
+      "Bash(grep:*)",
+      "Bash(cat:*)",
+      "WebFetch(domain:api.github.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:yazi-rs.github.io)",
+      "Bash(make:*)",
+      "Bash(ansible:*)",
+      "Bash(ssh john@192.168.2.105:*)",
+      "Bash(ssh:*)",
+      "Bash(xargs ls:*)"
     ],
     "deny": [],
     "ask": []

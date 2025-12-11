@@ -14,7 +14,9 @@
     dest: "/tmp/omz-install-{{ item.split(':')[0] }}.sh"
     mode: '0755'
   loop: "{{ target_shell_users }}"
-  when: not omz_installed.results[ansible_loop.index0].stat.exists
+  loop_control:
+    index_var: user_index
+  when: not omz_installed.results[user_index].stat.exists
   become: true
 
 - name: Install Oh My Zsh for each user

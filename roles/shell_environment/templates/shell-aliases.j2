@@ -38,6 +38,12 @@ else
   alias l='ls -CF'
 fi
 
+# Yazi file manager aliases
+if command -v yazi &> /dev/null; then
+  alias y='yazi'
+  alias yz='yazi'
+fi
+
 # Docker aliases
 alias d='docker'
 alias dps='docker ps'

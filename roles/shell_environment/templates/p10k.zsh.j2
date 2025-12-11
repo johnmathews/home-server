@@ -1,4 +1,4 @@
-!# vim: ft=zsh
+# vim: ft=zsh
 
 # Powerlevel10k configuration for {{ ansible_hostname }}
 # Managed by Ansible - shell_environment role
@@ -38,20 +38,35 @@ typeset -g POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
   time                    # current time
 )
 
+# Dracula color scheme for better contrast
+# Background: 236 (#282a36)
+# Foreground: 255 (#f8f8f2)
+# Cyan: 117 (#8be9fd)
+# Green: 84 (#50fa7b)
+# Orange: 215 (#ffb86c)
+# Pink: 212 (#ff79c6)
+# Purple: 141 (#bd93f9)
+# Red: 203 (#ff5555)
+# Yellow: 228 (#f1fa8c)
+
 # Context (user@host) settings
 typeset -g POWERLEVEL9K_CONTEXT_TEMPLATE='%n@%m'
 typeset -g POWERLEVEL9K_ALWAYS_SHOW_CONTEXT=true
 typeset -g POWERLEVEL9K_CONTEXT_PREFIX=''
+typeset -g POWERLEVEL9K_CONTEXT_FOREGROUND=117  # Dracula cyan
+typeset -g POWERLEVEL9K_CONTEXT_BACKGROUND=236  # Dracula background
 
 # Directory settings
-typeset -g POWERLEVEL9K_DIR_FOREGROUND=254
+typeset -g POWERLEVEL9K_DIR_FOREGROUND=141      # Dracula purple
+typeset -g POWERLEVEL9K_DIR_BACKGROUND=236      # Dracula background
 typeset -g POWERLEVEL9K_SHORTEN_STRATEGY=truncate_to_unique
 typeset -g POWERLEVEL9K_SHORTEN_DIR_LENGTH=1
 
 # VCS (git) settings
-typeset -g POWERLEVEL9K_VCS_CLEAN_FOREGROUND=076
-typeset -g POWERLEVEL9K_VCS_UNTRACKED_FOREGROUND=014
-typeset -g POWERLEVEL9K_VCS_MODIFIED_FOREGROUND=011
+typeset -g POWERLEVEL9K_VCS_CLEAN_FOREGROUND=84      # Dracula green
+typeset -g POWERLEVEL9K_VCS_UNTRACKED_FOREGROUND=117 # Dracula cyan
+typeset -g POWERLEVEL9K_VCS_MODIFIED_FOREGROUND=228  # Dracula yellow
+typeset -g POWERLEVEL9K_VCS_BACKGROUND=236           # Dracula background
 
 # Status settings
 typeset -g POWERLEVEL9K_STATUS_OK=false
@@ -62,8 +77,10 @@ typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD=3
 typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION=0
 
 # Time format
+{% raw %}
 typeset -g POWERLEVEL9K_TIME_FORMAT='%D{%H:%M:%S}'
 
-# Prompt character
-typeset -g POWERLEVEL9K_PROMPT_CHAR_OK_{VIINS,VICMD,VIVIS,VIOWR}_FOREGROUND=076
-typeset -g POWERLEVEL9K_PROMPT_CHAR_ERROR_{VIINS,VICMD,VIVIS,VIOWR}_FOREGROUND=196
+# Prompt character (Dracula colors)
+typeset -g POWERLEVEL9K_PROMPT_CHAR_OK_{VIINS,VICMD,VIVIS,VIOWR}_FOREGROUND=84   # Dracula green
+typeset -g POWERLEVEL9K_PROMPT_CHAR_ERROR_{VIINS,VICMD,VIVIS,VIOWR}_FOREGROUND=203  # Dracula red
+{% endraw %}
