@@ -8,9 +8,19 @@
     curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
   args:
     executable: /bin/bash
-    creates: /usr/local/bin/atuin
+    creates: /root/.atuin/bin/atuin
   environment:
     ATUIN_DONT_PRINT_WELCOME: "1"
+  when: shell_environment_atuin_enabled | bool
+  tags: [atuin, shell]
+
+- name: Create symlink to make atuin available system-wide
+  ansible.builtin.file:
+    src: /root/.atuin/bin/atuin
+    dest: /usr/local/bin/atuin
+    state: link
+    force: true
+  become: true
   when: shell_environment_atuin_enabled | bool
   tags: [atuin, shell]
 

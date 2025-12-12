@@ -21,7 +21,7 @@ if command -v eza &> /dev/null; then
   alias l='eza -lha --icons --git --group-directories-first'
   alias ls='eza -lh --git --group-directories-first --icons'
   alias la='eza -lah --git --group-directories-first --icons'
-  alias lsa='la'
+  alias lsa='eza -lah --git --group-directories-first --icons'
   alias lt='eza --tree --level=1'
   alias lt1='eza --tree --level=1'
   alias lt2='eza --tree --level=2'
@@ -31,11 +31,14 @@ if command -v eza &> /dev/null; then
   alias lt4='eza --tree --level=4'
   alias ltttt='lt4'
   alias lsd='eza --icons --long --git --tree --level=0 */'
+  alias ld='eza --icons --long --git --tree --level=0 */'
   alias lsda='eza --icons --long --git --tree --level=0 {*/,.*/}'
 else
   alias ll='ls -lah'
-  alias la='ls -A'
-  alias l='ls -CF'
+  alias la='ls -lA'
+  alias lsa='ls -lA'
+  alias l='ls -lF'
+  alias ld='ls -ld'
 fi
 
 # Yazi file manager aliases
@@ -50,7 +53,6 @@ alias dps='docker ps'
 alias dpsa='docker ps -a'
 alias dlog='docker logs'
 alias dexec='docker exec -it'
-alias ld='lazydocker'
 
 # Git aliases
 alias gst='git status'

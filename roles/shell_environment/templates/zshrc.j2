@@ -27,7 +27,6 @@ source $ZSH/oh-my-zsh.sh
 
 # NOTE: TERM_PROGRAM is intentionally NOT set here
 # Kitty graphics protocol doesn't work through SSH + tmux
-# Yazi will automatically fall back to chafa symbols mode which works perfectly
 
 # Load shell aliases
 [[ -f ~/.zsh_aliases ]] && source ~/.zsh_aliases
@@ -56,3 +55,8 @@ fi
 
 # Local customizations (not managed by Ansible)
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
+
+# cd into /srv/apps if it exists
+if [[ -d /srv/apps ]]; then
+  cd /srv/apps
+fi
