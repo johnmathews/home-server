@@ -101,38 +101,6 @@ return lazy.setup({
     },
   },
 
-  -- WIP my plugin to show git stats when you open a project
-  {
-    dir = "/Users/john/projects/neovim/neovim-dashboard",
-    name = "project-dashboard.nvim",
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-      "nvim-tree/nvim-web-devicons",
-    },
-    config = function()
-      require("project-dashboard").setup({
-        auto_open = false,
-        show_timing = true,
-        github = {
-          enabled = true,
-          timeout = 5000,
-        },
-        layout = {
-          margin_x = 12, -- more padding from edges
-          margin_y = 2, -- more top/bottom padding
-          max_width = 0.5,
-        },
-        tiles = {
-          gap_x = 4, -- wider gaps between tiles
-          gap_y = 1, -- tight vertical spacing
-          background = true,
-          border_style = "rounded",
-        },
-      })
-    end,
-    event = "VimEnter",
-  },
-
   -- dont open a file accidentally in the filetree or preview window
   { "stevearc/stickybuf.nvim" },
 

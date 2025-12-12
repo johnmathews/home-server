@@ -2,7 +2,10 @@
 
 # Neovim
 shell_environment_neovim_enabled: true
-shell_environment_neovim_config_style: "minimal" # minimal, extended, custom
+shell_environment_neovim_config_style: "custom" # minimal, extended, custom
+shell_environment_neovim_version: "v0.11.5"
+shell_environment_neovim_install_dir: "/opt"
+shell_environment_neovim_bin_dir: "/usr/local/bin"
 
 # Zsh
 shell_environment_zsh_enabled: true

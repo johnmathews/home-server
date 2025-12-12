@@ -1,13 +1,84 @@
 ---
 # Neovim installation and configuration
 
-- name: Install Neovim from apt
+- name: Remove old Neovim from apt if present
   ansible.builtin.apt:
     name: neovim
+    state: absent
+  become: true
+
+- name: Install build tools for native plugins
+  ansible.builtin.apt:
+    name:
+      - build-essential
+      - cmake
     state: present
     update_cache: true
     cache_valid_time: 3600
   become: true
+
+- name: Install dependencies for Mason LSP servers
+  ansible.builtin.apt:
+    name:
+      - nodejs
+      - npm
+      - python3-pip
+      - python3-venv
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+  become: true
+
+- name: Check if Neovim is already installed with correct version
+  ansible.builtin.stat:
+    path: "{{ shell_environment_neovim_install_dir }}/nvim-{{ shell_environment_neovim_version }}/usr/bin/nvim"
+  register: nvim_installed
+  become: true
+
+- name: Download Neovim AppImage
+  ansible.builtin.get_url:
+    url: "https://github.com/neovim/neovim/releases/download/{{ shell_environment_neovim_version }}/nvim-linux-x86_64.appimage"
+    dest: "/tmp/nvim-{{ shell_environment_neovim_version }}.appimage"
+    mode: '0755'
+    timeout: 120
+  become: true
+  when: not nvim_installed.stat.exists
+  register: nvim_download
+  retries: 3
+  delay: 5
+  until: nvim_download is succeeded
+
+- name: Extract Neovim AppImage
+  ansible.builtin.command:
+    cmd: "/tmp/nvim-{{ shell_environment_neovim_version }}.appimage --appimage-extract"
+    chdir: "/tmp"
+    creates: "/tmp/squashfs-root/usr/bin/nvim"
+  become: true
+  when: nvim_download is changed or not nvim_installed.stat.exists
+
+- name: Move extracted Neovim to install directory
+  ansible.builtin.command:
+    cmd: >-
+      mv /tmp/squashfs-root
+      {{ shell_environment_neovim_install_dir }}/nvim-{{ shell_environment_neovim_version }}
+    creates: "{{ shell_environment_neovim_install_dir }}/nvim-{{ shell_environment_neovim_version }}/usr/bin/nvim"
+  become: true
+  when: nvim_download is changed or not nvim_installed.stat.exists
+
+- name: Create symlink for nvim binary
+  ansible.builtin.file:
+    src: "{{ shell_environment_neovim_install_dir }}/nvim-{{ shell_environment_neovim_version }}/usr/bin/nvim"
+    dest: "{{ shell_environment_neovim_bin_dir }}/nvim"
+    state: link
+    force: true
+  become: true
+
+- name: Remove AppImage download
+  ansible.builtin.file:
+    path: "/tmp/nvim-{{ shell_environment_neovim_version }}.appimage"
+    state: absent
+  become: true
+  when: nvim_download is changed or not nvim_installed.stat.exists
 
 - name: Create Neovim config directory for each user
   ansible.builtin.file:
