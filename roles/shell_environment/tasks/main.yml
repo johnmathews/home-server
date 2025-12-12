@@ -43,6 +43,11 @@
   when: shell_environment_p10k_enabled | bool
   tags: [p10k, powerlevel10k, theme]
 
+- name: Install and configure Atuin
+  ansible.builtin.import_tasks: atuin.yml
+  when: shell_environment_atuin_enabled | bool
+  tags: [atuin, shell]
+
 - name: Configure shell integration
   ansible.builtin.import_tasks: shell-integration.yml
   tags: [integration, shell]

@@ -23,8 +23,10 @@ shell_environment_p10k_enabled: true
 shell_environment_p10k_repo: "https://github.com/romkatv/powerlevel10k.git"
 shell_environment_p10k_style: "lean" # lean, classic, rainbow, pure
 
-# Atuin integration
+# Atuin shell history sync
+shell_environment_atuin_enabled: true
 shell_environment_atuin_integration: true
+shell_environment_atuin_sync_address: "http://192.168.2.106:8888"
 
 # User targeting (empty = auto-discover UID >= 1000)
 shell_environment_shell_users: []
@@ -44,6 +46,7 @@ shell_environment_cli_tools:
   - zoxide
   - imagemagick
   - tree
+  - bat
 
 # Shell aliases
 shell_environment_aliases_enabled: true

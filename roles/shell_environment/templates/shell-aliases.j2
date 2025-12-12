@@ -97,5 +97,10 @@ alias localip='ip addr show | grep "inet " | grep -v 127.0.0.1 | awk "{print \$2
 # Enable aliases to be sudo'ed
 alias sudo='sudo '
 
+# Bat (batcat on Debian/Ubuntu)
+if command -v batcat &> /dev/null; then
+  alias bat='batcat'
+fi
+
 # Local customizations (not managed by Ansible)
 [[ -f ~/.zsh_aliases.local ]] && source ~/.zsh_aliases.local
