@@ -69,3 +69,8 @@
     mode: '0644'
   notify: restart docker compose stack
   tags: docker
+
+- name: Fix facebook-albums permissions (one-time)
+  ansible.builtin.import_tasks: fix_facebook_albums_permissions.yml
+  when: fix_facebook_albums_perms | default(false) | bool
+  tags: fix_permissions

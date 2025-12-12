@@ -3,18 +3,16 @@ services:
     container_name: immich_folder_album_creator
     image: salvoxia/immich-folder-album-creator:latest
     restart: unless-stopped
-    # Use a UID/GID that has read access to the mounted API key file 
-    # and external libraries
     user: 1001:1001
     volumes:
       - /srv/apps/immich/immich_api_key.secret:/immich_api_key.secret:ro
-      - /mnt/nfs/photos/facebook-albums:/external_libs/photos
+      - /mnt/nfs/photos/facebook_albums:/external_libs/photos
     environment:
       API_URL: http://192.168.2.113:2283/api
       API_KEY_FILE: /immich_api_key.secret
       ROOT_PATH: /external_libs/photos
-      CRON_EXPRESSION: "0 * * * *"
       TZ: Europe/Berlin
+      CRON_EXPRESSION: "0 * * * *"
 
   image-borders:
     container_name: image_borders
@@ -32,10 +30,10 @@ services:
     image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
     user: "1001:1001"
     volumes:
-      # Do not edit the next line. If you want to change the media storage location on your system, edit the value of UPLOAD_LOCATION in the .env file
       - ${UPLOAD_LOCATION}:/usr/src/app/upload
-      - /mnt/nfs/photos:/mnt/nfs/photos
       - /etc/localtime:/etc/localtime:ro
+      - /mnt/nfs/photos:/mnt/nfs/photos
+      - /mnt/nfs/photos/facebook_albums:/external_libs/photos
     env_file:
       - .env
     ports:
@@ -113,7 +111,6 @@ services:
     command:
       - '--path.rootfs=/host'
       - '--collector.textfile.directory=/textfile'
-    network_mode: host
     ports:
       - "9100:9100"
     pid: host

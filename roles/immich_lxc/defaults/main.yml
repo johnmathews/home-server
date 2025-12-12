@@ -7,5 +7,6 @@ guid: 1001
 
 docker_compose_dir: "/srv/apps"
 
-# smb_username: smb_user
-# smb_server: 192.168.2.104
+# One-time permission fix for facebook-albums
+# Set to true to run, then set back to false after successful execution
+fix_facebook_albums_perms: true

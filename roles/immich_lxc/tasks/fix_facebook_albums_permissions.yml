@@ -1,0 +1,40 @@
+---
+# One-time permission fix for facebook-albums directory
+# Run with: make immich TAGS=fix_permissions
+# After running successfully, set fix_facebook_albums_perms: false in defaults/main.yml
+#
+# NOTE: Permissions must be changed on TrueNAS server, not NFS client
+# This task delegates to nas_vm (192.168.2.104) to make the changes
+
+- name: Check if facebook-albums directory exists on TrueNAS
+  ansible.builtin.stat:
+    path: /mnt/tank/photos/facebook-albums
+  register: facebook_albums_dir
+  delegate_to: nas_vm
+  become: true
+
+- name: Fix ownership of facebook-albums directory and contents
+  ansible.builtin.file:
+    path: /mnt/tank/photos/facebook-albums
+    owner: "{{ puid }}"
+    group: "{{ guid }}"
+    recurse: true
+  when:
+    - facebook_albums_dir.stat.exists
+    - facebook_albums_dir.stat.isdir
+  delegate_to: nas_vm
+  become: true
+
+- name: Set directory permissions to 0755
+  ansible.builtin.command: find /mnt/tank/photos/facebook-albums -type d -exec chmod 0755 {} +
+  when: facebook_albums_dir.stat.exists
+  delegate_to: nas_vm
+  become: true
+  changed_when: true
+
+- name: Set file permissions to 0644
+  ansible.builtin.command: find /mnt/tank/photos/facebook-albums -type f -exec chmod 0644 {} +
+  when: facebook_albums_dir.stat.exists
+  delegate_to: nas_vm
+  become: true
+  changed_when: true
