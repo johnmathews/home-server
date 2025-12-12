@@ -7,7 +7,8 @@ x-netvisor-env: &netvisor-env
   NETVISOR_DAEMON_PORT: ${NETVISOR_DAEMON_PORT:-60073}
 
 services:
-  daemon:
+
+  netvisor-daemon:
     image: mayanayza/netvisor-daemon:latest
     container_name: netvisor-daemon
     network_mode: host
@@ -33,7 +34,7 @@ services:
       # Comment out the line below to disable docker discovery
       - /var/run/docker.sock:/var/run/docker.sock:ro
 
-  postgres:
+  netvisor-postgres:
     image: postgres:17-alpine
     container_name: netvisor-postgres
     environment:
@@ -51,7 +52,7 @@ services:
     networks:
       - netvisor
 
-  server:
+  netvisor-server:
     image: mayanayza/netvisor-server:latest
     container_name: netvisor-server
     ports:

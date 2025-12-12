@@ -50,7 +50,7 @@ shell_environment_cli_tools:
   - imagemagick
   - tree
   - bat
-  - exa
+  - eza
 
 # Shell aliases
 shell_environment_aliases_enabled: true

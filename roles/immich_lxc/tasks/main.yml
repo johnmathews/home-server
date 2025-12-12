@@ -1,7 +1,5 @@
 # roles/immich_lxc/tasks/main.yml
 
----
-
 - name: Ensure cifs-utils is installed
   ansible.builtin.apt:
     name: cifs-utils
@@ -29,16 +27,25 @@
     - /srv/apps/alloy
   tags: alloy, immich
 
-- name: Deploy .env file template 
+- name: Deploy .env file template
   template:
-    src: templates/.env.j2 
+    src: templates/.env.j2
     dest: /srv/apps/.env
     owner: root
     group: root
     mode: '0644'
-  tags: docker 
+  tags: docker
 
-- name: Upload alloy config files 
+- name: Deploy immich api file
+  template:
+    src: files/immich_api_key.secret
+    dest: /srv/apps/immich/immich_api_key.secret
+    owner: root
+    group: root
+    mode: '0644'
+  tags: docker
+
+- name: Upload alloy config files
   copy:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
@@ -48,9 +55,9 @@
   loop:
     - alloy:
       src: templates/config.alloy
-      dest: /srv/apps/alloy/config.alloy 
+      dest: /srv/apps/alloy/config.alloy
   become: true
-  tags: alloy 
+  tags: alloy
   notify: restart alloy
 
 - name: Copy Docker Compose file
@@ -61,4 +68,4 @@
     group: root
     mode: '0644'
   notify: restart docker compose stack
-  tags: docker 
+  tags: docker

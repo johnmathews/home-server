@@ -5,3 +5,5 @@ cloud-images/
 .env
 sabnzbd.ini.j2
 collections/
+*.secret
+

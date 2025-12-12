@@ -1,6 +1,21 @@
-# immich_lxc/files/docker-compose.yml
-
 services:
+  immich-folder-album-creator:
+    container_name: immich_folder_album_creator
+    image: salvoxia/immich-folder-album-creator:latest
+    restart: unless-stopped
+    # Use a UID/GID that has read access to the mounted API key file 
+    # and external libraries
+    user: 1001:1001
+    volumes:
+      - /srv/apps/immich/immich_api_key.secret:/immich_api_key.secret:ro
+      - /mnt/nfs/photos/facebook-albums:/external_libs/photos
+    environment:
+      API_URL: http://192.168.2.113:2283/api
+      API_KEY_FILE: /immich_api_key.secret
+      ROOT_PATH: /external_libs/photos
+      CRON_EXPRESSION: "0 * * * *"
+      TZ: Europe/Berlin
+
   image-borders:
     container_name: image_borders
     image: ghcr.io/johnmathews/image-borders:latest
