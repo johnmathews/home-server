@@ -16,6 +16,8 @@
       tags: n8n
     - role: shell_environment
       tags: shell
+    - role: tailscale
+      tags: tailscale
 
   # - role: sleep_hours
   #   tags: sleep

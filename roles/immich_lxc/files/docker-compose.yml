@@ -12,7 +12,7 @@ services:
       API_KEY_FILE: /immich_api_key.secret
       ROOT_PATH: /external_libs/photos
       TZ: Europe/Berlin
-      CRON_EXPRESSION: "0 * * * *"
+      CRON_EXPRESSION: "0 0 1 11 1"
 
   image-borders:
     container_name: image_borders

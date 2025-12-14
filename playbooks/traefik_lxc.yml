@@ -1,6 +1,5 @@
 # playbooks/traefik_lxc.yml
 
-
 - name: Traefik LXC
   hosts: traefik_lxc
   gather_facts: true
@@ -11,6 +10,8 @@
       tags: traefik
     - role: shell_environment
       tags: shell
+    - role: tailscale
+      tags: tailscale
 
   vars:
     foo: bar

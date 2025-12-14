@@ -33,7 +33,14 @@
       "Bash(ssh:*)",
       "Bash(xargs ls:*)",
       "WebSearch",
-      "Bash(ansible-playbook:*)"
+      "Bash(ansible-playbook:*)",
+      "Bash(tee:*)",
+      "Bash(for host in 192.168.2.{105,106,110,113,115,116,117,119,103,108})",
+      "Bash(do timeout 3 ssh -o ConnectTimeout=2 -o StrictHostKeyChecking=no john@$host \"hostname && pgrep -af ''apt|dpkg|tailscale'' || echo ''no processes''\")",
+      "Bash(echo:*)",
+      "Bash(done)",
+      "Bash(ping:*)",
+      "Bash(timeout 5 ssh:*)"
     ],
     "deny": [],
     "ask": []

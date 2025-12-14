@@ -1,0 +1,27 @@
+# Tailscale configuration defaults
+
+tailscale_auth_key: "{{vault_tailscale_auth_key }}"
+
+# Enable/disable Tailscale service
+tailscale_enabled: true
+
+# Tailscale arguments (--advertise-routes, --accept-routes, etc.)
+tailscale_args: ""
+
+# Accept routes from other Tailscale nodes
+tailscale_accept_routes: false
+
+# Advertise routes to other nodes (e.g., "192.168.2.0/24" for Proxmox to share local network)
+tailscale_advertise_routes: ""
+
+# Enable exit node functionality (route all traffic through this node)
+tailscale_exit_node: false
+
+# Accept DNS from Tailscale (MagicDNS)
+tailscale_accept_dns: true
+
+# SSH server via Tailscale
+tailscale_ssh: false
+
+# Tags for ACL-based access control
+tailscale_tags: ""

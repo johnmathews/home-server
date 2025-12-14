@@ -1,6 +1,5 @@
 # playbooks/immich_lxc.yml
 
-
 - name: Immich LXC
   hosts: immich_lxc
   gather_facts: true
@@ -15,5 +14,7 @@
       tags: immich
     - role: shell_environment
       tags: shell
+    - role: tailscale
+      tags: tailscale
 
   # nfs vars in /host_vars

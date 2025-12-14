@@ -68,9 +68,9 @@ services:
     volumes:
       - ./data:/data
     depends_on:
-      postgres:
+      netvisor-postgres:
         condition: service_healthy
-      daemon:
+      netvisor-daemon:
         condition: service_healthy
     restart: unless-stopped
     networks:

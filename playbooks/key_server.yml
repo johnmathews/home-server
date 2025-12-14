@@ -1,6 +1,5 @@
 # playbooks/key_server.yml
 
-
 - name: Key Server
   hosts: key_server
   gather_facts: true
@@ -11,6 +10,8 @@
       tags: key_server
     - role: shell_environment
       tags: shell
+    - role: tailscale
+      tags: tailscale
 
   vars:
     ciuser: "{{ vm_defaults.ciuser }}"

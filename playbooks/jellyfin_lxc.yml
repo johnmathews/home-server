@@ -14,5 +14,7 @@
       tags: jelly
     - role: shell_environment
       tags: shell
+    - role: tailscale
+      tags: tailscale
 
   # nfs vars in /host_vars

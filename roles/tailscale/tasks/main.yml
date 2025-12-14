@@ -1,0 +1,124 @@
+---
+- name: Install Tailscale on Debian/Ubuntu
+  when: ansible_os_family == "Debian"
+  block:
+    - name: Add Tailscale GPG key
+      ansible.builtin.apt_key:
+        url: https://pkgs.tailscale.com/stable/{{ ansible_distribution | lower }}/{{ ansible_distribution_release }}.noarmor.gpg
+        state: present
+        keyring: /usr/share/keyrings/tailscale-archive-keyring.gpg
+
+    - name: Add Tailscale repository
+      ansible.builtin.apt_repository:
+        repo: "deb [signed-by=/usr/share/keyrings/tailscale-archive-keyring.gpg] https://pkgs.tailscale.com/stable/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} main"
+        state: present
+        filename: tailscale
+
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Install Tailscale
+      ansible.builtin.apt:
+        name: tailscale
+        state: present
+
+- name: Check if Tailscale is already authenticated
+  ansible.builtin.command: tailscale status --json
+  register: tailscale_status
+  changed_when: false
+  failed_when: false
+
+- name: Parse Tailscale status
+  ansible.builtin.set_fact:
+    tailscale_authenticated: "{{ (tailscale_status.stdout | from_json).BackendState == 'Running' }}"
+  when: tailscale_status.rc == 0
+
+- name: Set tailscale_authenticated to false if status check failed
+  ansible.builtin.set_fact:
+    tailscale_authenticated: false
+  when: tailscale_status.rc != 0
+
+- name: Authenticate Tailscale
+  when: not tailscale_authenticated and tailscale_auth_key != ""
+  block:
+    - name: Build Tailscale up command
+      ansible.builtin.set_fact:
+        tailscale_up_cmd: "tailscale up --authkey={{ tailscale_auth_key }}"
+
+    - name: Add accept-routes argument
+      ansible.builtin.set_fact:
+        tailscale_up_cmd: "{{ tailscale_up_cmd }} --accept-routes"
+      when: tailscale_accept_routes | bool
+
+    - name: Add advertise-routes argument
+      ansible.builtin.set_fact:
+        tailscale_up_cmd: "{{ tailscale_up_cmd }} --advertise-routes={{ tailscale_advertise_routes }}"
+      when: tailscale_advertise_routes != ""
+
+    - name: Add exit-node argument
+      ansible.builtin.set_fact:
+        tailscale_up_cmd: "{{ tailscale_up_cmd }} --advertise-exit-node"
+      when: tailscale_exit_node | bool
+
+    - name: Add accept-dns argument
+      ansible.builtin.set_fact:
+        tailscale_up_cmd: "{{ tailscale_up_cmd }} --accept-dns={{ 'true' if tailscale_accept_dns else 'false' }}"
+
+    - name: Add ssh argument
+      ansible.builtin.set_fact:
+        tailscale_up_cmd: "{{ tailscale_up_cmd }} --ssh"
+      when: tailscale_ssh | bool
+
+    - name: Add tags argument
+      ansible.builtin.set_fact:
+        tailscale_up_cmd: "{{ tailscale_up_cmd }} --advertise-tags={{ tailscale_tags }}"
+      when: tailscale_tags != ""
+
+    - name: Add custom args
+      ansible.builtin.set_fact:
+        tailscale_up_cmd: "{{ tailscale_up_cmd }} {{ tailscale_args }}"
+      when: tailscale_args != ""
+
+    - name: Authenticate Tailscale
+      ansible.builtin.command: "{{ tailscale_up_cmd }}"
+      changed_when: true
+      register: tailscale_auth_result
+      failed_when: false
+      no_log: true  # Don't log auth key
+
+    - name: Check authentication result
+      ansible.builtin.fail:
+        msg: |
+          Tailscale authentication failed!
+          Common issues:
+          1. Auth key expired or invalid
+          2. Network connectivity to Tailscale servers blocked
+          3. Firewall blocking outbound HTTPS (443) or Tailscale ports (41641 UDP)
+
+          Debug steps:
+          - SSH to host: ssh root@192.168.2.117
+          - Check connectivity: curl -I https://login.tailscale.com
+          - Try manual auth: tailscale up --authkey=YOUR_KEY
+          - Check logs: journalctl -u tailscaled -n 50
+
+          Error code: {{ tailscale_auth_result.rc }}
+      when: tailscale_auth_result.rc != 0
+
+- name: Ensure Tailscale service is enabled and started
+  ansible.builtin.systemd:
+    name: tailscaled
+    enabled: "{{ tailscale_enabled }}"
+    state: "{{ 'started' if tailscale_enabled else 'stopped' }}"
+
+- name: Get Tailscale status
+  ansible.builtin.command: tailscale status
+  register: tailscale_status_output
+  changed_when: false
+  when: tailscale_enabled
+
+- name: Display Tailscale IP
+  ansible.builtin.debug:
+    msg: "Tailscale status: {{ tailscale_status_output.stdout_lines }}"
+  when: tailscale_enabled and tailscale_status_output is defined

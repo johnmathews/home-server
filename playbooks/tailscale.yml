@@ -1,0 +1,7 @@
+- name: Install and configure Tailscale on all hosts
+  hosts: all
+  become: true
+  roles:
+    - role: tailscale
+  tags:
+    - tailscale

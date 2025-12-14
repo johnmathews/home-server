@@ -13,4 +13,5 @@
 - import_playbook: pve.yml
 - import_playbook: share_drive_probe.yml
 - import_playbook: shell_environment.yml
+- import_playbook: tailscale.yml
 - import_playbook: tubearchivist_lxc.yml

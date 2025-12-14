@@ -1,0 +1,72 @@
+---
+# This task runs on the Proxmox HOST to configure LXC containers for Tailscale
+# LXCs need TUN/TAP device access which requires host-side configuration
+
+- name: Get list of all LXC containers
+  ansible.builtin.shell: |
+    pct list | awk 'NR>1 {print $1}'
+  register: lxc_containers
+  changed_when: false
+
+- name: Check if LXC configs already have TUN device
+  ansible.builtin.shell: |
+    grep -q "lxc.cgroup2.devices.allow: c 10:200 rwm" /etc/pve/lxc/{{ item }}.conf
+  loop: "{{ lxc_containers.stdout_lines }}"
+  register: tun_check
+  changed_when: false
+  failed_when: false
+
+- name: Add TUN/TAP device access to LXC containers
+  ansible.builtin.blockinfile:
+    path: "/etc/pve/lxc/{{ item.item }}.conf"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - Tailscale TUN device"
+    block: |
+      lxc.cgroup2.devices.allow: c 10:200 rwm
+      lxc.mount.entry: /dev/net/tun dev/net/tun none bind,create=file
+  loop: "{{ tun_check.results }}"
+  when: item.rc != 0
+  register: lxc_config_changed
+
+- name: Get running LXC container status
+  ansible.builtin.shell: |
+    pct status {{ item.item }} | grep -q running
+  loop: "{{ lxc_config_changed.results }}"
+  when: item.changed
+  register: lxc_running_status
+  changed_when: false
+  failed_when: false
+
+- name: Notify user about LXC restart requirement
+  ansible.builtin.debug:
+    msg: |
+      LXC {{ item.item.item }} configuration updated for Tailscale.
+      The container needs to be restarted for changes to take effect.
+      Run: pct reboot {{ item.item.item }}
+  loop: "{{ lxc_running_status.results }}"
+  when:
+    - item.item is defined
+    - item.item.changed
+    - item.rc == 0
+
+- name: Restart LXC containers to apply TUN device access
+  ansible.builtin.command: "pct reboot {{ item.item.item }}"
+  loop: "{{ lxc_running_status.results }}"
+  when:
+    - item.item is defined
+    - item.item.changed
+    - item.rc == 0
+  async: 10
+  poll: 0
+
+- name: Wait for LXC containers to come back online
+  ansible.builtin.wait_for:
+    host: "{{ hostvars[groups['lxcs'] | select('match', '.*_lxc') | list | map('regex_replace', '_lxc$', '') | select('match', '.*' ~ item.item.item ~ '.*') | first | default('localhost')]['ansible_host'] | default('localhost') }}"
+    port: 22
+    delay: 5
+    timeout: 60
+  loop: "{{ lxc_running_status.results }}"
+  when:
+    - item.item is defined
+    - item.item.changed
+    - item.rc == 0
+  failed_when: false

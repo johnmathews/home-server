@@ -1,6 +1,5 @@
 # playbooks/immich_lxc.yml
 
-
 - name: Open WebUI LXC
   hosts: open_webui_lxc
   gather_facts: true
@@ -11,3 +10,5 @@
       tags: open-webui
     - role: shell_environment
       tags: shell
+    - role: tailscale
+      tags: tailscale

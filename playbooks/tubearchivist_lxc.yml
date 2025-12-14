@@ -16,3 +16,5 @@
       tags: sleep
     - role: shell_environment
       tags: shell
+    - role: tailscale
+      tags: tailscale
