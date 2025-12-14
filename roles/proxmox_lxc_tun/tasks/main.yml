@@ -1,0 +1,86 @@
+---
+# Configure Proxmox LXC containers to support TUN devices
+# This is required for VPN software (Tailscale, WireGuard, OpenVPN, etc.)
+#
+# What this does:
+# - Adds /dev/net/tun device access to all LXC containers
+# - Modifies /etc/pve/lxc/XXX.conf files on Proxmox host
+# - Optionally reboots LXCs to apply changes
+#
+# Why needed:
+# - LXCs are sandboxed by default and can't create TUN devices
+# - VPN software needs TUN device to create virtual network interfaces
+
+- name: Check if running on Proxmox host
+  ansible.builtin.stat:
+    path: /usr/bin/pct
+  register: pct_check
+
+- name: Skip if not Proxmox host
+  ansible.builtin.debug:
+    msg: "Skipping - not a Proxmox host (pct command not found)"
+  when: not pct_check.stat.exists
+
+- name: Configure LXC TUN devices
+  when: pct_check.stat.exists and proxmox_lxc_tun_enabled
+  block:
+    - name: Get list of all LXC containers
+      ansible.builtin.shell: |
+        pct list | awk 'NR>1 {print $1}'
+      register: lxc_containers
+      changed_when: false
+
+    - name: Display found LXCs
+      ansible.builtin.debug:
+        msg: "Found {{ lxc_containers.stdout_lines | length }} LXC containers: {{ lxc_containers.stdout_lines | join(', ') }}"
+
+    - name: Check if LXC configs already have TUN device
+      ansible.builtin.shell: |
+        grep -q "lxc.cgroup2.devices.allow: c 10:200 rwm" /etc/pve/lxc/{{ item }}.conf
+      loop: "{{ lxc_containers.stdout_lines }}"
+      register: tun_check
+      changed_when: false
+      failed_when: false
+
+    - name: Add TUN/TAP device access to LXC containers
+      ansible.builtin.blockinfile:
+        path: "/etc/pve/lxc/{{ item.item }}.conf"
+        marker: "# {mark} ANSIBLE MANAGED - Tailscale/VPN TUN device"
+        block: |
+          lxc.cgroup2.devices.allow: c 10:200 rwm
+          lxc.mount.entry: /dev/net/tun dev/net/tun none bind,create=file
+      loop: "{{ tun_check.results }}"
+      when: item.rc != 0
+      register: lxc_config_updated
+
+    - name: List LXCs that were updated
+      ansible.builtin.set_fact:
+        updated_lxcs: "{{ lxc_config_updated.results | selectattr('changed', 'equalto', true) | map(attribute='item') | map(attribute='item') | list }}"
+
+    - name: Display LXCs that need restart
+      ansible.builtin.debug:
+        msg: "Updated {{ updated_lxcs | length }} LXC(s) with TUN device: {{ updated_lxcs | join(', ') }}"
+      when: updated_lxcs | length > 0
+
+    - name: Reboot updated LXC containers
+      ansible.builtin.command: "pct reboot {{ item }}"
+      loop: "{{ updated_lxcs }}"
+      when:
+        - updated_lxcs | length > 0
+        - proxmox_lxc_tun_auto_reboot
+
+    - name: Wait for LXCs to reboot
+      ansible.builtin.pause:
+        seconds: "{{ proxmox_lxc_tun_reboot_wait }}"
+        prompt: "Waiting {{ proxmox_lxc_tun_reboot_wait }}s for LXCs to reboot..."
+      when:
+        - updated_lxcs | length > 0
+        - proxmox_lxc_tun_auto_reboot
+
+    - name: Summary
+      ansible.builtin.debug:
+        msg: |
+          LXC TUN device configuration complete!
+          Total LXCs: {{ lxc_containers.stdout_lines | length }}
+          Updated: {{ updated_lxcs | length }}
+          All LXCs now have /dev/net/tun access for VPN software.

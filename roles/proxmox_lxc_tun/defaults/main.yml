@@ -1,0 +1,11 @@
+---
+# Proxmox LXC TUN device configuration defaults
+
+# Enable TUN device support for LXCs (required for VPN software like Tailscale)
+proxmox_lxc_tun_enabled: true
+
+# Automatically reboot LXCs after adding TUN device
+proxmox_lxc_tun_auto_reboot: true
+
+# Wait time after rebooting LXCs (seconds)
+proxmox_lxc_tun_reboot_wait: 20

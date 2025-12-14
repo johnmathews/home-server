@@ -23,6 +23,19 @@ Tailscale is a zero-config mesh VPN built on WireGuard that creates direct encry
      - ✗ Ephemeral (unless you want auto-cleanup of offline devices)
      - ✗ Pre-authorized (let admins approve devices)
 
+## Architecture Overview
+
+The Tailscale setup consists of:
+
+1. **`roles/tailscale/`** - Installs and configures Tailscale on any Debian/Ubuntu host
+2. **`roles/proxmox_lxc_tun/`** - Configures Proxmox LXC containers to support VPN software
+3. **`playbooks/tailscale.yml`** - Deploys Tailscale to all hosts
+4. **`inventory-tailscale.ini`** - Inventory file with Tailscale IPs for remote access
+
+### LXC Container Requirements
+
+Proxmox LXC containers are sandboxed and cannot create `/dev/net/tun` devices by default. The `proxmox_lxc_tun` role adds TUN device support to all LXC containers on the Proxmox host. This is automatically handled when you run `make pve`.
+
 ## Installation Steps
 
 ### 1. Add Auth Key to Vault
@@ -39,9 +52,28 @@ Encrypt the vault:
 ansible-vault encrypt group_vars/all/vault.yml
 ```
 
-### 2. Deploy Tailscale to All Hosts
+### 2. Configure Proxmox and LXCs
 
-Run the playbook to install and configure Tailscale on all VMs and LXCs:
+**Important:** Run this first to prepare LXC containers for VPN software:
+
+```bash
+# This will:
+# - Add TUN device support to all LXC containers
+# - Install Tailscale on the Proxmox host
+make pve
+```
+
+The `proxmox_lxc_tun` role (included in `make pve`) adds these lines to each LXC config:
+```
+lxc.cgroup2.devices.allow: c 10:200 rwm
+lxc.mount.entry: /dev/net/tun dev/net/tun none bind,create=file
+```
+
+This only needs to be run once and is idempotent (safe to run multiple times).
+
+### 3. Deploy Tailscale to All Other Hosts
+
+After Proxmox is configured, deploy to VMs and LXCs:
 
 ```bash
 # Deploy to all hosts
@@ -60,7 +92,7 @@ This will:
 - Start the Tailscale daemon
 - Display the assigned Tailscale IP
 
-### 3. Collect Tailscale IP Addresses
+### 4. Collect Tailscale IP Addresses
 
 After deployment, get the Tailscale IP for each host:
 
@@ -73,7 +105,7 @@ ssh john@192.168.2.105 "tailscale ip -4"
 tailscale status
 ```
 
-### 4. Update Tailscale Inventory
+### 5. Update Tailscale Inventory
 
 Edit `inventory-tailscale.ini` and replace the placeholder IPs (100.x.x.x) with actual Tailscale IPs:
 
@@ -85,7 +117,7 @@ media_vm ansible_host=100.64.0.5 ansible_user=john ansible_ssh_private_key_file=
 infra_vm ansible_host=100.64.0.8 ansible_user=john ansible_ssh_private_key_file=~/.ssh/john_macbook
 ```
 
-### 5. Install Tailscale on Your Laptop
+### 6. Install Tailscale on Your Laptop
 
 **macOS**:
 ```bash
@@ -104,7 +136,7 @@ sudo tailscale up
 **Windows**:
 Download installer from: https://tailscale.com/download/windows
 
-### 6. Test Remote Access
+### 7. Test Remote Access
 
 Test SSH access using Tailscale IPs:
 

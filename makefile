@@ -103,9 +103,6 @@ share_drive_probe:
 tailscale:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/tailscale.yml $(VAULT) $(ANSIBLE_OPTS)
 
-tailscale-prep:
-	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/proxmox-lxc-tailscale-prep.yml $(VAULT) $(ANSIBLE_OPTS)
-
 lint-paths:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/validate-paths.yml $(VAULT) $(ANSIBLE_OPTS)
 

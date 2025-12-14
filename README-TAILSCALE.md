@@ -39,18 +39,18 @@ tailscale_auth_key: "tskey-auth-PASTE-YOUR-KEY-HERE"
 
 Save and exit.
 
-### 3. Prepare LXC Containers (2 minutes)
+### 3. Deploy Tailscale to Homelab (5-10 minutes)
 
-**IMPORTANT**: LXC containers need special configuration to support VPN software. Run this ONCE:
+**First, configure Proxmox and LXCs:**
 
 ```bash
-# Prepare all LXCs for Tailscale (adds TUN device access)
-make tailscale-prep
+# This will:
+# 1. Add TUN device support to all LXC containers (for VPN)
+# 2. Install Tailscale on the Proxmox host
+make pve
 ```
 
-This configures all LXC containers and reboots them. Only needed once.
-
-### 4. Deploy Tailscale to Homelab (5-10 minutes)
+**Then deploy to all other hosts:**
 
 ```bash
 # From your homelab (on local network)
@@ -58,6 +58,8 @@ make tailscale
 ```
 
 This installs Tailscale on all your VMs and LXCs. Wait for it to complete.
+
+**Note:** The `make pve` command already configured your LXC containers with TUN device support (required for VPNs). You only need to run it once.
 
 ### 4. Collect Tailscale IPs (2 minutes)
 
