@@ -1,0 +1,8 @@
+# TrueNAS share refresh script (workaround for share activation bug)
+refresh_shares_enabled: true
+refresh_shares_nfs_path: "tank/paperless"
+refresh_shares_smb_path: "tank/paperless"
+refresh_shares_wait_seconds: 10
+refresh_shares_log_file: "/mnt/swift/logs/refresh_shares.log"
+
+truenas_api_url: "https://192.168.2.104/api/v2.0"

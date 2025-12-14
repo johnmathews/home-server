@@ -1,4 +1,74 @@
-This document covers the disk spindown script and the disk-status-exporter app
+This document covers TrueNAS scripts and apps: share refresh, disk spindown, and disk-status-exporter
+
+## Share Refresh
+
+TrueNAS has a bug where NFS/SMB shares appear active but don't actually work until they're disabled and re-enabled. A script runs on boot to work around this by cycling the shares (OFF → wait → ON).
+
+### Deployment
+
+Deploy the latest version:
+```bash
+make nas t=refresh-shares
+```
+
+### Configuration
+
+Variables in `roles/nas/defaults/main.yml`:
+- `refresh_shares_enabled: true`
+- `refresh_shares_nfs_path: "tank/paperless"`
+- `refresh_shares_smb_path: "tank/paperless"`
+- `refresh_shares_wait_seconds: 10`
+
+### UI
+
+`System → Advanced Settings → Init/Shutdown Scripts`
+- Type: Command
+- Command: `/mnt/swift/scripts/refresh_shares.sh`
+- When: Post Init
+
+### Script Location
+
+- `/mnt/swift/scripts/refresh_shares.sh` (deployed)
+- `roles/nas/templates/refresh_shares.sh.j2` (source)
+
+### How It Works
+
+1. Verifies TrueNAS API is accessible
+2. Looks up NFS and SMB share IDs via API
+3. Disables both shares
+4. Waits 10 seconds
+5. Re-enables both shares
+6. Logs everything to `/mnt/swift/logs/refresh_shares.log`
+
+### Logs
+
+`/mnt/swift/logs/refresh_shares.log`
+
+Example output:
+```
+────────────────────────────────────────────
+Refresh script started at 2025-12-14 23:30:45
+────────────────────────────────────────────
+
+[INFO] Verifying TrueNAS API health...
+  [OK] TrueNAS API accessible
+
+[INFO] Looking up share IDs...
+  [OK] NFS share tank/paperless → ID: 3
+  [OK] SMB share tank/paperless → ID: 5
+
+[INFO] Disabling shares...
+  [OK] Disabled NFS share (ID: 3)
+  [OK] Disabled SMB share (ID: 5)
+
+[INFO] Waiting 10 seconds...
+
+[INFO] Enabling shares...
+  [OK] Enabled NFS share (ID: 3)
+  [OK] Enabled SMB share (ID: 5)
+
+[OK] Share refresh complete!
+```
 
 ## Disk Spindown
 
@@ -16,9 +86,10 @@ period and only if utilisation is below 0.1% is a spindown using `hdparm` implem
 
 ### Spindown Script Deployment
 
-The current version of the disk spindown script can be
-
-- `make nas tags=hdds`
+Deploy the latest version:
+```bash
+make nas t=hdds
+```
 
 The version line at the top of the script shows when it was last edited.
 

@@ -6,8 +6,8 @@
     owner: root
     group: root
   loop:
-    - mnt/swift/apps/alloy"
-  tags: alloy
+    - /mnt/swift/apps/alloy
+  tags: alloy-configuration
 
 - name: Upload alloy config files 
   copy:
@@ -17,8 +17,7 @@
     group: root
     mode: '0644'
   loop:
-    - alloy:
-      src: files/config.alloy
-      dest: /mnt/swift/apps/alloy/config.alloy 
+    - src: files/config.alloy
+      dest: /mnt/swift/apps/alloy/config.alloy
   become: true
-  tags: alloy
+  tags: alloy-configuration

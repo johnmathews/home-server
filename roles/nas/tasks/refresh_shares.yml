@@ -1,0 +1,9 @@
+- name: Upload refresh_shares script to TrueNAS
+  template:
+    src: templates/refresh_shares.sh.j2
+    dest: /mnt/swift/scripts/refresh_shares.sh
+    mode: '0755'
+    owner: root
+    group: root
+  tags: refresh-shares
+  when: refresh_shares_enabled | default(true)

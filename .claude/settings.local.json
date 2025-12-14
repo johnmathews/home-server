@@ -40,7 +40,9 @@
       "Bash(echo:*)",
       "Bash(done)",
       "Bash(ping:*)",
-      "Bash(timeout 5 ssh:*)"
+      "Bash(timeout 5 ssh:*)",
+      "Bash(git restore:*)",
+      "Bash(scp:*)"
     ],
     "deny": [],
     "ask": []
