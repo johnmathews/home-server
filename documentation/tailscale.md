@@ -4,9 +4,11 @@ This guide covers setting up Tailscale VPN for remote SSH/Ansible access to your
 
 ## What is Tailscale?
 
-Tailscale is a zero-config mesh VPN built on WireGuard that creates direct encrypted connections between your devices. It allows you to access your homelab from anywhere (coffee shops, hotels, airports) as if you were on your local network.
+Tailscale is a zero-config mesh VPN built on WireGuard that creates direct encrypted connections between your devices. It
+allows you to access your homelab from anywhere (coffee shops, hotels, airports) as if you were on your local network.
 
 **Key benefits**:
+
 - **Zero configuration**: Install, authenticate, and it works
 - **Direct connections**: Peer-to-peer when possible (fast)
 - **Works everywhere**: Automatic NAT traversal through firewalls
@@ -34,7 +36,8 @@ The Tailscale setup consists of:
 
 ### LXC Container Requirements
 
-Proxmox LXC containers are sandboxed and cannot create `/dev/net/tun` devices by default. The `proxmox_lxc_tun` role adds TUN device support to all LXC containers on the Proxmox host. This is automatically handled when you run `make pve`.
+Proxmox LXC containers are sandboxed and cannot create `/dev/net/tun` devices by default. The `proxmox_lxc_tun` role adds
+TUN device support to all LXC containers on the Proxmox host. This is automatically handled when you run `make pve`.
 
 ## Installation Steps
 
@@ -48,6 +51,7 @@ tailscale_auth_key: "tskey-auth-XXXXXXXXXXXXXXXXXXXXX"
 ```
 
 Encrypt the vault:
+
 ```bash
 ansible-vault encrypt group_vars/all/vault.yml
 ```
@@ -64,6 +68,7 @@ make pve
 ```
 
 The `proxmox_lxc_tun` role (included in `make pve`) adds these lines to each LXC config:
+
 ```
 lxc.cgroup2.devices.allow: c 10:200 rwm
 lxc.mount.entry: /dev/net/tun dev/net/tun none bind,create=file
@@ -87,6 +92,7 @@ ansible-playbook -i inventory.ini playbooks/tailscale.yml --vault-password-file=
 ```
 
 This will:
+
 - Install Tailscale on each host
 - Authenticate with your Tailscale network
 - Start the Tailscale daemon
@@ -120,6 +126,7 @@ infra_vm ansible_host=100.64.0.8 ansible_user=john ansible_ssh_private_key_file=
 ### 6. Install Tailscale on Your Laptop
 
 **macOS**:
+
 ```bash
 brew install tailscale
 sudo tailscale up
@@ -128,13 +135,13 @@ sudo tailscale up
 Or download from: https://tailscale.com/download/mac
 
 **Linux**:
+
 ```bash
 curl -fsSL https://tailscale.com/install.sh | sh
 sudo tailscale up
 ```
 
-**Windows**:
-Download installer from: https://tailscale.com/download/windows
+**Windows**: Download installer from: https://tailscale.com/download/windows
 
 ### 7. Test Remote Access
 
@@ -189,6 +196,7 @@ Tailscale provides automatic DNS for your devices. Enable MagicDNS in the admin 
 https://login.tailscale.com/admin/dns
 
 Then access hosts by name:
+
 ```bash
 ssh john@media-vm
 ssh root@proxmox-host
@@ -202,11 +210,13 @@ open http://prometheus-lxc:9090
 To access the entire local network (192.168.2.x) through Tailscale, configure Proxmox as a subnet router:
 
 Edit `host_vars/proxmox_host.yml`:
+
 ```yaml
 tailscale_advertise_routes: "192.168.2.0/24"
 ```
 
 Redeploy:
+
 ```bash
 make tailscale LIMIT=proxmox_host
 ```
@@ -214,11 +224,13 @@ make tailscale LIMIT=proxmox_host
 Approve routes in admin console: https://login.tailscale.com/admin/machines
 
 Then enable route acceptance on your laptop:
+
 ```bash
 tailscale up --accept-routes
 ```
 
 Now you can access local IPs directly:
+
 ```bash
 ssh john@192.168.2.105  # Works via Proxmox subnet route
 ```
@@ -228,11 +240,13 @@ ssh john@192.168.2.105  # Works via Proxmox subnet route
 Route all your laptop traffic through your homelab (useful for privacy on untrusted networks):
 
 Configure Proxmox as exit node in `host_vars/proxmox_host.yml`:
+
 ```yaml
 tailscale_exit_node: true
 ```
 
 Enable on your laptop:
+
 ```bash
 tailscale up --exit-node=proxmox-host
 ```
@@ -242,6 +256,7 @@ tailscale up --exit-node=proxmox-host
 Restrict SSH to only accept connections from Tailscale interface.
 
 Edit `/etc/ssh/sshd_config` on each host:
+
 ```
 # Only listen on Tailscale interface
 ListenAddress 100.64.0.X  # Replace with actual Tailscale IP
@@ -249,6 +264,7 @@ ListenAddress 127.0.0.1   # Keep localhost for local access
 ```
 
 Restart SSH:
+
 ```bash
 systemctl restart sshd
 ```
@@ -257,28 +273,28 @@ systemctl restart sshd
 
 ### Access Control Lists (ACLs)
 
-Restrict which devices can access which services using Tailscale ACLs:
-https://login.tailscale.com/admin/acls
+Restrict which devices can access which services using Tailscale ACLs: https://login.tailscale.com/admin/acls
 
 Example ACL:
+
 ```json
 {
-  "acls": [
-    {
-      "action": "accept",
-      "src": ["tag:laptop"],
-      "dst": ["tag:homelab:*"]
-    },
-    {
-      "action": "accept",
-      "src": ["tag:homelab"],
-      "dst": ["tag:homelab:*"]
-    }
-  ],
-  "tagOwners": {
-    "tag:laptop": ["your-email@example.com"],
-    "tag:homelab": ["your-email@example.com"]
+ "acls": [
+  {
+   "action": "accept",
+   "src": ["tag:laptop"],
+   "dst": ["tag:homelab:*"]
+  },
+  {
+   "action": "accept",
+   "src": ["tag:homelab"],
+   "dst": ["tag:homelab:*"]
   }
+ ],
+ "tagOwners": {
+  "tag:laptop": ["your-email@example.com"],
+  "tag:homelab": ["your-email@example.com"]
+ }
 }
 ```
 
@@ -330,17 +346,19 @@ tailscale down
 
 ## Monitoring
 
-Tailscale integrates with your existing Prometheus setup via node_exporter. The Tailscale interface appears as `tailscale0` in network metrics.
+Tailscale integrates with your existing Prometheus setup via node_exporter. The Tailscale interface appears as
+`tailscale0` in network metrics.
 
 Add custom metrics (optional):
+
 ```yaml
 # In prometheus config
-- job_name: 'tailscale'
+- job_name: "tailscale"
   static_configs:
-    - targets:
-      - '100.64.0.1:9100'  # Proxmox
-      - '100.64.0.5:9100'  # Media
-      - '100.64.0.8:9100'  # Infra
+   - targets:
+      - "100.64.0.1:9100" # Proxmox
+      - "100.64.0.5:9100" # Media
+      - "100.64.0.8:9100" # Infra
 ```
 
 ## Security Considerations
@@ -357,16 +375,19 @@ Add custom metrics (optional):
 You now have two access methods:
 
 **Cloudflare Tunnel** (existing):
+
 - Web services: Immich, Jellyfin
 - Public access with Zero Trust authentication
 - HTTPS with automatic certs
 
 **Tailscale** (new):
+
 - SSH and Ansible management
 - Direct access to all services (including internal ones)
 - Private network, no public exposure
 
 Keep both! They serve different purposes:
+
 - Cloudflare for sharing services with others
 - Tailscale for your private management access
 
