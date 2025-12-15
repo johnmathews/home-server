@@ -109,14 +109,14 @@ validate_json() {
 
   # Check if jq is available for proper validation
   if command -v jq >/dev/null 2>&1; then
-    if ! jq empty 2>/dev/null <<< "$json"; then
+    if ! jq empty 2>/dev/null <<<"$json"; then
       return 1
     fi
 
     # Check for error field in response
-    if jq -e '.error' >/dev/null 2>&1 <<< "$json"; then
+    if jq -e '.error' >/dev/null 2>&1 <<<"$json"; then
       local error_msg
-      error_msg=$(jq -r '.error // "unknown"' 2>/dev/null <<< "$json")
+      error_msg=$(jq -r '.error // "unknown"' 2>/dev/null <<<"$json")
       log_err "_" api_response "error_in_json" "error=$error_msg"
       return 1
     fi
@@ -127,7 +127,7 @@ validate_json() {
     fi
 
     # Check for obvious error patterns
-    if grep -qi '"error"' <<< "$json"; then
+    if grep -qi '"error"' <<<"$json"; then
       log_warn "_" api_response "possible_error_in_json" "json=${json:0:100}"
       return 1
     fi
@@ -202,18 +202,18 @@ get_nfs_share_id() {
   local share_id
   if command -v jq >/dev/null 2>&1; then
     # Try exact path match first
-    share_id=$(jq -r ".[] | select(.path==\"$dataset\") | .id" <<< "$response" 2>/dev/null | head -1)
+    share_id=$(jq -r ".[] | select(.path==\"$dataset\") | .id" <<<"$response" 2>/dev/null | head -1)
 
     # If not found, try path variations
     if [[ -z "$share_id" ]] || [[ "$share_id" == "null" ]]; then
       # Try without /mnt prefix
       local short_path="${dataset#/mnt/}"
-      share_id=$(jq -r ".[] | select(.path | endswith(\"/$short_path\")) | .id" <<< "$response" 2>/dev/null | head -1)
+      share_id=$(jq -r ".[] | select(.path | endswith(\"/$short_path\")) | .id" <<<"$response" 2>/dev/null | head -1)
 
       # Try with /mnt prefix if not already there
       if [[ -z "$share_id" ]] || [[ "$share_id" == "null" ]]; then
         if [[ ! "$dataset" =~ ^/mnt/ ]]; then
-          share_id=$(jq -r ".[] | select(.path==\"/mnt/$dataset\") | .id" <<< "$response" 2>/dev/null | head -1)
+          share_id=$(jq -r ".[] | select(.path==\"/mnt/$dataset\") | .id" <<<"$response" 2>/dev/null | head -1)
         fi
       fi
     fi
@@ -249,18 +249,18 @@ get_smb_share_id() {
   local share_id
   if command -v jq >/dev/null 2>&1; then
     # Try exact path match first
-    share_id=$(jq -r ".[] | select(.path==\"$dataset\") | .id" <<< "$response" 2>/dev/null | head -1)
+    share_id=$(jq -r ".[] | select(.path==\"$dataset\") | .id" <<<"$response" 2>/dev/null | head -1)
 
     # If not found, try path variations
     if [[ -z "$share_id" ]] || [[ "$share_id" == "null" ]]; then
       # Try without /mnt prefix
       local short_path="${dataset#/mnt/}"
-      share_id=$(jq -r ".[] | select(.path | endswith(\"/$short_path\")) | .id" <<< "$response" 2>/dev/null | head -1)
+      share_id=$(jq -r ".[] | select(.path | endswith(\"/$short_path\")) | .id" <<<"$response" 2>/dev/null | head -1)
 
       # Try with /mnt prefix if not already there
       if [[ -z "$share_id" ]] || [[ "$share_id" == "null" ]]; then
         if [[ ! "$dataset" =~ ^/mnt/ ]]; then
-          share_id=$(jq -r ".[] | select(.path==\"/mnt/$dataset\") | .id" <<< "$response" 2>/dev/null | head -1)
+          share_id=$(jq -r ".[] | select(.path==\"/mnt/$dataset\") | .id" <<<"$response" 2>/dev/null | head -1)
         fi
       fi
     fi
@@ -280,6 +280,45 @@ get_smb_share_id() {
   return 0
 }
 
+# Retry wrapper for share lookups - handles timing issues during boot
+get_share_id_with_retry() {
+  local share_type="$1" dataset="$2"
+  local max_attempts=10
+  local wait_between=2
+  local attempt=1
+
+  log_debug "$dataset" "${share_type}_lookup" "starting_with_retry" "max_attempts=$max_attempts"
+
+  while [[ $attempt -le $max_attempts ]]; do
+    local share_id
+
+    if [[ "$share_type" == "nfs" ]]; then
+      share_id=$(get_nfs_share_id "$dataset" 2>/dev/null)
+    elif [[ "$share_type" == "smb" ]]; then
+      share_id=$(get_smb_share_id "$dataset" 2>/dev/null)
+    else
+      log_err "$dataset" share_lookup "invalid_type" "type=$share_type"
+      return 1
+    fi
+
+    if [[ -n "$share_id" && "$share_id" != "null" ]]; then
+      log_info "$dataset" "${share_type}_lookup" "found" "share_id=$share_id attempt=$attempt"
+      echo "$share_id"
+      return 0
+    fi
+
+    if [[ $attempt -lt $max_attempts ]]; then
+      log_debug "$dataset" "${share_type}_lookup" "retry" "attempt=$attempt waiting=${wait_between}s"
+      sleep $wait_between
+    fi
+
+    attempt=$((attempt + 1))
+  done
+
+  log_err "$dataset" "${share_type}_lookup" "failed_after_retries" "attempts=$max_attempts"
+  return 1
+}
+
 # Verify share state
 verify_share_state() {
   local share_type="$1" share_id="$2" expected_state="$3" dataset="$4"
@@ -293,12 +332,17 @@ verify_share_state() {
   fi
 
   if command -v jq >/dev/null 2>&1; then
-    local actual_state
-    actual_state=$(jq -r '.enabled // "unknown"' <<< "$verify")
+    local actual_state jq_error
+    actual_state=$(jq -r '.enabled | tostring' <<<"$verify" 2>/dev/null)
+    jq_error=$?
 
-    # Debug: log the actual response if state is unknown
-    if [[ "$actual_state" == "unknown" ]]; then
-      log_warn "$dataset" "${share_type}_verify" "debug_response" "response=${verify:0:200}"
+    # Convert boolean strings to lowercase for comparison
+    actual_state=$(echo "$actual_state" | tr '[:upper:]' '[:lower:]')
+
+    # Check if jq failed or returned null
+    if [[ $jq_error -ne 0 ]] || [[ "$actual_state" == "null" ]]; then
+      log_warn "$dataset" "${share_type}_verify" "cannot_determine_state" "jq_rc=$jq_error actual=$actual_state"
+      return 1
     fi
 
     if [[ "$actual_state" == "$expected_state" ]]; then
@@ -412,7 +456,7 @@ check_truenas_health() {
 
   if command -v jq >/dev/null 2>&1; then
     local version
-    version=$(jq -r '.version // "unknown"' <<< "$response" 2>/dev/null)
+    version=$(jq -r '.version // "unknown"' <<<"$response" 2>/dev/null)
     log_info "_" truenas_health "ok" "version=$version"
   else
     log_info "_" truenas_health "ok" "response_received"
@@ -424,6 +468,11 @@ check_truenas_health() {
 # -------- main refresh function --------
 
 refresh_shares() {
+
+  # the script runs POSTINIT with a 30second timeout.
+  # Brief initial delay before API calls
+  sleep 5
+
   msg_color "$BLUE" "[INFO] Verifying TrueNAS API health..."
 
   if ! check_truenas_health; then
@@ -434,17 +483,17 @@ refresh_shares() {
 
   msg_color "$BLUE" "[INFO] Looking up share IDs..."
 
-  # Get NFS share ID
+  # Get NFS share ID with retry logic
   local nfs_id
-  nfs_id=$(get_nfs_share_id "$SHARE_NFS_PATH")
+  nfs_id=$(get_share_id_with_retry "nfs" "$SHARE_NFS_PATH")
   if [[ -z "$nfs_id" ]]; then
     fail_early nfs_lookup_failed "Could not find NFS share: $SHARE_NFS_PATH" 1
   fi
   msg_color "$GREEN" "  [OK] NFS share $SHARE_NFS_PATH → ID: $nfs_id"
 
-  # Get SMB share ID
+  # Get SMB share ID with retry logic
   local smb_id
-  smb_id=$(get_smb_share_id "$SHARE_SMB_PATH")
+  smb_id=$(get_share_id_with_retry "smb" "$SHARE_SMB_PATH")
   if [[ -z "$smb_id" ]]; then
     fail_early smb_lookup_failed "Could not find SMB share: $SHARE_SMB_PATH" 1
   fi
