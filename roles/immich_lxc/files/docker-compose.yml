@@ -1,4 +1,16 @@
 services:
+
+  image-borders:
+    container_name: image_borders
+    image: ghcr.io/johnmathews/image-borders:latest
+    profiles: ["image-borders"]
+    restart: "no"
+    volumes:
+      - /mnt/nfs/photos/finals/reference-photos:/images
+    environment:
+      - SHRINK_BORDERS_PADDING: 5
+        # command: ["/images", "-p", "5"]
+
   immich-folder-album-creator:
     container_name: immich_folder_album_creator
     image: salvoxia/immich-folder-album-creator:latest
@@ -12,18 +24,9 @@ services:
       API_KEY_FILE: /immich_api_key.secret
       ROOT_PATH: /external_libs/photos
       TZ: Europe/Berlin
+      ALBUM_LEVELS: 2
+      MODE: CREATE
       CRON_EXPRESSION: "0 0 1 11 1"
-
-  image-borders:
-    container_name: image_borders
-    image: ghcr.io/johnmathews/image-borders:latest
-    profiles: ["image-borders"]
-    restart: "no"
-    volumes:
-      - /mnt/nfs/photos/finals/reference-photos:/images
-    environment:
-      - SHRINK_BORDERS_PADDING=5
-      # command: ["/images", "-p", "5"]
 
   immich-server:
     container_name: immich_server

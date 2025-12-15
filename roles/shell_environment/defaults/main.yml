@@ -10,6 +10,7 @@ shell_environment_neovim_bin_dir: "/usr/local/bin"
 # Zsh
 shell_environment_zsh_enabled: true
 shell_environment_set_default_shell: true # Set to true in host_vars to change default shell
+shell_environment_vim_mode_enabled: true  # Enable vim keybindings in Zsh
 
 # Oh My Zsh
 shell_environment_omz_enabled: true
@@ -50,7 +51,6 @@ shell_environment_cli_tools:
   - imagemagick
   - tree
   - bat
-  - eza
 
 # Shell aliases
 shell_environment_aliases_enabled: true

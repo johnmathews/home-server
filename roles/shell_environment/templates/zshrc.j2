@@ -46,6 +46,29 @@ setopt HIST_IGNORE_ALL_DUPS
 setopt HIST_FIND_NO_DUPS
 setopt HIST_SAVE_NO_DUPS
 
+{% if shell_environment_vim_mode_enabled | bool %}
+# Vi mode configuration
+bindkey -v
+export KEYTIMEOUT=10
+
+# Use 'kj' to enter normal mode (alternative to ESC)
+bindkey -M viins 'kj' vi-cmd-mode
+
+# Change cursor shape for different vi modes (beam for insert, block for normal)
+function zle-keymap-select {
+  case $KEYMAP in
+    vicmd) echo -ne '\e[1 q';;      # blinking block for normal mode
+    viins|main) echo -ne '\e[5 q';; # blinking beam for insert mode
+  esac
+}
+function zle-line-init {
+  echo -ne '\e[5 q'  # beam cursor on new line
+}
+zle -N zle-keymap-select
+zle -N zle-line-init
+
+{% endif %}
+
 {% if shell_environment_atuin_integration | bool %}
 # Atuin integration (MUST BE LAST - overwrites Ctrl+R)
 if command -v atuin &> /dev/null; then
@@ -64,4 +87,9 @@ fi
 # cd into /srv/infra if it exists
 if [[ -d /srv/infra ]]; then
   cd /srv/infra
+fi
+
+# cd into /srv/media if it exists
+if [[ -d /srv/media ]]; then
+  cd /srv/media
 fi

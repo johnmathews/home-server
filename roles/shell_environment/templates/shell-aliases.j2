@@ -49,8 +49,8 @@ fi
 
 # Docker aliases
 alias d='docker'
-alias dps='docker ps'
-alias dpsa='docker ps -a'
+alias dps='docker ps --format "table {{ "{{.Names}}" }}\t{{ "{{.Image}}" }}\t{{ "{{.CreatedAt}}" }}\t{{ "{{.Status}}" }}"'
+alias dpsa='docker ps -a --format "table {{ "{{.Names}}" }}\t{{ "{{.Image}}" }}\t{{ "{{.CreatedAt}}" }}\t{{ "{{.Status}}" }}"'
 alias dlog='docker logs'
 alias dexec='docker exec -it'
 
