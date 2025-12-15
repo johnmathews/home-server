@@ -367,25 +367,25 @@
     - Share Drive Probe:
         description: "{{ share_drive_probe_quiet_hours_start }} - {{ share_drive_probe_quiet_hours_end }}\ndocs.itsa.pizza/monitor_nfs_smb_mounts"
     - Spin Down Hard Disks:
-        description: "Hourly\ndocs.itsa.pizza/disks.\n\nProxmox HDDs: spundown using tool hd-idle.\n\nTrueNAS HDDs: spundown using script /mnt/switft/scripts/spindown_hdds.sh."
-    - Quiet Hours:
-        description: "{{ docker_quiet_hours_start_hour }}:00 - {{ docker_quiet_hours_end }}\ndocs.itsa.pizza/quiet_hours\n\n- Bazarr\n- Booklore- mariadb\n- Booklore\n- Jellyseerr\n- Paperless\n- Prowlarr\n- Radarr\n- Sabnzbd\n- Sonarr\n- TubeArchivist\n- qBittorrent"
+        description: "0,3,6,12,15,18,22\ndocs.itsa.pizza/disks.\n\nTrueNAS HDDs spundown using script /mnt/switft/scripts/spindown_hdds.sh."
+        # - Quiet Hours:
+        #     description: "{{ docker_quiet_hours_start_hour }}:00 - {{ docker_quiet_hours_end }}\ndocs.itsa.pizza/quiet_hours\n\n- Bazarr\n- Booklore- mariadb\n- Booklore\n- Jellyseerr\n- Paperless\n- Prowlarr\n- Radarr\n- Sabnzbd\n- Sonarr\n- TubeArchivist\n- qBittorrent"
 - Proxmox Backup:
-    - Pruning:
-        description: "10am\nDuration: a few seconds\n\nKeep:\ndaily:14\nweekly:1\nmonthly:3\nyearly:2"
-    - Garbage Collection:
-        description: "11am\nDuration: 1hr - 1hr 20m"
-    - Verification:
-        description: "1pm\nDuration: 3hr30\nReverify after 30 days"
     - Backup:
-        description: "5pm\npaused\n\nKeep:\nlast:14\ndaily:21\nweekly:5\nmonthly:12\nyearly:3"
+      description: "10am\nDuration: 14 minutes\nRetention:\nlast: 14\ndaily: 21\nweekly: 8\nmonthly: 6"
+    - Garbage Collection:
+        description: "11am\nDuration: 10 seconds"
+    - Pruning:
+        description: "12am\nDuration: 7 seconds\n\nKeep:\ndaily:14\nweekly:1\nmonthly:3\nyearly:2\nRemoves old backups according to retention policy."
+    - Verification:
+        description: "2pm\nDuration: 1 second\nReverify after 30 days"
 - TrueNAS_:
     - Disk Power Management:
         description: "tank:\n- 1hr standby\n- max. power usage w/ standby (level 127)\n\nbackup:\n- 30m standby\n- min. power usage w/ standby (level 1)"
     - Snapshots and Replication:
         description: "switft: 10:30am daily\ntank: 11:00am daily"
     - Cloud Sync Tasks:
-        description: "6pm daily"
+        description: "4pm daily"
     - Scrub Tasks:
         description: "On the first sunday at least 35 days after the previous scrub\ntank: 10am\nswift: 4pm\nbackup: 5pm"
     - SMART tests:

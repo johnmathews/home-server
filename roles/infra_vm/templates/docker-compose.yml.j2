@@ -136,20 +136,20 @@ services:
       - "5201:5201" # TCP
       - "5201:5201/udp" # UDP
 
-  filebrowser:
-    image: filebrowser/filebrowser:latest
-    container_name: filebrowser
-    user: "1000:1000"
-    ports:
-      - "8082:80"
-    volumes:
-      - /mnt/nfs:/srv
-      - /srv/infra/filebrowser/config:/config
-      - /srv/infra/filebrowser/config/database:/database
-    environment:
-      - TZ=Europe/Amsterdam
-      - FB_ROOT=/srv
-    restart: unless-stopped
+  # filebrowser:
+  #   image: filebrowser/filebrowser:latest
+  #   container_name: filebrowser
+  #   user: "1000:1000"
+  #   ports:
+  #     - "8082:80"
+  #   volumes:
+  #     - /mnt/nfs:/srv
+  #     - /srv/infra/filebrowser/config:/config
+  #     - /srv/infra/filebrowser/config/database:/database
+  #   environment:
+  #     - TZ=Europe/Amsterdam
+  #     - FB_ROOT=/srv
+  #   restart: unless-stopped
 
   homepage:
     image: ghcr.io/gethomepage/homepage:latest

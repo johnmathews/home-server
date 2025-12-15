@@ -133,20 +133,20 @@ services:
         max-file: "3"
     restart: always
 
-  filebrowser:
-    image: filebrowser/filebrowser:latest
-    container_name: filebrowser
-    user: "${PUID}:${PGID}"
-    ports:
-      - "8082:80"
-    volumes:
-      - /mnt/nfs/media:/srv # Adjust to the path you want to browse
-      - /srv/media/config/filebrowser/config:/config # Config and database
-      - /srv/media/config/filebrowser/config/database:/database # Config and database
-    environment:
-      - TZ=Europe/Amsterdam
-      - FB_ROOT=/srv
-    restart: always
+  # filebrowser:
+  #   image: filebrowser/filebrowser:latest
+  #   container_name: filebrowser
+  #   user: "${PUID}:${PGID}"
+  #   ports:
+  #     - "8082:80"
+  #   volumes:
+  #     - /mnt/nfs/media:/srv # Adjust to the path you want to browse
+  #     - /srv/media/config/filebrowser/config:/config # Config and database
+  #     - /srv/media/config/filebrowser/config/database:/database # Config and database
+  #   environment:
+  #     - TZ=Europe/Amsterdam
+  #     - FB_ROOT=/srv
+  #   restart: always
 
   booklore:
     image: booklore/booklore:latest
