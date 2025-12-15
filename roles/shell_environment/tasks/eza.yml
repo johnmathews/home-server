@@ -1,0 +1,59 @@
+---
+# Install eza modern ls replacement from prebuilt binaries
+
+- name: Ensure tar is installed
+  ansible.builtin.apt:
+    name: tar
+    state: present
+  become: true
+
+- name: Check if eza is already installed with correct version
+  ansible.builtin.stat:
+    path: "{{ shell_environment_eza_install_dir }}/eza-{{ shell_environment_eza_version }}/eza"
+  register: eza_installed
+  changed_when: false
+
+- name: Download eza binary archive
+  ansible.builtin.get_url:
+    url: "https://github.com/eza-community/eza/releases/download/{{ shell_environment_eza_version }}/eza_{{ shell_environment_eza_arch }}.tar.gz"
+    dest: "/tmp/eza-{{ shell_environment_eza_version }}.tar.gz"
+    mode: '0644'
+    timeout: 60
+  become: true
+  when: not eza_installed.stat.exists
+  register: eza_download
+  retries: 3
+  delay: 5
+  until: eza_download is succeeded
+
+- name: Create eza versioned directory
+  ansible.builtin.file:
+    path: "{{ shell_environment_eza_install_dir }}/eza-{{ shell_environment_eza_version }}"
+    state: directory
+    mode: '0755'
+  become: true
+  when: eza_download is changed or not eza_installed.stat.exists
+
+- name: Extract eza binary
+  ansible.builtin.unarchive:
+    src: "/tmp/eza-{{ shell_environment_eza_version }}.tar.gz"
+    dest: "{{ shell_environment_eza_install_dir }}/eza-{{ shell_environment_eza_version }}/"
+    remote_src: true
+    creates: "{{ shell_environment_eza_install_dir }}/eza-{{ shell_environment_eza_version }}/eza"
+  become: true
+  when: eza_download is changed or not eza_installed.stat.exists
+
+- name: Create symlink for eza binary
+  ansible.builtin.file:
+    src: "{{ shell_environment_eza_install_dir }}/eza-{{ shell_environment_eza_version }}/eza"
+    dest: "{{ shell_environment_eza_bin_dir }}/eza"
+    state: link
+    force: true
+  become: true
+
+- name: Remove eza download archive  # noqa: no-handler
+  ansible.builtin.file:
+    path: "/tmp/eza-{{ shell_environment_eza_version }}.tar.gz"
+    state: absent
+  become: true
+  when: eza_download is changed

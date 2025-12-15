@@ -23,10 +23,20 @@
   when: shell_environment_neovim_enabled | bool
   tags: [neovim, editor]
 
+- name: Install Node.js from NodeSource
+  ansible.builtin.import_tasks: nodejs.yml
+  when: shell_environment_nodejs_enabled | bool
+  tags: [nodejs, development, apps]
+
 - name: Install yazi file manager
   ansible.builtin.import_tasks: yazi.yml
   when: shell_environment_yazi_enabled | bool
   tags: [yazi, file-manager, apps]
+
+- name: Install eza modern ls replacement
+  ansible.builtin.import_tasks: eza.yml
+  when: shell_environment_eza_enabled | bool
+  tags: [eza, ls, apps]
 
 - name: Install and configure Zsh
   ansible.builtin.import_tasks: zsh.yml

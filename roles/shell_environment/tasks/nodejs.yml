@@ -1,0 +1,59 @@
+---
+# Node.js installation from NodeSource repository
+
+- name: Remove old Node.js from default repositories
+  ansible.builtin.apt:
+    name:
+      - nodejs
+      - npm
+    state: absent
+  become: true
+
+- name: Ensure directory exists for /etc/apt/keyrings
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+  become: true
+
+- name: Add NodeSource GPG key
+  ansible.builtin.get_url:
+    url: "https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key"
+    dest: /etc/apt/keyrings/nodesource.asc
+    mode: '0644'
+    force: false
+  become: true
+  register: nodesource_key
+
+- name: Add NodeSource repository
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/etc/apt/keyrings/nodesource.asc] https://deb.nodesource.com/node_{{ shell_environment_nodejs_major_version }}.x nodistro main"
+    state: present
+    filename: nodesource
+  become: true
+
+- name: Update apt cache after adding NodeSource repo
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+  become: true
+
+- name: Install Node.js from NodeSource
+  ansible.builtin.apt:
+    name: nodejs
+    state: present
+  become: true
+
+- name: Verify Node.js version
+  ansible.builtin.command: node --version
+  register: nodejs_version
+  changed_when: false
+  failed_when: false
+
+- name: Assert Node.js version is 20 or higher
+  ansible.builtin.assert:
+    that:
+      - nodejs_version.rc == 0
+      - nodejs_version.stdout | regex_replace('^v', '') is version('20.0.0', '>=', version_type='semver')
+    fail_msg: "Node.js version {{ nodejs_version.stdout | default('unknown') }} is below required v20.0.0"
+    success_msg: "Node.js {{ nodejs_version.stdout }} installed successfully"

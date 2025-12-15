@@ -65,3 +65,14 @@ shell_environment_yazi_arch: "x86_64-unknown-linux-gnu"
 shell_environment_yazi_install_dir: "/opt"
 shell_environment_yazi_bin_dir: "/usr/local/bin"
 
+# eza modern ls replacement (binary installation)
+shell_environment_eza_enabled: true
+shell_environment_eza_version: "v0.20.14"  # Latest stable as of Dec 2024
+shell_environment_eza_arch: "x86_64-unknown-linux-gnu"
+shell_environment_eza_install_dir: "/opt"
+shell_environment_eza_bin_dir: "/usr/local/bin"
+
+# Node.js (NodeSource repository)
+shell_environment_nodejs_enabled: true
+shell_environment_nodejs_major_version: "20"  # LTS - Iron (until April 2026)
+

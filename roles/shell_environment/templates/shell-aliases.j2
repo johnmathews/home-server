@@ -18,7 +18,7 @@ alias -- -='cd -'
 
 # Directory listing aliases (using eza if available, fallback to ls)
 if command -v eza &> /dev/null; then
-  alias l='eza -lha --icons --git --group-directories-first'
+  alias l='eza -lha --git --group-directories-first --icons '
   alias ls='eza -lh --git --group-directories-first --icons'
   alias la='eza -lah --git --group-directories-first --icons'
   alias lsa='eza -lah --git --group-directories-first --icons'
@@ -34,6 +34,7 @@ if command -v eza &> /dev/null; then
   alias ld='eza --icons --long --git --tree --level=0 */'
   alias lsda='eza --icons --long --git --tree --level=0 {*/,.*/}'
 else
+  alias ls='ls --color=auto'
   alias ll='ls -lah'
   alias la='ls -lA'
   alias lsa='ls -lA'

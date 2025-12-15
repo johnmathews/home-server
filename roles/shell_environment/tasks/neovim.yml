@@ -1,6 +1,13 @@
 ---
 # Neovim installation and configuration
 
+- name: Ensure Node.js is installed for Mason LSP servers
+  ansible.builtin.assert:
+    that:
+      - shell_environment_nodejs_enabled | bool
+    fail_msg: "Neovim requires Node.js for Mason LSP servers. Enable shell_environment_nodejs_enabled."
+    quiet: true
+
 - name: Remove old Neovim from apt if present
   ansible.builtin.apt:
     name: neovim
@@ -20,8 +27,6 @@
 - name: Install dependencies for Mason LSP servers
   ansible.builtin.apt:
     name:
-      - nodejs
-      - npm
       - python3-pip
       - python3-venv
     state: present
