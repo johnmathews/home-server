@@ -1,5 +1,11 @@
 # host_vars/n8n_lxc.yml
 
+# Shell environment configuration
+# Add root user (UID < 1000). Auto-discovered users (UID >= 1000) are also included.
+# Format: username:home_dir:shell
+shell_environment_shell_users:
+  - "root:/root:/bin/bash"
+
 # NFS shares (optional - n8n typically uses local storage)
 # Uncomment and configure if workflow file sharing is needed
 # nfs_shares:

@@ -32,7 +32,9 @@ shell_environment_atuin_enabled: true
 shell_environment_atuin_integration: true
 shell_environment_atuin_sync_address: "http://192.168.2.106:8888"
 
-# User targeting (empty = auto-discover UID >= 1000)
+# User targeting: Explicit users + auto-discovered users (UID >= 1000 with valid shell)
+# Both lists are combined and deduplicated. Use this to add root or other users with UID < 1000.
+# Format: username:home_dir:shell
 shell_environment_shell_users: []
 
 # CLI tools (apps.yml)

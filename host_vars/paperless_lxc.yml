@@ -36,45 +36,11 @@ sleep_hours_plugins:
 uptime_kuma_url: "http://192.168.2.106:3001"
 uptime_kuma_user: "john"
 
-## SHELL 
-#
-# Neovim
-shell_environment_neovim_enabled: true
-shell_environment_neovim_config_style: "minimal" # minimal, extended, custom
-
-# Zsh
-shell_environment_zsh_enabled: true
-shell_environment_set_default_shell: true # Set to true in host_vars to change default shell
-
-# Oh My Zsh
-shell_environment_omz_enabled: true
-shell_environment_omz_plugins:
-  - git
-  - docker
-  - kubectl
-  - sudo
-  - history
-shell_environment_omz_install_url: "https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh"
-
-# Powerlevel10k
-shell_environment_p10k_enabled: true
-shell_environment_p10k_repo: "https://github.com/romkatv/powerlevel10k.git"
-shell_environment_p10k_style: "lean" # lean, classic, rainbow, pure
-
-# Atuin integration
-shell_environment_atuin_integration: true
-
-# User targeting (empty = auto-discover UID >= 1000)
-shell_environment_shell_users: []
-
-# CLI tools (apps.yml)
-shell_environment_cli_tools_enabled: true
-shell_environment_cli_tools:
-  - tldr
-  - htop
-
-# Shell aliases
-shell_environment_aliases_enabled: true
-
-# SSH directory setup
-shell_environment_ssh_setup_enabled: false # User enables in host_vars if needed
+## SHELL
+# Only override non-default values (see roles/shell_environment/defaults/main.yml for all defaults)
+shell_environment_neovim_config_style: "minimal" # Override default "custom"
+shell_environment_cli_tools: [tldr, htop] # Minimal subset of defaults
+# Add root user (UID < 1000). Auto-discovered users (UID >= 1000) are also included.
+# Format: username:home_dir:shell
+shell_environment_shell_users:
+  - "root:/root:/bin/bash"

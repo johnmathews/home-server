@@ -9,13 +9,11 @@
     executable: /bin/bash
   register: shell_users_raw
   changed_when: false
-  when: shell_environment_shell_users | length == 0
   tags: [always]
 
-- name: Set target users (discovered or explicit)
+- name: Set target users (explicit + discovered, deduplicated)
   ansible.builtin.set_fact:
-    target_shell_users: "{{ shell_environment_shell_users if shell_environment_shell_users | length > 0
-                            else shell_users_raw.stdout_lines | default([]) }}"
+    target_shell_users: "{{ (shell_environment_shell_users + (shell_users_raw.stdout_lines | default([]))) | unique }}"
   tags: [always]
 
 - name: Install Neovim

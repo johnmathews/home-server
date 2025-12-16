@@ -9,4 +9,4 @@ docker_compose_dir: "/srv/apps"
 
 # One-time permission fix for facebook-albums
 # Set to true to run, then set back to false after successful execution
-fix_facebook_albums_perms: true
+fix_facebook_albums_perms: false

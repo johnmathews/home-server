@@ -1,3 +1,9 @@
+# Shell environment configuration
+# Add root user (UID < 1000). Auto-discovered users (UID >= 1000) are also included.
+# Format: username:home_dir:shell
+shell_environment_shell_users:
+  - "root:/root:/bin/bash"
+
 nfs_shares:
   - name: downloads
     mountpoint: /mnt/nfs/downloads
@@ -11,9 +17,6 @@ nfs_shares:
   - name: media
     mountpoint: /mnt/nfs/media
     target: /mnt/tank/media
-  - name: books
-    mountpoint: /mnt/nfs/books
-    target: /mnt/tank/books
 
 # Sleep Hours Configuration
 # NFS/SMB share control: During quiet hours, shares are automatically disabled

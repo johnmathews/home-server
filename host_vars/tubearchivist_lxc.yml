@@ -1,3 +1,9 @@
+# Shell environment configuration
+# Add root user (UID < 1000). Auto-discovered users (UID >= 1000) are also included.
+# Format: username:home_dir:shell
+shell_environment_shell_users:
+  - "root:/root:/bin/bash"
+
 nfs_shares:
   - name: youtube-kids
     mountpoint: /mnt/nfs/youtube-kids

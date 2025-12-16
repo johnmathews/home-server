@@ -42,7 +42,15 @@
       "Bash(ping:*)",
       "Bash(timeout 5 ssh:*)",
       "Bash(git restore:*)",
-      "Bash(scp:*)"
+      "Bash(scp:*)",
+      "Bash(ls:*)",
+      "Bash(wc:*)",
+      "Bash(xargs:*)",
+      "Bash(for file in host_vars/*.yml)",
+      "Bash(do)",
+      "Bash(if grep -q \"Explicitly define users since auto-discovery only finds UID >= 1000\" \"$file\")",
+      "Bash(then)",
+      "Bash(fi)"
     ],
     "deny": [],
     "ask": []
