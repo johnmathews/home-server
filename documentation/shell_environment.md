@@ -1,6 +1,7 @@
 # Shell Environment
 
-The `shell_environment` role provides a modern, feature-rich shell environment across all hosts with Zsh, Powerlevel10k theming, intelligent history management, and a comprehensive set of CLI tools and aliases.
+The `shell_environment` role provides a modern, feature-rich shell environment across all hosts with Zsh, Powerlevel10k
+theming, intelligent history management, and a comprehensive set of CLI tools and aliases.
 
 ## Features
 
@@ -35,10 +36,11 @@ This ensures both root (UID 0) and regular users get the shell environment.
 ```yaml
 # host_vars/hostname.yml
 shell_environment_shell_users:
-  - "root:/root:/bin/bash"
+ - "root:/root:/bin/bash"
 ```
 
 With this configuration:
+
 - Root gets the shell environment (from explicit list)
 - Regular users (UID >= 1000) also get it (from auto-discovery)
 - System service users with nologin shells are excluded
@@ -62,6 +64,7 @@ make site tags=shell
 The role provides numerous aliases for common operations:
 
 ### Docker
+
 - `d` - docker
 - `dps` - docker ps (formatted table)
 - `dpsa` - docker ps -a (all containers)
@@ -69,22 +72,26 @@ The role provides numerous aliases for common operations:
 - `dexec` - docker exec -it (interactive shell)
 
 ### Git
+
 - `gst` - git status
 - `glog` - git log --oneline --graph
 - `gtr` - git log --oneline --graph --all
 
 ### Navigation
+
 - `..` - cd ..
 - `...` - cd ../..
 - `....` - cd ../../..
 
 ### File Management
+
 - `ls` - eza with git status and icons (if available)
 - `ll` - eza -la (long format with hidden files)
 - `lt` - eza --tree (tree view)
 - `y` - yazi (file manager)
 
 ### Utilities
+
 - `v`, `vi`, `vim` - neovim
 - `cl` - clear screen and list files
 - `x` - exit
@@ -132,6 +139,7 @@ See `roles/shell_environment/defaults/main.yml` for all available configuration 
 Atuin provides encrypted, searchable shell history synchronized across all hosts.
 
 **Key bindings:**
+
 - `Ctrl+R` - Search history across all hosts
 - `Up Arrow` - Navigate command history
 
@@ -141,11 +149,29 @@ Atuin provides encrypted, searchable shell history synchronized across all hosts
 shell_environment_atuin_sync_address: "http://192.168.2.106:8888"
 ```
 
+**First-time setup for each user:**
+
+Each user (including non-root users) needs to register or login to atuin:
+
+```bash
+# Register a new account (first time)
+atuin register -u <username> -e <email> -p <password>
+
+# Or login with existing account
+atuin login -u <username> -p <password>
+
+# Sync your history
+atuin sync
+```
+
+The atuin binary is installed system-wide at `/usr/local/bin/atuin` and is accessible to all users.
+
 ## Powerlevel10k Prompt
 
 The default prompt style is "lean" with the following information:
 
 **Left side:**
+
 - User@host (colored by privilege level)
 - Current time
 - Current directory (truncated)
@@ -153,6 +179,7 @@ The default prompt style is "lean" with the following information:
 - Vi mode indicator
 
 **Right side:**
+
 - Exit status of last command
 - Command execution time
 - Background jobs
@@ -161,7 +188,7 @@ The default prompt style is "lean" with the following information:
 **Configuration:** Change prompt style per host:
 
 ```yaml
-shell_environment_p10k_style: "rainbow"  # lean, classic, rainbow, pure
+shell_environment_p10k_style: "rainbow" # lean, classic, rainbow, pure
 ```
 
 ## Vi Mode
@@ -169,6 +196,7 @@ shell_environment_p10k_style: "rainbow"  # lean, classic, rainbow, pure
 Vi mode provides vim keybindings in the shell (enabled by default).
 
 **Key features:**
+
 - `kj` or `ESC` - Enter normal mode
 - Cursor shape changes (line in insert, block in normal)
 - All standard vim navigation (h, j, k, l, w, b, etc.)
@@ -188,12 +216,13 @@ Ensure root is explicitly listed in host_vars:
 
 ```yaml
 shell_environment_shell_users:
-  - "root:/root:/bin/bash"
+ - "root:/root:/bin/bash"
 ```
 
 ### Shell environment not applying to regular users
 
 Check that:
+
 1. User has UID >= 1000
 2. User's shell is not `/usr/sbin/nologin` or `/bin/false`
 3. Run `getent passwd | awk -F: '$3 >= 1000 && $7 !~ /nologin|false/ {print $1":"$6":"$7}'` to see discovered users

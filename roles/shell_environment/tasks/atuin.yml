@@ -1,25 +1,19 @@
 # shell_environment/tasks/atuin.yml
 
----
 # Install and configure Atuin shell history sync
 
-- name: Ensure Atuin is installed
+- name: Ensure Atuin is installed system-wide
   ansible.builtin.shell: |
-    curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
+    set -e
+    export ATUIN_DONT_PRINT_WELCOME=1
+    curl --proto "=https" --tlsv1.2 -LsSf https://setup.atuin.sh | sh -s -- --no-modify-path
+    if [ -d /root/.atuin ]; then
+      cp -r /root/.atuin/bin/atuin /usr/local/bin/atuin
+      chmod 755 /usr/local/bin/atuin
+    fi
   args:
     executable: /bin/bash
-    creates: /root/.atuin/bin/atuin
-  environment:
-    ATUIN_DONT_PRINT_WELCOME: "1"
-  when: shell_environment_atuin_enabled | bool
-  tags: [atuin, shell]
-
-- name: Create symlink to make atuin available system-wide
-  ansible.builtin.file:
-    src: /root/.atuin/bin/atuin
-    dest: /usr/local/bin/atuin
-    state: link
-    force: true
+    creates: /usr/local/bin/atuin
   become: true
   when: shell_environment_atuin_enabled | bool
   tags: [atuin, shell]
