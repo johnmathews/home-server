@@ -40,9 +40,13 @@
   register: nvim_installed
   become: true
 
+- name: Map architecture to Neovim naming convention
+  ansible.builtin.set_fact:
+    neovim_arch: "{{ 'arm64' if ansible_architecture == 'aarch64' else ansible_architecture }}"
+
 - name: Download Neovim AppImage
   ansible.builtin.get_url:
-    url: "https://github.com/neovim/neovim/releases/download/{{ shell_environment_neovim_version }}/nvim-linux-x86_64.appimage"
+    url: "https://github.com/neovim/neovim/releases/download/{{ shell_environment_neovim_version }}/nvim-linux-{{ neovim_arch }}.appimage"
     dest: "/tmp/nvim-{{ shell_environment_neovim_version }}.appimage"
     mode: '0755'
     timeout: 120
