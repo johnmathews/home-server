@@ -6,6 +6,10 @@ shell_environment_neovim_config_style: "custom" # minimal, extended, custom
 shell_environment_neovim_version: "v0.11.5"
 shell_environment_neovim_install_dir: "/opt"
 shell_environment_neovim_bin_dir: "/usr/local/bin"
+shell_environment_neovim_deploy_docs: true       # Deploy documentation files
+shell_environment_neovim_deploy_scripts: true    # Deploy development scripts
+# Optional: Custom Python path for neovim python provider (defaults to ~/.pyenv/versions/3.10.12/envs/nvim/bin/python3)
+# shell_environment_neovim_python_path: "/usr/bin/python3"
 
 # Zsh
 shell_environment_zsh_enabled: true

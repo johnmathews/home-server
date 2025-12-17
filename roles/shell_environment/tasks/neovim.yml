@@ -99,7 +99,51 @@
   loop: "{{ target_shell_users }}"
   become: true
 
-- name: Deploy Neovim config (init.lua)
+- name: Create Neovim subdirectories
+  ansible.builtin.file:
+    path: "{{ item[0].split(':')[1] }}/.config/nvim/{{ item[1] }}"
+    state: directory
+    owner: "{{ item[0].split(':')[0] }}"
+    group: "{{ item[0].split(':')[0] }}"
+    mode: '0755'
+  with_nested:
+    - "{{ target_shell_users }}"
+    - ['lua', 'lua/plugins', 'lua/snippets', 'ftplugin', 'docs', 'scripts']
+  become: true
+
+- name: Deploy Neovim core lua modules
+  ansible.builtin.copy:
+    src: "nvim-custom/lua/{{ item[1] }}"
+    dest: "{{ item[0].split(':')[1] }}/.config/nvim/lua/{{ item[1] }}"
+    owner: "{{ item[0].split(':')[0] }}"
+    group: "{{ item[0].split(':')[0] }}"
+    mode: '0644'
+  loop: "{{ target_shell_users | product(['options.lua', 'plugins.lua', 'functions.lua', 'mappings.lua', 'autocmd.lua', 'colorscheme.lua']) | list }}"
+  become: true
+
+- name: Deploy Neovim plugin configurations
+  ansible.builtin.copy:
+    src: "nvim-custom/lua/plugins/"
+    dest: "{{ item.split(':')[1] }}/.config/nvim/lua/plugins/"
+    owner: "{{ item.split(':')[0] }}"
+    group: "{{ item.split(':')[0] }}"
+    mode: '0644'
+    directory_mode: '0755'
+  loop: "{{ target_shell_users }}"
+  become: true
+
+- name: Deploy Neovim snippet files
+  ansible.builtin.copy:
+    src: "nvim-custom/lua/snippets/"
+    dest: "{{ item.split(':')[1] }}/.config/nvim/lua/snippets/"
+    owner: "{{ item.split(':')[0] }}"
+    group: "{{ item.split(':')[0] }}"
+    mode: '0644'
+    directory_mode: '0755'
+  loop: "{{ target_shell_users }}"
+  become: true
+
+- name: Deploy Neovim main configuration (init.lua)
   ansible.builtin.template:
     src: init.lua.j2
     dest: "{{ item.split(':')[1] }}/.config/nvim/init.lua"
@@ -108,3 +152,49 @@
     mode: '0644'
   loop: "{{ target_shell_users }}"
   become: true
+
+- name: Deploy Neovim filetype plugins
+  ansible.builtin.copy:
+    src: "nvim-custom/ftplugin/"
+    dest: "{{ item.split(':')[1] }}/.config/nvim/ftplugin/"
+    owner: "{{ item.split(':')[0] }}"
+    group: "{{ item.split(':')[0] }}"
+    mode: '0644'
+    directory_mode: '0755'
+  loop: "{{ target_shell_users }}"
+  become: true
+
+- name: Deploy Neovim documentation
+  ansible.builtin.copy:
+    src: "nvim-custom/docs/"
+    dest: "{{ item.split(':')[1] }}/.config/nvim/docs/"
+    owner: "{{ item.split(':')[0] }}"
+    group: "{{ item.split(':')[0] }}"
+    mode: '0644'
+    directory_mode: '0755'
+  loop: "{{ target_shell_users }}"
+  become: true
+  when: shell_environment_neovim_deploy_docs | bool
+
+- name: Deploy Neovim support files
+  ansible.builtin.copy:
+    src: "nvim-custom/{{ item[1] }}"
+    dest: "{{ item[0].split(':')[1] }}/.config/nvim/{{ item[1] }}"
+    owner: "{{ item[0].split(':')[0] }}"
+    group: "{{ item[0].split(':')[0] }}"
+    mode: '0644'
+  loop: "{{ target_shell_users | product(['README.md', 'AGENTS.md', 'lazy-lock.json', 'stylua.toml']) | list }}"
+  become: true
+  when: shell_environment_neovim_config_style == 'custom'
+
+- name: Deploy Neovim development scripts
+  ansible.builtin.copy:
+    src: "nvim-custom/scripts/"
+    dest: "{{ item.split(':')[1] }}/.config/nvim/scripts/"
+    owner: "{{ item.split(':')[0] }}"
+    group: "{{ item.split(':')[0] }}"
+    mode: '0755'
+    directory_mode: '0755'
+  loop: "{{ target_shell_users }}"
+  become: true
+  when: shell_environment_neovim_deploy_scripts | bool

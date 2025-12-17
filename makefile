@@ -8,8 +8,8 @@ VAULT ?= --vault-password-file=.vault_pass.txt
 PLAYBOOK_DIR := playbooks
 ANSIBLE := .venv/bin/ansible-playbook
 
-# INVENTORY := -i inventory.ini
-INVENTORY := -i inventory-tailscale.ini
+INVENTORY := -i inventory.ini
+# INVENTORY := -i inventory-tailscale.ini
 
 
 # Pass like: make media TAGS=homepage
@@ -17,10 +17,10 @@ INVENTORY := -i inventory-tailscale.ini
 #   make media SKIP=bigstuff
 #   make media LIMIT=infra
 #   make media EXTRA="--diff -vv"
-TAGS   ?=
-SKIP   ?=
-LIMIT  ?=
-EXTRA  ?=
+TAGS  ?=
+SKIP  ?=
+LIMIT ?=
+EXTRA ?=
 
 tags  ?=
 skip  ?=
