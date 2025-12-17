@@ -226,10 +226,10 @@
         href: http://192.168.2.105:8082
         siteMonitor: http://192.168.2.105:8082
         icon: filebrowser
-    - HomeTube:
-        href: http://192.168.2.105:8501
-        # siteMonitor: http://192.168.2.105:8501
-        icon: http://192.168.2.105:8501/favicon.ico
+    # - HomeTube:
+    #     href: http://192.168.2.105:8501
+    #     # siteMonitor: http://192.168.2.105:8501
+    #     icon: http://192.168.2.105:8501/favicon.ico
     - BookLore:
         href: https://books.itsa.pizza
         # siteMonitor: http://192.168.2.105:6060
@@ -479,10 +479,10 @@
         widget:
           type: myspeed
           url: http://192.168.2.112:5216/
-    - VaultWarden:
-        href: https://passwords.itsa.pizza
-        siteMonitor: https://192.168.2.13:8000
-        icon: vaultwarden
+    # - VaultWarden:
+    #     href: https://passwords.itsa.pizza
+    #     siteMonitor: https://192.168.2.13:8000
+    #     icon: vaultwarden
     - Home Assistant:
         href: https://home.itsa.pizza
         siteMonitor: http://192.168.2.102:8123
@@ -496,6 +496,10 @@
             - state: sensor.tech_shelf_power
               label: server shelf
 - External:
+    - Tailscale:
+        href: https://login.tailscale.com/admin/machines
+        siteMonitor: https://login.tailscale.com/admin/machines
+        icon: tailscale
     - Pushover:
         href: https://pushover.net/
         siteMonitor: https://pushover.net/
