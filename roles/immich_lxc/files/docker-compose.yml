@@ -11,6 +11,20 @@ services:
       - SHRINK_BORDERS_PADDING: 5
         # command: ["/images", "-p", "5"]
 
+  immich-public-proxy:
+    image: alangrainger/immich-public-proxy:latest
+    container_name: immich-public-proxy
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      PUBLIC_BASE_URL: https://immich.itsa.pizza
+      IMMICH_URL: http://192.168.2.113:2283
+    healthcheck:
+      test: curl -s http://localhost:3000/share/healthcheck -o /dev/null || exit 1
+      start_period: 10s
+      timeout: 5s
+
   immich-server:
     container_name: immich_server
     image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
@@ -19,7 +33,6 @@ services:
       - ${UPLOAD_LOCATION}:/usr/src/app/upload
       - /etc/localtime:/etc/localtime:ro
       - /mnt/nfs/photos:/mnt/nfs/photos
-      - /mnt/nfs/photos/facebook_albums:/external_libs/photos
     env_file:
       - .env
     ports:

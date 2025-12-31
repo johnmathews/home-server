@@ -1,7 +1,6 @@
 # vim: ft=yaml
 # jellyfin_lxc/files/docker-compose.yml
 
-
 services:
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
@@ -66,7 +65,7 @@ services:
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--storage.tsdb.path=/prometheus"
-      - "--storage.tsdb.retention.size=18GB"
+      - "--storage.tsdb.retention.size=20GB"
       - "--storage.tsdb.retention.time=100d"
     restart: always
 
