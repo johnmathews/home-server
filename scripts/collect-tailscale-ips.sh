@@ -4,7 +4,6 @@
 
 set -euo pipefail
 
-INVENTORY="inventory.ini"
 SSH_KEY="$HOME/.ssh/john_macbook"
 
 echo "Collecting Tailscale IPs from all hosts..."
@@ -15,15 +14,15 @@ echo "├──────────────────────┼�
 
 # Function to get Tailscale IP from a host
 get_tailscale_ip() {
-    local user=$1
-    local host=$2
-    local name=$3
+  local user=$1
+  local host=$2
+  local name=$3
 
-    # Try to get Tailscale IP
-    tailscale_ip=$(ssh -i "$SSH_KEY" -o ConnectTimeout=5 -o StrictHostKeyChecking=no \
-        "${user}@${host}" "tailscale ip -4 2>/dev/null" 2>/dev/null || echo "Not available")
+  # Try to get Tailscale IP
+  tailscale_ip=$(ssh -i "$SSH_KEY" -o ConnectTimeout=5 -o StrictHostKeyChecking=no \
+    "${user}@${host}" "tailscale ip -4 2>/dev/null" 2>/dev/null || echo "Not available")
 
-    printf "│ %-20s │ %-15s │ %-17s │\n" "$name" "$host" "$tailscale_ip"
+  printf "│ %-20s │ %-15s │ %-17s │\n" "$name" "$host" "$tailscale_ip"
 }
 
 # Proxmox
