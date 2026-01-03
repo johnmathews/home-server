@@ -8,18 +8,18 @@ services:
     volumes:
       - /mnt/nfs/photos/finals/reference-photos:/images
     environment:
-      - SHRINK_BORDERS_PADDING: 5
-        # command: ["/images", "-p", "5"]
+      SHRINK_BORDERS_PADDING: 5
+      # command: ["/images", "-p", "5"]
 
   immich-public-proxy:
     image: alangrainger/immich-public-proxy:latest
-    container_name: immich-public-proxy
+    container_name: immich_public_proxy
     restart: always
     ports:
       - "3000:3000"
     environment:
-      PUBLIC_BASE_URL: https://immich.itsa.pizza
       IMMICH_URL: http://192.168.2.113:2283
+      PUBLIC_BASE_URL: https://immich.itsa.pizza
     healthcheck:
       test: curl -s http://localhost:3000/share/healthcheck -o /dev/null || exit 1
       start_period: 10s

@@ -11,6 +11,16 @@ http:
       middlewares:
         - force-https-proto
         - security-headers
+
+    immich-share:
+      rule: Host(`share.itsa.pizza`) || ( Host(`immich.itsa.pizza`) && ( PathPrefix(`/share`) ) )
+      entryPoints: [web]
+      service: immich-share-svc
+      priority: 150 # outrank generic rules
+      middlewares:
+        - force-https-proto
+        - security-headers
+
     immich-auth:
       rule: Host(`immich.itsa.pizza`) && ( PathPrefix(`/api/auth`) || PathPrefix(`/auth`) || PathPrefix(`/api/oauth`) || PathPrefix(`/oauth`) )
       entryPoints: [web]
@@ -20,6 +30,7 @@ http:
         - force-https-proto
         - security-headers
         - immich-login-rl
+
     jelly:
       rule: Host(`jelly.itsa.pizza`)
       entryPoints: [web]
@@ -28,6 +39,7 @@ http:
         - force-https-proto
         - security-headers
         - jelly-login-rl
+
     traefik-ip:
       rule: Host(`192.168.2.108`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))
       entryPoints: [web]
@@ -36,6 +48,7 @@ http:
       middlewares:
         - local-only
         - security-headers # optional; remove if it causes UI issues
+
     traefik-api-local:
       rule: Host(`traefik.itsa.pizza`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
       entryPoints: [web]
@@ -44,23 +57,33 @@ http:
       middlewares:
         - local-only
         - security-headers
+
     traefik-dash:
       rule: Host(`traefik.itsa.pizza`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))
       entryPoints: [web]
       service: api@internal
       middlewares:
         - security-headers
+
   services:
     immich-svc:
       loadBalancer:
         servers:
           - url: "http://192.168.2.113:2283"
         passHostHeader: true
+
+    immich-share-svc:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.2.113:3000"
+        passHostHeader: true
+
     jelly-svc:
       loadBalancer:
         servers:
           - url: "http://192.168.2.110:8096"
         passHostHeader: true
+
   middlewares:
     local-only:
       ipAllowList:
@@ -69,19 +92,23 @@ http:
           - 10.0.0.0/8
           - 172.16.0.0/12
           - 127.0.0.1/32
+
     force-https-proto:
       headers:
         customRequestHeaders:
           X-Forwarded-Proto: "https"
+
     immich-login-rl:
       rateLimit:
         average: 200 # tokens added per period
         period: 1s # refill period (v3 style)
         burst: 300 # allow short spikes (JS chunk bursts, parallel requests)
+
     jelly-login-rl:
       rateLimit:
         average: 60
         burst: 30
+
     security-headers:
       headers:
         referrerPolicy: "strict-origin-when-cross-origin"

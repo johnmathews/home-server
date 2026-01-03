@@ -1,4 +1,5 @@
 # traefik_lxc/tasks/main.yml
+
 - name: Create base app directories for containers
   ansible.builtin.file:
     path: "{{ item }}"
@@ -10,6 +11,7 @@
     - "{{ docker_compose_dir }}/alloy"
     - "{{ docker_compose_dir }}/traefik/dynamic"
   tags: traefik
+
 - name: Copy Alloy config
   copy:
     src: files/config.alloy
@@ -19,6 +21,7 @@
     mode: '0644'
   notify: restart alloy
   tags: alloy
+
 - name: Template Traefik config
   template:
     src: traefik.yml.j2
@@ -28,6 +31,7 @@
     mode: '0644'
   notify: restart traefik
   tags: traefik
+
 - name: Template Traefik dynamic routers
   template:
     src: routers.yml.j2
@@ -37,6 +41,7 @@
     mode: '0644'
   notify: restart traefik
   tags: traefik
+
 - name: Copy docker-compose.yml
   template:
     src: templates/docker-compose.yml.j2
