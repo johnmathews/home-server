@@ -19,11 +19,38 @@ _ytdl_on_media_vm() {
     return 1
   fi
 
-  # Must exist locally BEFORE we do anything
+  # Validate URL format (basic check for supported video sites)
+  if [[ ! "$url" =~ ^https?://(www\.)?(youtube\.com|youtu\.be|vimeo\.com|dailymotion\.com|twitch\.tv) ]]; then
+    echo "⚠️  Warning: URL doesn't look like a supported video site"
+    echo "   Supported: YouTube, Vimeo, Dailymotion, Twitch"
+    echo "   Proceeding anyway..."
+  fi
+
+  # Check cookies file exists and has content
   if [[ ! -f "$LOCAL_YT_COOKIES" ]]; then
     echo "❌ Cookies file not found:"
     echo "   $LOCAL_YT_COOKIES"
     echo "Export youtube.com cookies to this file (Netscape cookies.txt)."
+    return 1
+  fi
+
+  if [[ ! -s "$LOCAL_YT_COOKIES" ]]; then
+    echo "❌ Cookies file is empty:"
+    echo "   $LOCAL_YT_COOKIES"
+    return 1
+  fi
+
+  # Warn if cookies are older than 7 days (likely stale)
+  local cookie_age_days=$(( ($(date +%s) - $(stat -f %m "$LOCAL_YT_COOKIES" 2>/dev/null || stat -c %Y "$LOCAL_YT_COOKIES")) / 86400 ))
+  if [[ $cookie_age_days -gt 7 ]]; then
+    echo "⚠️  Warning: Cookies file is $cookie_age_days days old (may be stale)"
+    echo "   Consider re-exporting fresh cookies from your browser"
+  fi
+
+  # Check if yt-dlp is installed on remote
+  if ! /usr/bin/ssh -o BatchMode=yes media 'command -v yt-dlp >/dev/null 2>&1'; then
+    echo "❌ yt-dlp not found on media VM"
+    echo "   Install it with: ssh media 'pip install yt-dlp'"
     return 1
   fi
 
@@ -33,6 +60,9 @@ _ytdl_on_media_vm() {
     echo "❌ Failed to create remote temp dir"
     return 1
   }
+
+  # Setup cleanup trap to ensure temp files are removed even on interrupt
+  trap "/usr/bin/ssh media \"rm -rf '$remote_tmpdir' 2>/dev/null || true\" 2>/dev/null; trap - INT TERM; return 130" INT TERM
 
   # Put cookie inside tempdir to avoid collisions
   local remote_cookie="$remote_tmpdir/cookies.txt"
@@ -54,6 +84,62 @@ _ytdl_on_media_vm() {
 
   echo "⏬ Downloading on media VM to: $remote_tmpdir"
   echo "📦 Final destination: $remote_final_dir"
+  echo ""
+
+  # Fetch video info for display and duplicate checking
+  echo "🔍 Fetching video info..."
+  local video_info
+  video_info="$(/usr/bin/ssh -o BatchMode=yes media "yt-dlp --print '%(id)s|%(title)s|%(height)sp' --cookies $(printf '%q' "$remote_cookie") $(printf '%q' "$url") 2>/dev/null" || echo "unknown|Unknown Video|0p")"
+
+  local video_id="${video_info%%|*}"
+  local video_title="${${video_info#*|}%%|*}"
+  local new_quality="${video_info##*|}"
+
+  echo ""
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo "📹 VIDEO: $video_title"
+  echo "🆔 ID: $video_id"
+  echo "📊 Quality: $new_quality"
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo ""
+
+  # Check if video already exists
+  echo "🔎 Checking for existing downloads..."
+  local existing_file
+  existing_file="$(/usr/bin/ssh -o BatchMode=yes media "find $(printf '%q' "$remote_final_dir") -type f -name '*\\[${video_id}\\]*' 2>/dev/null | head -1" || echo "")"
+
+  if [[ -n "$existing_file" ]]; then
+    echo "⚠️  Found existing file: $(basename "$existing_file")"
+
+    # Get quality of existing file using ffprobe
+    local existing_quality
+    existing_quality="$(/usr/bin/ssh -o BatchMode=yes media "ffprobe -v error -select_streams v:0 -show_entries stream=height -of csv=p=0 $(printf '%q' "$existing_file") 2>/dev/null" || echo "0")"
+    existing_quality="${existing_quality}p"
+
+    echo "   Existing quality: $existing_quality"
+    echo "   New quality: $new_quality"
+
+    # Compare qualities (extract numeric values)
+    local existing_num="${existing_quality%p}"
+    local new_num="${new_quality%p}"
+
+    if [[ "$new_num" -le "$existing_num" ]]; then
+      echo ""
+      echo "❌ Skipping download - existing file has equal or better quality"
+      echo "   To force re-download, delete: $existing_file"
+      # Clear trap and cleanup
+      trap - INT TERM
+      /usr/bin/ssh media "rm -rf '$remote_tmpdir' 2>/dev/null || true"
+      return 0
+    else
+      echo ""
+      echo "✅ New quality is better - proceeding with download"
+      echo "   Old file will be replaced"
+    fi
+  else
+    echo "✓ No existing download found"
+  fi
+  echo ""
 
   # Run yt-dlp remotely, then move results to final dir
   local remote_script='
@@ -99,10 +185,17 @@ echo "✅ Done."
 '
 
   if /usr/bin/ssh -o BatchMode=yes media "bash -s -- $(printf '%q' "$remote_tmpdir") $(printf '%q' "$remote_cookie") $(printf '%q' "$remote_final_dir") $(printf '%q' "$url")" <<<"$remote_script"; then
-    : # success
+    # Clear trap and cleanup manually on success
+    trap - INT TERM
+    /usr/bin/ssh media "rm -rf '$remote_tmpdir' 2>/dev/null || true"
+    echo ""
+    echo "✅ Successfully downloaded to: $remote_final_dir"
+    return 0
   else
-    echo "❌ Remote job failed"
-    # best-effort cleanup
+    local exit_code=$?
+    echo "❌ Remote job failed (exit code: $exit_code)"
+    # Clear trap and cleanup manually on failure
+    trap - INT TERM
     # shellcheck disable=SC2029  # Intentional client-side expansion
     /usr/bin/ssh media "rm -rf '$remote_tmpdir' 2>/dev/null || true"
     return 1
