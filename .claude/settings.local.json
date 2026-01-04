@@ -50,7 +50,8 @@
       "Bash(do)",
       "Bash(if grep -q \"Explicitly define users since auto-discovery only finds UID >= 1000\" \"$file\")",
       "Bash(then)",
-      "Bash(fi)"
+      "Bash(fi)",
+      "Bash(zsh:*)"
     ],
     "deny": [],
     "ask": []
