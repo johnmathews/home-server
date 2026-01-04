@@ -17,6 +17,9 @@ nfs_shares:
   - name: media
     mountpoint: /mnt/nfs/media
     target: /mnt/tank/media
+  - name: movies
+    mountpoint: /mnt/nfs/movies
+    target: /mnt/tank/movies
 
 # Sleep Hours Configuration
 # NFS/SMB share control: During quiet hours, shares are automatically disabled
