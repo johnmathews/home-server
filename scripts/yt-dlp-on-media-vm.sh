@@ -159,6 +159,7 @@ yt-dlp \
   --embed-thumbnail \
   --convert-thumbnails jpg \
   --sub-langs "en.*,nl,de,es" \
+  --write-auto-subs \
   --embed-subs \
   -f bestvideo+bestaudio \
   --merge-output-format mkv \
