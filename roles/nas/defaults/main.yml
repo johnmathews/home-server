@@ -6,3 +6,15 @@ refresh_shares_wait_seconds: 5
 refresh_shares_log_file: "/mnt/swift/logs/refresh_shares.log"
 
 truenas_api_url: "https://192.168.2.104/api/v2.0"
+
+# Safe reboot script configuration
+safe_reboot_enabled: true
+safe_reboot_max_retries: 5
+safe_reboot_retry_sleep_seconds: 1800  # 30 minutes
+safe_reboot_io_sample_duration: 300    # 5 minutes - total I/O sampling period
+safe_reboot_io_sample_interval: 30     # 30 seconds - interval between samples
+safe_reboot_io_ops_threshold: 2        # operations/sec - allow minimal background I/O below this
+safe_reboot_log_file: "/mnt/swift/logs/safe_reboot.log"
+safe_reboot_log_max_size_mb: 10        # rotate log when it reaches 10MB
+safe_reboot_log_keep_count: 5          # keep last 5 rotated logs
+safe_reboot_lock_file: "/var/run/safe_reboot.lock"

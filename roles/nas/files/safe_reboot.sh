@@ -1,0 +1,301 @@
+#!/usr/bin/env bash
+
+# Version: 2026-01-05
+#
+# Location: /mnt/swift/scripts/safe_reboot.sh
+# Purpose: Safely reboot TrueNAS Scale after verifying no critical operations are in progress.
+#
+# Safety checks:
+#   - No ZFS resilver or scrub in progress
+#   - No active I/O on ZFS pools
+#   - No system updates in progress (future enhancement)
+#
+# Retry behavior:
+#   - If any check fails, wait 30 minutes and retry
+#   - Maximum 5 retries (2.5 hours total)
+#   - Logs all decisions to /mnt/swift/logs/safe_reboot.log
+#
+# Notes:
+#   - Uses ANSI color in logs for readability. Disable with NO_COLOR=1 env var.
+#   - Designed to run via cron (user configures schedule in TrueNAS UI)
+#   - Plain logs (no color escape codes): NO_COLOR=1 /mnt/swift/scripts/safe_reboot.sh
+
+# ---------- RIGOR ----------
+set -Eeuo pipefail
+shopt -s lastpipe
+export LC_ALL=C
+PATH=/usr/sbin:/usr/bin:/sbin:/bin
+
+# ---------- CONFIG ----------
+MAX_RETRIES=5
+RETRY_SLEEP=1800                              # 30 minutes in seconds
+IO_SAMPLE_DURATION=300                        # seconds to sample I/O activity (5 minutes)
+IO_SAMPLE_INTERVAL=30                         # seconds between I/O samples
+IO_OPS_THRESHOLD=2                            # operations/sec threshold - allow minimal background I/O below this
+LOG_FILE="/mnt/swift/logs/safe_reboot.log"    # keep on SSD; never wakes HDDs
+LOG_MAX_SIZE=$((10 * 1024 * 1024))            # rotate logs at 10MB
+LOG_KEEP_COUNT=5                              # keep last 5 rotated logs
+LOCK_FILE="/var/run/safe_reboot.lock"
+
+# ---------- ABSOLUTE PATHS (cron-safe) ----------
+AWK=/usr/bin/awk
+DATE=/bin/date
+FLOCK=/usr/bin/flock
+GREP=/usr/bin/grep
+IONICE=/usr/bin/ionice
+MKDIR=/usr/bin/mkdir
+MV=/bin/mv
+NICE=/usr/bin/nice
+RM=/bin/rm
+SHUTDOWN=/sbin/shutdown
+STAT=/usr/bin/stat
+TAIL=/usr/bin/tail
+TEE=/usr/bin/tee
+ZPOOL=/usr/sbin/zpool
+
+# ---------- COLORS ----------
+if [[ -z "${NO_COLOR:-}" ]]; then
+  C_RESET=$'\033[0m'
+  C_DIM=$'\033[2m'
+  C_BOLD=$'\033[1m'
+  C_INFO=$'\033[36m' # cyan
+  C_WARN=$'\033[33m' # yellow
+  C_ERR=$'\033[31m'  # red
+  C_OK=$'\033[32m'   # green
+  C_NOTE=$'\033[35m' # magenta
+else
+  C_RESET= C_DIM= C_BOLD= C_INFO= C_WARN= C_ERR= C_OK= C_NOTE=
+fi
+
+HAD_ERROR=0
+
+ts() { "$DATE" "+%F %T"; }
+
+_log() {
+  # $1=color  $2=level  $3=message
+  local color="$1" lvl="$2" msg="$3"
+  # Timestamp + level padded to width 5
+  printf "[%s] %s%-5s%s %s\n" "$(ts)" "$color" "$lvl" "$C_RESET" "$msg" | "$TEE" -a "$LOG_FILE"
+}
+
+log() { _log "$C_INFO" "INFO" "$*"; }
+log_warn() { _log "$C_WARN" "WARN" "$*"; }
+log_err() { _log "$C_ERR" "ERROR" "$*"; }
+log_ok() { _log "$C_OK" "OK" "$*"; }
+log_note() { _log "$C_NOTE" "NOTE" "$*"; }
+
+die() {
+  HAD_ERROR=1
+  log_err "$*"
+  exit 1
+}
+
+# ---------- ERROR/EXIT TRAPS ----------
+on_err() {
+  local exit_code=$?
+  local line=${BASH_LINENO[0]:-?}
+  local cmd=${BASH_COMMAND:-?}
+
+  HAD_ERROR=1
+  log_err "Aborted with exit code ${exit_code}"
+  log_err "Failing command: ${C_BOLD}${cmd}${C_RESET}"
+  log_err "At line: ${line} in ${BASH_SOURCE[1]:-main}"
+
+  # Mini stack (skip this function & trap frame)
+  local i
+  for ((i = 1; i < ${#FUNCNAME[@]}; i++)); do
+    local fn="${FUNCNAME[$i]}"
+    local src="${BASH_SOURCE[$i]}"
+    local lno="${BASH_LINENO[$((i - 1))]}"
+    [[ -n "$fn" ]] || fn="main"
+    log_note "  at ${fn} (${src}:${lno})"
+  done
+  exit "$exit_code"
+}
+
+on_exit() {
+  if [[ $HAD_ERROR -eq 0 ]]; then
+    echo | "$TEE" -a "$LOG_FILE"
+    log_ok "Safe reboot script complete. Exiting."
+  fi
+}
+
+trap on_err ERR
+trap on_exit EXIT
+
+# ---------- LOG ROTATION ----------
+rotate_logs() {
+  [[ -f "$LOG_FILE" ]] || return 0
+
+  local size
+  size=$("$STAT" -c %s "$LOG_FILE" 2>/dev/null || echo 0)
+
+  if ((size >= LOG_MAX_SIZE)); then
+    # Rotate existing logs: .4 -> .5, .3 -> .4, etc.
+    local i
+    for ((i = LOG_KEEP_COUNT - 1; i >= 1; i--)); do
+      if [[ -f "${LOG_FILE}.${i}" ]]; then
+        "$MV" "${LOG_FILE}.${i}" "${LOG_FILE}.$((i + 1))" 2>/dev/null || true
+      fi
+    done
+
+    # Remove oldest log if it exists
+    [[ -f "${LOG_FILE}.${LOG_KEEP_COUNT}" ]] && "$RM" -f "${LOG_FILE}.${LOG_KEEP_COUNT}" 2>/dev/null || true
+
+    # Rotate current log to .1
+    "$MV" "$LOG_FILE" "${LOG_FILE}.1" 2>/dev/null || true
+  fi
+}
+
+# ---------- PRECHECKS ----------
+"$MKDIR" -p "$(dirname "$LOG_FILE")" || die "Cannot create log dir: $(dirname "$LOG_FILE")"
+
+for bin in "$AWK" "$DATE" "$FLOCK" "$GREP" "$IONICE" "$MKDIR" "$MV" "$NICE" "$RM" "$SHUTDOWN" "$STAT" "$TAIL" "$TEE" "$ZPOOL"; do
+  [[ -x "$bin" ]] || die "Required binary missing: $bin"
+done
+
+# Rotate logs before starting
+rotate_logs
+
+[[ $EUID -eq 0 ]] || die "Run as root."
+
+# Single-run lock
+exec {LOCKFD}>"$LOCK_FILE" || die "Cannot open lock file $LOCK_FILE"
+"$FLOCK" -n "$LOCKFD" || {
+  echo | "$TEE" -a "$LOG_FILE"
+  log_note "Another run is active; exiting."
+  exit 0
+}
+
+# ---------- SAFETY CHECK FUNCTIONS ----------
+
+check_zfs_scan() {
+  if "$ZPOOL" status 2>/dev/null | "$GREP" -Eq "(resilver|scrub) in progress"; then
+    log_warn "ZFS resilver or scrub in progress"
+    return 1
+  fi
+  return 0
+}
+
+check_active_io() {
+  # Sample zpool iostat multiple times over IO_SAMPLE_DURATION to catch bursty I/O
+  # Calculate number of samples needed
+  local num_samples=$((IO_SAMPLE_DURATION / IO_SAMPLE_INTERVAL))
+  ((num_samples < 1)) && num_samples=1
+
+  echo | "$TEE" -a "$LOG_FILE"
+  log "Sampling zpool I/O every ${IO_SAMPLE_INTERVAL}s for ${IO_SAMPLE_DURATION}s (${num_samples} samples)..."
+
+  local sample_num=0
+  local max_ops=0
+  local total_ops=0
+  local high_samples=0
+
+  # Take multiple samples at intervals
+  while ((sample_num < num_samples)); do
+    sample_num=$((sample_num + 1))
+
+    # Sample zpool iostat: 2 samples IO_SAMPLE_INTERVAL seconds apart
+    # First sample is since boot (discarded), second shows activity during interval
+    local iostat_output
+    iostat_output=$("$NICE" -n 10 "$IONICE" -c3 \
+      "$ZPOOL" iostat -p "$IO_SAMPLE_INTERVAL" 2 2>/dev/null | "$TAIL" -n +4 | "$GREP" -v "^$" || true)
+
+    if [[ -z "$iostat_output" ]]; then
+      log_warn "Unable to read zpool iostat; assuming I/O present for safety"
+      return 1
+    fi
+
+    # Sum read and write operations across all pools
+    local sample_ops
+    sample_ops=$("$AWK" '{r+=$(NF-1); w+=$(NF)} END{print r+w}' <<<"$iostat_output")
+    sample_ops=${sample_ops:-0}
+
+    # Calculate ops/sec for this sample
+    local ops_per_sec
+    ops_per_sec=$("$AWK" -v ops="$sample_ops" -v interval="$IO_SAMPLE_INTERVAL" 'BEGIN{printf "%.2f", ops/interval}')
+
+    # Track statistics
+    total_ops=$("$AWK" -v t="$total_ops" -v s="$sample_ops" 'BEGIN{print t+s}')
+    if "$AWK" -v s="$sample_ops" -v m="$max_ops" 'BEGIN{exit !(s > m)}'; then
+      max_ops=$sample_ops
+    fi
+
+    # Check if this sample exceeds threshold
+    if "$AWK" -v ops="$ops_per_sec" -v thresh="$IO_OPS_THRESHOLD" 'BEGIN{exit !(ops > thresh)}'; then
+      log_warn "Sample ${sample_num}/${num_samples}: ${C_BOLD}${ops_per_sec} ops/sec${C_RESET} (threshold: ${IO_OPS_THRESHOLD})"
+      high_samples=$((high_samples + 1))
+    else
+      log "Sample ${sample_num}/${num_samples}: ${ops_per_sec} ops/sec"
+    fi
+  done
+
+  # Calculate average ops/sec across all samples
+  local avg_ops_per_sec
+  avg_ops_per_sec=$("$AWK" -v total="$total_ops" -v duration="$IO_SAMPLE_DURATION" \
+    'BEGIN{printf "%.2f", total/duration}')
+
+  echo | "$TEE" -a "$LOG_FILE"
+  log "I/O Summary: avg ${C_BOLD}${avg_ops_per_sec} ops/sec${C_RESET}, ${high_samples} samples exceeded threshold"
+
+  # Fail if average exceeds threshold
+  if "$AWK" -v avg="$avg_ops_per_sec" -v thresh="$IO_OPS_THRESHOLD" 'BEGIN{exit !(avg > thresh)}'; then
+    log_warn "Average I/O (${avg_ops_per_sec} ops/sec) exceeds threshold (${IO_OPS_THRESHOLD})"
+    return 1
+  fi
+
+  log_ok "Average I/O below threshold (${avg_ops_per_sec} ops/sec < ${IO_OPS_THRESHOLD})"
+  return 0
+}
+
+check_system_updates() {
+  # Future enhancement: Check TrueNAS API for pending updates
+  # For now, always return success (no check)
+  return 0
+}
+
+all_checks_pass() {
+  local zfs_ok=0 io_ok=0 updates_ok=0
+
+  check_zfs_scan && zfs_ok=1
+  check_active_io && io_ok=1
+  check_system_updates && updates_ok=1
+
+  if [[ $zfs_ok -eq 1 && $io_ok -eq 1 && $updates_ok -eq 1 ]]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+# ---------- MAIN LOGIC ----------
+echo | "$TEE" -a "$LOG_FILE"
+log "============================================================"
+log "Starting safe reboot check ${C_DIM}(max retries: ${MAX_RETRIES}, retry interval: ${RETRY_SLEEP}s)${C_RESET}"
+
+retry_count=0
+while ((retry_count < MAX_RETRIES)); do
+  log "Attempt $((retry_count + 1)) of ${MAX_RETRIES}: Running safety checks..."
+
+  if all_checks_pass; then
+    echo | "$TEE" -a "$LOG_FILE"
+    log_ok "All safety checks passed. Initiating reboot now..."
+    "$SHUTDOWN" -r now
+    exit 0
+  fi
+
+  retry_count=$((retry_count + 1))
+
+  if ((retry_count < MAX_RETRIES)); then
+    echo | "$TEE" -a "$LOG_FILE"
+    log_warn "Safety checks failed. Retry $retry_count of ${MAX_RETRIES} in ${RETRY_SLEEP} seconds ($(($RETRY_SLEEP / 60)) minutes)..."
+    sleep "$RETRY_SLEEP"
+  fi
+done
+
+# Max retries exceeded
+echo | "$TEE" -a "$LOG_FILE"
+log_err "Maximum retry limit (${MAX_RETRIES}) exceeded. Aborting reboot."
+log_err "Manual intervention required. Check system state and retry later."
+HAD_ERROR=1
+exit 1

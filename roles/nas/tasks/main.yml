@@ -154,3 +154,7 @@
 - name: Deploy alloy configuration
   import_tasks: alloy_configuration.yml
   tags: alloy-configuration
+
+- name: Set up script to safely reboot TrueNAS
+  import_tasks: safe_reboot.yml
+  tags: safe-reboot
