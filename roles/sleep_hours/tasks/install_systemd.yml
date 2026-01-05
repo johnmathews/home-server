@@ -33,8 +33,6 @@
     mode: '0644'
   notify: restart sleep-hours timers
 
-
-
 - name: Install stop timer
   become: true
   ansible.builtin.template:

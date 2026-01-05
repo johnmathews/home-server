@@ -1,6 +1,6 @@
 - name: Upload safe_reboot script to TrueNAS
-  ansible.builtin.copy:
-    src: files/safe_reboot.sh
+  ansible.builtin.template:
+    src: safe_reboot.sh.j2
     dest: /mnt/swift/scripts/safe_reboot.sh
     mode: '0755'
     owner: root

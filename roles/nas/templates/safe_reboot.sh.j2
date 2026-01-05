@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# vim: ft=sh
 
 # Version: 2026-01-05
 #
@@ -19,7 +20,7 @@
 #   - Uses ANSI color in logs for readability. Disable with NO_COLOR=1 env var.
 #   - Designed to run via cron (user configures schedule in TrueNAS UI)
 #   - Plain logs (no color escape codes): NO_COLOR=1 /mnt/swift/scripts/safe_reboot.sh
-
+{% raw %}
 # ---------- RIGOR ----------
 set -Eeuo pipefail
 shopt -s lastpipe
@@ -28,17 +29,24 @@ PATH=/usr/sbin:/usr/bin:/sbin:/bin
 
 # ---------- CONFIG ----------
 MAX_RETRIES=5
-RETRY_SLEEP=1800                              # 30 minutes in seconds
-IO_SAMPLE_DURATION=300                        # seconds to sample I/O activity (5 minutes)
-IO_SAMPLE_INTERVAL=30                         # seconds between I/O samples
-IO_OPS_THRESHOLD=2                            # operations/sec threshold - allow minimal background I/O below this
-LOG_FILE="/mnt/swift/logs/safe_reboot.log"    # keep on SSD; never wakes HDDs
-LOG_MAX_SIZE=$((10 * 1024 * 1024))            # rotate logs at 10MB
-LOG_KEEP_COUNT=5                              # keep last 5 rotated logs
+RETRY_SLEEP=1800                           # 30 minutes in seconds
+IO_SAMPLE_DURATION=300                     # seconds to sample I/O activity (5 minutes)
+IO_SAMPLE_INTERVAL=30                      # seconds between I/O samples
+IO_OPS_THRESHOLD=2                         # operations/sec threshold - allow minimal background I/O below this
+LOG_FILE="/mnt/swift/logs/safe_reboot.log" # keep on SSD; never wakes HDDs
+LOG_MAX_SIZE=$((10 * 1024 * 1024))         # rotate logs at 10MB
+LOG_KEEP_COUNT=5                           # keep last 5 rotated logs
 LOCK_FILE="/var/run/safe_reboot.lock"
 
+# Pushover notification settings
+PUSHOVER_ENABLED=true
+{% endraw %}
+PUSHOVER_USER_KEY="{{ vault_pushover_user_key }}"
+PUSHOVER_API_TOKEN="{{ vault_pushover_truenas_app_api_token }}"
+{% raw %}
 # ---------- ABSOLUTE PATHS (cron-safe) ----------
 AWK=/usr/bin/awk
+CURL=/usr/bin/curl
 DATE=/bin/date
 FLOCK=/usr/bin/flock
 GREP=/usr/bin/grep
@@ -88,6 +96,22 @@ die() {
   HAD_ERROR=1
   log_err "$*"
   exit 1
+}
+
+send_pushover() {
+  [[ "$PUSHOVER_ENABLED" == "true" ]] || return 0
+
+  local title="$1"
+  local message="$2"
+  local priority="${3:-0}" # default priority 0 (normal)
+
+  "$CURL" -s -o /dev/null \
+    --form-string "token=${PUSHOVER_API_TOKEN}" \
+    --form-string "user=${PUSHOVER_USER_KEY}" \
+    --form-string "title=${title}" \
+    --form-string "message=${message}" \
+    --form-string "priority=${priority}" \
+    https://api.pushover.net/1/messages.json || true
 }
 
 # ---------- ERROR/EXIT TRAPS ----------
@@ -150,7 +174,7 @@ rotate_logs() {
 # ---------- PRECHECKS ----------
 "$MKDIR" -p "$(dirname "$LOG_FILE")" || die "Cannot create log dir: $(dirname "$LOG_FILE")"
 
-for bin in "$AWK" "$DATE" "$FLOCK" "$GREP" "$IONICE" "$MKDIR" "$MV" "$NICE" "$RM" "$SHUTDOWN" "$STAT" "$TAIL" "$TEE" "$ZPOOL"; do
+for bin in "$AWK" "$CURL" "$DATE" "$FLOCK" "$GREP" "$IONICE" "$MKDIR" "$MV" "$NICE" "$RM" "$SHUTDOWN" "$STAT" "$TAIL" "$TEE" "$ZPOOL"; do
   [[ -x "$bin" ]] || die "Required binary missing: $bin"
 done
 
@@ -206,9 +230,10 @@ check_active_io() {
       return 1
     fi
 
-    # Sum read and write operations across all pools
+    # Sum read and write operations across all pools (columns 4 and 5)
+    # Skip header/separator lines (start with dash or have fewer than 6 fields)
     local sample_ops
-    sample_ops=$("$AWK" '{r+=$(NF-1); w+=$(NF)} END{print r+w}' <<<"$iostat_output")
+    sample_ops=$("$AWK" '/^[^-]/ && NF >= 6 {r+=$4; w+=$5} END{print r+w}' <<<"$iostat_output")
     sample_ops=${sample_ops:-0}
 
     # Calculate ops/sec for this sample
@@ -230,21 +255,21 @@ check_active_io() {
     fi
   done
 
-  # Calculate average ops/sec across all samples
+  # Calculate average ops/sec across all samples (for informational purposes)
   local avg_ops_per_sec
   avg_ops_per_sec=$("$AWK" -v total="$total_ops" -v duration="$IO_SAMPLE_DURATION" \
     'BEGIN{printf "%.2f", total/duration}')
 
   echo | "$TEE" -a "$LOG_FILE"
-  log "I/O Summary: avg ${C_BOLD}${avg_ops_per_sec} ops/sec${C_RESET}, ${high_samples} samples exceeded threshold"
+  log "I/O Summary: avg ${C_BOLD}${avg_ops_per_sec} ops/sec${C_RESET}, ${high_samples}/${num_samples} samples exceeded threshold"
 
-  # Fail if average exceeds threshold
-  if "$AWK" -v avg="$avg_ops_per_sec" -v thresh="$IO_OPS_THRESHOLD" 'BEGIN{exit !(avg > thresh)}'; then
-    log_warn "Average I/O (${avg_ops_per_sec} ops/sec) exceeds threshold (${IO_OPS_THRESHOLD})"
+  # Fail if ANY sample exceeded threshold
+  if ((high_samples > 0)); then
+    log_warn "I/O check failed: ${high_samples} sample(s) exceeded threshold (${IO_OPS_THRESHOLD} ops/sec)"
     return 1
   fi
 
-  log_ok "Average I/O below threshold (${avg_ops_per_sec} ops/sec < ${IO_OPS_THRESHOLD})"
+  log_ok "All samples below threshold (${IO_OPS_THRESHOLD} ops/sec)"
   return 0
 }
 
@@ -257,9 +282,29 @@ check_system_updates() {
 all_checks_pass() {
   local zfs_ok=0 io_ok=0 updates_ok=0
 
-  check_zfs_scan && zfs_ok=1
-  check_active_io && io_ok=1
-  check_system_updates && updates_ok=1
+  # Store global failure reasons for Pushover notification
+  FAILURE_REASONS=""
+
+  if ! check_zfs_scan; then
+    FAILURE_REASONS="${FAILURE_REASONS}• ZFS resilver/scrub in progress\n"
+  else
+    zfs_ok=1
+  fi
+
+  if ! check_active_io; then
+    # Get last I/O summary from log for details
+    local io_summary
+    io_summary=$(grep "I/O Summary:" "$LOG_FILE" 2>/dev/null | tail -1 | sed 's/.*I/I/' || echo "I/O above threshold")
+    FAILURE_REASONS="${FAILURE_REASONS}• ${io_summary}\n"
+  else
+    io_ok=1
+  fi
+
+  if ! check_system_updates; then
+    FAILURE_REASONS="${FAILURE_REASONS}• System updates in progress\n"
+  else
+    updates_ok=1
+  fi
 
   if [[ $zfs_ok -eq 1 && $io_ok -eq 1 && $updates_ok -eq 1 ]]; then
     return 0
@@ -280,6 +325,12 @@ while ((retry_count < MAX_RETRIES)); do
   if all_checks_pass; then
     echo | "$TEE" -a "$LOG_FILE"
     log_ok "All safety checks passed. Initiating reboot now..."
+
+    # Send success notification
+    local reboot_time
+    reboot_time=$(ts)
+    send_pushover "TrueNAS Reboot" "TrueNAS is rebooting now after passing all safety checks.\n\nReboot initiated at: ${reboot_time}" 0
+
     "$SHUTDOWN" -r now
     exit 0
   fi
@@ -297,5 +348,10 @@ done
 echo | "$TEE" -a "$LOG_FILE"
 log_err "Maximum retry limit (${MAX_RETRIES}) exceeded. Aborting reboot."
 log_err "Manual intervention required. Check system state and retry later."
+
+# Send failure notification with details
+send_pushover "TrueNAS Reboot Failed" "TrueNAS safe reboot aborted after ${MAX_RETRIES} attempts.\n\nReasons:\n${FAILURE_REASONS}\nManual intervention required." 0
+
 HAD_ERROR=1
 exit 1
+{% endraw %}

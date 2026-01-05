@@ -18,3 +18,4 @@ safe_reboot_log_file: "/mnt/swift/logs/safe_reboot.log"
 safe_reboot_log_max_size_mb: 10        # rotate log when it reaches 10MB
 safe_reboot_log_keep_count: 5          # keep last 5 rotated logs
 safe_reboot_lock_file: "/var/run/safe_reboot.lock"
+safe_reboot_pushover_enabled: true     # send Pushover notifications (keys stored in vault)
