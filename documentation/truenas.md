@@ -177,3 +177,74 @@ Github repo: [https://github.com/johnmathews/disk_status_exporter](https://githu
 ### Logs
 
 In the TrueNAS UI, click on the app and then select `Details > Workloads > View Logs`
+
+## Safe Reboot
+
+TrueNAS has a script that performs safety checks before rebooting to avoid interrupting critical operations like ZFS resilvers, scrubs, or active I/O workloads.
+
+### Deployment
+
+Deploy the latest version:
+```bash
+make nas t=safe-reboot
+```
+
+### Configuration
+
+Variables in `roles/nas/defaults/main.yml`:
+- `safe_reboot_max_retries: 4` - Maximum number of retry attempts
+- `safe_reboot_retry_sleep_seconds: 300` - Wait time between retries (5 minutes)
+- `safe_reboot_io_sample_duration: 180` - Duration to sample I/O per attempt (3 minutes)
+- `safe_reboot_io_sample_interval: 30` - Interval between I/O samples (30 seconds)
+- `safe_reboot_io_ops_threshold: 120` - Operations/minute threshold (2 ops/sec) - normalized so changing sample interval doesn't affect effective threshold
+
+### UI
+
+Configure via TrueNAS cron job to schedule safe reboots:
+- `System → Advanced Settings → Cron Jobs`
+- Type: Command
+- Command: `/mnt/swift/scripts/safe_reboot.sh`
+- Schedule: User-defined (e.g., weekly maintenance window)
+
+### Script Location
+
+- `/mnt/swift/scripts/safe_reboot.sh` (deployed)
+- `roles/nas/templates/safe_reboot.sh.j2` (source)
+
+### How It Works
+
+1. Verifies no ZFS resilver or scrub is in progress
+2. Samples zpool I/O every 30 seconds for 3 minutes (6 samples total per attempt)
+3. Calculates operations per second for each sample
+4. Compares each sample against threshold (120 ops/min = 2 ops/sec, normalized by sample interval)
+5. If ALL samples are below threshold, initiates reboot
+6. If ANY sample exceeds threshold, attempt fails
+7. On failure, waits 5 minutes and retries (up to 4 attempts total)
+8. Sends Pushover notifications on success or failure
+9. Logs all decisions to `/mnt/swift/logs/safe_reboot.log`
+
+### Maximum Runtime
+
+If TrueNAS is continuously busy and all retries exhaust:
+- 4 attempts × 3 minutes per attempt = 12 minutes of I/O sampling
+- 3 wait periods × 5 minutes each = 15 minutes of waiting
+- **Total: 27 minutes maximum** before giving up
+
+### Logs
+
+`/mnt/swift/logs/safe_reboot.log` (rotates at 10MB, keeps 5 old logs)
+
+Example output:
+```
+[2026-01-05 14:00:00] INFO  ============================================================
+[2026-01-05 14:00:00] INFO  Starting safe reboot check (max retries: 4, retry interval: 300s)
+[2026-01-05 14:00:00] INFO  Attempt 1 of 4: Running safety checks...
+[2026-01-05 14:00:00] INFO  Sampling zpool I/O every 30s for 180s (6 samples)...
+[2026-01-05 14:00:00] INFO  Threshold: 2.00 ops/sec (60.00 ops per 30s sample)
+[2026-01-05 14:00:30] INFO  Sample 1/6: 0.45 ops/sec (13.5 ops)
+[2026-01-05 14:01:00] INFO  Sample 2/6: 0.62 ops/sec (18.6 ops)
+...
+[2026-01-05 14:03:00] INFO  I/O Summary: avg 0.58 ops/sec, 0/6 samples exceeded threshold
+[2026-01-05 14:03:00] OK    All samples below threshold (2.00 ops/sec)
+[2026-01-05 14:03:00] OK    All safety checks passed. Initiating reboot now...
+```

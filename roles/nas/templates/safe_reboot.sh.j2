@@ -28,11 +28,13 @@ export LC_ALL=C
 PATH=/usr/sbin:/usr/bin:/sbin:/bin
 
 # ---------- CONFIG ----------
-MAX_RETRIES=5
-RETRY_SLEEP=1800                           # 30 minutes in seconds
-IO_SAMPLE_DURATION=300                     # seconds to sample I/O activity (5 minutes)
-IO_SAMPLE_INTERVAL=30                      # seconds between I/O samples
-IO_OPS_THRESHOLD=2                         # operations/sec threshold - allow minimal background I/O below this
+{% endraw %}
+MAX_RETRIES={{ safe_reboot_max_retries }}
+RETRY_SLEEP={{ safe_reboot_retry_sleep_seconds }}
+IO_SAMPLE_DURATION={{ safe_reboot_io_sample_duration }}
+IO_SAMPLE_INTERVAL={{ safe_reboot_io_sample_interval }}
+IO_OPS_THRESHOLD={{ safe_reboot_io_ops_threshold }}
+{% raw %}
 LOG_FILE="/mnt/swift/logs/safe_reboot.log" # keep on SSD; never wakes HDDs
 LOG_MAX_SIZE=$((10 * 1024 * 1024))         # rotate logs at 10MB
 LOG_KEEP_COUNT=5                           # keep last 5 rotated logs
@@ -91,6 +93,7 @@ log_warn() { _log "$C_WARN" "WARN" "$*"; }
 log_err() { _log "$C_ERR" "ERROR" "$*"; }
 log_ok() { _log "$C_OK" "OK" "$*"; }
 log_note() { _log "$C_NOTE" "NOTE" "$*"; }
+log_none() { _log "$C_NOTE" "" "$*"; }
 
 die() {
   HAD_ERROR=1
@@ -104,6 +107,10 @@ send_pushover() {
   local title="$1"
   local message="$2"
   local priority="${3:-0}" # default priority 0 (normal)
+
+  # Strip ANSI color codes from title and message (Pushover doesn't support them)
+  title=$(echo "$title" | sed $'s/\033\[[0-9;]*m//g')
+  message=$(echo "$message" | sed $'s/\033\[[0-9;]*m//g')
 
   "$CURL" -s -o /dev/null \
     --form-string "token=${PUSHOVER_API_TOKEN}" \
@@ -145,7 +152,7 @@ on_exit() {
 }
 
 trap on_err ERR
-trap on_exit EXIT
+trap on_exit EXIT INT TERM HUP
 
 # ---------- LOG ROTATION ----------
 rotate_logs() {
@@ -205,10 +212,21 @@ check_active_io() {
   # Sample zpool iostat multiple times over IO_SAMPLE_DURATION to catch bursty I/O
   # Calculate number of samples needed
   local num_samples=$((IO_SAMPLE_DURATION / IO_SAMPLE_INTERVAL))
-  ((num_samples < 1)) && num_samples=1
+  if ((num_samples < 1)); then
+    num_samples=1
+  fi
 
-  echo | "$TEE" -a "$LOG_FILE"
+  # Convert ops/min threshold to ops for this specific sample interval
+  # IO_OPS_THRESHOLD is in ops/min, so: (ops/min / 60) * interval_seconds = ops_per_sample
+  local ops_threshold_per_sample
+  ops_threshold_per_sample=$("$AWK" -v ops_per_min="$IO_OPS_THRESHOLD" -v interval="$IO_SAMPLE_INTERVAL" \
+    'BEGIN{printf "%.2f", (ops_per_min / 60) * interval}')
+
+  local ops_per_sec_threshold
+  ops_per_sec_threshold=$("$AWK" -v ops_per_min="$IO_OPS_THRESHOLD" 'BEGIN{printf "%.2f", ops_per_min / 60}')
+
   log "Sampling zpool I/O every ${IO_SAMPLE_INTERVAL}s for ${IO_SAMPLE_DURATION}s (${num_samples} samples)..."
+  log "Threshold: ${ops_per_sec_threshold} ops/sec (${ops_threshold_per_sample} ops per ${IO_SAMPLE_INTERVAL}s sample)"
 
   local sample_num=0
   local max_ops=0
@@ -247,11 +265,11 @@ check_active_io() {
     fi
 
     # Check if this sample exceeds threshold
-    if "$AWK" -v ops="$ops_per_sec" -v thresh="$IO_OPS_THRESHOLD" 'BEGIN{exit !(ops > thresh)}'; then
-      log_warn "Sample ${sample_num}/${num_samples}: ${C_BOLD}${ops_per_sec} ops/sec${C_RESET} (threshold: ${IO_OPS_THRESHOLD})"
+    if "$AWK" -v ops="$sample_ops" -v thresh="$ops_threshold_per_sample" 'BEGIN{exit !(ops > thresh)}'; then
+      log_warn "Sample ${sample_num}/${num_samples}: ${C_BOLD}${ops_per_sec} ops/sec${C_RESET} (${sample_ops} ops > ${ops_threshold_per_sample} threshold)"
       high_samples=$((high_samples + 1))
     else
-      log "Sample ${sample_num}/${num_samples}: ${ops_per_sec} ops/sec"
+      log "Sample ${sample_num}/${num_samples}: ${ops_per_sec} ops/sec (${sample_ops} ops)"
     fi
   done
 
@@ -261,15 +279,15 @@ check_active_io() {
     'BEGIN{printf "%.2f", total/duration}')
 
   echo | "$TEE" -a "$LOG_FILE"
-  log "I/O Summary: avg ${C_BOLD}${avg_ops_per_sec} ops/sec${C_RESET}, ${high_samples}/${num_samples} samples exceeded threshold"
+  log "I/O Summary: ${high_samples}/${num_samples} ${IO_SAMPLE_INTERVAL}-second samples exceeded the threshold, average across all samples was ${C_BOLD}${avg_ops_per_sec} ops/sec${C_RESET}, threshold ${ops_per_sec_threshold} ops/sec"
 
   # Fail if ANY sample exceeded threshold
   if ((high_samples > 0)); then
-    log_warn "I/O check failed: ${high_samples} sample(s) exceeded threshold (${IO_OPS_THRESHOLD} ops/sec)"
+    log_warn "I/O check failed: ${high_samples} sample(s) exceeded threshold (${ops_per_sec_threshold} ops/sec)"
     return 1
   fi
 
-  log_ok "All samples below threshold (${IO_OPS_THRESHOLD} ops/sec)"
+  log_ok "All samples below threshold (${ops_per_sec_threshold} ops/sec)"
   return 0
 }
 
@@ -286,22 +304,22 @@ all_checks_pass() {
   FAILURE_REASONS=""
 
   if ! check_zfs_scan; then
-    FAILURE_REASONS="${FAILURE_REASONS}• ZFS resilver/scrub in progress\n"
+    FAILURE_REASONS="${FAILURE_REASONS}• ZFS resilver/scrub in progress"
   else
     zfs_ok=1
   fi
 
   if ! check_active_io; then
-    # Get last I/O summary from log for details
+    # Get last I/O summary from log for details (strip timestamp, level, and "I/O Summary:" prefix)
     local io_summary
-    io_summary=$(grep "I/O Summary:" "$LOG_FILE" 2>/dev/null | tail -1 | sed 's/.*I/I/' || echo "I/O above threshold")
-    FAILURE_REASONS="${FAILURE_REASONS}• ${io_summary}\n"
+    io_summary=$(grep "I/O Summary:" "$LOG_FILE" 2>/dev/null | tail -1 | sed 's/.*I\/O Summary: //' || echo "I/O above threshold")
+    FAILURE_REASONS="${FAILURE_REASONS} ${io_summary}"
   else
     io_ok=1
   fi
 
   if ! check_system_updates; then
-    FAILURE_REASONS="${FAILURE_REASONS}• System updates in progress\n"
+    FAILURE_REASONS="${FAILURE_REASONS}• System updates in progress"
   else
     updates_ok=1
   fi
@@ -315,21 +333,43 @@ all_checks_pass() {
 
 # ---------- MAIN LOGIC ----------
 echo | "$TEE" -a "$LOG_FILE"
-log "============================================================"
+log_none "============================================================"
+echo | "$TEE" -a "$LOG_FILE"
 log "Starting safe reboot check ${C_DIM}(max retries: ${MAX_RETRIES}, retry interval: ${RETRY_SLEEP}s)${C_RESET}"
+
+# Calculate values for start notification
+max_runtime_mins=$(((MAX_RETRIES * IO_SAMPLE_DURATION + (MAX_RETRIES - 1) * RETRY_SLEEP) / 60))
+num_samples=$((IO_SAMPLE_DURATION / IO_SAMPLE_INTERVAL))
+sample_duration_mins=$((IO_SAMPLE_DURATION / 60))
+ops_per_sec=$("$AWK" -v ops_per_min="$IO_OPS_THRESHOLD" 'BEGIN{printf "%.2f", ops_per_min / 60}')
+retry_wait_mins=$((RETRY_SLEEP / 60))
+
+# Send detailed start notification
+send_pushover "TrueNAS Safe Reboot" "Safe reboot script starting.
+
+Configuration:
+• ${MAX_RETRIES} attempts maximum
+• Each attempt: ${num_samples} samples × ${IO_SAMPLE_INTERVAL} seconds (${sample_duration_mins} minutes total)
+• I/O threshold: ${ops_per_sec} ops/sec (${IO_OPS_THRESHOLD} ops/min)
+• Wait between failed attempts: ${retry_wait_mins} minutes
+• Maximum duration: ${max_runtime_mins} minutes
+
+The system will reboot automatically if all I/O samples in any attempt are below the threshold." 0
 
 retry_count=0
 while ((retry_count < MAX_RETRIES)); do
+
+  echo | "$TEE" -a "$LOG_FILE"
   log "Attempt $((retry_count + 1)) of ${MAX_RETRIES}: Running safety checks..."
 
   if all_checks_pass; then
-    echo | "$TEE" -a "$LOG_FILE"
     log_ok "All safety checks passed. Initiating reboot now..."
 
     # Send success notification
-    local reboot_time
     reboot_time=$(ts)
-    send_pushover "TrueNAS Reboot" "TrueNAS is rebooting now after passing all safety checks.\n\nReboot initiated at: ${reboot_time}" 0
+    send_pushover "TrueNAS Reboot" "TrueNAS is rebooting now after passing all safety checks.
+
+Reboot initiated at: ${reboot_time}" 0
 
     "$SHUTDOWN" -r now
     exit 0
@@ -338,8 +378,7 @@ while ((retry_count < MAX_RETRIES)); do
   retry_count=$((retry_count + 1))
 
   if ((retry_count < MAX_RETRIES)); then
-    echo | "$TEE" -a "$LOG_FILE"
-    log_warn "Safety checks failed. Retry $retry_count of ${MAX_RETRIES} in ${RETRY_SLEEP} seconds ($(($RETRY_SLEEP / 60)) minutes)..."
+    log "Waiting $(($RETRY_SLEEP / 60)) minutes before next attempt..."
     sleep "$RETRY_SLEEP"
   fi
 done
@@ -347,10 +386,14 @@ done
 # Max retries exceeded
 echo | "$TEE" -a "$LOG_FILE"
 log_err "Maximum retry limit (${MAX_RETRIES}) exceeded. Aborting reboot."
-log_err "Manual intervention required. Check system state and retry later."
 
 # Send failure notification with details
-send_pushover "TrueNAS Reboot Failed" "TrueNAS safe reboot aborted after ${MAX_RETRIES} attempts.\n\nReasons:\n${FAILURE_REASONS}\nManual intervention required." 0
+send_pushover "TrueNAS Reboot Failed" "TrueNAS safe reboot aborted after ${MAX_RETRIES} attempts.
+
+Reasons:
+${FAILURE_REASONS}
+
+Manual intervention required." 0
 
 HAD_ERROR=1
 exit 1

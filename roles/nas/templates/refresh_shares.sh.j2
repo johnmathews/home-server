@@ -322,7 +322,7 @@ get_smb_share_id() {
 # With 60s timeout, we can be more patient and thorough
 get_share_id_with_retry() {
   local share_type="$1" dataset="$2"
-  local max_attempts=8  # Increased from 6 with 60s timeout
+  local max_attempts=8 # Increased from 6 with 60s timeout
   local attempt=1
 
   log_debug "$dataset" "${share_type}_lookup" "starting_with_retry" "max_attempts=$max_attempts"
@@ -525,7 +525,7 @@ refresh_shares() {
 
   # the script runs POSTINIT with a 60second timeout.
   # Initial delay to let middleware and services start properly
-  sleep 5
+  sleep 30
 
   msg_color "$BLUE" "[INFO] Verifying TrueNAS API health..."
 

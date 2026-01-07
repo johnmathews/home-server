@@ -51,7 +51,11 @@
       "Bash(if grep -q \"Explicitly define users since auto-discovery only finds UID >= 1000\" \"$file\")",
       "Bash(then)",
       "Bash(fi)",
-      "Bash(zsh:*)"
+      "Bash(zsh:*)",
+      "Bash(shellcheck:*)",
+      "mcp__MCP_DOCKER__mcp-find",
+      "mcp__MCP_DOCKER__mcp-add",
+      "Bash(wait)"
     ],
     "deny": [],
     "ask": []
