@@ -7,18 +7,21 @@
     - Jellyfin:
         - abbr:
           href: http://192.168.2.110:8096
-    - Jellyseer:
+    - Immich:
         - abbr:
-          href: http://192.168.2.105:5055
+          href: http://192.168.2.113:2283
     - Paperless:
         - abbr:
           href: http://192.168.2.117:8000
     - Tubearchivist:
         - abbr:
           href: http://192.168.2.116:8000
-    - Hometube:
+    - BookLore:
         - abbr:
-          href: http://192.168.2.105:8501/
+          href: http://192.168.2.105:6060
+    - Jellyseer:
+        - abbr:
+          href: http://192.168.2.105:5055
     - Sonarr:
         - abbr:
           href: http://192.168.2.105:8989
@@ -34,15 +37,6 @@
     - Gluetun:
         - abbr:
           href: http://192.168.2.105:8000/v1/publicip/ip
-    - BookLore:
-        - abbr:
-          href: http://192.168.2.105:6060
-    - Immich:
-        - abbr:
-          href: http://192.168.2.113:2283
-    - Tunarr:
-        - abbr:
-          href: http://192.168.2.110:8000
 
 - Observability:
     - Grafana:
@@ -69,7 +63,7 @@
     - Media Alloy:
         - abbr:
           href: http://192.168.2.105:12345
-    - Tube Alloy:
+    - Tubearchivist Alloy:
         - abbr:
           href: http://192.168.2.116:12345
     - Prometheus Alloy:
@@ -104,9 +98,6 @@
     - AdGuard:
         - abbr:
           href: http://192.168.2.111
-    - VaultWarden:
-        - abbr:
-          href: https://192.168.2.13:8000
     - Docs:
         - abbr:
           href: http://192.168.2.106:8000
@@ -124,6 +115,9 @@
     - Router:
         - abbr:
           href: http://192.168.2.254
+    - MikroTik Router:
+        - abbr:
+          href: http://192.168.88.1/
 
 - Docs:
     - Server:

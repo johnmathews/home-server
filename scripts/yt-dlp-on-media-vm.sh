@@ -2,7 +2,7 @@
 # ---- youtube download -> media vm (server-side) ----
 
 # Where the media VM should place final files (NFS mount already available there)
-REMOTE_FINAL_BASE="/mnt/nfs/movies/finals"
+REMOTE_FINAL_BASE="/mnt/nfs/movies/youtube"
 
 # Local cookies file on your Mac (Netscape cookies.txt format)
 LOCAL_YT_COOKIES="$HOME/.config/yt-dlp/cookies/cookies.txt"
@@ -204,7 +204,10 @@ echo "✅ Done."
 }
 
 # Convenience commands
+alias ytg='noglob _ytdl_on_media_vm training'
 alias yt='noglob _ytdl_on_media_vm youtube'
 alias ytc='noglob _ytdl_on_media_vm create'
-alias ytg='noglob _ytdl_on_media_vm gym'
 alias ytm='noglob _ytdl_on_media_vm music'
+alias yth='noglob _ytdl_on_media_vm humanity'
+alias ytt='noglob _ytdl_on_media_vm travel'
+alias ytme='noglob _ytdl_on_media_vm math+engineering'
