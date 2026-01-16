@@ -89,17 +89,43 @@ _ytdl_on_media_vm() {
   # Fetch video info for display and duplicate checking
   echo "🔍 Fetching video info..."
   local video_info
-  video_info="$(/usr/bin/ssh -o BatchMode=yes media "yt-dlp --print '%(id)s|%(title)s|%(height)sp' --cookies $(printf '%q' "$remote_cookie") $(printf '%q' "$url") 2>/dev/null" || echo "unknown|Unknown Video|0p")"
+  video_info="$(/usr/bin/ssh -o BatchMode=yes media "yt-dlp --print '%(id)s|%(title)s|%(height)sp|%(filesize_approx)s' --cookies $(printf '%q' "$remote_cookie") $(printf '%q' "$url") 2>/dev/null" || echo "unknown|Unknown Video|0p|0")"
 
   local video_id="${video_info%%|*}"
   local video_title="${${video_info#*|}%%|*}"
-  local new_quality="${video_info##*|}"
+  local remaining="${video_info#*|*|}"
+  local new_quality="${remaining%%|*}"
+  local filesize_bytes="${remaining##*|}"
+
+  # Format filesize with smart rounding
+  local filesize_display="Unknown"
+  if [[ -n "$filesize_bytes" && "$filesize_bytes" != "0" && "$filesize_bytes" != "None" ]]; then
+    local size_mb=$((filesize_bytes / 1048576))  # Convert to MB
+    if [[ $size_mb -lt 1024 ]]; then
+      # Less than 1 GB - show in MB
+      if [[ $size_mb -ge 100 ]]; then
+        # Round to nearest 10 for large MB values
+        size_mb=$(( (size_mb + 5) / 10 * 10 ))
+        filesize_display="${size_mb} MB"
+      else
+        # Show 1 decimal place for smaller values
+        local size_mb_decimal=$(awk "BEGIN {printf \"%.1f\", $filesize_bytes / 1048576}")
+        filesize_display="${size_mb_decimal} MB"
+      fi
+    else
+      # 1 GB or more - show in GB with 1 decimal
+      local size_gb=$(awk "BEGIN {printf \"%.1f\", $filesize_bytes / 1073741824}")
+      filesize_display="${size_gb} GB"
+    fi
+  fi
 
   echo ""
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
   echo "📹 VIDEO: $video_title"
   echo "🆔 ID: $video_id"
   echo "📊 Quality: $new_quality"
+  echo "📦 Size: ~$filesize_display"
+  echo "📁 Category: $category"
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
   echo ""
 
@@ -203,11 +229,126 @@ echo "✅ Done."
   fi
 }
 
-# Convenience commands
-alias ytg='noglob _ytdl_on_media_vm training'
-alias yt='noglob _ytdl_on_media_vm youtube'
-alias ytc='noglob _ytdl_on_media_vm create'
-alias ytm='noglob _ytdl_on_media_vm music'
-alias yth='noglob _ytdl_on_media_vm humanity'
-alias ytt='noglob _ytdl_on_media_vm travel'
-alias ytme='noglob _ytdl_on_media_vm math+engineering'
+# Help text function
+_yt_show_help() {
+  cat <<'EOF'
+yt - Download videos to media VM with categorization
+
+USAGE:
+  yt -SHORTCUT URL
+  yt --category CATEGORY URL
+  yt --help
+
+DESCRIPTION:
+  Downloads YouTube (and other) videos directly on the media VM and saves them to the correct subdirectory in the movies dataset.
+
+  The script copies a youtube cookie from ~/.config/yt-dlp/cookies/cookies.txt onto the media VM. 
+  Use a browser plugin to copy the cookie from a browser to the local config directory.
+
+  The script handles:
+    - quality selection
+    - duplicate detection
+    - metadata embedding
+    - destination directory according to category
+
+CATEGORIES:
+  -g  training          Training and gym/workout videos
+  -y  youtube           General YouTube content
+  -c  create            Creative/maker content
+  -m  music             Music videos and performances
+  -h  humanity          Humanities and cultural content
+  -t  travel            Travel videos and vlogs
+  -e  math+engineering  Math and engineering content
+
+OPTIONS:
+  --category CATEGORY    Specify category by name (alternative to shortcuts)
+  --help                 Show this help message
+
+EXAMPLES:
+  yt -g "https://youtu.be/C4TVr2NtEg8"
+  yt -m "https://youtube.com/watch?v=dQw4w9WgXcQ"
+  yt --category training "https://youtu.be/C4TVr2NtEg8"
+
+REQUIREMENTS:
+  - YouTube cookies must be exported to: ~/.config/yt-dlp/cookies/cookies.txt
+  - SSH access to 'media' host must be configured
+  - yt-dlp must be installed on the media VM
+
+FILES:
+  Final videos are saved to: /mnt/nfs/movies/youtube/{CATEGORY}/
+
+EOF
+}
+
+# Main yt command with flag parsing
+yt() {
+  setopt local_options pipefail
+
+  # Valid categories
+  local -a valid_categories=(training youtube create music humanity travel math+engineering)
+
+  # Show help if no arguments or help requested
+  if [[ $# -eq 0 ]] || [[ "$1" == "--help" ]]; then
+    _yt_show_help
+    return 0
+  fi
+
+  # Parse flags using zparseopts
+  local -A opts
+  zparseopts -D -E -A opts -- g y c m h t e -category: -help
+
+  # Map shortcut flags to categories
+  local category
+  if (( ${+opts[-g]} )); then
+    category="training"
+  elif (( ${+opts[-y]} )); then
+    category="youtube"
+  elif (( ${+opts[-c]} )); then
+    category="create"
+  elif (( ${+opts[-m]} )); then
+    category="music"
+  elif (( ${+opts[-h]} )); then
+    category="humanity"
+  elif (( ${+opts[-t]} )); then
+    category="travel"
+  elif (( ${+opts[-e]} )); then
+    category="math+engineering"
+  elif [[ -n "${opts[--category]}" ]]; then
+    category="${opts[--category]}"
+  fi
+
+  if [[ -z "$category" ]]; then
+    echo "❌ Error: Category shortcut is required"
+    echo ""
+    echo "Usage: yt -g|-y|-c|-m|-h|-t|-e URL"
+    echo "   or: yt --category CATEGORY URL"
+    echo ""
+    echo "Run 'yt --help' for more information"
+    return 1
+  fi
+
+  # Validate category
+  if [[ ! ${valid_categories[(ie)$category]} -le ${#valid_categories} ]]; then
+    echo "❌ Error: Invalid category '$category'"
+    echo ""
+    echo "Valid categories: ${(j:, :)valid_categories}"
+    echo ""
+    echo "Run 'yt --help' for more information"
+    return 1
+  fi
+
+  # Extract URL (first remaining positional argument)
+  local url="$1"
+
+  if [[ -z "$url" ]]; then
+    echo "❌ Error: URL is required"
+    echo ""
+    echo "Usage: yt -g|-y|-c|-m|-h|-t|-e URL"
+    echo ""
+    echo "Run 'yt --help' for more information"
+    return 1
+  fi
+
+  # Call the main download function with noglob handling
+  noglob _ytdl_on_media_vm "$category" "$url"
+}

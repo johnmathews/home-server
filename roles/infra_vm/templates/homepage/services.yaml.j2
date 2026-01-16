@@ -226,13 +226,9 @@
         href: http://192.168.2.105:8082
         siteMonitor: http://192.168.2.105:8082
         icon: filebrowser
-    # - HomeTube:
-    #     href: http://192.168.2.105:8501
-    #     # siteMonitor: http://192.168.2.105:8501
-    #     icon: http://192.168.2.105:8501/favicon.ico
     - BookLore:
         href: https://books.itsa.pizza
-        # siteMonitor: http://192.168.2.105:6060
+        siteMonitor: http://192.168.2.105:6060
         description: Books
         icon: sh-booklore
     - Paperless:
@@ -245,39 +241,27 @@
           type: paperlessngx
           url: http://192.168.2.117:8000
           key: "{{ vault_paperless_key }}"
-    # - Tunarr:
-    #     href: http://tunarr.itsa.pizza
-    #     siteMonitor: http://192.168.2.110:8000
-    #     description: TV channels
-    #     icon: tunarr
-    #     showStats: true
-    # - Tunarr chanells:
-    #     href: http://192.168.2.110:8001
-    #     siteMonitor: http://192.168.2.110:8001
-    #     description: TV channels
-    #     icon: tunarr
-    #     showStats: true
     - Radarr:
         href: https://radarr.itsa.pizza
-        # siteMonitor: http://192.168.2.105:7878
+        siteMonitor: http://192.168.2.105:7878
         description: Movie Manager
         icon: radarr
-        # widget:
-        #   type: radarr
-        #   url: http://192.168.2.105:7878
-        #   key: "{{ vault_radarr_key }}"
-        #   fields: [wanted, missing, movies, queued]
-        #   enableQueue: false
+        widget:
+          type: radarr
+          url: http://192.168.2.105:7878
+          key: "{{ vault_radarr_key }}"
+          fields: [wanted, missing, movies, queued]
+          enableQueue: false
     - Sonarr:
         href: https://sonarr.itsa.pizza/
-        # siteMonitor: http://192.168.2.105:8989/
+        siteMonitor: http://192.168.2.105:8989/
         description: TV Series Manager
         icon: sonarr
-        # widget:
-        #   type: sonarr
-        #   url: http://192.168.2.105:8989/
-        #   key: "{{ vault_sonarr_key }}"
-        #   enableQueue: false
+        widget:
+          type: sonarr
+          url: http://192.168.2.105:8989/
+          key: "{{ vault_sonarr_key }}"
+          enableQueue: false
     - Gluetun:
         href: http://192.168.2.105:8000/v1/publicip/ip
         siteMonitor: http://192.168.2.105:8000/v1/publicip/ip
@@ -289,7 +273,7 @@
           key: "{{ vault_gluetun_password }}"
     - Prowlarr:
         href: http://prowlarr.itsa.pizza
-        # siteMonitor: http://192.168.2.105:9696
+        siteMonitor: http://192.168.2.105:9696
         description: Indexer Manager
         icon: prowlarr
         widget:
@@ -298,33 +282,34 @@
           key: "{{ vault_prowlarr_api_key }}"
     - Bazarr:
         href: http://bazarr.itsa.pizza
-        # siteMonitor: http://192.168.2.105:6767
+        siteMonitor: http://192.168.2.105:6767
         description: Subtitles
         icon: bazarr
-        # widget:
-        #   type: bazarr
-        #   url: http://192.168.2.105:6767
-        #   key: "{{vault_bazarr_key}}"
+        widget:
+          type: bazarr
+          url: http://192.168.2.105:6767
+          key: "{{vault_bazarr_key}}"
     - SABnzbd:
         href: http://sabnzbd.itsa.pizza
-        # siteMonitor: http://192.168.2.105:8081/
+        siteMonitor: http://192.168.2.105:8081/
         description: Usenet download client
         icon: sabnzbd
-        # widget:
-        #   type: sabnzbd
-        #   url: http://192.168.2.105:8081/
-        #   key: "{{ vault_sabnzbd_key }}"
+        widget:
+          type: sabnzbd
+          url: http://192.168.2.105:8081/
+          key: "{{ vault_sabnzbd_key }}"
     - qBittorrent:
         href: http://qbittorrent.itsa.pizza
-        # siteMonitor: http://192.168.2.105:8080
+        siteMonitor: http://192.168.2.105:8080
         description: Downloader
         icon: https://cdn.jsdelivr.net/gh/selfhst/icons/svg/qbittorrent.svg
-        # widget:
-        #   type: qbittorrent
-        #   url: http://192.168.2.105:8080
-        #   username: admin
-        #   password: "{{ vault_qbittorrent_password }}"
-        #   enableLeechProgress: true
+        widget:
+          type: qbittorrent
+          url: http://192.168.2.105:8080
+          username: admin
+          password: "{{ vault_qbittorrent_password }}"
+          enableLeechProgress: true
+
 - Usenet:
     - NZBGeek.info:
         href: https://nzbgeek.info/dashboard.php
@@ -347,11 +332,13 @@
         siteMonitor: https://app.addy.io
         description: Email address aliases
         icon: https://app.addy.io/favicon.ico
+
 - Documentation:
     - Docs:
         href: https://docs.itsa.pizza
         siteMonitor: http://192.168.2.106:8000
         icon: si-materialformkdocs
+
 - Media_:
     - Mullvad:
         description: 22 January 2026 07:51
@@ -368,17 +355,17 @@
         description: "{{ share_drive_probe_quiet_hours_start }} - {{ share_drive_probe_quiet_hours_end }}\ndocs.itsa.pizza/monitor_nfs_smb_mounts"
     - Spin Down Hard Disks:
         description: "0,3,6,12,15,18,22\ndocs.itsa.pizza/disks.\n\nTrueNAS HDDs spundown using script /mnt/switft/scripts/spindown_hdds.sh."
-        # - Quiet Hours:
-        #     description: "{{ docker_quiet_hours_start_hour }}:00 - {{ docker_quiet_hours_end }}\ndocs.itsa.pizza/quiet_hours\n\n- Bazarr\n- Booklore- mariadb\n- Booklore\n- Jellyseerr\n- Paperless\n- Prowlarr\n- Radarr\n- Sabnzbd\n- Sonarr\n- TubeArchivist\n- qBittorrent"
+
 - Proxmox Backup:
     - Backup:
-      description: "10am\nDuration: 14 minutes\nRetention:\nlast: 14\ndaily: 21\nweekly: 8\nmonthly: 6"
+        description: "10am\nDuration: 14 minutes\nRetention:\nlast: 14\ndaily: 21\nweekly: 8\nmonthly: 6"
     - Garbage Collection:
         description: "11am\nDuration: 10 seconds"
     - Pruning:
         description: "12am\nDuration: 7 seconds\n\nKeep:\ndaily:14\nweekly:1\nmonthly:3\nyearly:2\nRemoves old backups according to retention policy."
     - Verification:
         description: "2pm\nDuration: 1 second\nReverify after 30 days"
+
 - TrueNAS_:
     - Disk Power Management:
         description: "tank:\n- 1hr standby\n- max. power usage w/ standby (level 127)\n\nbackup:\n- 30m standby\n- min. power usage w/ standby (level 1)"
@@ -390,6 +377,7 @@
         description: "On the first sunday at least 35 days after the previous scrub\ntank: 10am\nswift: 4pm\nbackup: 5pm"
     - SMART tests:
         description: "backup and tank\nshort: 12pm Sundays\nlong: 10am First day of the month"
+
 - Infra:
     - n8n:
         href: https://n8n.itsa.pizza
@@ -546,12 +534,9 @@
           username: "{{ vault_proxmox_backup_api_token_id }}"
           password: "{{ vault_proxmox_backup_api_token_secret }}"
 - Hardware:
-    - Router:
-        href: http://192.168.2.254/
-        siteMonitor: http://192.168.2.254/
-        icon: router
     - MikroTik Router:
-        href: http://192.168.88.1/
+        href: http://192.168.2.1
+        siteMonitor: http://192.168.2.1
         icon: router
     - MegaRAC SP-X (local):
         href: https://192.168.2.213

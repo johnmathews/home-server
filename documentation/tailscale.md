@@ -1,6 +1,7 @@
-# Tailscale Remote Access Setup
+# Tailscale Remote Access & DNS Privacy Setup
 
-This guide covers setting up Tailscale VPN for remote SSH/Ansible access to your homelab while traveling.
+This guide covers setting up Tailscale VPN for remote SSH/Ansible access to your homelab and configuring encrypted DNS
+that works both at home and while traveling.
 
 ## What is Tailscale?
 
@@ -14,6 +15,46 @@ allows you to access your homelab from anywhere (coffee shops, hotels, airports)
 - **Works everywhere**: Automatic NAT traversal through firewalls
 - **Transparent to apps**: SSH and Ansible work without modification
 - **Secure**: WireGuard encryption, no exposed ports on your router
+- **DNS privacy**: Routes DNS queries to your home AdGuard setup when traveling
+
+## Architecture Overview
+
+### Network Topology
+
+**At home (local network):**
+
+```
+Device (192.168.2.x)
+    ↓ (via MikroTik DHCP)
+AdGuard Home (192.168.2.111)
+    ↓
+Unbound → Quad9 (encrypted DNS-over-TLS)
+```
+
+**When traveling (via Tailscale):**
+
+```
+Device (any WiFi)
+    ↓ (via Tailscale VPN tunnel)
+AdGuard Home (100.108.0.112 Tailscale IP)
+    ↓
+Unbound → Quad9 (encrypted DNS-over-TLS)
+```
+
+### Tailscale Components
+
+The Tailscale setup consists of:
+
+1. **`roles/tailscale/`** - Installs and configures Tailscale on any Debian/Ubuntu host
+2. **`roles/proxmox_lxc_tun/`** - Configures Proxmox LXC containers to support VPN software
+3. **`playbooks/tailscale.yml`** - Deploys Tailscale to all hosts
+4. **`inventory-tailscale.ini`** - Inventory file with Tailscale IPs for remote access
+5. **Tailscale DNS** - Routes DNS queries to home AdGuard for privacy and ad blocking
+
+### LXC Container Requirements
+
+Proxmox LXC containers are sandboxed and cannot create `/dev/net/tun` devices by default. The `proxmox_lxc_tun` role adds
+TUN device support to all LXC containers on the Proxmox host. This is automatically handled when you run `make pve`.
 
 ## Prerequisites
 
@@ -24,20 +65,6 @@ allows you to access your homelab from anywhere (coffee shops, hotels, airports)
      - ✓ Reusable (if you plan to reinstall)
      - ✗ Ephemeral (unless you want auto-cleanup of offline devices)
      - ✗ Pre-authorized (let admins approve devices)
-
-## Architecture Overview
-
-The Tailscale setup consists of:
-
-1. **`roles/tailscale/`** - Installs and configures Tailscale on any Debian/Ubuntu host
-2. **`roles/proxmox_lxc_tun/`** - Configures Proxmox LXC containers to support VPN software
-3. **`playbooks/tailscale.yml`** - Deploys Tailscale to all hosts
-4. **`inventory-tailscale.ini`** - Inventory file with Tailscale IPs for remote access
-
-### LXC Container Requirements
-
-Proxmox LXC containers are sandboxed and cannot create `/dev/net/tun` devices by default. The `proxmox_lxc_tun` role adds
-TUN device support to all LXC containers on the Proxmox host. This is automatically handled when you run `make pve`.
 
 ## Installation Steps
 
@@ -76,9 +103,28 @@ lxc.mount.entry: /dev/net/tun dev/net/tun none bind,create=file
 
 This only needs to be run once and is idempotent (safe to run multiple times).
 
-### 3. Deploy Tailscale to All Other Hosts
+### 3. Deploy Tailscale to AdGuard LXC
 
-After Proxmox is configured, deploy to VMs and LXCs:
+**Critical:** The AdGuard LXC must have its own Tailscale instance for DNS to work remotely:
+
+```bash
+# Deploy to AdGuard specifically
+make tailscale LIMIT=adguard
+
+# Or use Ansible directly
+ansible-playbook -i inventory.ini playbooks/tailscale.yml --vault-password-file=.vault_pass.txt --limit adguard
+```
+
+After deployment, get the AdGuard Tailscale IP:
+
+```bash
+ssh root@192.168.2.111 "tailscale ip -4"
+# Output: 100.108.0.112 (save this for DNS configuration)
+```
+
+### 4. Deploy Tailscale to All Other Hosts
+
+Deploy to remaining VMs and LXCs:
 
 ```bash
 # Deploy to all hosts
@@ -98,7 +144,7 @@ This will:
 - Start the Tailscale daemon
 - Display the assigned Tailscale IP
 
-### 4. Collect Tailscale IP Addresses
+### 5. Collect Tailscale IP Addresses
 
 After deployment, get the Tailscale IP for each host:
 
@@ -111,11 +157,35 @@ ssh john@192.168.2.105 "tailscale ip -4"
 tailscale status
 ```
 
-### 5. Update Tailscale Inventory
+### 6. Configure Tailscale DNS
+
+This enables ad blocking and encrypted DNS when traveling.
+
+**In Tailscale admin console** (https://login.tailscale.com/admin/dns):
+
+1. Navigate to DNS settings
+2. Under **Nameservers** section:
+   - `100.100.100.100` - MagicDNS (locked, required for Tailscale hostname resolution)
+   - Add: `100.108.0.112` - Your AdGuard LXC Tailscale IP (from step 3)
+3. **Do NOT enable "Override local DNS"** - this breaks connectivity
+4. Save changes
+
+**On your laptop/devices:**
+
+Enable Tailscale DNS in the app:
+
+- **macOS/Windows**: Tailscale app → Settings → ✓ "Use Tailscale DNS settings"
+- **Linux**: DNS is automatically configured
+- **iOS/Android**: DNS is automatically configured
+
+### 7. Update Tailscale Inventory
 
 Edit `inventory-tailscale.ini` and replace the placeholder IPs (100.x.x.x) with actual Tailscale IPs:
 
 ```ini
+[adguard]
+adguard_lxc ansible_host=100.108.0.112 ansible_user=root ansible_ssh_private_key_file=~/.ssh/id_rsa
+
 [media]
 media_vm ansible_host=100.64.0.5 ansible_user=john ansible_ssh_private_key_file=~/.ssh/john_macbook
 
@@ -123,7 +193,7 @@ media_vm ansible_host=100.64.0.5 ansible_user=john ansible_ssh_private_key_file=
 infra_vm ansible_host=100.64.0.8 ansible_user=john ansible_ssh_private_key_file=~/.ssh/john_macbook
 ```
 
-### 6. Install Tailscale on Your Laptop
+### 8. Install Tailscale on Your Laptop
 
 **macOS**:
 
@@ -143,13 +213,16 @@ sudo tailscale up
 
 **Windows**: Download installer from: https://tailscale.com/download/windows
 
-### 7. Test Remote Access
+### 9. Test Remote Access
 
 Test SSH access using Tailscale IPs:
 
 ```bash
 # Test SSH to Proxmox
 ssh root@100.64.0.1
+
+# Test SSH to AdGuard
+ssh root@100.108.0.112
 
 # Test SSH to Media VM
 ssh john@100.64.0.5
@@ -158,7 +231,64 @@ ssh john@100.64.0.5
 ansible all -i inventory-tailscale.ini -m ping
 ```
 
+### 10. Verify DNS Privacy
+
+**Test DNS is working:**
+
+```bash
+# Should show AdGuard's Tailscale IP or 100.100.100.100 (MagicDNS)
+nslookup google.com
+```
+
+**Test privacy is maintained:**
+
+1. Visit: https://www.dnsleaktest.com/
+2. Run standard or extended test
+3. Expected results:
+   - ISP: **Windstream Communications** or **Quad9** or **PCH**
+   - **NOT** your actual ISP or café/hotel network
+
+If you see your ISP or the local network's provider, DNS is leaking!
+
+**Check AdGuard is processing your queries:**
+
+1. Open AdGuard web UI: http://100.108.0.112 (AdGuard's Tailscale IP)
+2. Go to Query Log
+3. You should see queries from your laptop's Tailscale IP (100.Y.Y.Y)
+
 ## Usage
+
+### DNS Behavior by Context
+
+**At home on local WiFi (Tailscale disconnected):**
+
+- DNS: `192.168.2.111` (direct to AdGuard, no VPN overhead)
+- Privacy: ✅ Encrypted DNS via Quad9
+- Ad blocking: ✅ Full ad blocking
+- Speed: Fastest (local network)
+
+**At home on local WiFi (Tailscale connected):**
+
+- DNS: `100.108.0.112` or `100.100.100.100` (AdGuard via Tailscale)
+- Privacy: ✅ Encrypted DNS via Quad9
+- Ad blocking: ✅ Full ad blocking
+- Speed: Fast (VPN overhead is minimal on local network)
+
+**Traveling on café/hotel WiFi (Tailscale disconnected):**
+
+- DNS: Whatever the network provides (e.g., café's ISP)
+- Privacy: ❌ No encryption, café/ISP can see DNS queries
+- Ad blocking: ❌ No ad blocking
+- Speed: Depends on network
+
+**Traveling on café/hotel WiFi (Tailscale connected):**
+
+- DNS: `100.108.0.112` or `100.100.100.100` (tunnels to home AdGuard)
+- Privacy: ✅ Encrypted DNS via Quad9, café/ISP cannot see DNS queries
+- Ad blocking: ✅ Full ad blocking
+- Speed: Good (VPN tunnel adds latency but DNS is cached)
+
+**Key takeaway:** Keep Tailscale connected when on untrusted networks for privacy and ad blocking!
 
 ### Running Playbooks Remotely
 
@@ -180,6 +310,9 @@ make media INVENTORY="-i inventory-tailscale.ini"
 You can also access web services directly via Tailscale IPs:
 
 ```bash
+# AdGuard Home
+open http://100.108.0.112
+
 # Prometheus (not exposed via Cloudflare)
 open http://100.64.0.7:9090
 
@@ -192,15 +325,209 @@ open https://100.64.0.1:8006
 
 ### MagicDNS (Optional)
 
-Tailscale provides automatic DNS for your devices. Enable MagicDNS in the admin console:
-https://login.tailscale.com/admin/dns
+Tailscale provides automatic DNS for your devices. This is already enabled and provides the `100.100.100.100` resolver.
 
-Then access hosts by name:
+Access hosts by their Tailscale hostnames:
 
 ```bash
 ssh john@media-vm
 ssh root@proxmox-host
+ssh root@adguard
 open http://prometheus-lxc:9090
+```
+
+## Verification & Troubleshooting
+
+### Check Tailscale Connection Status
+
+```bash
+# On any host
+tailscale status
+
+# Get your device's Tailscale IP
+tailscale ip -4
+
+# Check connection quality
+tailscale netcheck
+
+# View logs
+journalctl -u tailscaled -f
+```
+
+### Verify DNS is Working
+
+**Test 1: Check DNS server in use**
+
+```bash
+nslookup google.com
+```
+
+Expected output when Tailscale is connected:
+
+- `Server: 100.100.100.100` (MagicDNS forwarding to your AdGuard)
+- OR `Server: 100.108.0.112` (directly to AdGuard)
+
+Wrong output:
+
+- `Server: 192.168.43.1` (café/hotel router - DNS not tunneling through Tailscale!)
+
+**Test 2: DNS leak test** Visit: https://www.dnsleaktest.com/
+
+Expected: Windstream Communications / Quad9 / PCH Wrong: Your actual ISP, café name, hotel network, etc.
+
+**Test 3: Check AdGuard is receiving queries**
+
+1. Open AdGuard web UI: http://100.108.0.112 (via Tailscale)
+2. Go to Query Log
+3. Look for queries from your device's Tailscale IP
+
+**Test 4: Verify ad blocking is working** Visit: https://ads-blocker.com/testing/ Expected: Ads should be blocked
+
+### Common Issues
+
+#### Problem: Tailscale connected but DNS shows local network
+
+**Symptoms:**
+
+```bash
+nslookup google.com
+Server: 192.168.43.1  # Local café router
+```
+
+**Diagnosis:** Tailscale DNS settings not enabled
+
+**Fix (macOS/Windows):**
+
+1. Open Tailscale app
+2. Go to Settings
+3. Enable ✓ "Use Tailscale DNS settings"
+4. Restart Tailscale app
+
+**Fix (Linux):**
+
+```bash
+# Check if DNS is configured
+resolvectl status
+
+# Force DNS update
+sudo tailscale down
+sudo tailscale up --accept-dns
+```
+
+#### Problem: DNS leak test shows café/hotel ISP
+
+**Symptoms:** dnsleaktest.com shows local network's provider instead of Quad9
+
+**Diagnosis:** DNS queries not tunneling through Tailscale
+
+**Fix:**
+
+1. Verify Tailscale is connected: `tailscale status`
+2. Check DNS settings in Tailscale admin console
+3. Verify AdGuard Tailscale IP is correct
+4. Enable "Use Tailscale DNS settings" in app
+5. Restart device if needed
+
+#### Problem: Can't connect to Tailscale
+
+**Symptoms:** `tailscale status` shows "Logged out" or connection fails
+
+**Fix:**
+
+```bash
+# Re-authenticate
+sudo tailscale up
+
+# Check firewall isn't blocking
+# Tailscale needs UDP port 41641 and HTTPS (443) access
+
+# Check logs
+journalctl -u tailscaled -n 50
+```
+
+#### Problem: Slow DNS resolution when traveling
+
+**Symptoms:** Websites take long to load, DNS timeouts
+
+**Possible causes:**
+
+1. Poor connection between you and home
+2. AdGuard/Unbound issues at home
+3. Quad9 upstream issues
+
+**Diagnosis:**
+
+```bash
+# Test direct connectivity to home
+ping 100.108.0.112  # AdGuard Tailscale IP
+
+# Test DNS directly
+dig @100.108.0.112 google.com
+
+# Check if using DERP relay (slower than direct)
+tailscale status  # Look for "relay" vs "direct" in output
+```
+
+**Fix:**
+
+- If using relay: Wait for direct connection to establish, or restart Tailscale
+- If AdGuard is slow: SSH to AdGuard and check logs
+- If persistent: Temporarily disable Tailscale DNS to use local network
+
+#### Problem: AdGuard web UI not accessible via Tailscale
+
+**Symptoms:** http://100.108.0.112 times out
+
+**Diagnosis:**
+
+```bash
+# Can you ping AdGuard?
+ping 100.108.0.112
+
+# Is AdGuard listening on all interfaces?
+ssh root@192.168.2.111  # Local IP
+ss -tlnp | grep 80
+# Should show: *:80 (not 127.0.0.1:80 or 192.168.2.111:80)
+```
+
+**Fix:** If AdGuard is only listening on specific IP:
+
+1. Open AdGuard web UI (http://192.168.2.111)
+2. Settings → General Settings
+3. Set "Bind host" to "All interfaces" or add Tailscale IP
+4. Restart AdGuard
+
+### Connection Quality
+
+If direct connections fail, Tailscale falls back to DERP relays (higher latency but still works):
+
+```bash
+# Check connection type
+tailscale status
+# Look for "relay" vs "direct" in output
+```
+
+Direct connections are preferred but relays ensure it always works.
+
+### Restart Tailscale
+
+```bash
+# On any host
+systemctl restart tailscaled
+tailscale up  # Re-authenticate if needed
+
+# On macOS
+# Quit and reopen Tailscale app
+```
+
+### Remove a Device
+
+```bash
+# On the device
+tailscale down
+
+# Or remove from admin console:
+# https://login.tailscale.com/admin/machines
 ```
 
 ## Advanced Configuration
@@ -235,6 +562,9 @@ Now you can access local IPs directly:
 ssh john@192.168.2.105  # Works via Proxmox subnet route
 ```
 
+**Note:** With subnet routing, you can use `192.168.2.111` for AdGuard instead of the Tailscale IP when traveling.
+However, the Tailscale IP approach is more explicit and doesn't require subnet routing to be configured.
+
 ### Exit Node
 
 Route all your laptop traffic through your homelab (useful for privacy on untrusted networks):
@@ -250,6 +580,20 @@ Enable on your laptop:
 ```bash
 tailscale up --exit-node=proxmox-host
 ```
+
+**With exit node enabled:**
+
+- ALL internet traffic routes through your home connection
+- Your public IP appears as your home IP (188.142.8.214)
+- Slower (all traffic has VPN overhead)
+- Maximum privacy on untrusted networks
+
+**Without exit node (current setup):**
+
+- Only DNS queries route through home
+- Your public IP is the local network's IP
+- Faster (only DNS has VPN overhead)
+- Good privacy for most use cases
 
 ### SSH Hardening
 
@@ -298,52 +642,6 @@ Example ACL:
 }
 ```
 
-## Troubleshooting
-
-### Check Tailscale Status
-
-```bash
-# On any host
-tailscale status
-
-# Get IP addresses
-tailscale ip -4
-tailscale ip -6
-
-# View network map
-tailscale netcheck
-
-# Check logs
-journalctl -u tailscaled -f
-```
-
-### Connection Issues
-
-If direct connections fail, Tailscale falls back to DERP relays (higher latency but still works):
-
-```bash
-# Check connection type
-tailscale status
-# Look for "relay" vs "direct" in output
-```
-
-### Restart Tailscale
-
-```bash
-systemctl restart tailscaled
-tailscale up  # Re-authenticate if needed
-```
-
-### Remove a Device
-
-```bash
-# On the device
-tailscale down
-
-# Or remove from admin console:
-# https://login.tailscale.com/admin/machines
-```
-
 ## Monitoring
 
 Tailscale integrates with your existing Prometheus setup via node_exporter. The Tailscale interface appears as
@@ -357,6 +655,7 @@ Add custom metrics (optional):
   static_configs:
    - targets:
       - "100.64.0.1:9100" # Proxmox
+      - "100.108.0.112:9100" # AdGuard
       - "100.64.0.5:9100" # Media
       - "100.64.0.8:9100" # Infra
 ```
@@ -369,6 +668,37 @@ Add custom metrics (optional):
 4. **MFA**: Enable 2FA on your Tailscale account
 5. **ACLs**: Implement least-privilege access policies
 6. **Audit logs**: Review connection logs in admin console periodically
+7. **DNS privacy**: Verify DNS leak tests regularly when traveling
+8. **Exit node usage**: Only enable when needed (adds latency)
+
+## Privacy Summary
+
+**What your ISP (KPN) can see:**
+
+- At home: Encrypted traffic to Quad9 (IP addresses only)
+- Traveling: Encrypted Tailscale VPN traffic to your home IP
+
+**What your ISP (KPN) cannot see:**
+
+- Which domains you're looking up (DNS queries are encrypted)
+- Which websites you're visiting (HTTPS encrypts the connection)
+- Contents of your traffic (all encrypted)
+
+**What café/hotel WiFi can see (with Tailscale connected):**
+
+- Encrypted Tailscale VPN traffic to your home IP
+- Cannot see: DNS queries, websites, or any traffic contents
+
+**What Quad9 can see:**
+
+- Your DNS queries (which domains you look up)
+- But: Quad9 is a privacy-focused non-profit, doesn't sell data, Swiss jurisdiction
+
+**What Tailscale can see:**
+
+- Which devices are connected to your network
+- Connection metadata (when devices connect)
+- Cannot see: Your traffic contents (end-to-end encrypted)
 
 ## Hybrid Architecture
 
@@ -379,17 +709,19 @@ You now have two access methods:
 - Web services: Immich, Jellyfin
 - Public access with Zero Trust authentication
 - HTTPS with automatic certs
+- No VPN required for users
 
 **Tailscale** (new):
 
 - SSH and Ansible management
 - Direct access to all services (including internal ones)
 - Private network, no public exposure
+- DNS privacy and ad blocking when traveling
 
 Keep both! They serve different purposes:
 
 - Cloudflare for sharing services with others
-- Tailscale for your private management access
+- Tailscale for your private management access and DNS privacy
 
 ## Cost
 
@@ -399,9 +731,43 @@ Keep both! They serve different purposes:
 
 For homelab use, the free tier is more than adequate.
 
+## Quick Reference Commands
+
+```bash
+# Check Tailscale status
+tailscale status
+
+# Get your Tailscale IP
+tailscale ip -4
+
+# Test DNS
+nslookup google.com
+
+# Check DNS privacy
+# Visit: https://www.dnsleaktest.com/
+
+# Check AdGuard is working
+# Visit: http://100.108.0.112 (AdGuard web UI)
+
+# Restart Tailscale
+sudo systemctl restart tailscaled
+
+# Re-authenticate
+sudo tailscale up
+
+# Enable Tailscale DNS (Linux)
+sudo tailscale up --accept-dns
+
+# Check connection quality
+tailscale netcheck
+```
+
 ## Additional Resources
 
 - Official docs: https://tailscale.com/kb
 - Admin console: https://login.tailscale.com/admin
+- DNS settings: https://login.tailscale.com/admin/dns
 - Status page: https://status.tailscale.com
 - Community forum: https://forum.tailscale.com
+- DNS leak testing: https://www.dnsleaktest.com/
+- AdGuard docs: https://github.com/AdguardTeam/AdGuardHome/wiki
