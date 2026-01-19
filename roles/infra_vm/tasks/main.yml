@@ -126,7 +126,7 @@
     group: docker
     mode: '0644'
   notify: update docker compose stack
-  tags: docker
+  tags: docker, mikrotik_exporter
 
 - name: Upload .env file from template
   ansible.builtin.template:
@@ -191,4 +191,4 @@
     dependencies: true
     remove_orphans: true
   become: false
-  tags: docker
+  tags: docker, mikrotik_exporter

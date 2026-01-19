@@ -1,6 +1,7 @@
 [TOC]
 
-Monitors the MikroTik hAP ax3 router using [MKTXP](https://github.com/akpw/mktxp), a Prometheus exporter that pulls metrics via the RouterOS API.
+Monitors the MikroTik hAP ax3 router using [MKTXP](https://github.com/akpw/mktxp), a Prometheus exporter that pulls
+metrics via the RouterOS API.
 
 ## Architecture
 
