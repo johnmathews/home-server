@@ -1,7 +1,6 @@
 [TOC]
 
-Monitors the MikroTik hAP ax3 router using [MKTXP](https://github.com/akpw/mktxp), a Prometheus exporter that pulls
-metrics via the RouterOS API.
+Monitors the MikroTik hAP ax3 router using [MKTXP](https://github.com/akpw/mktxp), a Prometheus exporter that pulls metrics via the RouterOS API.
 
 ## Architecture
 
@@ -16,8 +15,15 @@ Enable the API and create a read-only user on the router:
 ```routeros
 /ip service enable api
 /user add name=mktxp_exporter group=read password=YOUR_PASSWORD
-/user set mktxp_exporter group=read,api
 ```
+
+Restrict API access to only the infra VM (recommended):
+
+```routeros
+/user set mktxp_exporter address=192.168.2.106/32
+```
+
+Note: RouterOS API uses username/password authentication only - API tokens are not supported.
 
 ## Deployment
 
@@ -52,18 +58,18 @@ docker logs mikrotik_exporter
 Verify metrics endpoint:
 
 ```sh
-curl -s http://192.168.2.106:49090/metrics | head -20
+curl -s http://192.168.2.106:49090/metrics | grep mktxp | head -10
 ```
 
 ## Metrics
 
 Key metrics exposed (all prefixed with `mktxp_`):
 
+- `system_uptime`, `system_cpu_load` - System health
+- `system_free_memory`, `system_total_memory` - Memory usage
 - `interface_tx_byte`, `interface_rx_byte` - Network throughput
 - `wireless_clients_count` - Connected WiFi clients
 - `dhcp_lease_count` - Active DHCP leases
-- `system_cpu_load` - Router CPU usage
-- `health_temperature` - Router temperature
 
 ## Configuration
 
