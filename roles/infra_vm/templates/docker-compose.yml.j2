@@ -161,6 +161,17 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     restart: always
 
+  mikrotik_exporter:
+    image: ghcr.io/akpw/mktxp:latest
+    container_name: mikrotik_exporter
+    user: "1000:1000"
+    command: mktxp --cfg-dir /etc/mktxp export
+    ports:
+      - "49090:49090"
+    volumes:
+      - /srv/infra/mikrotik_exporter:/etc/mktxp:ro
+    restart: always
+
   container-health-exporter:
     image: ghcr.io/johnmathews/container-status-exporter:latest
     container_name: container-status-exporter

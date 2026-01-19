@@ -1,0 +1,27 @@
+# infra_vm/tasks/mikrotik_exporter.yml
+---
+- name: Ensure mikrotik_exporter config directory exists
+  ansible.builtin.file:
+    path: /srv/infra/mikrotik_exporter
+    state: directory
+    owner: "{{ docker_user }}"
+    group: "{{ docker_user }}"
+    mode: '0755'
+
+- name: Template mikrotik_exporter.conf
+  ansible.builtin.template:
+    src: mikrotik_exporter/mikrotik_exporter.conf.j2
+    dest: /srv/infra/mikrotik_exporter/mktxp.conf
+    owner: "{{ docker_user }}"
+    group: "{{ docker_user }}"
+    mode: '0600'
+  notify: restart mikrotik_exporter
+
+- name: Template _mikrotik_exporter.conf
+  ansible.builtin.template:
+    src: mikrotik_exporter/_mikrotik_exporter.conf.j2
+    dest: /srv/infra/mikrotik_exporter/_mktxp.conf
+    owner: "{{ docker_user }}"
+    group: "{{ docker_user }}"
+    mode: '0644'
+  notify: restart mikrotik_exporter

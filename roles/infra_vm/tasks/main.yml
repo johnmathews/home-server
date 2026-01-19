@@ -102,7 +102,7 @@
     mode: '0755'
   tags: docker
 
-- name: Ensure required directories exist (one task)
+- name: Ensure required directories exist
   ansible.builtin.file:
     path: "{{ item.path }}"
     state: directory
@@ -178,6 +178,10 @@
 - name: Include mkdocs tasks
   import_tasks: mkdocs.yml
   tags: docs, docker
+
+- name: Include mikrotik_exporter tasks
+  import_tasks: mikrotik_exporter.yml
+  tags: mikrotik_exporter
 
 - name: Launch containers
   community.docker.docker_compose_v2:

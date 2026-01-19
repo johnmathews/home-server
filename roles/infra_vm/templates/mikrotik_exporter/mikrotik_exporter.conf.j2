@@ -1,0 +1,41 @@
+# vim: ft=ini
+# Router entry - one section per device
+[hap-ax3]
+    enabled = True
+    hostname = {{ mikrotik_router_ip }}
+    port = 8728
+    username = {{ vault_mikrotik_exporter_username }}
+    password = {{ vault_mikrotik_exporter_password }}
+
+    use_ssl = False
+    no_ssl_certificate = False
+    ssl_certificate_verify = False
+    plaintext_login = True
+
+    # Core metrics (enabled)
+    dhcp = True
+    dhcp_lease = True
+    pool = True
+    interface = True
+    firewall = True
+    monitor = True
+    route = True
+    wireless = True
+    wireless_clients = True
+    capsman = False
+    capsman_clients = False
+
+    # Health & system
+    health = True
+    poe = False
+    netwatch = True
+    public_ip = True
+
+    # Optional metrics (disabled by default)
+    ipv6_firewall = False
+    ipv6_neighbor = False
+    user = True
+    queue = True
+
+    # Use router name as label value
+    use_comments_over_names = True
