@@ -67,7 +67,11 @@
       "Bash(docker compose:*)",
       "Bash(git -C /Users/john/projects/home-server/proxmox-setup diff roles/infra_vm/templates/docker-compose.yml.j2)",
       "Bash(git -C /Users/john/projects/home-server/proxmox-setup add roles/infra_vm/templates/docker-compose.yml.j2)",
-      "Bash(git -C /Users/john/projects/home-server/proxmox-setup commit -m \"$\\(cat <<''EOF''\nFix docker-compose template issues\n\n- Fix cadvisor command Jinja2 syntax\n- Remove user directive from mikrotik_exporter to fix permission error\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
+      "Bash(git -C /Users/john/projects/home-server/proxmox-setup commit -m \"$\\(cat <<''EOF''\nFix docker-compose template issues\n\n- Fix cadvisor command Jinja2 syntax\n- Remove user directive from mikrotik_exporter to fix permission error\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(curl:*)",
+      "Bash(git -C /Users/john/projects/home-server/proxmox-setup add roles/infra_vm/templates/mikrotik_exporter/ roles/infra_vm/templates/docker-compose.yml.j2 roles/infra_vm/tasks/mikrotik_exporter.yml)",
+      "Bash(git -C /Users/john/projects/home-server/proxmox-setup commit -m \"$\\(cat <<''EOF''\nFix mikrotik_exporter config for latest MKTXP version\n\n- Add missing config keys \\(compact_default_conf_values, etc.\\)\n- Replace deprecated use_comments_over_names with interface_name_format\n- Remove read-only volume mount to allow config migrations\n- Change config file mode to 0644 for container access\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git -C /Users/john/projects/home-server/proxmox-setup commit -m \"$\\(cat <<''EOF''\nUpdate MikroTik exporter docs with IP restriction and fixes\n\n- Add recommended IP restriction for API user security\n- Fix router setup commands \\(remove incorrect group syntax\\)\n- Note that API tokens are not supported\n- Update metrics list and verification command\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
     ],
     "deny": [],
     "ask": []
