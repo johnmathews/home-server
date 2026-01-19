@@ -129,7 +129,7 @@ services:
       - /tmp
     security_opt:
       - no-new-privileges:true
-    command: {? {cadvisor_optimization_flags | to_json: ''} : ''}
+    command: {{ cadvisor_optimization_flags | to_json }}
 
   uptime-kuma:
     image: louislam/uptime-kuma:latest
@@ -164,7 +164,6 @@ services:
   mikrotik_exporter:
     image: ghcr.io/akpw/mktxp:latest
     container_name: mikrotik_exporter
-    user: "1000:1000"
     command: mktxp --cfg-dir /etc/mktxp export
     ports:
       - "49090:49090"
