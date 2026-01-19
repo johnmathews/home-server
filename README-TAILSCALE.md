@@ -4,7 +4,8 @@ This guide gets you up and running with Tailscale remote access in ~30 minutes.
 
 ## What You'll Get
 
-After following this guide, you can run Ansible playbooks and SSH into your homelab from anywhere in the world (coffee shops, hotels, airports) as if you were at home.
+After following this guide, you can run Ansible playbooks and SSH into your homelab from anywhere in the world (coffee
+shops, hotels, airports) as if you were at home.
 
 ## Prerequisites
 
@@ -18,6 +19,7 @@ After following this guide, you can run Ansible playbooks and SSH into your home
 Visit: https://login.tailscale.com/admin/settings/keys
 
 Click "Generate auth key" with these settings:
+
 - **Expiration**: 90 days
 - **Reusable**: ✓ (checked)
 - **Ephemeral**: ✗ (unchecked)
@@ -28,11 +30,13 @@ Copy the key (starts with `tskey-auth-...`)
 ### 2. Add Key to Vault (2 minutes)
 
 Edit your vault file:
+
 ```bash
 ansible-vault edit group_vars/all/vault.yml
 ```
 
 Add this line:
+
 ```yaml
 tailscale_auth_key: "tskey-auth-PASTE-YOUR-KEY-HERE"
 ```
@@ -59,7 +63,8 @@ make tailscale
 
 This installs Tailscale on all your VMs and LXCs. Wait for it to complete.
 
-**Note:** The `make pve` command already configured your LXC containers with TUN device support (required for VPNs). You only need to run it once.
+**Note:** The `make pve` command already configured your LXC containers with TUN device support (required for VPNs). You
+only need to run it once.
 
 ### 4. Collect Tailscale IPs (2 minutes)
 
@@ -68,6 +73,7 @@ This installs Tailscale on all your VMs and LXCs. Wait for it to complete.
 ```
 
 This shows a table like:
+
 ```
 ┌──────────────────────┬─────────────────┬───────────────────┐
 │ Host                 │ Local IP        │ Tailscale IP      │
@@ -80,9 +86,11 @@ This shows a table like:
 
 ### 5. Update Inventory File (3 minutes)
 
-Edit `inventory-tailscale.ini` and replace the placeholder IPs (100.x.x.x) with the actual Tailscale IPs from the table above.
+Edit `inventory-tailscale.ini` and replace the placeholder IPs (100.x.x.x) with the actual Tailscale IPs from the table
+above.
 
 Example:
+
 ```ini
 [media]
 media_vm ansible_host=100.64.0.5 ansible_user=john ansible_ssh_private_key_file=~/.ssh/john_macbook
@@ -91,31 +99,34 @@ media_vm ansible_host=100.64.0.5 ansible_user=john ansible_ssh_private_key_file=
 ### 6. Install Tailscale on Your Laptop (3 minutes)
 
 **macOS**:
+
 ```bash
 brew install tailscale
 sudo tailscale up
 ```
 
 **Linux**:
+
 ```bash
 curl -fsSL https://tailscale.com/install.sh | sh
 sudo tailscale up
 ```
 
-**Windows**:
-Download from: https://tailscale.com/download/windows
+**Windows**: Download from: https://tailscale.com/download/windows
 
 A browser will open - sign in with the same account you used in step 1.
 
 ### 7. Test It! (2 minutes)
 
 Test SSH:
+
 ```bash
 ssh root@100.64.0.1  # Proxmox (use actual IP from step 4)
 ssh john@100.64.0.5  # Media VM (use actual IP from step 4)
 ```
 
 Test Ansible:
+
 ```bash
 ansible all -i inventory-tailscale.ini -m ping
 ```
@@ -160,14 +171,17 @@ open https://100.64.0.1:8006
 ## Troubleshooting
 
 **"Connection refused" when testing SSH?**
+
 - Check Tailscale is running: `tailscale status`
 - Verify you're using the correct Tailscale IP from step 4
 
 **Ansible ping fails?**
+
 - Double-check IPs in `inventory-tailscale.ini` match output from step 4
 - Ensure SSH keys are correct (`~/.ssh/john_macbook`)
 
 **Need to regenerate auth key?**
+
 - Keys expire based on the expiration you set (default 90 days)
 - Generate a new one at: https://login.tailscale.com/admin/settings/keys
 - Update `group_vars/all/vault.yml` and run `make tailscale` again
@@ -175,6 +189,7 @@ open https://100.64.0.1:8006
 ## Full Documentation
 
 See `documentation/tailscale.md` for:
+
 - Advanced configuration (subnet routing, exit nodes, ACLs)
 - Security hardening (SSH restrictions, MFA)
 - Monitoring integration

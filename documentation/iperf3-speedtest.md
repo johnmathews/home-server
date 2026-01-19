@@ -1,8 +1,6 @@
-`iperf3` is a network testing utility. It runs on the Proxmox server and also on
-a client, like your laptop.
+`iperf3` is a network testing utility. It runs on the Proxmox server and also on a client, like your laptop.
 
-Make a connection between the server and the client and you can test the speed
-of the connection between them.
+Make a connection between the server and the client and you can test the speed of the connection between them.
 
 ## Server setup
 
@@ -23,17 +21,22 @@ The service definition is:
 
 ## Client setup
 
-You need to also install `iPerf3` on your laptop. 
+You need to also install `iPerf3` on your laptop.
 
 You can use `brew install iperf3`.
 
 Then run the command above.
 
-## Testing 
+## Testing
 
-Use this command to test how well you can stream movies from the server to your
-laptop at your current location:
+Use this command to test how well you can stream movies from the server to your laptop at your current location:
 
 ```sh
 iperf3 -c 192.168.2.106 -R -u -b 400M -t 30
+```
+
+Use this command to measure the quality of your WiFi signal and router/antenna placement:
+
+```sh
+iperf3 -c 192.168.2.106 -R -t 30 -b 300M
 ```

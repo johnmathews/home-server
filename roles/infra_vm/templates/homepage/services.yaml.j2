@@ -222,10 +222,6 @@
     #     description: Meal Planner
     #     icon: mealie
     #     showStats: true
-    - File Browser:
-        href: http://192.168.2.105:8082
-        siteMonitor: http://192.168.2.105:8082
-        icon: filebrowser
     - BookLore:
         href: https://books.itsa.pizza
         siteMonitor: http://192.168.2.105:6060
@@ -353,8 +349,6 @@
 - System_:
     - Share Drive Probe:
         description: "{{ share_drive_probe_quiet_hours_start }} - {{ share_drive_probe_quiet_hours_end }}\ndocs.itsa.pizza/monitor_nfs_smb_mounts"
-    - Spin Down Hard Disks:
-        description: "0,3,6,12,15,18,22\ndocs.itsa.pizza/disks.\n\nTrueNAS HDDs spundown using script /mnt/switft/scripts/spindown_hdds.sh."
 
 - Proxmox Backup:
     - Backup:
@@ -370,23 +364,29 @@
     - Disk Power Management:
         description: "tank:\n- 1hr standby\n- max. power usage w/ standby (level 127)\n\nbackup:\n- 30m standby\n- min. power usage w/ standby (level 1)"
     - Snapshots and Replication:
-        description: "switft: 10:30am daily\ntank: 11:00am daily"
+        description: "- tank: 13:00 daily\n- switft: 13:30 daily"
     - Cloud Sync Tasks:
         description: "4pm daily"
     - Scrub Tasks:
-        description: "On the first sunday at least 35 days after the previous scrub\ntank: 10am\nswift: 4pm\nbackup: 5pm"
+        description: "On the first sunday at least 35 days after the previous scrub\n- tank: 10am\n- swift: 4pm\n- backup: 5pm"
     - SMART tests:
         description: "backup and tank\nshort: 12pm Sundays\nlong: 10am First day of the month"
+    - Spindown HDDs:
+        description: "docs.itsa.pizza/disks.\n\n0,1,4,7,10,15,18,20,22"
+    - Reboot:
+        description: "6:15am, every 4 days"
+    - Startup Scripts:
+        description: "- Unlock datasets\n- Refresh shares"
 
 - Infra:
     - n8n:
         href: https://n8n.itsa.pizza
         siteMonitor: http://192.168.2.103:5678
         icon: n8n
-    - netvisor:
-        href: https://net.itsa.pizza
-        siteMonitor: http://192.168.2.106:60072
-        icon: sh-netvisor
+    # - netvisor:
+    #     href: https://net.itsa.pizza
+    #     siteMonitor: http://192.168.2.106:60072
+    #     icon: sh-netvisor
     - Grafana:
         href: https://charts.itsa.pizza/d/dekkfibh9454wb/home-server?from=now-24h&to=now&timezone=browser%3Fkiosk&refresh=10s
         siteMonitor: http://192.168.2.106:3000
@@ -428,10 +428,6 @@
           url: http://192.168.2.106:9000
           env: 5
           key: "{{ vault_portainer_key }}"
-    - File Browser:
-        href: http://192.168.2.106:8082
-        siteMonitor: http://192.168.2.106:8082
-        icon: filebrowser
     - AdGuard:
         href: http://adguard.itsa.pizza
         siteMonitor: http://192.168.2.111
@@ -463,14 +459,14 @@
         # siteMonitor: http://192.168.2.106:5201
         description: wifi speed test
         icon: iperf3
-    - MySpeed:
-        href: http://speed.itsa.pizza
-        siteMonitor: http://192.168.2.112:5216/
+    - MikroTik Exporter:
+        href: http://192.168.2.106:49090/metrics
+        siteMonitor: http://192.168.2.106:49090/metrics
+        icon: mikrotik
+        description: MikroTik metrics exporter
+    - LibreSpeed:
+        href: http://speed.itsa.pizza:8080
         description: Network Speed
-        icon: myspeed
-        widget:
-          type: myspeed
-          url: http://192.168.2.112:5216/
     # - VaultWarden:
     #     href: https://passwords.itsa.pizza
     #     siteMonitor: https://192.168.2.13:8000

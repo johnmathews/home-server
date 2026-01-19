@@ -55,7 +55,15 @@
       "Bash(shellcheck:*)",
       "mcp__MCP_DOCKER__mcp-find",
       "mcp__MCP_DOCKER__mcp-add",
-      "Bash(wait)"
+      "Bash(wait)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(git -C /Users/john/projects/home-server/proxmox-setup status)",
+      "Bash(git -C /Users/john/projects/home-server/proxmox-setup diff --staged)",
+      "Bash(git -C /Users/john/projects/home-server/proxmox-setup diff)",
+      "Bash(git -C /Users/john/projects/home-server/proxmox-setup log --oneline -5)",
+      "Bash(git -C /Users/john/projects/home-server/proxmox-setup commit -m \"$\\(cat <<''EOF''\nAdd MikroTik router monitoring via MKTXP exporter\n\nSet up mikrotik_exporter container on infra VM to collect metrics from\nhAP ax3 router via RouterOS API. Includes Prometheus scrape target\nconfiguration.\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git -C /Users/john/projects/home-server/proxmox-setup add documentation/mikrotik-exporter.md)",
+      "Bash(git -C /Users/john/projects/home-server/proxmox-setup commit -m \"$\\(cat <<''EOF''\nAdd MikroTik exporter documentation\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
     ],
     "deny": [],
     "ask": []

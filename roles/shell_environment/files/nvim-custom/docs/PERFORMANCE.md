@@ -12,24 +12,25 @@
 **Current:** 347ms (headless), improved lazy-loading for real-world usage  
 **Gap:** 197ms (2.3x slower than target for headless boot)
 
-**Note:** Headless startup doesn't benefit from lazy-loading optimizations. Real-world usage with `InsertEnter`, `BufReadPre`, and keypress-triggered loading will be significantly faster.
+**Note:** Headless startup doesn't benefit from lazy-loading optimizations. Real-world usage with `InsertEnter`,
+`BufReadPre`, and keypress-triggered loading will be significantly faster.
 
 ---
 
 ## Top 10 Slowest Operations
 
-| Time (ms) | Component | Type |
-|-----------|-----------|------|
-| 108.2ms | `require('plugins')` | Plugin loading via lazy.nvim |
-| 14.6ms | `require('plugins.lsp')` | LSP configuration |
-| 10.7ms | `require('plugins.telescope')` | Telescope setup |
-| 6.4ms | nvim-ts-autotag sourcing | Treesitter plugin |
-| 6.3ms | `require('plugins.cmp')` | Completion engine |
-| 5.4ms | telescope projects extension | Extension loading |
-| 4.9ms | `require('nvim-treesitter')` | Treesitter core |
-| 4.3ms | `require('plugins.mason')` | Mason tool installer |
-| 4.1ms | LuaSnip plugin | Snippet engine |
-| 3.9ms | `require('plugins.lualine')` | Statusline |
+| Time (ms) | Component                      | Type                         |
+| --------- | ------------------------------ | ---------------------------- |
+| 108.2ms   | `require('plugins')`           | Plugin loading via lazy.nvim |
+| 14.6ms    | `require('plugins.lsp')`       | LSP configuration            |
+| 10.7ms    | `require('plugins.telescope')` | Telescope setup              |
+| 6.4ms     | nvim-ts-autotag sourcing       | Treesitter plugin            |
+| 6.3ms     | `require('plugins.cmp')`       | Completion engine            |
+| 5.4ms     | telescope projects extension   | Extension loading            |
+| 4.9ms     | `require('nvim-treesitter')`   | Treesitter core              |
+| 4.3ms     | `require('plugins.mason')`     | Mason tool installer         |
+| 4.1ms     | LuaSnip plugin                 | Snippet engine               |
+| 3.9ms     | `require('plugins.lualine')`   | Statusline                   |
 
 **Total from top 10:** ~169ms (49% of startup time)
 
@@ -72,6 +73,7 @@
 1. **Lazy-load Telescope (save ~16ms)**
    - Only load on first `<Tab>` keypress
    - Extensions can load with main plugin
+
    ```lua
    keys = { "<Tab>" }, -- Load on first Tab press
    cmd = { "Telescope" }, -- Load on :Telescope command
@@ -80,6 +82,7 @@
 2. **Lazy-load completion (save ~10ms)**
    - Load nvim-cmp on InsertEnter
    - Load LuaSnip with cmp
+
    ```lua
    event = "InsertEnter",
    ```
@@ -121,9 +124,10 @@
 ✅ **Lazy-load nvim-cmp** - Load on `InsertEnter`  
 ✅ **Lazy-load LuaSnip** - Load on `InsertEnter`  
 ✅ **Lazy-load alpha-nvim** - Load on `VimEnter`  
-✅ **Lazy-load gitsigns** - Load on `BufReadPre`  
+✅ **Lazy-load gitsigns** - Load on `BufReadPre`
 
-**Impact:** While headless startup remains similar (~347ms vs 342ms baseline), real-world usage benefits significantly from deferred loading of heavy plugins until actually needed.
+**Impact:** While headless startup remains similar (~347ms vs 342ms baseline), real-world usage benefits significantly
+from deferred loading of heavy plugins until actually needed.
 
 ---
 
@@ -145,12 +149,12 @@ nvim +StartupTime
 
 ## Baseline Measurements
 
-| Scenario | Time | Date | Notes |
-|----------|------|------|-------|
-| Headless startup (baseline) | 342ms | 2025-11-07 | Before lazy-loading |
-| With file loading | ~490ms | 2025-11-07 | Before lazy-loading |
-| After lazy-loading improvements | 347ms | 2025-11-07 | Headless (doesn't show benefits) |
-| Real-world usage (estimated) | ~250-280ms | 2025-11-07 | With lazy-loading benefits |
+| Scenario                        | Time       | Date       | Notes                            |
+| ------------------------------- | ---------- | ---------- | -------------------------------- |
+| Headless startup (baseline)     | 342ms      | 2025-11-07 | Before lazy-loading              |
+| With file loading               | ~490ms     | 2025-11-07 | Before lazy-loading              |
+| After lazy-loading improvements | 347ms      | 2025-11-07 | Headless (doesn't show benefits) |
+| Real-world usage (estimated)    | ~250-280ms | 2025-11-07 | With lazy-loading benefits       |
 
 ---
 
