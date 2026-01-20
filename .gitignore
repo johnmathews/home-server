@@ -6,3 +6,4 @@ cloud-images/
 sabnzbd.ini.j2
 collections/
 *.secret
+router_backups/
