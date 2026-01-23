@@ -56,6 +56,19 @@ groups:
       #    offset must be on a vector selector; using the recorded vector makes this clean.
       - record: disk:spindown_event:1
         expr: clamp_min(disk:standby:bool - disk:standby:bool offset 15s, 0)
+  - name: network_traffic_signed
+    interval: 30s
+    rules:
+      # Proxmox network metrics - downloads negative, uploads positive
+      - record: pve_network_download_bytes
+        expr: -1 * pve_network_receive_bytes
+      - record: pve_network_upload_bytes
+        expr: pve_network_transmit_bytes
+      # Router (MikroTik) network metrics - downloads negative, uploads positive
+      - record: mktxp_interface_download_byte
+        expr: -1 * mktxp_interface_rx_byte
+      - record: mktxp_interface_upload_byte
+        expr: mktxp_interface_tx_byte
   - name: ups_mains_rules
     interval: 3m
     rules:
