@@ -1,6 +1,7 @@
 # vim: ft=yaml
 # paperless_lxc/files/docker-compose.yml
 services:
+
   paperless-db:
     container_name: paperless-db
     image: docker.io/library/postgres:17
@@ -14,13 +15,21 @@ services:
       PUID: ${PUID}
       PGID: ${PGID}
       TZ: ${TZ}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U paperless -d paperless"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   paperless-webserver:
     container_name: paperless-webserver
     image: ghcr.io/paperless-ngx/paperless-ngx:latest
     restart: always
     depends_on:
-      - paperless-db
-      - paperless-broker
+      paperless-db:
+        condition: service_healthy
+      paperless-broker:
+        condition: service_healthy
     ports:
       - "8000:8000"
     volumes:
@@ -39,6 +48,7 @@ services:
       USERMAP_UID: ${PUID}
       USERMAP_GID: ${PGID}
       TZ: ${TZ}
+
   paperless-broker:
     container_name: paperless-broker
     image: docker.io/library/redis:8
@@ -49,6 +59,12 @@ services:
       - TZ=${TZ}
     volumes:
       - "{{ docker_compose_dir }}//paperless/redisdata:/data"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   node_exporter:
     image: quay.io/prometheus/node-exporter:latest
     container_name: node_exporter
@@ -64,6 +80,7 @@ services:
     volumes:
       - '/:/host:ro,rslave'
       - '/var/lib/node_exporter/textfile_collector:/textfile:ro'
+
   alloy:
     image: grafana/alloy:latest
     container_name: alloy
@@ -92,6 +109,7 @@ services:
       options:
         max-size: "10m"
         max-file: "5"
+
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
     container_name: cadvisor
@@ -112,5 +130,3 @@ services:
       options:
         max-size: "10m"
         max-file: "5"
-volumes:
-  promtail_positions: {}
