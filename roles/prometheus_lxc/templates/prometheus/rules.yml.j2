@@ -68,9 +68,9 @@ groups:
       # Router (MikroTik) network metrics - rate calculated first, then sign applied
       # Downloads negative, uploads positive
       - record: mktxp_interface_download_bytes_per_second
-        expr: -1 * rate(mktxp_interface_rx_byte[5m])
+        expr: -1 * rate(mktxp_interface_rx_byte_total[5m])
       - record: mktxp_interface_upload_bytes_per_second
-        expr: rate(mktxp_interface_tx_byte[5m])
+        expr: rate(mktxp_interface_tx_byte_total[5m])
   - name: ups_mains_rules
     interval: 3m
     rules:
