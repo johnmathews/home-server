@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Version: 2025-01-24 10:00
+# Version: 2025-01-24 14:00
 
 # Location: /mnt/swift/scripts/spindown_hdds.sh
 # Purpose: Safely spin down ONLY the explicitly listed HDDs (by-id) when idle.
@@ -9,6 +9,7 @@
 #   - Uses ANSI color in logs for readability. Disable with NO_COLOR=1 env var.
 #   - Disks are configured as "by-id|label" pairs in TARGETS.
 #   - Plain logs (no color escape codes), run it with: NO_COLOR=1 /mnt/swift/scripts/spindown_hdds.sh
+#   - Uses I/O sector counts from /sys/block/*/stat for precise idle detection
 
 # ---------- RIGOR ----------
 set -Eeuo pipefail
@@ -26,8 +27,8 @@ TARGETS=(
   "/dev/disk/by-id/ata-ST16000NT001-3LV101_ZR5GK5G9|tank"
 )
 
-SAMPLE_DURATION=900                          # seconds for iostat sampling (all disks sampled in parallel)
-UTIL_THRESHOLD=0.03                          # %util below this (0.1 = 0.1%) => allow spindown
+SAMPLE_DURATION=900                          # seconds for I/O sampling (all disks sampled in parallel)
+IO_THRESHOLD=100                             # sectors below this => allow spindown (100 sectors = ~50KB)
 LOG_FILE="/mnt/swift/logs/spindown_hdds.log" # keep on SSD; never wakes HDDs
 COOLDOWN_SECS=1800                           # 30 min cooldown to reduce thrash (0 disables)
 LOCK_FILE="/var/run/spindown_hdds.lock"
@@ -40,7 +41,6 @@ DATE=/bin/date
 FLOCK=/usr/bin/flock
 GREP=/usr/bin/grep
 HDPARM=/usr/sbin/hdparm
-IOSTAT=/usr/bin/iostat
 SMARTCTL=/usr/sbin/smartctl
 TEE=/usr/bin/tee
 ZPOOL=/usr/sbin/zpool
@@ -48,9 +48,9 @@ NICE=/usr/bin/nice
 IONICE=/usr/bin/ionice
 READLINK=/usr/bin/readlink
 STAT=/usr/bin/stat
-TAIL=/usr/bin/tail
 TOUCH=/usr/bin/touch
 MKDIR=/usr/bin/mkdir
+SLEEP=/bin/sleep
 
 # ---------- COLORS ----------
 if [[ -z "${NO_COLOR:-}" ]]; then
@@ -109,10 +109,17 @@ on_err() {
     [[ -n "$fn" ]] || fn="main"
     log_note "  at ${fn} (${src}:${lno})"
   done
+
+  # Cleanup io_sampler temp files
+  _cleanup_sample_dir 2>/dev/null || true
+
   exit "$exit_code"
 }
 
 on_exit() {
+  # Cleanup io_sampler temp files
+  _cleanup_sample_dir 2>/dev/null || true
+
   if [[ $HAD_ERROR -eq 0 ]]; then
     echo | "$TEE" -a "$LOG_FILE"
     log_ok "Spindown script complete. Exiting."
@@ -126,11 +133,20 @@ trap on_exit EXIT
 "$MKDIR" -p "$(dirname "$LOG_FILE")" || die "Cannot create log dir: $(dirname "$LOG_FILE")"
 "$MKDIR" -p "$STAMP_DIR" || die "Cannot create stamp dir: $STAMP_DIR"
 
-for bin in "$AWK" "$BASENAME" "$DATE" "$FLOCK" "$GREP" "$HDPARM" "$IOSTAT" "$SMARTCTL" "$TEE" "$ZPOOL" "$NICE" "$IONICE" "$READLINK" "$STAT" "$TAIL" "$TOUCH" "$MKDIR"; do
+for bin in "$AWK" "$BASENAME" "$DATE" "$FLOCK" "$GREP" "$HDPARM" "$SMARTCTL" "$TEE" "$ZPOOL" "$NICE" "$IONICE" "$READLINK" "$STAT" "$TOUCH" "$MKDIR" "$SLEEP"; do
   [[ -x "$bin" ]] || die "Required binary missing: $bin"
 done
 
 [[ $EUID -eq 0 ]] || die "Run as root."
+
+# ---------- SOURCE IO SAMPLER ----------
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+IO_SAMPLER="${SCRIPT_DIR}/io_sampler.sh"
+if [[ ! -f "$IO_SAMPLER" ]]; then
+  die "io_sampler.sh not found at $IO_SAMPLER"
+fi
+# shellcheck source=io_sampler.sh
+source "$IO_SAMPLER"
 
 # Single-run lock
 exec {LOCKFD}>"$LOCK_FILE" || die "Cannot open lock file $LOCK_FILE"
@@ -141,13 +157,13 @@ exec {LOCKFD}>"$LOCK_FILE" || die "Cannot open lock file $LOCK_FILE"
 }
 
 # Small jitter so multiple cron hosts don't collide (max 10s)
-sleep $((RANDOM % 10))
+"$SLEEP" $((RANDOM % 10))
 
 ((${#TARGETS[@]} > 0)) || die "No TARGETS configured."
 
 echo | "$TEE" -a "$LOG_FILE"
 log "============================================================"
-log "Starting HDD spindown  ${C_DIM}(SAMPLE_DURATION=${SAMPLE_DURATION}s, UTIL_THRESHOLD=${UTIL_THRESHOLD}%)${C_RESET}"
+log "Starting HDD spindown  ${C_DIM}(SAMPLE_DURATION=${SAMPLE_DURATION}s, IO_THRESHOLD=${IO_THRESHOLD} sectors)${C_RESET}"
 for pair in "${TARGETS[@]}"; do
   IFS='|' read -r devid label <<<"$pair"
   sdnode=""
@@ -171,11 +187,10 @@ if "$ZPOOL" status 2>/dev/null | "$GREP" -Eq "scan: (resilver|scrub) in progress
 fi
 
 # ---------- PRE-FLIGHT: Collect valid spinning disks ----------
-# Arrays to track disks that pass all pre-flight checks
-declare -a SAMPLE_DISKS=()       # sdnode names for iostat
-declare -A DISK_DEVID=()         # sdnode -> by-id path
-declare -A DISK_LABEL=()         # sdnode -> friendly label
-declare -A DISK_REALNODE=()      # sdnode -> /dev/sdX path
+# Space-separated list of sdnode names that pass all checks
+PREFLIGHT_DISKS=""
+# Store metadata in temp files (bash 3.x compatible)
+PREFLIGHT_DIR=$(mktemp -d)
 
 log "Pre-flight: checking disk states…"
 
@@ -240,54 +255,61 @@ for pair in "${TARGETS[@]}"; do
   fi
 
   # Disk passed all checks; add to sample list
-  SAMPLE_DISKS+=("$sdnode")
-  DISK_DEVID["$sdnode"]="$devid"
-  DISK_LABEL["$sdnode"]="$label"
-  DISK_REALNODE["$sdnode"]="$realnode"
+  PREFLIGHT_DISKS="$PREFLIGHT_DISKS $sdnode"
+  echo "$devid" > "$PREFLIGHT_DIR/${sdnode}.devid"
+  echo "$label" > "$PREFLIGHT_DIR/${sdnode}.label"
+  echo "$realnode" > "$PREFLIGHT_DIR/${sdnode}.realnode"
   log "  ${C_OK}✓${C_RESET} ${label} (${sdnode}): queued for sampling"
 done
 
-# ---------- PARALLEL IOSTAT SAMPLING ----------
-if [[ ${#SAMPLE_DISKS[@]} -eq 0 ]]; then
+# Trim leading space
+PREFLIGHT_DISKS="${PREFLIGHT_DISKS# }"
+
+# ---------- I/O COUNT SAMPLING ----------
+if [[ -z "$PREFLIGHT_DISKS" ]]; then
   log_note "No disks require sampling; exiting."
+  rm -rf "$PREFLIGHT_DIR"
   exit 0
 fi
 
+# Convert space-separated to count
+disk_count=$(echo "$PREFLIGHT_DISKS" | wc -w | tr -d ' ')
+
 echo | "$TEE" -a "$LOG_FILE"
-log "Sampling ${#SAMPLE_DISKS[@]} disk(s) in parallel for ${SAMPLE_DURATION}s: ${SAMPLE_DISKS[*]}"
+log "Sampling ${disk_count} disk(s) in parallel for ${SAMPLE_DURATION}s: ${PREFLIGHT_DISKS}"
 
-# Run iostat on all disks simultaneously; capture output
-iostat_output="$(
-  "$NICE" -n 10 "$IONICE" -c3 \
-    "$IOSTAT" -d -x -y "${SAMPLE_DISKS[@]}" "$SAMPLE_DURATION" 2 2>/dev/null || true
-)"
+# Start I/O sampling using io_sampler
+# shellcheck disable=SC2086
+sample_io_start $PREFLIGHT_DISKS
 
-# Parse iostat output into associative array: sdnode -> %util
-declare -A DISK_UTIL=()
-for sdnode in "${SAMPLE_DISKS[@]}"; do
-  # Get the last line for this device (second sample, ignoring first)
-  util_line=$("$GREP" -E "^[[:space:]]*${sdnode}[[:space:]]" <<<"$iostat_output" | "$TAIL" -n1 || true)
-  if [[ -z "$util_line" ]]; then
-    DISK_UTIL["$sdnode"]="0.00"
-    log_warn "${DISK_LABEL[$sdnode]}: no iostat line captured; treating as idle."
-  else
-    DISK_UTIL["$sdnode"]=$("$AWK" '{print $(NF)+0}' <<<"$util_line")
-  fi
-done
+log "Waiting ${SAMPLE_DURATION} seconds…"
+"$SLEEP" "$SAMPLE_DURATION"
+
+# End I/O sampling
+sample_io_end
 
 # ---------- DECISION PHASE ----------
 echo | "$TEE" -a "$LOG_FILE"
 log "Making spindown decisions…"
 
-for sdnode in "${SAMPLE_DISKS[@]}"; do
-  devid="${DISK_DEVID[$sdnode]}"
-  label="${DISK_LABEL[$sdnode]}"
-  realnode="${DISK_REALNODE[$sdnode]}"
-  util="${DISK_UTIL[$sdnode]}"
+for sdnode in $PREFLIGHT_DISKS; do
+  devid=$(cat "$PREFLIGHT_DIR/${sdnode}.devid")
+  label=$(cat "$PREFLIGHT_DIR/${sdnode}.label")
+  realnode=$(cat "$PREFLIGHT_DIR/${sdnode}.realnode")
 
-  log "${label} (${sdnode}): ${C_BOLD}${util}%${C_RESET} utilisation (threshold: ${UTIL_THRESHOLD}%)"
+  # Get I/O delta
+  io_details=$(get_io_delta_detailed "$sdnode")
+  set -- $io_details
+  read_sectors="$1"
+  write_sectors="$2"
+  total_sectors="$3"
 
-  # ZFS-aware guard: if reads/writes non-zero, skip
+  # Convert to human-readable
+  total_human=$(sectors_to_human "$total_sectors")
+
+  log "${label} (${sdnode}): ${C_BOLD}${total_sectors}${C_RESET} sectors (${total_human}) transferred [R:${read_sectors} W:${write_sectors}] (threshold: ${IO_THRESHOLD})"
+
+  # ZFS-aware guard: if reads/writes non-zero in instant check, skip
   devlabel_byid="$("$BASENAME" "$devid")"
   devlabel_sdx="$sdnode"
   devlabel_real="$("$BASENAME" "$realnode")"
@@ -299,10 +321,10 @@ for sdnode in "${SAMPLE_DISKS[@]}"; do
     continue
   fi
 
-  # Compare as numbers: spin down if util < threshold
+  # Check if disk is idle (I/O below threshold)
   stamp="$STAMP_DIR/${sdnode}.stamp"
-  if "$AWK" -v u="$util" -v t="$UTIL_THRESHOLD" 'BEGIN{exit !(u < t)}'; then
-    log_warn "${label} (${sdnode}): ${util}% < ${UTIL_THRESHOLD}% threshold; spinning down…"
+  if is_disk_idle "$sdnode" "$IO_THRESHOLD"; then
+    log_warn "${label} (${sdnode}): ${total_sectors} <= ${IO_THRESHOLD} sectors; spinning down…"
     if "$HDPARM" -y "$devid" >/dev/null 2>&1; then
       log_ok "${label} (${sdnode}): disk in standby."
       "$TOUCH" "$stamp" || true
@@ -311,6 +333,9 @@ for sdnode in "${SAMPLE_DISKS[@]}"; do
       "$TOUCH" "$stamp" || true
     fi
   else
-    log_note "${label} (${sdnode}): ${util}% >= ${UTIL_THRESHOLD}% threshold; skipping spindown."
+    log_note "${label} (${sdnode}): ${total_sectors} > ${IO_THRESHOLD} sectors; skipping spindown."
   fi
 done
+
+# Cleanup preflight temp dir
+rm -rf "$PREFLIGHT_DIR"

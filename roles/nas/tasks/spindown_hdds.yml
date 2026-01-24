@@ -1,7 +1,15 @@
+- name: Upload io_sampler module to TrueNAS swift/scripts
+  ansible.builtin.copy:
+    src: files/io_sampler.sh
+    dest: /mnt/swift/scripts/io_sampler.sh
+    mode: '0755'
+    owner: root
+    group: root
+
 - name: Upload spindown_hdds script to TrueNAS swift/scripts
   ansible.builtin.copy:
     src: files/spindown_hdds.sh
     dest: /mnt/swift/scripts/spindown_hdds.sh
     mode: '0755'
     owner: root
-    group: root   # ‘wheel’ might not exist on SCALE
+    group: root

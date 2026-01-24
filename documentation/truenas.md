@@ -106,17 +106,23 @@ The version line at the top of the script shows when it was last edited.
 
 Cron runs a script at hours `0`, `2`, `6`, `23` to see if any HDDs can be spun down.
 
-**Parallel sampling:** All disks are sampled simultaneously using a single `iostat` call. This allows for longer sample durations (15 minutes) without proportional runtime increase. Previously, 4 disks × 7 minutes = 28 minutes total; now 4 disks are sampled in ~15 minutes.
+**Parallel sampling:** All disks are sampled simultaneously using I/O sector counts from `/sys/block/*/stat`. This allows for longer sample durations (15 minutes) without proportional runtime increase. Previously, 4 disks × 7 minutes = 28 minutes total; now 4 disks are sampled in ~15 minutes.
 
 **Parameters:**
 - `SAMPLE_DURATION=900` (15 minutes) - catches periodic activity patterns
 - `COOLDOWN_SECS=1800` (30 minutes) - prevents spindown thrash after recent spindown
-- `UTIL_THRESHOLD=0.03` (0.03% utilisation) - disk must be nearly idle
+- `IO_THRESHOLD=100` (sectors) - disk must transfer fewer than ~50KB to be considered idle
+
+**Why sector counts instead of iostat %util:**
+- Sector counts are absolute cumulative values from the kernel, not time-averaged percentages
+- Zero I/O during sample period = exactly 0 sectors transferred (binary certainty)
+- No threshold tuning needed - "idle" means truly no activity
+- More reliable for detecting periodic background tasks
 
 **Workflow:**
 1. Pre-flight: validate each disk (exists, rotational, not in standby, no self-test, cooldown expired)
-2. Parallel sample: run `iostat -d -x -y <all-disks> 900 2` for all valid disks
-3. Decision: check zpool iostat for immediate activity, spindown if idle
+2. Parallel sample: read initial sector counts, wait SAMPLE_DURATION, read final counts for all valid disks
+3. Decision: calculate delta (sectors transferred), check zpool iostat for immediate activity, spindown if idle
 
 The script must be told which disks to try to spindown. It uses the disk id.
 
@@ -136,7 +142,7 @@ TARGETS=(
 
 ```
 [2026-01-24 02:00:03] INFO  ============================================================
-[2026-01-24 02:00:03] INFO  Starting HDD spindown  (SAMPLE_DURATION=900s, UTIL_THRESHOLD=0.03%)
+[2026-01-24 02:00:03] INFO  Starting HDD spindown  (SAMPLE_DURATION=900s, IO_THRESHOLD=100 sectors)
 [2026-01-24 02:00:03] INFO    target: sdb - backup [/dev/disk/by-id/ata-ST8000VN004-3CP101_WWZ5AS90]
 [2026-01-24 02:00:03] INFO    target: sdc - backup [/dev/disk/by-id/ata-ST8000VN004-3CP101_WWZ5TZSF]
 [2026-01-24 02:00:03] INFO    target: sdd - tank [/dev/disk/by-id/ata-ST16000NT001-3LV101_K3S04BKQ]
@@ -148,16 +154,17 @@ TARGETS=(
 [2026-01-24 02:00:03] INFO    ✓ tank (sde): queued for sampling
 
 [2026-01-24 02:00:03] INFO  Sampling 3 disk(s) in parallel for 900s: sdc sdd sde
+[2026-01-24 02:00:03] INFO  Waiting 900 seconds…
 
 [2026-01-24 02:15:03] INFO  Making spindown decisions…
-[2026-01-24 02:15:03] INFO  backup (sdc): 0.01% utilisation (threshold: 0.03%)
-[2026-01-24 02:15:03] WARN  backup (sdc): 0.01% < 0.03% threshold; spinning down…
+[2026-01-24 02:15:03] INFO  backup (sdc): 48 sectors (24.00KB) transferred [R:16 W:32] (threshold: 100)
+[2026-01-24 02:15:03] WARN  backup (sdc): 48 <= 100 sectors; spinning down…
 [2026-01-24 02:15:03] OK    backup (sdc): disk in standby.
-[2026-01-24 02:15:03] INFO  tank (sdd): 0.02% utilisation (threshold: 0.03%)
-[2026-01-24 02:15:03] WARN  tank (sdd): 0.02% < 0.03% threshold; spinning down…
+[2026-01-24 02:15:03] INFO  tank (sdd): 72 sectors (36.00KB) transferred [R:40 W:32] (threshold: 100)
+[2026-01-24 02:15:03] WARN  tank (sdd): 72 <= 100 sectors; spinning down…
 [2026-01-24 02:15:03] OK    tank (sdd): disk in standby.
-[2026-01-24 02:15:03] INFO  tank (sde): 0.05% utilisation (threshold: 0.03%)
-[2026-01-24 02:15:03] NOTE  tank (sde): 0.05% >= 0.03% threshold; skipping spindown.
+[2026-01-24 02:15:03] INFO  tank (sde): 256 sectors (128.00KB) transferred [R:128 W:128] (threshold: 100)
+[2026-01-24 02:15:03] NOTE  tank (sde): 256 > 100 sectors; skipping spindown.
 
 [2026-01-24 02:15:03] OK    Spindown script complete. Exiting.
 ```
