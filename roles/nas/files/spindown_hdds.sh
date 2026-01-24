@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Version: 2025-10-05 14:27
+# Version: 2025-01-24 10:00
 
 # Location: /mnt/swift/scripts/spindown_hdds.sh
 # Purpose: Safely spin down ONLY the explicitly listed HDDs (by-id) when idle.
@@ -26,10 +26,10 @@ TARGETS=(
   "/dev/disk/by-id/ata-ST16000NT001-3LV101_ZR5GK5G9|tank"
 )
 
-SAMPLE_DURATION=400                          # seconds for iostat sampling. 2 samples are taken, the first is ignored.
-UTIL_THRESHOLD=0.05                          # %util below this (0.1 = 0.1%) => allow spindown
+SAMPLE_DURATION=900                          # seconds for iostat sampling (all disks sampled in parallel)
+UTIL_THRESHOLD=0.03                          # %util below this (0.1 = 0.1%) => allow spindown
 LOG_FILE="/mnt/swift/logs/spindown_hdds.log" # keep on SSD; never wakes HDDs
-COOLDOWN_SECS=600                            # 0 disables
+COOLDOWN_SECS=1800                           # 30 min cooldown to reduce thrash (0 disables)
 LOCK_FILE="/var/run/spindown_hdds.lock"
 STAMP_DIR="/var/run/spindown-stamps"
 
@@ -170,7 +170,15 @@ if "$ZPOOL" status 2>/dev/null | "$GREP" -Eq "scan: (resilver|scrub) in progress
   exit 0
 fi
 
-# ---------- MAIN LOOP ----------
+# ---------- PRE-FLIGHT: Collect valid spinning disks ----------
+# Arrays to track disks that pass all pre-flight checks
+declare -a SAMPLE_DISKS=()       # sdnode names for iostat
+declare -A DISK_DEVID=()         # sdnode -> by-id path
+declare -A DISK_LABEL=()         # sdnode -> friendly label
+declare -A DISK_REALNODE=()      # sdnode -> /dev/sdX path
+
+log "Pre-flight: checking disk states…"
+
 for pair in "${TARGETS[@]}"; do
   IFS='|' read -r devid label <<<"$pair"
 
@@ -204,18 +212,16 @@ for pair in "${TARGETS[@]}"; do
   case "$rc" in
   0) ;; # OK, proceed
   2)
-    echo | "$TEE" -a "$LOG_FILE"
     log_note "${label} (${sdnode}): already in standby; skipping."
     continue
     ;;
   *)
-    echo | "$TEE" -a "$LOG_FILE"
     log_warn "${label}: smartctl returned rc=$rc (non-fatal); continuing."
     ;;
   esac
 
   if [[ $rc -eq 0 ]]; then
-    # Skip if a SMART self-test is running (won’t wake due to -n standby)
+    # Skip if a SMART self-test is running (won't wake due to -n standby)
     if "$NICE" -n 10 "$IONICE" -c3 "$SMARTCTL" -n standby -c "$devid" 2>/dev/null | "$GREP" -qi "Self-test routine in progress"; then
       log_note "${label} (${sdnode}): SMART self-test running; skipping."
       continue
@@ -233,22 +239,53 @@ for pair in "${TARGETS[@]}"; do
     fi
   fi
 
-  # Sample iostat and read final %util
-  echo | "$TEE" -a "$LOG_FILE"
-  log "${label} (${sdnode}): sampling I/O for ${SAMPLE_DURATION}s…"
-  util_line="$(
-    "$NICE" -n 10 "$IONICE" -c3 \
-      "$IOSTAT" -d -x -y "$sdnode" "$SAMPLE_DURATION" 2 2>/dev/null |
-      "$GREP" -E "^[[:space:]]*$sdnode[[:space:]]" | "$TAIL" -n1 || true
-  )"
+  # Disk passed all checks; add to sample list
+  SAMPLE_DISKS+=("$sdnode")
+  DISK_DEVID["$sdnode"]="$devid"
+  DISK_LABEL["$sdnode"]="$label"
+  DISK_REALNODE["$sdnode"]="$realnode"
+  log "  ${C_OK}✓${C_RESET} ${label} (${sdnode}): queued for sampling"
+done
 
+# ---------- PARALLEL IOSTAT SAMPLING ----------
+if [[ ${#SAMPLE_DISKS[@]} -eq 0 ]]; then
+  log_note "No disks require sampling; exiting."
+  exit 0
+fi
+
+echo | "$TEE" -a "$LOG_FILE"
+log "Sampling ${#SAMPLE_DISKS[@]} disk(s) in parallel for ${SAMPLE_DURATION}s: ${SAMPLE_DISKS[*]}"
+
+# Run iostat on all disks simultaneously; capture output
+iostat_output="$(
+  "$NICE" -n 10 "$IONICE" -c3 \
+    "$IOSTAT" -d -x -y "${SAMPLE_DISKS[@]}" "$SAMPLE_DURATION" 2 2>/dev/null || true
+)"
+
+# Parse iostat output into associative array: sdnode -> %util
+declare -A DISK_UTIL=()
+for sdnode in "${SAMPLE_DISKS[@]}"; do
+  # Get the last line for this device (second sample, ignoring first)
+  util_line=$("$GREP" -E "^[[:space:]]*${sdnode}[[:space:]]" <<<"$iostat_output" | "$TAIL" -n1 || true)
   if [[ -z "$util_line" ]]; then
-    util="0.00"
-    log_warn "${label}: no iostat line captured; treating as idle."
+    DISK_UTIL["$sdnode"]="0.00"
+    log_warn "${DISK_LABEL[$sdnode]}: no iostat line captured; treating as idle."
   else
-    util=$("$AWK" '{print $(NF)+0}' <<<"$util_line")
+    DISK_UTIL["$sdnode"]=$("$AWK" '{print $(NF)+0}' <<<"$util_line")
   fi
-  log "${label} (${sdnode}): ${C_BOLD}${util}% utilisation${C_RESET}"
+done
+
+# ---------- DECISION PHASE ----------
+echo | "$TEE" -a "$LOG_FILE"
+log "Making spindown decisions…"
+
+for sdnode in "${SAMPLE_DISKS[@]}"; do
+  devid="${DISK_DEVID[$sdnode]}"
+  label="${DISK_LABEL[$sdnode]}"
+  realnode="${DISK_REALNODE[$sdnode]}"
+  util="${DISK_UTIL[$sdnode]}"
+
+  log "${label} (${sdnode}): ${C_BOLD}${util}%${C_RESET} utilisation (threshold: ${UTIL_THRESHOLD}%)"
 
   # ZFS-aware guard: if reads/writes non-zero, skip
   devlabel_byid="$("$BASENAME" "$devid")"
@@ -258,13 +295,14 @@ for pair in "${TARGETS[@]}"; do
     "$AWK" -v d1="$devlabel_byid" -v d2="$devlabel_sdx" -v d3="$devlabel_real" '
        { name=$1; r=$(NF-1)+0; w=$(NF)+0; if (index(name,d1)||index(name,d2)||index(name,d3)) if (r+w>0) act=1 }
        END{ exit act?0:1 }'; then
-    log_note "${label} (${sdnode}): zpool iostat shows activity; skipping."
+    log_note "${label} (${sdnode}): zpool iostat shows activity; skipping spindown."
     continue
   fi
 
   # Compare as numbers: spin down if util < threshold
+  stamp="$STAMP_DIR/${sdnode}.stamp"
   if "$AWK" -v u="$util" -v t="$UTIL_THRESHOLD" 'BEGIN{exit !(u < t)}'; then
-    log_warn "${label} (${sdnode}): Spinning down…"
+    log_warn "${label} (${sdnode}): ${util}% < ${UTIL_THRESHOLD}% threshold; spinning down…"
     if "$HDPARM" -y "$devid" >/dev/null 2>&1; then
       log_ok "${label} (${sdnode}): disk in standby."
       "$TOUCH" "$stamp" || true
@@ -273,6 +311,6 @@ for pair in "${TARGETS[@]}"; do
       "$TOUCH" "$stamp" || true
     fi
   else
-    log_note "${label} (${sdnode}): utilisation >= ${UTIL_THRESHOLD}%, skipping spindown."
+    log_note "${label} (${sdnode}): ${util}% >= ${UTIL_THRESHOLD}% threshold; skipping spindown."
   fi
 done

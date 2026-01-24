@@ -24,9 +24,12 @@ Perhaps `hd-idle` could be dockerized and deployed as a custom app.
 
 A script measures disk utilisation and, if conditions are met, spins down the HDDs using an hdparm command.
 
-The script is deployed using `make nas tags=hdds`.
+The script is deployed using `make nas t=hdds`.
 
-The script contains a list of disk ids to monitor. Disk activity and sample duration are parametrised.
+The script contains a list of disk ids to monitor. All disks are sampled **in parallel** using a single `iostat` call, which allows for longer sample durations without proportional runtime increase. Parameters:
+- `SAMPLE_DURATION=900` (15 minutes) - catches periodic activity patterns
+- `COOLDOWN_SECS=1800` (30 minutes) - prevents spindown thrash
+- `UTIL_THRESHOLD=0.03` (0.03% utilisation threshold)
 
 The script is deployed to `/mnt/swift/scripts/spindown_hdds.sh` using Ansible.
 
