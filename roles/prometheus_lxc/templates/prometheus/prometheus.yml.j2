@@ -258,6 +258,10 @@ scrape_configs:
         regex: '([^:]+)(?::\d+)?'
         target_label: host
         replacement: '$1'
+    metric_relabel_configs:
+      # drop unstable sdX label so reboots don't create new series
+      - action: labeldrop
+        regex: 'device'
   - job_name: 'nut'
     metrics_path: /ups_metrics
     scrape_interval: 30s

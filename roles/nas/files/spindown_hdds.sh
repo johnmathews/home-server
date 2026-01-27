@@ -30,7 +30,7 @@ TARGETS=(
 SAMPLE_DURATION=900                          # seconds for I/O sampling (all disks sampled in parallel)
 IO_THRESHOLD=100                             # sectors below this => allow spindown (100 sectors = ~50KB)
 LOG_FILE="/mnt/swift/logs/spindown_hdds.log" # keep on SSD; never wakes HDDs
-COOLDOWN_SECS=1800                           # 30 min cooldown to reduce thrash (0 disables)
+COOLDOWN_SECS=3600                           # 60 min cooldown to reduce thrash (0 disables)
 LOCK_FILE="/var/run/spindown_hdds.lock"
 STAMP_DIR="/var/run/spindown-stamps"
 
@@ -256,9 +256,9 @@ for pair in "${TARGETS[@]}"; do
 
   # Disk passed all checks; add to sample list
   PREFLIGHT_DISKS="$PREFLIGHT_DISKS $sdnode"
-  echo "$devid" > "$PREFLIGHT_DIR/${sdnode}.devid"
-  echo "$label" > "$PREFLIGHT_DIR/${sdnode}.label"
-  echo "$realnode" > "$PREFLIGHT_DIR/${sdnode}.realnode"
+  echo "$devid" >"$PREFLIGHT_DIR/${sdnode}.devid"
+  echo "$label" >"$PREFLIGHT_DIR/${sdnode}.label"
+  echo "$realnode" >"$PREFLIGHT_DIR/${sdnode}.realnode"
   log "  ${C_OK}✓${C_RESET} ${label} (${sdnode}): queued for sampling"
 done
 

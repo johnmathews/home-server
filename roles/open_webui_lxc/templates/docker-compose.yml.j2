@@ -1,8 +1,6 @@
 # vim: ft=yaml
 # open_webui_lxc/files/docker-compose.yml.j2
 
----
-
 services:
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
@@ -16,7 +14,7 @@ services:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
       - /var/lib/docker/:/var/lib/docker:ro
       - /var/run:/var/run:ro
-    privileged: false  # required for some metrics, but `true` makes it scan /dev/** and in an LXC /dev/series/by-id does not exist.
+    privileged: false # required for some metrics, but `true` makes it scan /dev/** and in an LXC /dev/series/by-id does not exist.
     security_opt:
       - no-new-privileges:true
     logging:
@@ -35,7 +33,7 @@ services:
       LOG_LEVEL: "warn"
     volumes:
       # config 
-      - ./alloy:/etc/alloy:ro 
+      - ./alloy:/etc/alloy:ro
       # docker 
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
@@ -44,9 +42,7 @@ services:
       - /run/log/journal:/run/log/journal:ro
       - /etc/machine-id:/etc/machine-id:ro
     command: >
-      run --server.http.listen-addr=0.0.0.0:12345
-      --storage.path=/var/lib/alloy/data
-      /etc/alloy/config.alloy
+      run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
     ports:
       - "12345:12345"
     logging:
@@ -64,9 +60,9 @@ services:
     environment:
       WEBUI_NAME: "itsa.pizza"
       WEBUI_URL: "https://chat.itsa.pizza"
-      ENABLE_SIGNUP: "true"   # let Cloudflare Access be the gate
+      ENABLE_SIGNUP: "true" # let Cloudflare Access be the gate
       ENABLE_SIGNUP_PASSWORD_CONFIRMATION: "true"
-      ENABLE_OAUTH: "false"    # set true only if you wire up an OAuth provider
+      ENABLE_OAUTH: "false" # set true only if you wire up an OAuth provider
       MAX_FILE_SIZE_MB: "50"
       TZ: ${TZ}
       # Point to OpenAI (default). If using a proxy, set OPENAI_API_BASE.
@@ -74,11 +70,15 @@ services:
       # Optional: if you use Azure OpenAI or a proxy
       # OPENAI_API_BASE: "https://api.openai.com/v1"
       # OPENAI_API_TYPE: "openai"
-
     volumes:
       - /srv/apps/open-webui/data:/app/backend/data
       # If you want custom prompts or provider configs:
       # - ./open-webui.json:/app/backend/data/settings.json:ro
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
 
   node_exporter:
     image: quay.io/prometheus/node-exporter:latest
