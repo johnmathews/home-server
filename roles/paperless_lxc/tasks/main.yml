@@ -92,3 +92,14 @@
     group: root
   tags: docker
   notify: restart all containers
+
+- name: Add consumer health check cron job
+  ansible.builtin.cron:
+    name: "paperless consumer health check"
+    minute: "*/5"
+    job: >-
+      [ $(docker exec paperless-webserver find /usr/src/paperless/consume -type f -mmin +5 2>/dev/null | wc -l) -gt 0 ]
+      && [ $(docker logs --since 10m paperless-webserver 2>&1 | grep -c 'paperless.consumer') -eq 0 ]
+      && docker exec paperless-webserver s6-svc -r /run/service/svc-consumer/
+    user: root
+  tags: consumer-health
