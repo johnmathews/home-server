@@ -17,7 +17,7 @@ alias .....='cd ../../../..'
 alias -- -='cd -'
 
 # Directory listing aliases (using eza if available, fallback to ls)
-if command -v eza &> /dev/null; then
+if command -v eza &>/dev/null; then
   alias l='eza -lha --git --group-directories-first --icons '
   alias ls='eza -lh --git --group-directories-first --icons'
   alias la='eza -lah --git --group-directories-first --icons'
@@ -43,7 +43,7 @@ else
 fi
 
 # Yazi file manager aliases
-if command -v yazi &> /dev/null; then
+if command -v yazi &>/dev/null; then
   alias y='yazi'
   alias yz='yazi'
 fi
@@ -52,7 +52,7 @@ fi
 alias d='docker'
 alias dps='docker ps --format "table {{ "{{.Names}}" }}\t{{ "{{.Image}}" }}\t{{ "{{.CreatedAt}}" }}\t{{ "{{.Status}}" }}"'
 alias dpsa='docker ps -a --format "table {{ "{{.Names}}" }}\t{{ "{{.Image}}" }}\t{{ "{{.CreatedAt}}" }}\t{{ "{{.Status}}" }}"'
-alias dlog='docker logs'
+alias dl='docker compose logs -f -n 1000'
 alias dexec='docker exec -it'
 
 # Git aliases
@@ -101,7 +101,7 @@ alias localip='ip addr show | grep "inet " | grep -v 127.0.0.1 | awk "{print \$2
 alias sudo='sudo '
 
 # Bat (batcat on Debian/Ubuntu)
-if command -v batcat &> /dev/null; then
+if command -v batcat &>/dev/null; then
   alias bat='batcat'
 fi
 

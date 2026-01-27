@@ -1,6 +1,21 @@
 ---
 # Node.js installation from NodeSource repository
 
+- name: Check if Node.js is already installed
+  ansible.builtin.command: node --version
+  register: nodejs_check
+  changed_when: false
+  failed_when: false
+
+- name: Set Node.js installation status
+  ansible.builtin.set_fact:
+    nodejs_needs_install: >-
+      {{
+        nodejs_check.rc != 0 or
+        (nodejs_check.stdout | regex_replace('^v', '') | split('.') | first | int)
+        != (shell_environment_nodejs_major_version | int)
+      }}
+
 - name: Remove old Node.js from default repositories
   ansible.builtin.apt:
     name:
@@ -8,6 +23,7 @@
       - npm
     state: absent
   become: true
+  when: nodejs_needs_install
 
 - name: Ensure directory exists for /etc/apt/keyrings
   ansible.builtin.file:
@@ -15,6 +31,7 @@
     state: directory
     mode: '0755'
   become: true
+  when: nodejs_needs_install
 
 - name: Add NodeSource GPG key
   ansible.builtin.get_url:
@@ -24,6 +41,7 @@
     force: false
   become: true
   register: nodesource_key
+  when: nodejs_needs_install
 
 - name: Add NodeSource repository
   ansible.builtin.apt_repository:
@@ -31,24 +49,28 @@
     state: present
     filename: nodesource
   become: true
+  when: nodejs_needs_install
 
 - name: Update apt cache after adding NodeSource repo
   ansible.builtin.apt:
     update_cache: true
     cache_valid_time: 3600
   become: true
+  when: nodejs_needs_install
 
 - name: Install Node.js from NodeSource
   ansible.builtin.apt:
     name: nodejs
     state: present
   become: true
+  when: nodejs_needs_install
 
 - name: Verify Node.js version
   ansible.builtin.command: node --version
   register: nodejs_version
   changed_when: false
   failed_when: false
+  when: nodejs_needs_install
 
 - name: Assert Node.js version is 20 or higher
   ansible.builtin.assert:
@@ -57,3 +79,4 @@
       - nodejs_version.stdout | regex_replace('^v', '') is version('20.0.0', '>=', version_type='semver')
     fail_msg: "Node.js version {{ nodejs_version.stdout | default('unknown') }} is below required v20.0.0"
     success_msg: "Node.js {{ nodejs_version.stdout }} installed successfully"
+  when: nodejs_needs_install

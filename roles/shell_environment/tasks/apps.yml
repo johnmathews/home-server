@@ -34,27 +34,3 @@
   become: true
   when: shell_environment_aliases_enabled | bool
   tags: [apps, aliases, shell]
-
-- name: Create custom Neovim config directory
-  ansible.builtin.file:
-    path: "{{ item.split(':')[1] }}/.config/nvim"
-    state: directory
-    owner: "{{ item.split(':')[0] }}"
-    group: "{{ item.split(':')[0] }}"
-    mode: '0755'
-  loop: "{{ target_shell_users }}"
-  become: true
-  when: shell_environment_neovim_config_style == "custom"
-  tags: [neovim, apps, editor]
-
-- name: Deploy custom Neovim config files
-  ansible.builtin.copy:
-    src: "nvim-custom/"
-    dest: "{{ item.split(':')[1] }}/.config/nvim/"
-    owner: "{{ item.split(':')[0] }}"
-    group: "{{ item.split(':')[0] }}"
-    mode: '0644'
-  loop: "{{ target_shell_users }}"
-  become: true
-  when: shell_environment_neovim_config_style == "custom"
-  tags: [neovim, apps, editor]
