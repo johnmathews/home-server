@@ -25,6 +25,13 @@
     state: present
     update_cache: true
 
+- name: Install deno for yt-dlp JavaScript runtime
+  ansible.builtin.shell: |
+    curl -fsSL https://deno.land/install.sh | DENO_INSTALL=/usr/local sh
+  args:
+    creates: /usr/local/bin/deno
+  tags: deno
+
 - name: Install Docker using official role
   import_role:
     name: geerlingguy.docker

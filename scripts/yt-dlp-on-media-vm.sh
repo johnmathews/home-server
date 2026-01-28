@@ -89,7 +89,7 @@ _ytdl_on_media_vm() {
   # Fetch video info for display and duplicate checking
   echo "🔍 Fetching video info..."
   local video_info
-  video_info="$(/usr/bin/ssh -o BatchMode=yes media "yt-dlp --print '%(id)s|%(title)s|%(height)sp|%(filesize_approx)s' --cookies $(printf '%q' "$remote_cookie") $(printf '%q' "$url") 2>/dev/null" || echo "unknown|Unknown Video|0p|0")"
+  video_info="$(/usr/bin/ssh -o BatchMode=yes media "yt-dlp --remote-components ejs:github --print '%(id)s|%(title)s|%(height)sp|%(filesize_approx)s' --cookies $(printf '%q' "$remote_cookie") $(printf '%q' "$url") 2>/dev/null" || echo "unknown|Unknown Video|0p|0")"
 
   local video_id="${video_info%%|*}"
   local video_title="${${video_info#*|}%%|*}"
@@ -179,6 +179,7 @@ url="$4"
 mkdir -p "$finaldir"
 
 yt-dlp \
+  --remote-components ejs:github \
   --cookies "$cookie" \
   --embed-metadata \
   --embed-chapters \
