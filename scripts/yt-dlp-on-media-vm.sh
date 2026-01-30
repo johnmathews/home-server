@@ -89,13 +89,13 @@ _ytdl_on_media_vm() {
   # Fetch video info for display and duplicate checking
   echo "🔍 Fetching video info..."
   local video_info
-  video_info="$(/usr/bin/ssh -o BatchMode=yes media "yt-dlp --remote-components ejs:github --print '%(id)s\t%(title)s\t%(height)sp\t%(filesize_approx)s' --cookies $(printf '%q' "$remote_cookie") $(printf '%q' "$url") 2>/dev/null" || printf 'unknown\tUnknown Video\t0p\t0')"
+  video_info="$(/usr/bin/ssh -o BatchMode=yes media "yt-dlp --remote-components ejs:github --print '%(id)s' --print '%(title)s' --print '%(height)sp' --print '%(filesize_approx)s' --cookies $(printf '%q' "$remote_cookie") $(printf '%q' "$url") 2>/dev/null" || printf 'unknown\nUnknown Video\n0p\n0')"
 
-  local video_id="${video_info%%$'\t'*}"
-  local video_title="${${video_info#*$'\t'}%%$'\t'*}"
-  local remaining="${video_info#*$'\t'*$'\t'}"
-  local new_quality="${remaining%%$'\t'*}"
-  local filesize_bytes="${remaining##*$'\t'}"
+  local -a info_lines=("${(@f)video_info}")
+  local video_id="${info_lines[1]}"
+  local video_title="${info_lines[2]}"
+  local new_quality="${info_lines[3]}"
+  local filesize_bytes="${info_lines[4]}"
 
   # Format filesize with smart rounding
   local filesize_display="Unknown"

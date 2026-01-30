@@ -76,7 +76,14 @@
       "mcp__MCP_DOCKER__execute_query",
       "mcp__MCP_DOCKER__list_prometheus_metric_names",
       "Bash(BATS_TEST_DIRNAME=/Users/john/projects/home-server/proxmox-setup/tests/unit /opt/homebrew/bin/bash:*)",
-      "Bash(.venv/bin/ansible-playbook:*)"
+      "Bash(.venv/bin/ansible-playbook:*)",
+      "WebFetch(domain:immich.app)",
+      "WebFetch(domain:docs.immich.app)",
+      "WebFetch(domain:api.immich.app)",
+      "WebFetch(domain:www.answeroverflow.com)",
+      "WebFetch(domain:blog.elest.io)",
+      "WebFetch(domain:v1.102.0.archive.immich.app)",
+      "Bash(uv run:*)"
     ],
     "deny": [],
     "ask": []
