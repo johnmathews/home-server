@@ -166,7 +166,9 @@ def main() -> None:
     print(f"Found album: {album_id}")
 
     if args.debug:
-        print(f"\n[debug] Fetching assets from album '{args.album}' to show stored paths...")
+        print(
+            f"\n[debug] Fetching assets from album '{args.album}' to show stored paths..."
+        )
         resp = session.get(f"{IMMICH_URL}/api/albums/{album_id}", timeout=30)
         resp.raise_for_status()
         album_data = resp.json()

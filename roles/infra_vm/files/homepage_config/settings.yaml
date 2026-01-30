@@ -18,6 +18,11 @@ layout:
     initiallyCollapsed: false
     style: row
     columns: 4
+  NAS:
+    tab: Infra
+    initiallyCollapsed: false
+    style: row
+    columns: 4
   Infra:
     tab: Infra
     style: row
@@ -33,11 +38,6 @@ layout:
     columns: 3
   Hardware:
     tab: Infra
-    initiallyCollapsed: false
-    style: row
-    columns: 3
-  NAS:
-    tab: NAS
     initiallyCollapsed: false
     style: row
     columns: 3

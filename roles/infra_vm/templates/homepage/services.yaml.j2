@@ -494,7 +494,7 @@
         icon: pushover
 - NAS:
     - TrueNAS:
-        href: https://nas.itsa.pizza
+        href: https://nas.itsa.pizza/ui/system/advanced
         siteMonitor: http://192.168.2.104
         icon: truenas
         widget:
@@ -502,7 +502,7 @@
           url: http://192.168.2.104
           username: truenas_admin
           password: "{{ vault_truenas_password }}"
-          enablePools: true # optional, defaults to false
+          enablePools: false # optional, defaults to false
           nasType: scale
     - File Browser:
         href: https://files.itsa.pizza
