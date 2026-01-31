@@ -128,6 +128,14 @@ scrape_configs:
         regex: '(192\.168\.2\.114|100\.88\.114\.14)'
         target_label: client_name
         replacement: 'Media VM'
+      - source_labels: [user]
+        regex: '192\.168\.2\.11'
+        target_label: client_name
+        replacement: 'Ritsyas MacBook Air'
+      - source_labels: [user]
+        regex: '192\.168\.2\.12'
+        target_label: client_name
+        replacement: 'iPad'
 
   - job_name: 'container-status'
     scrape_interval: 30s
