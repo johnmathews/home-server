@@ -83,7 +83,8 @@
       "WebFetch(domain:www.answeroverflow.com)",
       "WebFetch(domain:blog.elest.io)",
       "WebFetch(domain:v1.102.0.archive.immich.app)",
-      "Bash(uv run:*)"
+      "Bash(uv run:*)",
+      "WebFetch(domain:docs.tubearchivist.com)"
     ],
     "deny": [],
     "ask": []

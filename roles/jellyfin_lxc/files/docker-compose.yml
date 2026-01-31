@@ -2,8 +2,7 @@
 services:
 
   jellyfin:
-    # image: jellyfin/jellyfin
-    # dockerfile uses the official image and adds yt-dlp 
+    # image: dockerfile uses the official image and adds yt-dlp 
     build:
       context: ./
       dockerfile: Dockerfile
@@ -35,7 +34,6 @@ services:
         target: /transcode
         tmpfs:
           size: 4g
-      # - /srv/apps/jellyfin/plugins/tubearchivist_metadata:/config/plugins/TubeArchivistMetadataKids_1.3.19.0
       - /srv/apps/jellyfin/appdata:/config
       - /srv/apps/jellyfin/cache:/cache
       - /mnt/nfs/library:/library # kids shows, family movies, etc
@@ -47,7 +45,6 @@ services:
       options:
         max-size: "10m"
         max-file: "10"
-    # privileged: true
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS --connect-timeout 2 http://127.0.0.1:8096/ >/dev/null || exit 1"]
       interval: 30s
