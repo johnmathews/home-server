@@ -7,7 +7,7 @@ guid: 1001
 pgid: 1001
 
 # SMB is NOT necessary. The paperless instance itself connects the the paperless datastore via NFS.
-# other clients, phones, laptops etc connect to paperless datastore via SMB, but not the paperless LXC.
+# other clients, phones, laptops etc connect to paperless datastore via SMB which is a trueNAS dataset and independent of the paperless service.
 smb_media_vm_username: media_vm
 smb_server: 192.168.2.104
 smb_opts_items:
