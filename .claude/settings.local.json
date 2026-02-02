@@ -84,7 +84,8 @@
       "WebFetch(domain:blog.elest.io)",
       "WebFetch(domain:v1.102.0.archive.immich.app)",
       "Bash(uv run:*)",
-      "WebFetch(domain:docs.tubearchivist.com)"
+      "WebFetch(domain:docs.tubearchivist.com)",
+      "Bash(git rm:*)"
     ],
     "deny": [],
     "ask": []
