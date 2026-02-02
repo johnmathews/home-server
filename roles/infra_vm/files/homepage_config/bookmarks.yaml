@@ -89,6 +89,9 @@
     - TrueNAS:
         - abbr:
           href: http://192.168.2.104
+    - Homepage:
+        - abbr:
+          href: http://192.168.2.106:3002
     - Traefik:
         - abbr:
           href: http://192.168.2.108/dashboard/
