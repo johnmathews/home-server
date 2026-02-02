@@ -1,3 +1,27 @@
+- name: Ensure locales package is installed
+  ansible.builtin.apt:
+    name: locales
+    state: present
+    update_cache: true
+  tags: [locale]
+
+- name: Generate en_US.UTF-8 locale
+  community.general.locale_gen:
+    name: en_US.UTF-8
+    state: present
+  tags: [locale]
+
+- name: Set default system locale to en_US.UTF-8
+  ansible.builtin.copy:
+    dest: /etc/default/locale
+    content: |
+      LANG=en_US.UTF-8
+      LC_ALL=en_US.UTF-8
+    owner: root
+    group: root
+    mode: "0644"
+  tags: [locale]
+
 - name: Install dependencies
   ansible.builtin.apt:
     name:

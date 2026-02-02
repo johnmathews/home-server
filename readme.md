@@ -215,7 +215,7 @@ best to attach the fans to an ESP32 board that has temperature probes, and make 
     - Make sure that in cloud-init the `IP config` isn't blank:
       - IPv4: `DHCP`
     - In Proxmox > 105 (media) > Cloud-Init and set User, Password, SSH public key etc.
-    - Set ZFS reserved space and volsize (maximum possible size):
+    - Set ZFS reserved space and volsize (maximum possible size) by running these commands on the Proxmox host:
       - `zfs set refreservation=32G rpool/data/vm-105-disk-1`
       - `zfs set volsize=32G rpool/data/vm-105-disk-1`
     - Update reserved IP on router if necessary and use correct IP address in next Ansible configuration step.
@@ -248,8 +248,8 @@ This VM will host the monitoring and dashboard applications.
     - Make sure that in cloud-init the `IP config` isn't blank:
       - IPv4: `DHCP`
     - In Proxmox > 106 (infra) > Cloud-Init and set User, Password, SSH public
-      key etc.
-    - Set ZFS reserved space and volsize (maximum possible size):
+      key, IP config, etc.
+    - Set ZFS reserved space and volsize (maximum possible size) by running the commands on the proxmox host itself:
       - `zfs set refreservation=16G rpool/data/vm-106-disk-1`
       - `zfs set volsize=16G rpool/data/vm-106-disk-1`
     - Update reserved IP on router if necessary and use the correct IP address
