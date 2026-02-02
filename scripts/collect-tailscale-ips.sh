@@ -29,6 +29,7 @@ get_tailscale_ip() {
 get_tailscale_ip "root" "192.168.2.214" "proxmox_host"
 
 # VMs
+get_tailscale_ip "root" "192.168.2.103" "mailcow_vm"
 get_tailscale_ip "root" "192.168.2.104" "truenas"
 get_tailscale_ip "john" "192.168.2.105" "media_vm"
 get_tailscale_ip "john" "192.168.2.106" "infra_vm"
@@ -36,7 +37,6 @@ get_tailscale_ip "john" "192.168.2.106" "infra_vm"
 # LXCs
 get_tailscale_ip "root" "192.168.2.100" "cloudflared_lxc"
 get_tailscale_ip "root" "192.168.2.101" "pihole_lxc"
-get_tailscale_ip "root" "192.168.2.103" "n8n_lxc"
 get_tailscale_ip "root" "192.168.2.108" "traefik_lxc"
 get_tailscale_ip "root" "192.168.2.110" "jellyfin_lxc"
 get_tailscale_ip "root" "192.168.2.113" "immich_lxc"

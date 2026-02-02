@@ -10,14 +10,14 @@
       tags: nfs
     - role: share_drive_probe
       tags: shares
-    - role: media_vm
-      tags: media
     - role: sleep_hours
       tags: sleep
     - role: shell_environment
       tags: shell
     - role: tailscale
       tags: tailscale
+    - role: media_vm
+      tags: media
 
   vars:
     proxmox_node_name: proxmox

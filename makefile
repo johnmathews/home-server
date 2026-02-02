@@ -57,6 +57,9 @@ pve:
 nas:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/nas.yml $(VAULT) $(ANSIBLE_OPTS)
 
+mail:
+	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/mail_vm.yml $(VAULT) $(ANSIBLE_OPTS)
+
 media:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/media_vm.yml $(VAULT) $(ANSIBLE_OPTS)
 
@@ -89,9 +92,6 @@ jelly:
 
 open-webui:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/open_webui_lxc.yml $(VAULT) $(ANSIBLE_OPTS)
-
-n8n:
-	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/n8n_lxc.yml $(VAULT) $(ANSIBLE_OPTS)
 
 atuin:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/atuin.yml $(VAULT) $(ANSIBLE_OPTS)

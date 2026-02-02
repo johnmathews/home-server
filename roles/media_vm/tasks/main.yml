@@ -195,3 +195,18 @@
 - name: Set permissions of booklore config directory
   ansible.builtin.command: chown -R 1001:1001 "{{ media_stack_base_dir }}/config/booklore"
   become: true
+
+- name: Set Immich environment variables
+  ansible.builtin.lineinfile:
+    path: /etc/environment
+    regexp: "^{{ item.key }}="
+    line: "{{ item.key }}={{ item.value }}"
+  become: true
+  loop:
+    - {key: IMMICH_API_KEY, value: "{{ vault_immich_media_vm_api_key }}"}
+    - {key: IMMICH_LIBRARY_ID, value: "{{ vault_immich_reference_library_id }}"}
+    - {key: IMMICH_API_URL, value: "{{ vault_immich_api_url }}"}
+    - {key: IMMICH_SHARE_USER, value: "John"}
+    - {key: PUSHOVER_USER_KEY, value: "{{ vault_pushover_user_key }}"}
+    - {key: PUSHOVER_APP_TOKEN, value: "{{ vault_pushover_media_vm_app_api_token }}"}
+  tags: immich, pushover
