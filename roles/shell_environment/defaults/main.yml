@@ -57,6 +57,7 @@ shell_environment_cli_tools:
   - imagemagick
   - tree
   - bat
+  - tmux
 
 # uv Python package manager (installer script)
 shell_environment_uv_enabled: true
