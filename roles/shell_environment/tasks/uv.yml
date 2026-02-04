@@ -1,0 +1,18 @@
+# shell_environment/tasks/uv.yml
+
+# Install uv Python package manager via official installer
+
+- name: Ensure uv is installed system-wide
+  ansible.builtin.shell: |
+    set -eo pipefail
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+    if [ -f /root/.local/bin/uv ]; then
+      cp /root/.local/bin/uv /usr/local/bin/uv
+      chmod 755 /usr/local/bin/uv
+    fi
+  args:
+    executable: /bin/bash
+    creates: /usr/local/bin/uv
+  become: true
+  when: shell_environment_uv_enabled | bool
+  tags: [uv, python, apps]

@@ -6,15 +6,15 @@ shell_environment_neovim_config_style: "custom" # minimal, extended, custom
 shell_environment_neovim_version: "v0.11.5"
 shell_environment_neovim_install_dir: "/opt"
 shell_environment_neovim_bin_dir: "/usr/local/bin"
-shell_environment_neovim_deploy_docs: true       # Deploy documentation files
-shell_environment_neovim_deploy_scripts: true    # Deploy development scripts
+shell_environment_neovim_deploy_docs: true # Deploy documentation files
+shell_environment_neovim_deploy_scripts: true # Deploy development scripts
 # Optional: Custom Python path for neovim python provider (defaults to ~/.pyenv/versions/3.10.12/envs/nvim/bin/python3)
 # shell_environment_neovim_python_path: "/usr/bin/python3"
 
 # Zsh
 shell_environment_zsh_enabled: true
 shell_environment_set_default_shell: true # Set to true in host_vars to change default shell
-shell_environment_vim_mode_enabled: true  # Enable vim keybindings in Zsh
+shell_environment_vim_mode_enabled: true # Enable vim keybindings in Zsh
 
 # Oh My Zsh
 shell_environment_omz_enabled: true
@@ -58,6 +58,9 @@ shell_environment_cli_tools:
   - tree
   - bat
 
+# uv Python package manager (installer script)
+shell_environment_uv_enabled: true
+
 # Shell aliases
 shell_environment_aliases_enabled: true
 
@@ -73,12 +76,12 @@ shell_environment_yazi_bin_dir: "/usr/local/bin"
 
 # eza modern ls replacement (binary installation)
 shell_environment_eza_enabled: true
-shell_environment_eza_version: "v0.20.14"  # Latest stable as of Dec 2024
+shell_environment_eza_version: "v0.20.14" # Latest stable as of Dec 2024
 shell_environment_eza_arch: "x86_64-unknown-linux-gnu"
 shell_environment_eza_install_dir: "/opt"
 shell_environment_eza_bin_dir: "/usr/local/bin"
 
 # Node.js (NodeSource repository)
 shell_environment_nodejs_enabled: true
-shell_environment_nodejs_major_version: "20"  # LTS - Iron (until April 2026)
+shell_environment_nodejs_major_version: "20" # LTS - Iron (until April 2026)
 

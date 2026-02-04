@@ -5,9 +5,9 @@ shell_environment_shell_users:
   - "root:/root:/bin/bash"
 
 nfs_shares:
-  # - name: immich
-  #   mountpoint: /mnt/nfs/immich
-  #   target: /mnt/tank/immich
   - name: photos
     mountpoint: /mnt/nfs/photos
     target: /mnt/tank/photos
+  - name: movies
+    mountpoint: /mnt/nfs/movies
+    target: /mnt/tank/movies

@@ -5,7 +5,7 @@ services:
   alloy:
     image: grafana/alloy:latest
     container_name: alloy
-    restart: unless-stopped
+    restart: always
     environment:
       LOKI_WRITE_ENDPOINT: "http://192.168.2.106:3100/loki/api/v1/push"
       NODE_HOSTNAME: "media"
@@ -40,7 +40,7 @@ services:
     ports:
       - "9100:9100"
     pid: host
-    restart: unless-stopped
+    restart: always
     volumes:
       - '/:/host:ro,rslave'
       - '/var/lib/node_exporter/textfile_collector:/textfile:ro'
@@ -133,21 +133,6 @@ services:
         max-file: "3"
     restart: always
 
-  # filebrowser:
-  #   image: filebrowser/filebrowser:latest
-  #   container_name: filebrowser
-  #   user: "${PUID}:${PGID}"
-  #   ports:
-  #     - "8082:80"
-  #   volumes:
-  #     - /mnt/nfs/media:/srv # Adjust to the path you want to browse
-  #     - /srv/media/config/filebrowser/config:/config # Config and database
-  #     - /srv/media/config/filebrowser/config/database:/database # Config and database
-  #   environment:
-  #     - TZ=Europe/Amsterdam
-  #     - FB_ROOT=/srv
-  #   restart: always
-
   booklore:
     image: booklore/booklore:latest
     container_name: booklore
@@ -174,7 +159,7 @@ services:
       - /mnt/nfs/books:/nfs/books
       - /mnt/nfs/library:/nfs/library:ro
       - /mnt/nfs/media:/nfs/media:ro
-    restart: unless-stopped
+    restart: always
 
   booklore-mariadb:
     image: lscr.io/linuxserver/mariadb:11.4.5
@@ -190,7 +175,7 @@ services:
     env_file: .env
     volumes:
       - /srv/media/config/booklore/mariadb/config:/config
-    restart: unless-stopped
+    restart: always
     healthcheck:
       test: ["CMD", "mariadb-admin", "ping", "-h", "localhost"]
       interval: 5s

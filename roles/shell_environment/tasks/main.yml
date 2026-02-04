@@ -65,6 +65,11 @@
   when: shell_environment_atuin_enabled | bool
   tags: [atuin, shell]
 
+- name: Install uv Python package manager
+  ansible.builtin.import_tasks: uv.yml
+  when: shell_environment_uv_enabled | bool
+  tags: [uv, python, apps]
+
 - name: Configure shell integration
   ansible.builtin.import_tasks: shell-integration.yml
   tags: [integration, shell]
