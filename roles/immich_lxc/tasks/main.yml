@@ -70,6 +70,21 @@
   notify: restart docker compose stack
   tags: docker
 
+- name: Set Immich environment variables
+  ansible.builtin.lineinfile:
+    path: /etc/environment
+    regexp: "^{{ item.key }}="
+    line: "{{ item.key }}={{ item.value }}"
+  become: true
+  loop:
+    - {key: IMMICH_API_KEY, value: "{{ vault_immich_media_vm_api_key }}"}
+    - {key: IMMICH_LIBRARY_ID, value: "{{ vault_immich_reference_library_id }}"}
+    - {key: IMMICH_API_URL, value: "{{ vault_immich_api_url }}"}
+    - {key: IMMICH_SHARE_USER, value: "John"}
+    - {key: PUSHOVER_USER_KEY, value: "{{ vault_pushover_user_key }}"}
+    - {key: PUSHOVER_APP_TOKEN, value: "{{ vault_pushover_media_vm_app_api_token }}"}
+  tags: immich, pushover
+
 - name: Fix facebook-albums permissions (one-time)
   ansible.builtin.import_tasks: fix_facebook_albums_permissions.yml
   when: fix_facebook_albums_perms | default(false) | bool
