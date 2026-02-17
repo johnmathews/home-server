@@ -393,14 +393,14 @@
         href: https://docs.itsa.pizza
         siteMonitor: http://192.168.2.106:8000
         icon: si-materialformkdocs
-    - Mailcow:
-        href: https://mail.itsa.pizza
-        siteMonitor: https://mail.itsa.pizza
-        icon: mailcow
-        widget:
-          type: mailcow
-          url: https://192.168.2.103
-          key: "{{ vault_mailcow_readonly_api_key }}"
+    # - Mailcow:
+    #     href: https://mail.itsa.pizza
+    #     siteMonitor: https://mail.itsa.pizza
+    #     icon: mailcow
+    #     widget:
+    #       type: mailcow
+    #       url: https://192.168.2.103
+    #       key: "{{ vault_mailcow_readonly_api_key }}"
     - Prometheus:
         href: http://prometheus.itsa.pizza
         siteMonitor: http://192.168.2.115:9090
@@ -506,8 +506,13 @@
           nasType: scale
     - File Browser:
         href: https://files.itsa.pizza
-        siteMonitor: http://192.168.2.104:30051
+        siteMonitor: http://192.168.2.104:30334
         icon: filebrowser
+        # widget:
+        #   type: filebrowser
+        #   url: http://192.168.2.104:30334
+        #   username: "{{ vault_truenas_filebrowser_username }}"
+        #   password: "{{ vault_truenas_filebrowser_password }}"
 - PVE:
     - Proxmox:
         href: https://proxmox.itsa.pizza
