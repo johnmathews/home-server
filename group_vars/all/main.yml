@@ -27,6 +27,9 @@ uptime_kuma_user: "john"
 
 ansible_python_interpreter: /usr/bin/python3
 
+# Atuin client version (server uses latest Docker image; no semver tags after v18.2.0)
+atuin_version: "v18.12.1"
+
 # cAdvisor optimization flags (Phase 1: Conservative)
 # Reduces CPU usage by ~50-60% by aligning collection with Prometheus scrape interval
 cadvisor_optimization_flags:

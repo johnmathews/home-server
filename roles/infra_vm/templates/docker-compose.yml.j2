@@ -226,8 +226,8 @@ services:
   atuin:
     restart: always
     container_name: atuin
-    image: ghcr.io/atuinsh/atuin:v18.7.1
-    command: server start
+    image: ghcr.io/atuinsh/atuin:latest
+    command: start
     volumes:
       - "/srv/infra/atuin:/config"
     ports:
@@ -235,9 +235,12 @@ services:
     environment:
       ATUIN_HOST: "0.0.0.0"
       ATUIN_OPEN_REGISTRATION: "true"
-      ATUIN_DB_URI: postgres://$ATUIN_DB_USERNAME:$ATUIN_DB_PASSWORD@db/$ATUIN_DB_NAME
+      ATUIN_DB_URI: postgres://$ATUIN_DB_USERNAME:$ATUIN_DB_PASSWORD@atuin-db/$ATUIN_DB_NAME
       RUST_LOG: info,atuin_server=debug
-  db:
+    depends_on:
+      atuin-db:
+        condition: service_healthy
+  atuin-db:
     image: postgres:14
     container_name: atuin_database
     restart: unless-stopped
@@ -246,6 +249,13 @@ services:
     environment:
       POSTGRES_USER: ${ATUIN_DB_USERNAME}
       POSTGRES_PASSWORD: ${ATUIN_DB_PASSWORD}
+      POSTGRES_DB: ${ATUIN_DB_NAME}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $ATUIN_DB_USERNAME -d $ATUIN_DB_NAME"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
 
 volumes:

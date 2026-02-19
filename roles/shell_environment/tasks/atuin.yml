@@ -6,15 +6,21 @@
   ansible.builtin.shell: |
     set -e
     export ATUIN_DONT_PRINT_WELCOME=1
-    curl --proto "=https" --tlsv1.2 -LsSf https://setup.atuin.sh | sh -s -- --no-modify-path
+    # Skip if atuin is already the desired version
+    if [ -f /usr/local/bin/atuin ] && [ ! -L /usr/local/bin/atuin ] && /usr/local/bin/atuin --version 2>/dev/null | grep -q '{{ atuin_version | regex_replace("^v", "") }}'; then
+      exit 0
+    fi
+    # Remove broken symlink if present
+    rm -f /usr/local/bin/atuin
+    curl --proto "=https" --tlsv1.2 -LsSf https://github.com/atuinsh/atuin/releases/download/{{ atuin_version }}/atuin-installer.sh | sh -s -- --no-modify-path
     if [ -d /root/.atuin ]; then
-      cp -r /root/.atuin/bin/atuin /usr/local/bin/atuin
-      chmod 755 /usr/local/bin/atuin
+      install -m 755 /root/.atuin/bin/atuin /usr/local/bin/atuin
     fi
   args:
     executable: /bin/bash
-    creates: /usr/local/bin/atuin
   become: true
+  register: atuin_install
+  changed_when: "'exit 0' not in atuin_install.stdout"
   when: shell_environment_atuin_enabled | bool
   tags: [atuin, shell]
 

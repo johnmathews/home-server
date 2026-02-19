@@ -6,9 +6,15 @@ global:
   evaluation_interval: 15s
   external_labels:
     prom_cluster: home
+
 rule_files:
   - "rules/*.yml"
+
 scrape_configs:
+  - job_name: 'sre-agent'
+    static_configs:
+      - targets: ['192.168.2.106:8001']
+
   - job_name: 'prometheus'
     scrape_timeout: 10s
     static_configs:
@@ -20,6 +26,7 @@ scrape_configs:
         regex: '([^:]+)(?::\d+)?'
         target_label: host
         replacement: '$1'
+
   - job_name: 'cadvisor'
     scrape_interval: 30s
     scrape_timeout: 15s
@@ -178,6 +185,7 @@ scrape_configs:
         regex: '([^:]+)(?::\d+)?'
         target_label: host
         replacement: '$1'
+
   - job_name: 'home_assistant'
     metrics_path: /api/prometheus
     scheme: http
@@ -193,6 +201,7 @@ scrape_configs:
         regex: '([^:]+)(?::\d+)?'
         target_label: host
         replacement: '$1'
+
   - job_name: 'unbound'
     scrape_timeout: 10s
     static_configs:
@@ -237,6 +246,7 @@ scrape_configs:
         regex: '([^:]+)(?::\d+)?'
         target_label: host
         replacement: '$1'
+
   - job_name: 'pve_exporter'
     metrics_path: /pve
     scrape_timeout: 10s
@@ -270,6 +280,7 @@ scrape_configs:
       # drop unstable sdX label so reboots don't create new series
       - action: labeldrop
         regex: 'device'
+
   - job_name: 'nut'
     metrics_path: /ups_metrics
     scrape_interval: 30s
@@ -282,6 +293,7 @@ scrape_configs:
         regex: '([^:]+)(?::\d+)?'
         target_label: host
         replacement: '$1'
+
   - job_name: 'mikrotik_exporter'
     scrape_interval: 30s
     scrape_timeout: 15s

@@ -138,18 +138,47 @@ See `roles/shell_environment/defaults/main.yml` for all available configuration 
 
 Atuin provides encrypted, searchable shell history synchronized across all hosts.
 
-**Key bindings:**
+### Architecture
 
-- `Ctrl+R` - Search history across all hosts
+The infra VM runs the Atuin **server** as a Docker container (port 8888), backed by a Postgres database. All other
+VMs and LXCs run the Atuin **client** — the `shell_environment` role installs the CLI binary and configures it to sync
+against the server.
+
+- **Server**: `ghcr.io/atuinsh/atuin:latest` on the infra VM (Docker Compose)
+- **Client**: version-pinned binary installed to `/usr/local/bin/atuin`, controlled by `atuin_version` in
+  `group_vars/all/main.yml`
+- **Database**: Postgres 14 container (`atuin-db` service), data persisted at `/srv/infra/atuin/database`
+
+### Upgrading
+
+**Client binary** — bump `atuin_version` in `group_vars/all/main.yml`, then run `make <target> t=atuin` for each host.
+The task compares the installed version against the target and re-installs if they differ.
+
+**Server** — uses `latest` tag (Atuin stopped publishing semver Docker tags after v18.2.0). To pull a newer image,
+run `make infra t=docker` which triggers a `docker compose up --force-recreate`.
+
+### Key bindings
+
+- `Ctrl+R` - Search history (default scope: current host)
 - `Up Arrow` - Navigate command history
+- `Enter` - Select command and place on prompt (press Enter again to execute)
+- `Tab` - Select and immediately execute
 
-**Configuration:** The sync server address is configured in role defaults. Individual hosts can override:
+### Configuration
+
+The sync server address and default behavior are configured in role defaults. Individual hosts can override:
 
 ```yaml
 shell_environment_atuin_sync_address: "http://192.168.2.106:8888"
 ```
 
-**First-time setup for each user:**
+Client config is deployed to `~/.config/atuin/config.toml` for each user. Key settings:
+
+- `filter_mode = "host"` — search defaults to current host's history (can cycle to global)
+- `enter_accept = false` — Enter selects without executing, for safer command recall
+- `sync_address` — points to the self-hosted server on the infra VM
+
+### First-time setup for each user
 
 Each user (including non-root users) needs to register or login to atuin:
 
@@ -226,6 +255,18 @@ Check that:
 1. User has UID >= 1000
 2. User's shell is not `/usr/sbin/nologin` or `/bin/false`
 3. Run `getent passwd | awk -F: '$3 >= 1000 && $7 !~ /nologin|false/ {print $1":"$6":"$7}'` to see discovered users
+
+### Atuin not found or Ctrl+R not working
+
+Check that `/usr/local/bin/atuin` is a real binary and not a broken symlink:
+
+```bash
+file /usr/local/bin/atuin   # Should show ELF executable, not symlink
+atuin --version             # Should print version
+```
+
+If it's a symlink to `/root/.atuin/bin/atuin`, non-root users can't access it (root's home is mode 700). Fix by
+re-running the install task: `make <hostname> t=atuin`
 
 ### Atuin not syncing
 

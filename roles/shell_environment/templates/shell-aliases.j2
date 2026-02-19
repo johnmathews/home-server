@@ -50,8 +50,8 @@ fi
 
 # Docker aliases
 alias d='docker'
-alias dps='docker ps --format "table {{ "{{.Names}}" }}\t{{ "{{.Image}}" }}\t{{ "{{.CreatedAt}}" }}\t{{ "{{.Status}}" }}"'
-alias dpsa='docker ps -a --format "table {{ "{{.Names}}" }}\t{{ "{{.Image}}" }}\t{{ "{{.CreatedAt}}" }}\t{{ "{{.Status}}" }}"'
+alias dps='docker ps --format "table {{ "{{.Names}}" }}\t{{ "{{.Image}}" }}\t{{ "{{.CreatedAt}}" }}\t{{ "{{.Status}}" }}" | (read -r header; echo "$header"; sort)'
+alias dpsa='docker ps -a --format "table {{ "{{.Names}}" }}\t{{ "{{.Image}}" }}\t{{ "{{.CreatedAt}}" }}\t{{ "{{.Status}}" }}" | (read -r header; echo "$header"; sort)'
 alias dl='docker compose logs -f -n 1000'
 alias dexec='docker exec -it'
 

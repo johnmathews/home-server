@@ -85,7 +85,9 @@
       "WebFetch(domain:v1.102.0.archive.immich.app)",
       "Bash(uv run:*)",
       "WebFetch(domain:docs.tubearchivist.com)",
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "mcp__MCP_DOCKER__read_file",
+      "WebFetch(domain:docs.atuin.sh)"
     ],
     "deny": [],
     "ask": []
