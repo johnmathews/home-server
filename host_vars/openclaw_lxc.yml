@@ -1,0 +1,21 @@
+# Shell environment configuration
+# Add root user (UID < 1000). Auto-discovered users (UID >= 1000) are also included.
+# Format: username:home_dir:shell
+shell_environment_shell_users:
+  - "root:/root:/bin/bash"
+
+# Override CLI tools list for Debian (tldr not available in Debian repos)
+shell_environment_cli_tools:
+  - htop
+  - ffmpeg
+  - 7zip
+  - jq
+  - poppler-utils
+  - fd-find
+  - ripgrep
+  - fzf
+  - zoxide
+  - imagemagick
+  - tree
+  - bat
+  - tmux

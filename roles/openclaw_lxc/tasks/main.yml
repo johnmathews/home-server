@@ -1,0 +1,71 @@
+---
+
+- name: Ensure git is installed
+  ansible.builtin.apt:
+    name: git
+    state: present
+    update_cache: yes
+
+- name: Create base app directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+  loop:
+    - "{{ docker_compose_dir }}"
+    - /srv/apps/openclaw/config
+    - /srv/apps/openclaw/workspace
+    - /srv/apps/alloy
+
+- name: Clone openclaw repository
+  ansible.builtin.git:
+    repo: "{{ openclaw_repo_url }}"
+    dest: "{{ openclaw_build_dir }}"
+    version: main
+    force: false
+  register: openclaw_repo
+
+- name: Build openclaw docker image
+  community.docker.docker_image:
+    name: "{{ openclaw_image_name }}"
+    build:
+      path: "{{ openclaw_build_dir }}"
+      dockerfile: Dockerfile
+    source: build
+    force_source: "{{ openclaw_repo.changed }}"
+  register: openclaw_image
+  notify: restart openclaw-gateway
+
+- name: Create environment file from template
+  ansible.builtin.template:
+    src: .env.j2
+    dest: "{{ docker_compose_dir }}/.env"
+    mode: '0600'
+  notify:
+    - restart all containers
+  tags: docker
+
+- name: Upload alloy config
+  ansible.builtin.copy:
+    src: templates/config.alloy
+    dest: /srv/apps/alloy/config.alloy
+    owner: "{{ puid }}"
+    group: "{{ guid }}"
+    mode: '0644'
+  become: true
+  tags: alloy
+  notify:
+    - restart alloy
+
+- name: Copy docker-compose.yml
+  ansible.builtin.template:
+    src: templates/docker-compose.yml.j2
+    dest: "{{ docker_compose_dir }}/docker-compose.yml"
+    mode: '0644'
+    owner: root
+    group: root
+  tags: docker
+  notify:
+    - restart all containers

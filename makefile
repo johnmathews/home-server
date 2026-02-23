@@ -93,6 +93,9 @@ jelly:
 open-webui:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/open_webui_lxc.yml $(VAULT) $(ANSIBLE_OPTS)
 
+openclaw:
+	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/openclaw_lxc.yml $(VAULT) $(ANSIBLE_OPTS)
+
 atuin:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/atuin.yml $(VAULT) $(ANSIBLE_OPTS)
 
