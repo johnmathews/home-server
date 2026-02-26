@@ -9,17 +9,6 @@
     remove_orphans: true
   become: false
 
-- name: restart openclaw-gateway
-  community.docker.docker_compose_v2:
-    project_src: "{{ docker_compose_dir }}"
-    services:
-      - openclaw-gateway
-    state: present
-    recreate: always
-    dependencies: true
-    remove_orphans: true
-  become: false
-
 - name: restart alloy
   community.docker.docker_compose_v2:
     project_src: "{{ docker_compose_dir }}"

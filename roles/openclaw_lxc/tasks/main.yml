@@ -1,10 +1,11 @@
 ---
 
-- name: Ensure git is installed
-  ansible.builtin.apt:
-    name: git
+- name: Create john user
+  ansible.builtin.user:
+    name: john
+    shell: /bin/bash
+    create_home: true
     state: present
-    update_cache: yes
 
 - name: Create base app directories
   ansible.builtin.file:
@@ -16,45 +17,6 @@
   loop:
     - "{{ docker_compose_dir }}"
     - /srv/apps/alloy
-
-- name: Create openclaw data directories (owned by container node user uid 1000)
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: directory
-    mode: '0755'
-    owner: 1000
-    group: 1000
-  loop:
-    - /srv/apps/openclaw/config
-    - /srv/apps/openclaw/workspace
-
-- name: Clone openclaw repository
-  ansible.builtin.git:
-    repo: "{{ openclaw_repo_url }}"
-    dest: "{{ openclaw_build_dir }}"
-    version: main
-    force: false
-  register: openclaw_repo
-
-- name: Build openclaw docker image
-  community.docker.docker_image:
-    name: "{{ openclaw_image_name }}"
-    build:
-      path: "{{ openclaw_build_dir }}"
-      dockerfile: Dockerfile
-    source: build
-    force_source: "{{ openclaw_repo.changed }}"
-  register: openclaw_image
-  notify: restart openclaw-gateway
-
-- name: Create environment file from template
-  ansible.builtin.template:
-    src: .env.j2
-    dest: "{{ docker_compose_dir }}/.env"
-    mode: '0600'
-  notify:
-    - restart all containers
-  tags: docker
 
 - name: Upload alloy config
   ansible.builtin.copy:

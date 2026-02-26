@@ -3,7 +3,3 @@ TZ: Europe/Amsterdam
 docker_compose_dir: "/srv/apps"
 puid: 1001
 guid: 1001
-
-openclaw_repo_url: "https://github.com/openclaw/openclaw.git"
-openclaw_build_dir: "/srv/apps/openclaw-build"
-openclaw_image_name: "openclaw:local"

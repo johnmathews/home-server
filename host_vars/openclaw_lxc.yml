@@ -3,6 +3,7 @@
 # Format: username:home_dir:shell
 shell_environment_shell_users:
   - "root:/root:/bin/bash"
+  - "john:/home/john:/bin/bash"
 
 # Override CLI tools list for Debian (tldr not available in Debian repos)
 shell_environment_cli_tools:

@@ -1,62 +1,8 @@
 # vim: ft=yaml
 # openclaw_lxc/templates/docker-compose.yml.j2
+# Monitoring stack only — OpenClaw is installed natively via getting-started script
 
 services:
-  openclaw-gateway:
-    image: ${OPENCLAW_IMAGE:-openclaw:local}
-    environment:
-      HOME: /home/node
-      TERM: xterm-256color
-      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN}
-      CLAUDE_AI_SESSION_KEY: ${CLAUDE_AI_SESSION_KEY:-}
-      CLAUDE_WEB_SESSION_KEY: ${CLAUDE_WEB_SESSION_KEY:-}
-      CLAUDE_WEB_COOKIE: ${CLAUDE_WEB_COOKIE:-}
-    volumes:
-      - ${OPENCLAW_CONFIG_DIR}:/home/node/.openclaw
-      - ${OPENCLAW_WORKSPACE_DIR}:/home/node/.openclaw/workspace
-    ports:
-      - "18789:18789"
-      - "18790:18790"
-    init: true
-    restart: unless-stopped
-    command:
-      [
-        "node",
-        "dist/index.js",
-        "gateway",
-        "--bind",
-        "${OPENCLAW_GATEWAY_BIND:-lan}",
-        "--port",
-        "18789",
-      ]
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "5"
-
-  openclaw-cli:
-    image: ${OPENCLAW_IMAGE:-openclaw:local}
-    environment:
-      HOME: /home/node
-      TERM: xterm-256color
-      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN}
-      BROWSER: echo
-      CLAUDE_AI_SESSION_KEY: ${CLAUDE_AI_SESSION_KEY:-}
-      CLAUDE_WEB_SESSION_KEY: ${CLAUDE_WEB_SESSION_KEY:-}
-      CLAUDE_WEB_COOKIE: ${CLAUDE_WEB_COOKIE:-}
-    volumes:
-      - ${OPENCLAW_CONFIG_DIR}:/home/node/.openclaw
-      - ${OPENCLAW_WORKSPACE_DIR}:/home/node/.openclaw/workspace
-    stdin_open: true
-    tty: true
-    init: true
-    entrypoint: ["node", "dist/index.js"]
-    # Usage:
-    #   docker compose run --rm openclaw-cli onboard --no-install-daemon
-    #   docker compose run --rm openclaw-cli dashboard --no-open
-    #   docker compose run --rm openclaw-cli doctor --fix
-
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
     container_name: cadvisor
