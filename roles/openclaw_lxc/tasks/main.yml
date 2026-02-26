@@ -15,9 +15,18 @@
     group: root
   loop:
     - "{{ docker_compose_dir }}"
+    - /srv/apps/alloy
+
+- name: Create openclaw data directories (owned by container node user uid 1000)
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+    owner: 1000
+    group: 1000
+  loop:
     - /srv/apps/openclaw/config
     - /srv/apps/openclaw/workspace
-    - /srv/apps/alloy
 
 - name: Clone openclaw repository
   ansible.builtin.git:
