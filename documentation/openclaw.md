@@ -204,6 +204,31 @@ ssh -N \
   openclaw
 ```
 
+### Remote access (off-network via Tailscale)
+
+When off the home network, the macOS app can connect through Tailscale by changing the SSH target. The `~/.ssh/config`
+on the MacBook has two host aliases:
+
+```
++-------------------+-------------------+------------------------------------------+
+| SSH alias         | HostName          | Use when                                 |
++-------------------+-------------------+------------------------------------------+
+| openclaw          | 192.168.2.107     | On the home LAN                          |
+| openclawt         | 100.125.185.47    | Off-network (via Tailscale)              |
++-------------------+-------------------+------------------------------------------+
+```
+
+To switch: change the **SSH target** in OpenClaw app settings (or edit `gateway.remote.sshTarget` in
+`~/.openclaw/openclaw.json`) from `openclaw` to `openclawt`. The config is hot-reloaded. Tailscale must be running on
+both the MacBook and the OpenClaw LXC.
+
+To verify Tailscale is healthy on the LXC:
+
+```sh
+ssh openclaw
+tailscale status    # Shows node state and connected peers
+```
+
 ### Public access (Cloudflare Tunnel)
 
 OpenClaw is proxied behind cloudflared (NOT Traefik) at `claw.itsa.pizza` → `192.168.2.107:18789`. The tunnel is
@@ -361,11 +386,34 @@ Note: the CLI requires Node.js v20.11.0+ (the `--disable-warning=ExperimentalWar
 
 #### Known issues (as of version 2026.2.25, build 14883)
 
-- **Menu bar icon not appearing**: The app registers as a `UIElement` (menu bar-only, no dock icon) and creates an
-  `NSStatusItem`, but the icon may not render visibly. The app is functional (SSH tunnel active, gateway connected) but
-  invisible. The `lsappinfo` command shows `StatusLabel = NULL`. The web UI at http://localhost:18789 continues to work
-  as a workaround. Under Instances in the web UI, the macOS node may appear as two entries (one connected, one
-  disconnected) -- this may be caused by reconnection attempts or multiple transports being tried.
+- **Menu bar icon not appearing on macOS 26 Tahoe**: The app uses the `MenuBarExtraAccess` library to introspect
+  SwiftUI's `MenuBarExtra` and set a custom icon. This library relies on private SwiftUI internals that changed in
+  macOS 26 Tahoe, breaking icon rendering. The app runs and connects fine but the menu bar icon is invisible
+  (`lsappinfo` shows `StatusLabel = NULL`). This is an upstream bug -- the library needs to be updated for Tahoe.
+
+  **Workaround**: Enable the Dock icon so the app is visible and interactive:
+
+  ```sh
+  defaults write ai.openclaw.mac "openclaw.showDockIcon" -bool true
+  # Restart the app for the change to take effect
+  pkill -f "OpenClaw.app" && open /Applications/OpenClaw.app
+  ```
+
+  The web UI at http://localhost:18789 also works as an alternative interface.
+
+  Things that were tried and **did not** fix the menu bar icon:
+  - macOS System Settings > Menu Bar > "Allow in Menu Bar" toggle (new Tahoe feature)
+  - Changing the `openclaw.iconOverride` preference (system, idle, workingMain)
+  - Resetting SystemUIServer, ControlCenter, and Dock processes/preferences
+  - Enabling `NSStatusItem Visible Item-N` flags in `com.apple.controlcenter`
+  - Full app reset (delete prefs + config + relaunch onboarding)
+  - Updating to 2026.2.26 (the GitHub release zip contains a debug build -- see below)
+
+- **GitHub release 2026.2.26 is a debug build**: The zip at
+  `github.com/openclaw/openclaw/releases/download/v2026.2.26/OpenClaw-2026.2.26.zip` has bundle ID
+  `ai.openclaw.mac.debug` instead of `ai.openclaw.mac`. It uses a separate preferences domain, triggers Gatekeeper
+  warnings, and should not be used. Stick with the 2026.2.25 release build (`ai.openclaw.mac`, build 14883).
+
 - **No token field in setup UI**: The Getting Started flow does not include a field for the gateway auth token. It must
   be added manually to `~/.openclaw/openclaw.json` after completing the flow.
 - **Port conflicts with manual SSH tunnels**: If a manual SSH tunnel is already bound to port 18789, the app's built-in
