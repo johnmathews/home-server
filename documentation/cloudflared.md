@@ -1,5 +1,5 @@
-This LXC container runs the `cloudflared` service, enabling secure remote access
-to services hosted on your Proxmox server via Cloudflare Tunnel.
+This LXC container runs the `cloudflared` service, enabling secure remote access to services hosted on your Proxmox
+server via Cloudflare Tunnel.
 
 The container was created using the Proxmox Community Scripts project:
 https://community-scripts.github.io/ProxmoxVE/scripts?id=cloudflared
@@ -61,3 +61,12 @@ Manage the systemd service:
 sudo systemctl restart cloudflared
 sudo systemctl status cloudflared
 ```
+
+## Proxied Services
+
+The following services are routed through the Cloudflare Tunnel (not Traefik):
+
+- **OpenClaw** — `claw.itsa.pizza` → `192.168.2.107:18789` (OpenClaw gateway)
+
+All services are proxied via Cloudflare Tunnel. Cloudflare proxies some services towards Traefik for additional security
+such as rate limiting.

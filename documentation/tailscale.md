@@ -144,6 +144,26 @@ This will:
 - Start the Tailscale daemon
 - Display the assigned Tailscale IP
 
+### Note: OpenClaw LXC (manual install)
+
+Tailscale on the OpenClaw LXC (`192.168.2.107`) was installed **manually**, not via the Ansible `tailscale` role.
+Debian 13 (Trixie) does not ship `apt-key`, so the standard Tailscale install script fails. The workaround uses the
+modern signed-by keyring method:
+
+```bash
+# As root on the OpenClaw LXC:
+curl -fsSL https://pkgs.tailscale.com/stable/debian/trixie.noarmor.gpg \
+  | tee /usr/share/keyrings/tailscale-archive-keyring.gpg > /dev/null
+curl -fsSL https://pkgs.tailscale.com/stable/debian/trixie.tailscale-keyring.list \
+  | tee /etc/apt/sources.list.d/tailscale.list > /dev/null
+apt-get update && apt-get install -y tailscale
+tailscale up
+```
+
+Tailscale IP: `100.125.185.47` / MagicDNS: `openclaw.flicker-enigmatic.ts.net`
+
+If other Debian 13 LXCs need Tailscale in the future, the Ansible role should be updated with this keyring method.
+
 ### 5. Collect Tailscale IP Addresses
 
 After deployment, get the Tailscale IP for each host:
