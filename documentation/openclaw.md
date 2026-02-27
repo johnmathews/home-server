@@ -474,16 +474,20 @@ make openclaw t=shell     # Shell environment only
 On the LXC (`ssh openclaw`):
 
 ```sh
-# Check if OpenClaw is running
-systemctl status openclaw       # if installed as systemd service
-# or
-ps aux | grep openclaw
+# Gateway service (user-level systemd, NOT system-level)
+systemctl --user status openclaw-gateway
+systemctl --user restart openclaw-gateway
+journalctl --user -u openclaw-gateway -f
 
-# View OpenClaw logs
-journalctl -u openclaw -f       # if systemd service
+# Gateway logs (JSON, daily-rotated files in /tmp)
+tail -f /tmp/openclaw/openclaw-$(date +%Y-%m-%d).log
+# Search logs for errors:
+grep -i 'error\|fail' /tmp/openclaw/openclaw-$(date +%Y-%m-%d).log | tail -20
 
-# Restart OpenClaw
-systemctl restart openclaw      # if systemd service
+# Skills: check requirements, inspect a skill
+openclaw skills check
+openclaw skills info <skill-name>
+openclaw skills list
 
 # Check monitoring stack
 cd /srv/apps && docker compose ps
@@ -492,6 +496,43 @@ cd /srv/apps && docker compose logs -f alloy
 # View config
 cat ~/.openclaw/openclaw.json
 ```
+
+> **Important**: The gateway service is `openclaw-gateway` under **user-level** systemd (not system-level). Always use
+> the `--user` flag. `systemctl status openclaw` (without `--user`) will report "not found".
+
+> **Important**: After restarting the gateway, the macOS app must also be restarted (`pkill -f "OpenClaw.app" && open
+> /Applications/OpenClaw.app`). The app's SSH tunnel breaks when the gateway restarts and does not automatically
+> reconnect.
+
+## Skills troubleshooting
+
+Skills declare requirements (binaries, env vars, config keys, OS) in their `SKILL.md` frontmatter. If a skill fails to
+install with "unsatisfied requirement":
+
+1. Check what's missing: `openclaw skills info <skill-name>`
+2. Run a full requirements audit: `openclaw skills check`
+3. The gateway logs (`/tmp/openclaw/openclaw-*.log`) show install failures but the error message is generic — use the
+   CLI commands above for specifics
+
+After installing a missing dependency (binary, env var, etc.), **restart the gateway** for it to pick up the change:
+
+```sh
+systemctl --user restart openclaw-gateway
+```
+
+Then restart the macOS app (see note above).
+
+### Example: summarize skill
+
+The `summarize` skill requires the `summarize` CLI (`https://summarize.sh`). The skill's built-in install option is
+Homebrew-only, which doesn't work on the Debian LXC. Install via npm instead:
+
+```sh
+npm install -g @steipete/summarize
+```
+
+The `summarize` CLI also requires at least one LLM API key: `GEMINI_API_KEY`, `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, or
+`XAI_API_KEY`.
 
 ## References
 
