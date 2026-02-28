@@ -44,7 +44,6 @@ shell_environment_shell_users: []
 # CLI tools (apps.yml)
 shell_environment_cli_tools_enabled: true
 shell_environment_cli_tools:
-  - tldr
   - htop
   - ffmpeg
   - 7zip
