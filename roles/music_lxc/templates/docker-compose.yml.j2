@@ -15,7 +15,7 @@ services:
       - /mnt/nfs/music:/music:ro
     environment:
       - TZ={{ TZ }}
-      - ND_SCANSCHEDULE=1h
+      - ND_SCANSCHEDULE=@every 1h
       - ND_LOGLEVEL=info
       - ND_SESSIONTIMEOUT=24h
       - ND_MUSICFOLDER=/music

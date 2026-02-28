@@ -1,13 +1,13 @@
 - name: Create base app directories for containers
   ansible.builtin.file:
-    path: "{{ item }}"
+    path: "{{ item.path }}"
     state: directory
     mode: '0755'
-    owner: root
-    group: root
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
   loop:
-    - /srv/apps/navidrome/data
-    - /srv/apps/alloy
+    - { path: /srv/apps/navidrome/data, owner: "{{ puid }}", group: "{{ guid }}" }
+    - { path: /srv/apps/alloy, owner: root, group: root }
   tags: alloy, docker
   notify:
     - restart alloy
