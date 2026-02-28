@@ -129,4 +129,4 @@ The `/ping` endpoint returns a simple response and does NOT touch NFS — safe e
 ### Logs
 - Docker logs: `ssh music "docker logs navidrome --tail 50"`
 - Alloy ships all container logs to Loki at 192.168.2.106:3100
-- Query in Grafana: `{hostname="navidrome", container="navidrome"}`
+- Query in Grafana: `{hostname="music", container="navidrome"}`

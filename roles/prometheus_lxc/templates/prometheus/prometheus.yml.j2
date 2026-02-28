@@ -50,7 +50,7 @@ scrape_configs:
       - targets: ['192.168.2.119:18080']
         labels: {hostname: 'open-webui'}
       - targets: ['192.168.2.109:18080']
-        labels: {hostname: 'navidrome'}
+        labels: {hostname: 'music'}
     relabel_configs:
       - source_labels: [__address__]
         regex: '([^:]+)(?::\d+)?'
@@ -183,7 +183,7 @@ scrape_configs:
       - targets: ['192.168.2.119:9100']
         labels: {hostname: 'open-webui'}
       - targets: ['192.168.2.109:9100']
-        labels: {hostname: 'navidrome'}
+        labels: {hostname: 'music'}
     relabel_configs:
       - source_labels: [__address__]
         regex: '([^:]+)(?::\d+)?'
