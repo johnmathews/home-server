@@ -49,6 +49,8 @@ scrape_configs:
         labels: {hostname: 'paperless'}
       - targets: ['192.168.2.119:18080']
         labels: {hostname: 'open-webui'}
+      - targets: ['192.168.2.109:18080']
+        labels: {hostname: 'navidrome'}
     relabel_configs:
       - source_labels: [__address__]
         regex: '([^:]+)(?::\d+)?'
@@ -180,6 +182,8 @@ scrape_configs:
         labels: {hostname: 'paperless'}
       - targets: ['192.168.2.119:9100']
         labels: {hostname: 'open-webui'}
+      - targets: ['192.168.2.109:9100']
+        labels: {hostname: 'navidrome'}
     relabel_configs:
       - source_labels: [__address__]
         regex: '([^:]+)(?::\d+)?'

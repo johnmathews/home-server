@@ -1,0 +1,4 @@
+TZ: Europe/Amsterdam
+docker_compose_dir: /srv/apps
+puid: 1001
+guid: 1001

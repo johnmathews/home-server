@@ -69,6 +69,7 @@ Host IPs are assigned statically on the MikroTik router. Source of truth: `inven
 | traefik_lxc       | 192.168.2.108  |                  | Reverse proxy (Traefik)              |
 | jellyfin_lxc      | 192.168.2.110  |                  | Jellyfin media server                |
 | immich_lxc        | 192.168.2.113  |                  | Immich photo management              |
+| music_lxc         | 192.168.2.109  |                  | Navidrome music streaming :4533      |
 | prometheus_lxc    | 192.168.2.115  |                  | Prometheus metrics                   |
 | tubearchivist_lxc | 192.168.2.116  |                  | TubeArchivist                        |
 | paperless_lxc     | 192.168.2.117  |                  | Paperless-ngx document store         |
@@ -98,6 +99,7 @@ Service-specific guides in `/documentation/`. Read the relevant doc before worki
 - `media_vm.md` — Media VM services (Mullvad VPN, qBittorrent, Sonarr, Radarr)
 - `mikrotik-exporter.md` — MikroTik router Prometheus exporter (MKTXP)
 - `monitor_nfs_smb_mounts.md` — NFS/SMB mount health monitoring
+- `navidrome.md` — Navidrome music streaming, NFS mount, Subsonic API clients
 - `openclaw.md` — OpenClaw architecture, LXC setup, macOS app, Tailscale, known issues
 - `paperless.md` — Paperless-ngx document store and training schedule
 - `quiet_hours.md` — Night-time container pausing for HDD spindown

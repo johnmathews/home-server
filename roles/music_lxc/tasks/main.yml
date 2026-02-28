@@ -1,0 +1,38 @@
+- name: Create base app directories for containers
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+  loop:
+    - /srv/apps/navidrome/data
+    - /srv/apps/alloy
+  tags: alloy, docker
+  notify:
+    - restart alloy
+- name: Upload alloy config files
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ puid }}"
+    group: "{{ guid }}"
+    mode: '0644'
+  loop:
+    - alloy:
+      src: templates/config.alloy
+      dest: /srv/apps/alloy/config.alloy
+  become: true
+  tags: [docker, alloy]
+  notify:
+    - restart alloy
+- name: Copy docker-compose.yml
+  template:
+    src: templates/docker-compose.yml.j2
+    dest: /srv/apps/docker-compose.yml
+    mode: '0644'
+    owner: root
+    group: root
+  notify:
+    - restart docker compose stack
+  tags: docker, alloy

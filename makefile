@@ -87,6 +87,9 @@ paperless:
 media-dl:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/media_dl_lxc.yml $(VAULT) $(ANSIBLE_OPTS)
 
+music:
+	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/music_lxc.yml $(VAULT) $(ANSIBLE_OPTS)
+
 jelly:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/jellyfin_lxc.yml $(VAULT) $(ANSIBLE_OPTS)
 
