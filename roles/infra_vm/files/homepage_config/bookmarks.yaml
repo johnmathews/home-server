@@ -10,6 +10,9 @@
     - Navidrome:
         - abbr:
           href: http://192.168.2.109:4533
+    - Feishin:
+        - abbr:
+          href: http://192.168.2.109:9180
     - Immich:
         - abbr:
           href: http://192.168.2.113:2283
