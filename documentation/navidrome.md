@@ -104,6 +104,60 @@ Full list of compatible apps: https://www.navidrome.org/apps/
 
 Role chain: `nfs_client` → `share_drive_probe` → `music_lxc` → `shell_environment` → `tailscale`
 
+## Music Library Organization
+
+Navidrome **ignores folder names and file names entirely** — it organizes your library based solely on embedded metadata tags. However, a clean folder structure is still recommended for your own sanity and compatibility with other tools.
+
+### Folder structure
+
+```
+/mnt/tank/music/
+├── Artist Name/
+│   └── Album Name/
+│       ├── 01 - Track Title.flac
+│       ├── 02 - Track Title.flac
+│       └── cover.jpg
+├── Various Artists/
+│   └── Compilation Album/
+│       ├── 01 - Track Title.flac
+│       └── cover.jpg
+└── ...
+```
+
+### Required tags
+
+Every file must have these tags or Navidrome won't organize it correctly:
+
+- **Title** — song name
+- **Artist** — track artist
+- **Album** — album name
+- **Album Artist** — artist for the album (use "Various Artists" for compilations)
+- **Track Number** — 01, 02, etc.
+
+Highly recommended: **Genre**, **Year/Date**, **Disc Number** (for multi-disc albums).
+
+### Multi-artist and compilation albums
+
+- Use multi-valued tags (`ARTISTS` / `ALBUMARTISTS`) when possible — Navidrome parses these more accurately than separator-based strings like "Artist1 feat. Artist2"
+- For compilations: set Album Artist to "Various Artists" and enable the compilation flag (`TCMP=1` for ID3/MP3, `COMPILATION=1` for FLAC/Vorbis)
+
+### Album artwork
+
+Navidrome searches for artwork in this order (configurable via `CoverArtPriority`):
+
+1. External image files: `cover.*`, `folder.*`, `front.*` in the album directory
+2. Embedded images in the media file tags
+3. External services (Last.fm)
+
+**Best practice: do both.** Embed the cover art in each file's tags (portable — art travels with the file if moved), and also drop a `cover.jpg` in each album folder (fastest for Navidrome to find). MusicBrainz Picard can do both in one pass.
+
+### Tagging tools
+
+- **MusicBrainz Picard** (macOS/Linux/Windows) — looks up metadata from the MusicBrainz database, writes tags, embeds artwork, saves `cover.jpg`, and can rename/reorganize files. Uses AcoustID audio fingerprinting so it can identify files even with zero existing metadata. Works on files after ripping — you don't need to tag at rip time.
+- **beets** (CLI, macOS/Linux/Windows) — automated music library manager with MusicBrainz integration, good for large batch operations.
+
+Both are recommended in the Navidrome documentation.
+
 ## Troubleshooting
 
 ### Navidrome shows empty library

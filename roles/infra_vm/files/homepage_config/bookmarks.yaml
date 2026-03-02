@@ -7,6 +7,9 @@
     - Jellyfin:
         - abbr:
           href: http://192.168.2.110:8096
+    - Navidrome:
+        - abbr:
+          href: http://192.168.2.109:4533
     - Immich:
         - abbr:
           href: http://192.168.2.113:2283
