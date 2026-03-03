@@ -23,6 +23,9 @@ nfs_shares:
   - name: photos
     mountpoint: /mnt/nfs/photos
     target: /mnt/tank/photos
+  - name: music
+    mountpoint: /mnt/nfs/music
+    target: /mnt/tank/music
 
 # Sleep Hours Configuration
 # NFS/SMB share control: During quiet hours, shares are automatically disabled
@@ -47,6 +50,9 @@ sleep_hours_stop_containers:
   - sabnzbd
   - qbittorrent
   - booklore-mariadb
+  - lidarr
+  - slskd
+  - soularr
 
 sleep_hours_kuma_map:
   sabnzbd: 28

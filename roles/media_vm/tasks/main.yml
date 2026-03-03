@@ -178,6 +178,7 @@
     owner: "{{ puid }}"
     group: "{{ guid }}"
     mode: '0755'
+  tags: radarr,docker
 
 - name: Ensure Sonarr config directory has correct UID/GID
   ansible.builtin.file:
@@ -187,6 +188,57 @@
     owner: "{{ puid }}"
     group: "{{ guid }}"
     mode: '0755'
+  tags: sonarr,docker
+
+- name: Ensure Lidarr config directory has correct UID/GID
+  ansible.builtin.file:
+    path: "{{ media_stack_base_dir }}/config/lidarr"
+    state: directory
+    recurse: true
+    owner: "{{ puid }}"
+    group: "{{ guid }}"
+    mode: '0755'
+  tags: lidarr,docker
+
+- name: Ensure slskd config directory has correct UID/GID
+  ansible.builtin.file:
+    path: "{{ media_stack_base_dir }}/config/slskd"
+    state: directory
+    recurse: true
+    owner: "{{ puid }}"
+    group: "{{ guid }}"
+    mode: '0755'
+  tags: slskd,docker
+
+- name: Deploy slskd config from template
+  ansible.builtin.template:
+    src: templates/slskd/slskd.yml.j2
+    dest: "{{ media_stack_base_dir }}/config/slskd/slskd.yml"
+    owner: "{{ puid }}"
+    group: "{{ guid }}"
+    mode: '0600'
+  notify: restart media stack
+  tags: slskd
+
+- name: Ensure Soularr config directory has correct UID/GID
+  ansible.builtin.file:
+    path: "{{ media_stack_base_dir }}/config/soularr"
+    state: directory
+    recurse: true
+    owner: "{{ puid }}"
+    group: "{{ guid }}"
+    mode: '0755'
+  tags: soularr,docker
+
+- name: Deploy Soularr config template (will not overwrite existing)
+  ansible.builtin.template:
+    src: templates/soularr/config.ini.j2
+    dest: "{{ media_stack_base_dir }}/config/soularr/config.ini"
+    owner: "{{ puid }}"
+    group: "{{ guid }}"
+    mode: '0644'
+    force: false
+  tags: soularr,docker
 
 - name: Set permissions of file browser config directory
   ansible.builtin.command: chown -R 1001:1001 "{{ media_stack_base_dir }}/config/filebrowser"

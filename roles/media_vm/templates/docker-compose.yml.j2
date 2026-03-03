@@ -2,48 +2,51 @@
 # media_vm/files/docker-compose.yml
 services:
 
-  alloy:
-    image: grafana/alloy:latest
-    container_name: alloy
-    restart: always
+  lidarr:
+    image: lscr.io/linuxserver/lidarr:latest
+    container_name: lidarr
+    user: "${PUID}:${PGID}"
     environment:
-      LOKI_WRITE_ENDPOINT: "http://192.168.2.106:3100/loki/api/v1/push"
-      NODE_HOSTNAME: "media"
-      LOG_LEVEL: "warn"
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - UMASK=002
+      - TZ=${TZ}
     volumes:
-      # config 
-      - ./config/alloy:/etc/alloy:ro
-      # docker 
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      # journalctl  
-      - /var/log/journal:/var/log/journal:ro
-      - /run/log/journal:/run/log/journal:ro
-      - /etc/machine-id:/etc/machine-id:ro
-    command: >
-      run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
+      - /srv/media/config/lidarr:/config
+      - /mnt/nfs/music:/music
+      - /mnt/nfs/downloads:/downloads
     ports:
-      - "12345:12345"
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "5"
-
-  node_exporter:
-    image: quay.io/prometheus/node-exporter:latest
-    container_name: node_exporter
-    command:
-      - '--path.rootfs=/host'
-      - '--collector.textfile.directory=/textfile'
-    # network_mode: host
-    ports:
-      - "9100:9100"
-    pid: host
+      - "8686:8686"
     restart: always
+
+  slskd:
+    image: slskd/slskd:latest
+    container_name: slskd
+    user: "${PUID}:${PGID}"
+    environment:
+      - SLSKD_REMOTE_CONFIGURATION=true
+      - TZ=${TZ}
     volumes:
-      - '/:/host:ro,rslave'
-      - '/var/lib/node_exporter/textfile_collector:/textfile:ro'
+      - /srv/media/config/slskd:/app
+      - /mnt/nfs/downloads/slskd:/downloads
+      - /mnt/nfs/music:/music:ro
+    network_mode: "service:gluetun"
+    depends_on:
+      gluetun:
+        condition: service_healthy
+    restart: always
+
+  soularr:
+    image: mrusse08/soularr:latest
+    container_name: soularr
+    user: "${PUID}:${PGID}"
+    environment:
+      - TZ=${TZ}
+      - SCRIPT_INTERVAL=300
+    volumes:
+      - /srv/media/config/soularr:/data
+      - /mnt/nfs/downloads/slskd:/downloads
+    restart: always
 
   gluetun:
     image: qmcgaw/gluetun
@@ -59,6 +62,8 @@ services:
       - 8081:8081 # sabnzbd WebUI, set in config file.
       - 6881:6881/udp
       - 8000:8000/tcp # control server port
+      - 5030:5030 # slskd WebUI
+      - 50300:50300 # Soulseek P2P
     volumes:
       - /srv/media/config/gluetun:/gluetun
     healthcheck:
@@ -69,7 +74,7 @@ services:
     environment:
       # NO PORT FORWARDING 
       - FIREWALL=on
-      - FIREWALL_VPN_INPUT_PORTS="3189,6881"
+      - FIREWALL_VPN_INPUT_PORTS="3189,6881,50300"
       - VPN_SERVICE_PROVIDER=${VPN_SERVICE_PROVIDER}
       - VPN_TYPE=wireguard
       - WIREGUARD_ENDPOINT=${WIREGUARD_ENDPOINT}
@@ -269,6 +274,49 @@ services:
       - /srv/media/config/bazarr:/config
       - /mnt/nfs/library:/library
     restart: always
+
+  alloy:
+    image: grafana/alloy:latest
+    container_name: alloy
+    restart: always
+    environment:
+      LOKI_WRITE_ENDPOINT: "http://192.168.2.106:3100/loki/api/v1/push"
+      NODE_HOSTNAME: "media"
+      LOG_LEVEL: "warn"
+    volumes:
+      # config 
+      - ./config/alloy:/etc/alloy:ro
+      # docker 
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      # journalctl  
+      - /var/log/journal:/var/log/journal:ro
+      - /run/log/journal:/run/log/journal:ro
+      - /etc/machine-id:/etc/machine-id:ro
+    command: >
+      run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
+    ports:
+      - "12345:12345"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  node_exporter:
+    image: quay.io/prometheus/node-exporter:latest
+    container_name: node_exporter
+    command:
+      - '--path.rootfs=/host'
+      - '--collector.textfile.directory=/textfile'
+    # network_mode: host
+    ports:
+      - "9100:9100"
+    pid: host
+    restart: always
+    volumes:
+      - '/:/host:ro,rslave'
+      - '/var/lib/node_exporter/textfile_collector:/textfile:ro'
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest

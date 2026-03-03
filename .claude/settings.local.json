@@ -87,7 +87,10 @@
       "WebFetch(domain:docs.tubearchivist.com)",
       "Bash(git rm:*)",
       "mcp__MCP_DOCKER__read_file",
-      "WebFetch(domain:docs.atuin.sh)"
+      "WebFetch(domain:docs.atuin.sh)",
+      "mcp__MCP_DOCKER__list_directory",
+      "mcp__MCP_DOCKER__fetch",
+      "Bash(ansible-vault view:*)"
     ],
     "deny": [],
     "ask": []
