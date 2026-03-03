@@ -190,21 +190,21 @@
           showEpisodeNumber: false # optional, defaults to false
           expandOneStreamToTwoRows: false # optional, defaults to true
     - Feishin:
-        href: http://192.168.2.109:9180
+        href: http://music.itsa.pizza
         siteMonitor: http://192.168.2.109:9180
         description: Music Player
         icon: feishin
     - Navidrome:
-        href: http://192.168.2.109:4533
+        href: http://navidrome.itsa.pizza
         siteMonitor: http://192.168.2.109:4533
         description: Music Server
         icon: navidrome
-        # widget:
-        #   type: navidrome
-        #   url: http://192.168.2.109:4533
-        #   user: username
-        #   token: token #md5(password + salt)
-        #   salt: randomsalt
+        widget:
+          type: navidrome
+          url: http://192.168.2.109:4533
+          user: john
+          token: "{{ vault_navidrome_token }}"
+          salt: x7384k
     - Tubearchivist:
         href: https://tube.itsa.pizza
         siteMonitor: https://tube.itsa.pizza
@@ -232,12 +232,6 @@
         siteMonitor: http://192.168.2.113:2283
         description: photos
         icon: immich
-    # - Mealie:
-    #     href: http://192.168.2.109:9000
-    #     siteMonitor: http://192.168.2.109:9000
-    #     description: Meal Planner
-    #     icon: mealie
-    #     showStats: true
     - BookLore:
         href: https://books.itsa.pizza
         siteMonitor: http://192.168.2.105:6060
@@ -274,6 +268,20 @@
           url: http://192.168.2.105:8989/
           key: "{{ vault_sonarr_key }}"
           enableQueue: false
+    - Lidarr:
+        href: https://lidarr.itsa.pizza
+        siteMonitor: http://192.168.2.105:8686
+        description: music
+        icon: lidarr
+        widget:
+          type: lidarr
+          url: http://192.168.2.105:8686
+          key: "{{ vault_lidarr_api_key }}"
+    - Slskd:
+        href: https://slskd.itsa.pizza
+        siteMonitor: http://192.168.2.105:5030
+        description: music
+        icon: slskd
     - Gluetun:
         href: http://192.168.2.105:8000/v1/publicip/ip
         siteMonitor: http://192.168.2.105:8000/v1/publicip/ip
