@@ -38,11 +38,4 @@ web:
 
 integration:
   vpn:
-    enabled: true
-    port_forwarding: false
-    polling_interval: 2500
-    gluetun:
-      url: http://localhost:8000
-      auth: basic
-      username: {{ vault_gluetun_user }}
-      password: {{ vault_gluetun_password }}
+    enabled: false

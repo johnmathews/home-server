@@ -113,7 +113,7 @@ Default WebUI credentials are in the vault (`vault_slskd_web_username` / `vault_
 Soularr search failures are common and usually not a problem — it retries on the next cycle. Common reasons:
 - **New account**: Soulseek peers may ignore users sharing 0 files. As your library grows, results improve.
 - **Niche music**: not everything is on Soulseek. Soularr keeps retrying wanted albums indefinitely.
-- **409 Conflict**: duplicate search submitted to slskd — harmless, logged but not fatal.
+- **409 Conflict**: slskd is not connected to the Soulseek network — check if VPN integration is stuck (see troubleshooting below).
 
 ### Network routing
 
@@ -129,7 +129,7 @@ Soularr search failures are common and usually not a problem — it retries on t
   - Soulseek credentials: `vault_slskd_soulseek_username`, `vault_slskd_soulseek_password`
   - WebUI credentials: `vault_slskd_web_username`, `vault_slskd_web_password`
   - API key (for Soularr): `vault_slskd_api_key`
-  - Gluetun VPN integration: uses `vault_gluetun_user` / `vault_gluetun_password` (basic auth)
+  - Gluetun VPN integration: **disabled** — redundant since `network_mode: service:gluetun` already enforces VPN at the network level
 - **Soularr**: `roles/media_vm/templates/soularr/config.ini.j2` — Ansible-managed, deployed on every run
   - Lidarr API key: `vault_lidarr_api_key`
   - slskd API key: `vault_slskd_api_key`
@@ -166,9 +166,11 @@ during quiet hours to allow HDD spindown.
 - Check logs: `ssh media "docker logs slskd --tail 20"`
 - Look for `INVALIDPASS` — means username exists but password doesn't match
 
-#### slskd VPN integration 401 Unauthorized
-- Gluetun control server requires basic auth
-- Verify `vault_gluetun_user` / `vault_gluetun_password` match the gluetun auth config
+#### slskd stuck on "Waiting for VPN client"
+- VPN integration was disabled because `network_mode: service:gluetun` already enforces VPN at the Docker network level
+- If re-enabled, slskd polls gluetun's control API and refuses to connect to Soulseek until it gets a valid VPN IP
+- The 409 Conflict errors on searches are a symptom of slskd not being connected to the Soulseek network
+- Fix: ensure `integration.vpn.enabled: false` in `slskd.yml.j2`
 
 #### Soularr can't resolve hostnames
 - Startup race condition — usually resolves on next poll cycle (5 minutes)
