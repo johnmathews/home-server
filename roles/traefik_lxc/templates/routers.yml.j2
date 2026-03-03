@@ -40,6 +40,16 @@ http:
         - security-headers
         - jelly-login-rl
 
+    jelly-auth:
+      rule: Host(`jelly.itsa.pizza`) && PathPrefix(`/Users/AuthenticateByName`)
+      entryPoints: [web]
+      service: jelly-svc
+      priority: 200
+      middlewares:
+        - force-https-proto
+        - security-headers
+        - jelly-auth-rl
+
     traefik-ip:
       rule: Host(`192.168.2.108`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))
       entryPoints: [web]
@@ -65,6 +75,35 @@ http:
       middlewares:
         - security-headers
 
+    navidrome:
+      rule: Host(`navidrome.itsa.pizza`)
+      entryPoints: [web]
+      service: navidrome-svc
+      priority: 100
+      middlewares:
+        - force-https-proto
+        - security-headers
+        - music-rl
+
+    navidrome-auth:
+      rule: Host(`navidrome.itsa.pizza`) && PathPrefix(`/auth`)
+      entryPoints: [web]
+      service: navidrome-svc
+      priority: 200
+      middlewares:
+        - force-https-proto
+        - security-headers
+        - navidrome-auth-rl
+
+    music:
+      rule: Host(`music.itsa.pizza`)
+      entryPoints: [web]
+      service: music-svc
+      priority: 100
+      middlewares:
+        - force-https-proto
+        - security-headers
+
   services:
     immich-svc:
       loadBalancer:
@@ -82,6 +121,18 @@ http:
       loadBalancer:
         servers:
           - url: "http://192.168.2.110:8096"
+        passHostHeader: true
+
+    navidrome-svc:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.2.109:4533"
+        passHostHeader: true
+
+    music-svc:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.2.109:9180"
         passHostHeader: true
 
   middlewares:
@@ -103,11 +154,38 @@ http:
         average: 200 # tokens added per period
         period: 1s # refill period (v3 style)
         burst: 300 # allow short spikes (JS chunk bursts, parallel requests)
+        sourceCriterion:
+          requestHeaderName: CF-Connecting-IP
 
     jelly-login-rl:
       rateLimit:
         average: 60
         burst: 30
+        sourceCriterion:
+          requestHeaderName: CF-Connecting-IP
+
+    jelly-auth-rl:
+      rateLimit:
+        average: 5
+        period: 1m
+        burst: 3
+        sourceCriterion:
+          requestHeaderName: CF-Connecting-IP
+
+    music-rl:
+      rateLimit:
+        average: 60
+        burst: 30
+        sourceCriterion:
+          requestHeaderName: CF-Connecting-IP
+
+    navidrome-auth-rl:
+      rateLimit:
+        average: 5
+        period: 1m
+        burst: 3
+        sourceCriterion:
+          requestHeaderName: CF-Connecting-IP
 
     security-headers:
       headers:

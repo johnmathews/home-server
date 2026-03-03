@@ -112,3 +112,14 @@ groups:
             ),
             0
           )
+  - name: traefik_rate_limiting
+    interval: 30s
+    rules:
+      - alert: TraefikRateLimitHit
+        expr: sum by (router) (rate(traefik_router_requests_total{code="429"}[5m])) > 0.1
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Rate limiting active on {% raw %}{{ $labels.router }}{% endraw %}"
+          description: "Router {% raw %}{{ $labels.router }}{% endraw %} is returning 429s at {% raw %}{{ $value | printf \"%.1f\" }}{% endraw %} req/s (5m avg). Sustained for >2 min."

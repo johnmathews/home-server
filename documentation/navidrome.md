@@ -7,6 +7,16 @@ Navidrome is a self-hosted music server and streamer, compatible with the Subson
 ## Architecture
 
 ```
+                    Cloudflare Tunnel
+                         │
+           ┌─────────────┼─────────────────┐
+           │             │                 │
+navidrome.itsa.pizza  music.itsa.pizza     │
+           │             │             │
+           ▼             ▼             │
+       Traefik (192.168.2.108:80)      │
+           │             │             │
+           ▼             ▼             │
 ┌─────────────────────────────────────────────┐
 │  music_lxc (192.168.2.109)                  │
 │                                             │
@@ -15,6 +25,11 @@ Navidrome is a self-hosted music server and streamer, compatible with the Subson
 │  │  :4533       │──▶│  NFS from TrueNAS    │ │
 │  │  SQLite: /data   │  /mnt/tank/music     │ │
 │  └─────────────┘   └──────────────────────┘ │
+│         ▲                                   │
+│  ┌──────┴──────┐                            │
+│  │   Feishin    │                            │
+│  │   :9180      │                            │
+│  └─────────────┘                            │
 │                                             │
 │  ┌─────────┐  ┌──────────────┐  ┌────────┐ │
 │  │  Alloy   │  │ Node Exporter│  │cAdvisor│ │
@@ -30,14 +45,20 @@ Navidrome is a self-hosted music server and streamer, compatible with the Subson
 ## Network
 
 - **LXC IP**: 192.168.2.109
-- **Navidrome web UI**: http://192.168.2.109:4533
-- **Access**: LAN + Tailscale only (no Traefik/Cloudflare routing)
+- **Navidrome web UI**: http://192.168.2.109:4533 (LAN) / https://navidrome.itsa.pizza (public)
+- **Feishin web UI**: http://192.168.2.109:9180 (LAN) / https://music.itsa.pizza (public)
+- **Access**: LAN, Tailscale, and public via Cloudflare Tunnel → Traefik
+
+### Public routing
+
+Both `navidrome.itsa.pizza` and `music.itsa.pizza` are routed through the Cloudflare Tunnel to Traefik (192.168.2.108:80). Cloudflare Access is **not** applied to these subdomains — Subsonic API clients (play:Sub, flo, Feishin desktop) cannot send custom auth headers, so Access would block them. Instead, Traefik applies rate limiting (`music-rl` middleware: 60 req/s average, 30 burst) on the Navidrome route. Feishin (music) doesn't need its own rate limiter — it's a static web app that connects to `navidrome.itsa.pizza` from the browser, where `music-rl` already protects the API.
 
 ## Ports
 
 | Port  | Service       | Purpose                |
 |-------|---------------|------------------------|
 | 4533  | Navidrome     | Web UI + Subsonic API  |
+| 9180  | Feishin       | Web player UI          |
 | 9100  | Node Exporter | Host metrics           |
 | 12345 | Alloy         | Log shipping dashboard |
 | 18080 | cAdvisor      | Container metrics      |
@@ -91,7 +112,8 @@ Navidrome is compatible with the Subsonic API. Recommended clients:
 Full list of compatible apps: https://www.navidrome.org/apps/
 
 ### Client configuration
-- **Server URL**: `http://192.168.2.109:4533` (LAN) or Tailscale IP when off-network
+- **Server URL**: `https://navidrome.itsa.pizza` (works from any network)
+- **LAN-only URL**: `http://192.168.2.109:4533` (alternative for local use)
 - **Username/password**: create accounts in the Navidrome web UI
 
 ## Ansible

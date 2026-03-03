@@ -20,15 +20,12 @@ services:
       # Logs
       - "--log.level=INFO"
       - "--accesslog=true"
-      # Optional dashboard (HTTP on /dashboard) – keep it disabled or protect behind CF Access
-      - "--api.dashboard=true"
       # Enable Docker provider
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
-      # Enable Prometheus metrics (optional)
-      - "--metrics.prometheus=true"
     ports:
       - "80:80"
+      - "8080:8080"
     volumes:
       # Static + dynamic config files (no docker.sock needed on this host)
       - ./traefik/traefik.yml:/etc/traefik/traefik.yml:ro
