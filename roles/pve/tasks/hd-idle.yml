@@ -1,14 +1,14 @@
-- name: Download hd-idle deb package
-  become: true
-  ansible.builtin.get_url:
-    url: https://github.com/adelolmo/hd-idle/releases/download/v1.21/hd-idle_1.21_amd64.deb
-    dest: /tmp/hd-idle_1.05_amd64.deb
-    mode: '0644'
+# - name: Download hd-idle deb package
+#   become: true
+#   ansible.builtin.get_url:
+#     url: https://github.com/adelolmo/hd-idle/releases/download/v1.21/hd-idle_1.21_amd64.deb
+#     dest: /tmp/hd-idle_1.05_amd64.deb
+#     mode: '0644'
 
-- name: Install hd-idle from deb
-  become: true
-  ansible.builtin.apt:
-    deb: /tmp/hd-idle_1.05_amd64.deb
+# - name: Install hd-idle from deb
+#   become: true
+#   ansible.builtin.apt:
+#     deb: /tmp/hd-idle_1.05_amd64.deb
 
 # Debian/Proxmox package reads options from /etc/default/hd-idle.
 # We set a default "no spindown" and then one per-device timeout pair.

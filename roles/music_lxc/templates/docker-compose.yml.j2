@@ -37,7 +37,7 @@ services:
     container_name: feishin
     restart: unless-stopped
     environment:
-      - SERVER_NAME=navidrome # pre-defined server name
+      - SERVER_NAME=our-music # pre-defined server name
       - SERVER_LOCK=true # When true AND name/type/url are set, only username/password can be toggled
       - SERVER_TYPE=navidrome # the allowed types are: jellyfin, navidrome, subsonic. These values are case insensitive
       - SERVER_URL=https://navidrome.itsa.pizza # http://address:port or https://address:port
