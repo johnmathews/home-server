@@ -1,5 +1,8 @@
+# nas_vm is excluded because TrueNAS is an appliance — its filesystem is
+# managed by TrueNAS itself. Installing packages or writing to system paths
+# (e.g. /usr/share/keyrings) fails or gets reverted on updates.
 - name: Install and configure Tailscale on all hosts
-  hosts: all
+  hosts: all:!nas
   become: true
   roles:
     - role: tailscale

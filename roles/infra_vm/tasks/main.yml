@@ -167,10 +167,6 @@
     - restart alloy
     - restart loki
 
-- name: Include file-browser tasks
-  import_tasks: file-browser.yml
-  tags: file-browser
-
 - name: Include homepage tasks
   import_tasks: homepage.yml
   tags: homepage

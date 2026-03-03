@@ -18,7 +18,10 @@ tailscale_advertise_routes: ""
 tailscale_exit_node: false
 
 # Accept DNS from Tailscale (MagicDNS)
-tailscale_accept_dns: true
+# Default false: local DNS (e.g. AdGuard) should not be overridden by Tailscale.
+# When true, Tailscale pushes MagicDNS (100.100.100.100) as a catch-all resolver
+# via systemd-resolved, silently bypassing any local DNS configuration.
+tailscale_accept_dns: false
 
 # SSH server via Tailscale
 tailscale_ssh: false

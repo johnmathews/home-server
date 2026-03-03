@@ -51,6 +51,35 @@ The Tailscale setup consists of:
 4. **`inventory-tailscale.ini`** - Inventory file with Tailscale IPs for remote access
 5. **Tailscale DNS** - Routes DNS queries to home AdGuard for privacy and ad blocking
 
+### DNS: accept-dns must be false on server hosts
+
+**Critical:** The `accept-dns` setting (called `CorpDNS` internally) must be `false` on all server hosts (VMs and LXCs).
+The Ansible role default is `tailscale_accept_dns: false` — do not override this to `true` for server hosts.
+
+**Why this matters:**
+
+The primary DNS resolver for all server hosts is **AdGuard Home (192.168.2.111)**, which provides the DNS chain:
+
+```
+Server host → AdGuard (192.168.2.111) → Unbound → Quad9 (encrypted DNS-over-TLS)
+```
+
+When `accept-dns` is `true`, Tailscale tells `systemd-resolved` to use MagicDNS (`100.100.100.100`) with a `~.`
+catch-all domain, which silently overrides AdGuard for **all** DNS queries — not just `*.ts.net` names. If MagicDNS
+has any connectivity issues (e.g. after a reboot, network instability, or Tailscale service degradation), **all DNS
+resolution breaks**, taking down apt, Docker image pulls, and any service that needs to resolve hostnames.
+
+On hosts without `systemd-resolved` (most LXCs), Tailscale writes `100.100.100.100` directly into `/etc/resolv.conf`,
+completely replacing AdGuard with no fallback.
+
+**The rule:**
+
+- **Server hosts** (VMs, LXCs): `accept-dns: false` — use AdGuard via local network
+- **Client devices** (laptop, phone): `accept-dns: true` — use Tailscale DNS for privacy when traveling
+
+The `tailscale set --accept-dns=false` command is enforced on every Ansible run via the Tailscale role, even on
+already-authenticated hosts.
+
 ### LXC Container Requirements
 
 Proxmox LXC containers are sandboxed and cannot create `/dev/net/tun` devices by default. The `proxmox_lxc_tun` role adds
@@ -423,16 +452,18 @@ Server: 192.168.43.1  # Local café router
 3. Enable ✓ "Use Tailscale DNS settings"
 4. Restart Tailscale app
 
-**Fix (Linux):**
+**Fix (Linux client devices only — NOT server hosts):**
 
 ```bash
 # Check if DNS is configured
 resolvectl status
 
-# Force DNS update
+# Force DNS update (only on client devices like laptops, NOT on server VMs/LXCs)
 sudo tailscale down
 sudo tailscale up --accept-dns
 ```
+
+**Note:** On server hosts, `accept-dns` must remain `false`. See "DNS: accept-dns must be false on server hosts" above.
 
 #### Problem: DNS leak test shows café/hotel ISP
 
@@ -775,8 +806,8 @@ sudo systemctl restart tailscaled
 # Re-authenticate
 sudo tailscale up
 
-# Enable Tailscale DNS (Linux)
-sudo tailscale up --accept-dns
+# Check accept-dns setting (should be false on server hosts)
+tailscale debug prefs | grep CorpDNS
 
 # Check connection quality
 tailscale netcheck

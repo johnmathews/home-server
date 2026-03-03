@@ -69,17 +69,6 @@
     remove_orphans: true
   become: false
 
-- name: restart filebrowser
-  community.docker.docker_compose_v2:
-    project_src: "{{ docker_compose_dir }}"
-    services:
-      - filebrowser
-    state: present
-    recreate: always
-    dependencies: true
-    remove_orphans: true
-  become: false
-
 - name: restart mikrotik_exporter
   community.docker.docker_compose_v2:
     project_src: "{{ docker_compose_dir }}"

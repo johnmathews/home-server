@@ -112,6 +112,11 @@
     enabled: "{{ tailscale_enabled }}"
     state: "{{ 'started' if tailscale_enabled else 'stopped' }}"
 
+- name: Enforce Tailscale DNS setting
+  ansible.builtin.command: "tailscale set --accept-dns={{ 'true' if tailscale_accept_dns else 'false' }}"
+  changed_when: true
+  when: tailscale_enabled
+
 - name: Get Tailscale status
   ansible.builtin.command: tailscale status
   register: tailscale_status_output
