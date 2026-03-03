@@ -34,6 +34,12 @@
     - Radarr:
         - abbr:
           href: http://192.168.2.105:7878
+    - Lidarr:
+        - abbr:
+          href: http://192.168.2.105:8686
+    - Slskd:
+        - abbr:
+          href: http://192.168.2.105:5030
     - Sabnzbd:
         - abbr:
           href: http://192.168.2.105:8081

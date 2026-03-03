@@ -126,6 +126,15 @@ Full list of compatible apps: https://www.navidrome.org/apps/
 
 Role chain: `nfs_client` → `share_drive_probe` → `music_lxc` → `shell_environment` → `tailscale`
 
+## Music Sources
+
+Music files arrive in `/mnt/nfs/music` from two sources:
+
+- **gm** (manual) — downloads to `/mnt/nfs/music/Artist/Album/` directly
+- **Lidarr + Soularr + slskd** (automated) — runs on the Media VM (192.168.2.105). Soularr polls Lidarr's wanted list, searches Soulseek via slskd, and Lidarr imports completed downloads to `/mnt/nfs/music`. See `documentation/media_vm.md` for details.
+
+Navidrome scans hourly (`ND_SCANSCHEDULE=1h`) and picks up files from both sources automatically.
+
 ## Music Library Organization
 
 Navidrome **ignores folder names and file names entirely** — it organizes your library based solely on embedded metadata tags. However, a clean folder structure is still recommended for your own sanity and compatibility with other tools.

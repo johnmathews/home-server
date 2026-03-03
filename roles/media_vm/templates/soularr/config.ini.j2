@@ -4,13 +4,13 @@
 # slskd: Settings > Options > API Keys
 
 [Lidarr]
-api_key = CHANGE_ME
+api_key = {{ vault_lidarr_api_key }}
 host_url = http://lidarr:8686
 download_dir = /downloads/slskd
 disable_sync = False
 
 [Slskd]
-api_key = CHANGE_ME
+api_key = {{vault_slskd_api_key}}
 host_url = http://gluetun:5030
 url_base = /
 download_dir = /downloads
