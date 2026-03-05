@@ -1,10 +1,12 @@
 # traefik_lxc/files/traefik/dynamic/routers.yml
 # vim: ft=yaml
+{% set all_domains = [primary_domain_name] + (migration_additional_domains | default([])) %}
+{% macro host(sub) %}{% for d in all_domains %}Host(`{{ sub }}.{{ d }}`){% if not loop.last %} || {% endif %}{% endfor %}{% endmacro %}
 
 http:
   routers:
     immich:
-      rule: Host(`immich.{{ primary_domain_name }}`)
+      rule: {{ host('immich') }}
       entryPoints: [web]
       service: immich-svc
       priority: 100 # outrank generic rules
@@ -13,7 +15,8 @@ http:
         - security-headers
 
     immich-share:
-      rule: Host(`share.{{ primary_domain_name }}`) || ( Host(`immich.{{ primary_domain_name }}`) && ( PathPrefix(`/share`) ) )
+      rule: {% for d in all_domains %}Host(`share.{{ d }}`) || ( Host(`immich.{{ d }}`) && ( PathPrefix(`/share`) ) ){% if not loop.last %} || {% endif %}{% endfor %}
+
       entryPoints: [web]
       service: immich-share-svc
       priority: 150 # outrank generic rules
@@ -22,7 +25,7 @@ http:
         - security-headers
 
     immich-auth:
-      rule: Host(`immich.{{ primary_domain_name }}`) && ( PathPrefix(`/api/auth`) || PathPrefix(`/auth`) || PathPrefix(`/api/oauth`) || PathPrefix(`/oauth`) )
+      rule: ({{ host('immich') }}) && ( PathPrefix(`/api/auth`) || PathPrefix(`/auth`) || PathPrefix(`/api/oauth`) || PathPrefix(`/oauth`) )
       entryPoints: [web]
       service: immich-svc
       priority: 200
@@ -32,7 +35,7 @@ http:
         - immich-login-rl
 
     jelly:
-      rule: Host(`jelly.{{ primary_domain_name }}`)
+      rule: {{ host('jelly') }}
       entryPoints: [web]
       service: jelly-svc
       middlewares:
@@ -41,7 +44,7 @@ http:
         - jelly-login-rl
 
     jelly-auth:
-      rule: Host(`jelly.{{ primary_domain_name }}`) && PathPrefix(`/Users/AuthenticateByName`)
+      rule: ({{ host('jelly') }}) && PathPrefix(`/Users/AuthenticateByName`)
       entryPoints: [web]
       service: jelly-svc
       priority: 200
@@ -60,7 +63,7 @@ http:
         - security-headers # optional; remove if it causes UI issues
 
     traefik-api-local:
-      rule: Host(`traefik.{{ primary_domain_name }}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+      rule: ({{ host('traefik') }}) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
       entryPoints: [web]
       service: api@internal
       priority: 500
@@ -69,14 +72,14 @@ http:
         - security-headers
 
     traefik-dash:
-      rule: Host(`traefik.{{ primary_domain_name }}`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))
+      rule: ({{ host('traefik') }}) && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))
       entryPoints: [web]
       service: api@internal
       middlewares:
         - security-headers
 
     navidrome:
-      rule: Host(`navidrome.{{ primary_domain_name }}`)
+      rule: {{ host('navidrome') }}
       entryPoints: [web]
       service: navidrome-svc
       priority: 100
@@ -86,7 +89,7 @@ http:
         - music-rl
 
     navidrome-auth:
-      rule: Host(`navidrome.{{ primary_domain_name }}`) && PathPrefix(`/auth`)
+      rule: ({{ host('navidrome') }}) && PathPrefix(`/auth`)
       entryPoints: [web]
       service: navidrome-svc
       priority: 200
@@ -96,7 +99,7 @@ http:
         - navidrome-auth-rl
 
     music:
-      rule: Host(`music.{{ primary_domain_name }}`)
+      rule: {{ host('music') }}
       entryPoints: [web]
       service: music-svc
       priority: 100

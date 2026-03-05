@@ -83,14 +83,15 @@ domains simultaneously. No second tunnel is needed.
 ### Cloudflare Side
 
 - [x] Register `itsa-pizza.com` on Cloudflare (nameservers already pointing to Cloudflare)
-- [ ] Create CNAME records on `itsa-pizza.com` (dashboard or API — CLI cert.pem is zone-locked to `itsa.pizza`)
-- [ ] Recreate Cloudflare Zero Access policies for `itsa-pizza.com` subdomains (API or dashboard)
+- [x] Create CNAME records on `itsa-pizza.com` (51 records created via API script)
+- [x] Clean up bad CNAME records on `itsa.pizza` zone (removed via dashboard)
+- [x] Recreate Cloudflare Zero Access policies for `itsa-pizza.com` subdomains (duplicated via dashboard)
 
 ### Cloudflared LXC (192.168.2.101)
 
-- [ ] Add `itsa-pizza.com` hostnames to `/etc/cloudflared/config.yml` (alongside existing entries)
-- [ ] Restart cloudflared service
-- [ ] Run DNS route commands for new hostnames
+- [x] Add `itsa-pizza.com` hostnames to `/etc/cloudflared/config.yml` (alongside existing entries)
+- [x] Restart cloudflared service
+- [x] DNS records created via API (not CLI route commands — cert.pem is zone-locked)
 
 ### Ansible Codebase
 
@@ -118,35 +119,32 @@ These services store the domain in their own config/database and may need manual
 - [x] Investigate Cloudflare API for programmatic DNS/tunnel management (see `documentation/cloudflare-api.md`)
 - [x] Deploy cloudflared role (`make cloudflared` — config templated, service restarted, shell environment configured)
 
-### Stage 1: Cloudflare Setup (In Progress)
+### Stage 1: Cloudflare Setup (Completed)
 
 - [x] `itsa-pizza.com` registered on Cloudflare (nameservers already set, DNS setup "full")
-- [ ] Create CNAME records for `itsa-pizza.com` subdomains -> `e1e3b9c4-789a-4ad3-adff-a0c71bff1122.cfargotunnel.com`
-- [ ] Recreate Zero Access policies for `itsa-pizza.com` subdomains (API or dashboard)
-- [ ] Clean up bad CNAME records created on `itsa.pizza` zone (e.g. `itsa-pizza.com.itsa.pizza`)
+- [x] Create CNAME records for `itsa-pizza.com` subdomains (51 records via `scripts/cf-create-dns-records.sh --apply`)
+- [x] Clean up bad CNAME records on `itsa.pizza` zone (removed via dashboard)
+- [x] Recreate Zero Access policies for `itsa-pizza.com` subdomains (duplicated via dashboard)
 
-**Blocker resolved:** `cloudflared tunnel route dns` cannot create records on `itsa-pizza.com` because the
-`cert.pem` at `/root/.cloudflared/cert.pem` contains a zone-locked API token for `itsa.pizza` only. The token
-is embedded in an "ARGO TUNNEL TOKEN" and includes `zoneID` for `itsa.pizza`.
+**DNS records created via API:** Used `scripts/cf-create-dns-records.sh` with a Cloudflare API token scoped to
+`itsa-pizza.com` (DNS:Edit). The script creates proxied CNAME records pointing to the tunnel. It supports dry-run
+(default), `--apply` (create), and `--cleanup` (remove bad records from old zone). The CLI `cloudflared tunnel route
+dns` cannot be used for cross-zone record creation due to zone-locked cert.pem (see `cloudflare-api.md`).
 
-**Options for creating DNS records on `itsa-pizza.com`:**
+### Stage 2: Parallel Running (Completed)
 
-1. **Cloudflare dashboard** (simplest) — manually add CNAME records in the `itsa-pizza.com` DNS settings, each
-   pointing to `e1e3b9c4-789a-4ad3-adff-a0c71bff1122.cfargotunnel.com` with proxy enabled
-2. **Cloudflare API** — use an API token with `DNS:Edit` on both zones (see `cloudflare-api.md`)
-3. **Re-login** — run `cloudflared tunnel login` and select `itsa-pizza.com` to get a new cert.pem, create records,
-   then login again selecting `itsa.pizza` to restore the original cert (cert.pem only holds one zone at a time)
+Both domains work simultaneously using the same tunnel. `migration_additional_domains` in `group_vars/all/main.yml`
+drives the multi-domain support. The cloudflared config template loops over all domains to generate ingress rules.
+Traefik routers use a Jinja2 macro to match `Host()` on both domains.
 
-### Stage 2: Parallel Running (Both Domains Active)
-
-Both domains will work simultaneously using the same tunnel. This is the target state for a significant crossover period.
-
-- [ ] Add `itsa-pizza.com` hostnames to cloudflared config (keep `itsa.pizza` entries too)
-- [ ] Add Traefik router rules for new domain (keep old rules too)
-- [ ] Run `cloudflared tunnel route dns` for all new hostnames (creates CNAMEs automatically)
-- [ ] Recreate Zero Access policies for new domain
-- [ ] Test all services on `itsa-pizza.com`
-- [ ] Verify Cloudflare Zero Access works on new domain
+- [x] Add `itsa-pizza.com` hostnames to cloudflared config (`make cloudflared`)
+- [x] Add Traefik router rules for new domain (`make traefik`)
+- [x] Zero Access policies duplicated for new domain (done in Stage 1)
+- [x] Update services with allowed-hosts settings for both domains:
+  - Homepage `HOMEPAGE_ALLOWED_HOSTS` (infra VM docker-compose)
+  - Paperless `PAPERLESS_ALLOWED_HOSTS`, `CORS`, `CSRF` (.env template)
+- [x] Test all services on `itsa-pizza.com`
+- [x] Verify Cloudflare Zero Access works on new domain
 
 ### Stage 3: Ansible Codebase Update
 
@@ -186,8 +184,8 @@ crossover period.
 2. **Redirects**: Optional. Without redirects, old URLs fail after cutover. Only matters if shared Immich album links
    or similar external-facing URLs exist. See `cloudflare-api.md` for implementation details if needed.
 
-3. **Access policies**: Can be recreated via Cloudflare dashboard or API. If there are many policies, the API approach
-   (documented in `cloudflare-api.md`) saves time. An API token with `Access: Apps and Policies: Edit` would be needed.
+3. **Access policies**: Duplicated via dashboard. Only 3 apps existed (2 relevant + Warp). Policies include wildcard
+   `*.itsa-pizza.com` with email allowlist + service token bypass, and a bypass app for Immich/Jelly/Navidrome/Timer.
 
 ## SSH Access
 
