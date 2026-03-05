@@ -4,7 +4,6 @@
 - import_playbook: infra_vm.yml
 - import_playbook: jellyfin_lxc.yml
 - import_playbook: key_server.yml
-- import_playbook: mail_vm.yml
 - import_playbook: media_vm.yml
 - import_playbook: music_lxc.yml
 - import_playbook: nas.yml

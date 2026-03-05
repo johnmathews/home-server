@@ -27,7 +27,7 @@ To apply changes to the Cloudflare Tunnel configuration:
 ```sh
 cloudflared tunnel --config /etc/cloudflared/config.yml ingress validate
 sudo systemctl restart cloudflared
-cloudflared tunnel route dns home-server <subdomain>.itsa.pizza
+cloudflared tunnel route dns home-server <subdomain>.itsa-pizza.com
 ```
 
 ## Bulk DNS Update Example
@@ -95,21 +95,21 @@ All services listed in `/etc/cloudflared/config.yml`. Key subdomains:
 
 **Via Traefik (bypass Zero Access):**
 
-- `jelly.itsa.pizza` -> Traefik -> Jellyfin (192.168.2.110:8096)
-- `immich.itsa.pizza` -> Traefik -> Immich (192.168.2.113:2283)
-- `share.itsa.pizza` -> Traefik -> Immich shared albums
-- `navidrome.itsa.pizza` -> Traefik -> Navidrome (192.168.2.109:4533)
-- `music.itsa.pizza` -> Traefik -> Feishin (192.168.2.109:9180)
+- `jelly.itsa-pizza.com` -> Traefik -> Jellyfin (192.168.2.110:8096)
+- `immich.itsa-pizza.com` -> Traefik -> Immich (192.168.2.113:2283)
+- `share.itsa-pizza.com` -> Traefik -> Immich shared albums
+- `navidrome.itsa-pizza.com` -> Traefik -> Navidrome (192.168.2.109:4533)
+- `music.itsa-pizza.com` -> Traefik -> Feishin (192.168.2.109:9180)
 
 **Direct (with Zero Access):**
 
-- `itsa.pizza` / `dash.itsa.pizza` -> Homepage (192.168.2.106:3002)
-- `claw.itsa.pizza` -> OpenClaw (192.168.2.107:18789)
-- `charts.itsa.pizza` / `grafana.itsa.pizza` -> Grafana (192.168.2.106:3000)
-- `mail.itsa.pizza` -> Mailcow (192.168.2.103:443)
-- `sonarr.itsa.pizza`, `radarr.itsa.pizza`, etc. -> Media VM services
-- `paperless.itsa.pizza` / `documents.itsa.pizza` -> Paperless-ngx
-- `proxmox.itsa.pizza` / `pve.itsa.pizza` -> Proxmox UI
+- `itsa-pizza.com` / `dash.itsa-pizza.com` -> Homepage (192.168.2.106:3002)
+- `claw.itsa-pizza.com` -> OpenClaw (192.168.2.107:18789)
+- `charts.itsa-pizza.com` / `grafana.itsa-pizza.com` -> Grafana (192.168.2.106:3000)
+- `mail.itsa-pizza.com` -> Mailcow (192.168.2.103:443)
+- `sonarr.itsa-pizza.com`, `radarr.itsa-pizza.com`, etc. -> Media VM services
+- `paperless.itsa-pizza.com` / `documents.itsa-pizza.com` -> Paperless-ngx
+- `proxmox.itsa-pizza.com` / `pve.itsa-pizza.com` -> Proxmox UI
 - ... (see full list in config.yml)
 
 ## Ansible
@@ -124,5 +124,5 @@ config file, shell environment, and Tailscale.
 
 ## Domain Migration
 
-A migration from `itsa.pizza` to `itsa-pizza.com` is planned. See `documentation/domain-migration.md` for the full
+A migration from `itsa-pizza.com` to `itsa-pizza.com` is planned. See `documentation/domain-migration.md` for the full
 plan, stages, and open questions.

@@ -61,7 +61,7 @@ Host IPs are assigned statically on the MikroTik router. Source of truth: `inven
 | pve               | 192.168.2.214  |                  | Proxmox UI :8006                     |
 | pbs               | 192.168.2.200  |                  | Proxmox Backup Server                |
 | cloudflared_lxc   | 192.168.2.101  |                  | Cloudflare Tunnel                    |
-| mailcow-vm        | 192.168.2.103  |                  | Mailcow (mail.itsa.pizza)            |
+| mailcow-vm        | 192.168.2.103  |                  | Mailcow (retired)                    |
 | nas_vm            | 192.168.2.104  |                  | TrueNAS (NFS/SMB shares)            |
 | media-vm          | 192.168.2.105  |                  | Sonarr, Radarr, qBittorrent, etc.   |
 | infra-vm          | 192.168.2.106  |                  | Grafana, Prometheus, Loki, etc.      |
@@ -97,7 +97,6 @@ Service-specific guides in `/documentation/`. Read the relevant doc before worki
 - `index.md` — Top-level project overview and conventions
 - `iperf3-speedtest.md` — Network speed testing between server and clients
 - `key_server.md` — TrueNAS dataset encryption key server
-- `mailcow.md` — Mailcow Docker mail server (mail.itsa.pizza)
 - `media_vm.md` — Media VM services (Mullvad VPN, qBittorrent, Sonarr, Radarr)
 - `mikrotik-exporter.md` — MikroTik router Prometheus exporter (MKTXP)
 - `monitor_nfs_smb_mounts.md` — NFS/SMB mount health monitoring

@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-IMMICH_URL="https://immich.itsa.pizza" # no trailing /api
+IMMICH_URL="https://immich.itsa-pizza.com" # no trailing /api
 API_KEY=$IMMICH_API_KEY
 
 PAGE=1

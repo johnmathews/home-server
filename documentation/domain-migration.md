@@ -58,18 +58,10 @@ update `primary_domain_name` in `group_vars/all/main.yml` and redeploy.
 - `playbooks/mail_vm.yml` — mail_domain, mail_hostname
 - `roles/cloudflared_lxc/templates/config.yml.j2` — all tunnel ingress hostnames
 
-**Not templatized (need manual update at Stage 3):**
+**Previously not templatized (updated in Stage 3):**
 
-- `scripts/immich-empty-album.sh` line 4 — `IMMICH_URL="https://immich.itsa.pizza"`
-- `scripts/immich-unfavourite-all.sh` line 5 — `IMMICH_URL="https://immich.itsa.pizza"`
-- `documentation/cloudflared.md` — subdomain examples and service list
-- `documentation/traefik.md` — dashboard URLs and service list
-- `documentation/navidrome.md` — service access URLs
-- `documentation/openclaw.md` — `claw.itsa.pizza` references
-- `documentation/mailcow.md` — mail domain and DNS records (mailcow is retired, consider deleting)
-- `documentation/index.md` — `charts.itsa.pizza` reference
-- `CLAUDE.md` — network reference table (`mail.itsa.pizza`)
-- `readme.md` — `docs.itsa.pizza` link
+All standalone scripts, documentation files, `CLAUDE.md`, and `readme.md` have been updated to use `itsa-pizza.com`.
+`documentation/mailcow.md` was deleted (service retired).
 
 ## Tunnel and Multi-Domain Support
 
@@ -95,9 +87,10 @@ domains simultaneously. No second tunnel is needed.
 
 ### Ansible Codebase
 
-- [ ] Change `primary_domain_name` from `itsa.pizza` to `itsa-pizza.com` in `group_vars/all/main.yml`
-- [ ] Deploy with `make site` or per-service targets
-- [ ] Update standalone scripts and documentation
+- [x] Change `primary_domain_name` from `itsa.pizza` to `itsa-pizza.com` in `group_vars/all/main.yml`
+- [x] Deploy with `make site` (all hosts succeeded)
+- [x] Update standalone scripts and documentation
+- [x] Remove mailcow from `site.yml`, `shell_environment_clients`, and tailscale playbook
 
 ### Services That Need Reconfiguration After Deploy
 
@@ -146,23 +139,24 @@ Traefik routers use a Jinja2 macro to match `Host()` on both domains.
 - [x] Test all services on `itsa-pizza.com`
 - [x] Verify Cloudflare Zero Access works on new domain
 
-### Stage 3: Ansible Codebase Update
+### Stage 3: Ansible Codebase Update (Completed)
 
-- [ ] Update `primary_domain_name` to `itsa-pizza.com` in `group_vars/all/main.yml`
-- [ ] Run `make check` (dry-run) to validate
-- [ ] Deploy with `make site` or per-service targets
-- [ ] Update standalone scripts:
-  - `scripts/immich-empty-album.sh` line 4 — IMMICH_URL
-  - `scripts/immich-unfavourite-all.sh` line 5 — IMMICH_URL
-- [ ] Update documentation files:
+- [x] Update `primary_domain_name` to `itsa-pizza.com` in `group_vars/all/main.yml`
+- [x] Set `migration_additional_domains` to `["itsa.pizza"]` (keeps both domains active)
+- [x] Deploy with `make site` (all hosts succeeded)
+- [x] Update standalone scripts:
+  - `scripts/immich-empty-album.sh` — IMMICH_URL
+  - `scripts/immich-unfavourite-all.sh` — IMMICH_URL
+- [x] Update documentation files:
   - `documentation/cloudflared.md` — subdomain examples and service list
   - `documentation/traefik.md` — dashboard URLs and service list
   - `documentation/navidrome.md` — service access URLs
-  - `documentation/openclaw.md` — `claw.itsa.pizza` references
-  - `documentation/index.md` — `charts.itsa.pizza` reference
-  - `CLAUDE.md` — network reference table
-  - `readme.md` — `docs.itsa.pizza` link
-- [ ] Delete or archive `documentation/mailcow.md` (mailcow is retired)
+  - `documentation/openclaw.md` — `claw.itsa-pizza.com` references
+  - `documentation/index.md` — `charts.itsa-pizza.com` reference
+  - `CLAUDE.md` — network reference table (mailcow marked retired)
+  - `readme.md` — `docs.itsa-pizza.com` link
+- [x] Delete `documentation/mailcow.md` (mailcow is retired)
+- [x] Remove mailcow from mkdocs nav
 
 ### Stage 4: Cutover and Cleanup
 

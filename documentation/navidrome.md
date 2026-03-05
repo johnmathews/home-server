@@ -11,7 +11,7 @@ Navidrome is a self-hosted music server and streamer, compatible with the Subson
                          │
            ┌─────────────┼─────────────────┐
            │             │                 │
-navidrome.itsa.pizza  music.itsa.pizza     │
+navidrome.itsa-pizza.com  music.itsa-pizza.com     │
            │             │             │
            ▼             ▼             │
        Traefik (192.168.2.108:80)      │
@@ -45,13 +45,13 @@ navidrome.itsa.pizza  music.itsa.pizza     │
 ## Network
 
 - **LXC IP**: 192.168.2.109
-- **Navidrome web UI**: http://192.168.2.109:4533 (LAN) / https://navidrome.itsa.pizza (public)
-- **Feishin web UI**: http://192.168.2.109:9180 (LAN) / https://music.itsa.pizza (public)
+- **Navidrome web UI**: http://192.168.2.109:4533 (LAN) / https://navidrome.itsa-pizza.com (public)
+- **Feishin web UI**: http://192.168.2.109:9180 (LAN) / https://music.itsa-pizza.com (public)
 - **Access**: LAN, Tailscale, and public via Cloudflare Tunnel → Traefik
 
 ### Public routing
 
-Both `navidrome.itsa.pizza` and `music.itsa.pizza` are routed through the Cloudflare Tunnel to Traefik (192.168.2.108:80). Cloudflare Access is **not** applied to these subdomains — Subsonic API clients (play:Sub, flo, Feishin desktop) cannot send custom auth headers, so Access would block them. Instead, Traefik applies rate limiting (`music-rl` middleware: 60 req/s average, 30 burst) on the Navidrome route. Feishin (music) doesn't need its own rate limiter — it's a static web app that connects to `navidrome.itsa.pizza` from the browser, where `music-rl` already protects the API.
+Both `navidrome.itsa-pizza.com` and `music.itsa-pizza.com` are routed through the Cloudflare Tunnel to Traefik (192.168.2.108:80). Cloudflare Access is **not** applied to these subdomains — Subsonic API clients (play:Sub, flo, Feishin desktop) cannot send custom auth headers, so Access would block them. Instead, Traefik applies rate limiting (`music-rl` middleware: 60 req/s average, 30 burst) on the Navidrome route. Feishin (music) doesn't need its own rate limiter — it's a static web app that connects to `navidrome.itsa-pizza.com` from the browser, where `music-rl` already protects the API.
 
 ## Ports
 
@@ -112,7 +112,7 @@ Navidrome is compatible with the Subsonic API. Recommended clients:
 Full list of compatible apps: https://www.navidrome.org/apps/
 
 ### Client configuration
-- **Server URL**: `https://navidrome.itsa.pizza` (works from any network)
+- **Server URL**: `https://navidrome.itsa-pizza.com` (works from any network)
 - **LAN-only URL**: `http://192.168.2.109:4533` (alternative for local use)
 - **Username/password**: create accounts in the Navidrome web UI
 

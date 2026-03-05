@@ -1,8 +1,8 @@
 ## Traefik
 
-View the dashboard at [https://traefik.itsa.pizza/dashboard](https://traefik.itsa.pizza/dashboard/)
+View the dashboard at [https://traefik.itsa-pizza.com/dashboard](https://traefik.itsa-pizza.com/dashboard/)
 
-API overview: [https://traefik.itsa.pizza/api/overview](https://traefik.itsa.pizza/api/overview)
+API overview: [https://traefik.itsa-pizza.com/api/overview](https://traefik.itsa-pizza.com/api/overview)
 
 ## Role
 
@@ -14,10 +14,10 @@ Traefik listens on port 80 only.
 
 ## Services Behind Traefik
 
-- **Jellyfin** (`jelly.itsa.pizza`) — media streaming apps need direct API access
-- **Immich** (`immich.itsa.pizza`, `share.itsa.pizza`) — mobile app needs direct API access
-- **Navidrome** (`navidrome.itsa.pizza`) — Subsonic API clients need direct access
-- **Music/Feishin** (`music.itsa.pizza`) — Feishin web client
+- **Jellyfin** (`jelly.itsa-pizza.com`) — media streaming apps need direct API access
+- **Immich** (`immich.itsa-pizza.com`, `share.itsa-pizza.com`) — mobile app needs direct API access
+- **Navidrome** (`navidrome.itsa-pizza.com`) — Subsonic API clients need direct access
+- **Music/Feishin** (`music.itsa-pizza.com`) — Feishin web client
 
 These domains have a Cloudflare Zero Access bypass policy, so Traefik applies rate limiting on their authentication
 and API routes as a compensating security control.

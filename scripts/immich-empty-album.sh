@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-IMMICH_URL="https://immich.itsa.pizza"
+IMMICH_URL="https://immich.itsa-pizza.com"
 API_KEY=$IMMICH_API_KEY
 ALBUM_NAME="Favorites"
 BATCH=200 # drop to 100 if you hit 413/timeout

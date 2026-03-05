@@ -1,8 +1,7 @@
-# nas_vm is excluded because TrueNAS is an appliance — its filesystem is
-# managed by TrueNAS itself. Installing packages or writing to system paths
-# (e.g. /usr/share/keyrings) fails or gets reverted on updates.
+# nas_vm: TrueNAS appliance — package installs get reverted on updates.
+# mailcow: retired, VM is disabled.
 - name: Install and configure Tailscale on all hosts
-  hosts: all:!nas
+  hosts: all:!nas:!mailcow
   become: true
   roles:
     - role: tailscale

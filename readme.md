@@ -3,7 +3,7 @@
 This project is about setting up my home server. It contains the commands and Ansible playbooks used to provision a home
 server based on Proxmox.
 
-Read the [documentation](https://docs.itsa.pizza).
+Read the [documentation](https://docs.itsa-pizza.com).
 
 [Proxmox helper scripts](https://community-scripts.github.io/ProxmoxVE/) are used.
 

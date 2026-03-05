@@ -231,10 +231,10 @@ tailscale status    # Shows node state and connected peers
 
 ### Public access (Cloudflare Tunnel)
 
-OpenClaw is proxied behind cloudflared (NOT Traefik) at `claw.itsa.pizza` → `192.168.2.107:18789`. The tunnel is
+OpenClaw is proxied behind cloudflared (NOT Traefik) at `claw.itsa-pizza.com` → `192.168.2.107:18789`. The tunnel is
 configured on the cloudflared LXC (192.168.2.101) in `/etc/cloudflared/config.yml`.
 
-**Important**: `claw.itsa.pizza` is behind **Cloudflare Access** (zero-trust), which redirects unauthenticated requests
+**Important**: `claw.itsa-pizza.com` is behind **Cloudflare Access** (zero-trust), which redirects unauthenticated requests
 to `itsapizza.cloudflareaccess.com` for login. This means the Cloudflare Tunnel URL **cannot be used** for WebSocket
 connections from the macOS app or programmatic clients -- Cloudflare Access intercepts the WebSocket upgrade and returns
 a 302 redirect instead of passing it through to the gateway.
@@ -288,7 +288,7 @@ Several approaches were tested and failed:
 +----------------------------------+---------------------------------------------+
 | Approach                         | Result                                      |
 +----------------------------------+---------------------------------------------+
-| wss://claw.itsa.pizza            | Blocked by Cloudflare Access (302 redirect) |
+| wss://claw.itsa-pizza.com            | Blocked by Cloudflare Access (302 redirect) |
 | wss://100.125.185.47:18789       | Connection timeout (no TLS on gateway)      |
 | wss://openclaw.flicker-          | Tailscale Serve strips WebSocket upgrade    |
 |   enigmatic.ts.net               |   headers (returns 200 instead of 101)      |
@@ -347,7 +347,7 @@ For the Tailscale hostname (if used in future):
 ```json
 "controlUi": {
   "allowedOrigins": [
-    "https://claw.itsa.pizza",
+    "https://claw.itsa-pizza.com",
     "https://openclaw.flicker-enigmatic.ts.net"
   ]
 }

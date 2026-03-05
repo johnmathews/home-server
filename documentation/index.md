@@ -1,6 +1,6 @@
 # Home Server
 
-Check out [charts.itsa.pizza](https://charts.itsa.pizza) for metrics and logs.
+Check out [charts.itsa-pizza.com](https://charts.itsa-pizza.com) for metrics and logs.
 
 Media containers are paused during night hours to allow HDDs to spin down.
 
@@ -17,5 +17,5 @@ match the last part of the MAC address. See `~/.ssh/known_hosts` and
 
 ## Domain
 
-External access uses `itsa.pizza` via Cloudflare (DNS, Tunnel, Zero Access).
+External access uses `itsa-pizza.com` via Cloudflare (DNS, Tunnel, Zero Access).
 A migration to `itsa-pizza.com` is planned — see `documentation/domain-migration.md`.
