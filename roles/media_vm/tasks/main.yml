@@ -3,6 +3,14 @@
 # for share_drive_probe tasks, see playbooks/media_vm.yml tag=share
 # for quiet_hours and pausing docker containers at night, see roles/sleep_hours role with tags=sleep
 
+- name: Preserve SSH host keys across reboots
+  ansible.builtin.copy:
+    dest: /etc/cloud/cloud.cfg.d/99_preserve_ssh_keys.cfg
+    content: |
+      ssh_deletekeys: false
+      ssh_genkeytypes: []
+    mode: '0644'
+
 - name: Gather facts for media-vm
   ansible.builtin.setup: {}
 
@@ -119,7 +127,7 @@
     mode: '0644'
   notify:
     - restart media stack
-  tags: docker
+  tags: docker, portainer
 
 - name: Upload alloy config file
   copy:
@@ -142,7 +150,7 @@
     dest: /srv/media/.env
     mode: '0600'
   notify: restart media stack
-  tags: docker
+  tags: docker, portainer
 
 - name: Create gluetun config file from template
   template:

@@ -33,3 +33,12 @@
     mode: '0644'
   notify: restart homepage
 
+- name: Template homepage bookmarks.yaml
+  template:
+    src: homepage/bookmarks.yaml.j2
+    dest: /srv/infra/homepage/config/bookmarks.yaml
+    owner: "{{ docker_user }}"
+    group: "{{ docker_user }}"
+    mode: '0644'
+  notify: restart homepage
+

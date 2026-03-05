@@ -117,7 +117,7 @@ services:
     environment:
       PUID: 1000
       PGID: 1000
-      HOMEPAGE_ALLOWED_HOSTS: 192.168.2.106:3002,dash.itsa.pizza,itsa.pizza
+      HOMEPAGE_ALLOWED_HOSTS: 192.168.2.106:3002,dash.{{ primary_domain_name }},{{ primary_domain_name }}
     ports:
       - 3002:3000
     env_file:

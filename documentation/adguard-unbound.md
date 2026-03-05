@@ -146,6 +146,36 @@ Key metrics:
 - `total.num.cachemiss`: Queries that needed upstream lookup
 - `time.up`: Uptime in seconds (if low, cache will be cold)
 
+## Host DNS Configuration
+
+Different hosts get their DNS configuration in different ways:
+
+**VMs (media-vm, infra-vm, etc.):** Use `systemd-resolved`, which gets the DNS server from MikroTik DHCP
+(`192.168.2.111`). No Ansible management needed.
+
+**LXCs (openclaw, traefik, prometheus, etc.):** Proxmox writes `/etc/resolv.conf` at container creation with
+`192.168.2.111`. No Ansible management needed.
+
+**PVE host:** Static IP, no DHCP — manages `/etc/resolv.conf` directly. Ansible deploys a template with a primary and
+fallback DNS server:
+
+```
+nameserver 192.168.2.111   # AdGuard Home (primary)
+nameserver 9.9.9.9         # Quad9 direct (fallback)
+```
+
+The fallback ensures PVE can still resolve DNS if the AdGuard LXC is down (e.g., during Proxmox maintenance or LXC
+migration). The fallback skips ad blocking but keeps the host functional.
+
+**Ansible variables** (in `group_vars/all/main.yml`):
+
+- `dns_primary: "192.168.2.111"` — AdGuard Home
+- `dns_fallback: "9.9.9.9"` — Quad9 (matches Unbound upstream)
+
+**Ansible task:** `roles/pve/tasks/main.yml` deploys `roles/pve/templates/resolv.conf.j2` (tagged `dns`).
+
+To apply: `make pve t=dns`
+
 ## Configuration Files
 
 ### AdGuard Home Config

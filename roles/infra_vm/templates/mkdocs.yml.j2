@@ -1,6 +1,6 @@
 # vim: ft=yaml
 site_name: Home Server Documentation
-site_url: https://docs.itsa.pizza
+site_url: https://docs.{{ primary_domain_name }}
 theme:
   name: material
   palette:
@@ -33,7 +33,9 @@ nav:
   - UPS: ups.md
   - Key Server: key_server.md
   - Adguard + Unbound: adguard-unbound.md
+  - Cloudflare API: cloudflare-api.md
   - Cloudflared: cloudflared.md
+  - Domain Migration: domain-migration.md
   - iperf3-speedtest: iperf3-speedtest.md
   - Immich: immich_lxc.md
   - Mailcow: mailcow.md

@@ -4,12 +4,38 @@ View the dashboard at [https://traefik.itsa.pizza/dashboard](https://traefik.its
 
 API overview: [https://traefik.itsa.pizza/api/overview](https://traefik.itsa.pizza/api/overview)
 
-## Immich, Jellyfin
+## Role
 
-Traefik controls ingress for `Immich` and `Jellyfin`.
+Traefik acts as a reverse proxy for services that bypass Cloudflare Zero Access policies. These services have native
+apps or APIs that break when Zero Access injects an authentication redirect (302).
 
-Immich and Jellyfin are proxied behind Cloudflare but they are not controlled by Cloudflare Zero Access, their domains have a bypass policy.
+Traefik does **not** handle TLS — Cloudflare terminates TLS at the edge, and the tunnel connects to Traefik over HTTP.
+Traefik listens on port 80 only.
 
-Therefore Traefik applies some rate limiting to their authentication and api routes.
+## Services Behind Traefik
 
-Only port 443 is exposed to the public internet, because they are proxied behind Cloudflare.
+- **Jellyfin** (`jelly.itsa.pizza`) — media streaming apps need direct API access
+- **Immich** (`immich.itsa.pizza`, `share.itsa.pizza`) — mobile app needs direct API access
+- **Navidrome** (`navidrome.itsa.pizza`) — Subsonic API clients need direct access
+- **Music/Feishin** (`music.itsa.pizza`) — Feishin web client
+
+These domains have a Cloudflare Zero Access bypass policy, so Traefik applies rate limiting on their authentication
+and API routes as a compensating security control.
+
+## Traffic Flow
+
+```
+Cloudflare Edge -> Tunnel -> cloudflared LXC -> Traefik (192.168.2.108:80) -> Service
+```
+
+## Configuration
+
+- Static config: `traefik.yml` (entrypoints, providers)
+- Dynamic config: `routers.yml` (routing rules, rate limiting, services)
+- Both managed by Ansible role `traefik_lxc`
+
+## Deployment
+
+```sh
+make traefik
+```

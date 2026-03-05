@@ -89,7 +89,9 @@ Service-specific guides in `/documentation/`. Read the relevant doc before worki
 
 - `adguard-unbound.md` — DNS privacy and ad blocking (MikroTik → AdGuard → Unbound → Quad9)
 - `ansible_build_commands.md` — Make commands and tags quick reference
-- `cloudflared.md` — Cloudflare Tunnel setup, proxied services, DNS routes
+- `cloudflare-api.md` — Cloudflare API reference for DNS, Tunnel, Access, and Redirect automation
+- `cloudflared.md` — Cloudflare Tunnel setup, proxied services, DNS routes, architecture
+- `domain-migration.md` — Migration plan from itsa.pizza to itsa-pizza.com (multi-session project)
 - `disks.md` — Proxmox host disk management and backup storage
 - `immich_lxc.md` — Immich photo management, environment variables, vault config
 - `index.md` — Top-level project overview and conventions

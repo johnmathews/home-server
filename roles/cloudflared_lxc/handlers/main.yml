@@ -1,0 +1,9 @@
+# cloudflared_lxc/handlers/main.yml
+
+---
+
+- name: restart cloudflared
+  ansible.builtin.systemd:
+    name: cloudflared
+    state: restarted
+    daemon_reload: true

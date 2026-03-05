@@ -4,7 +4,7 @@
 http:
   routers:
     immich:
-      rule: Host(`immich.itsa.pizza`)
+      rule: Host(`immich.{{ primary_domain_name }}`)
       entryPoints: [web]
       service: immich-svc
       priority: 100 # outrank generic rules
@@ -13,7 +13,7 @@ http:
         - security-headers
 
     immich-share:
-      rule: Host(`share.itsa.pizza`) || ( Host(`immich.itsa.pizza`) && ( PathPrefix(`/share`) ) )
+      rule: Host(`share.{{ primary_domain_name }}`) || ( Host(`immich.{{ primary_domain_name }}`) && ( PathPrefix(`/share`) ) )
       entryPoints: [web]
       service: immich-share-svc
       priority: 150 # outrank generic rules
@@ -22,7 +22,7 @@ http:
         - security-headers
 
     immich-auth:
-      rule: Host(`immich.itsa.pizza`) && ( PathPrefix(`/api/auth`) || PathPrefix(`/auth`) || PathPrefix(`/api/oauth`) || PathPrefix(`/oauth`) )
+      rule: Host(`immich.{{ primary_domain_name }}`) && ( PathPrefix(`/api/auth`) || PathPrefix(`/auth`) || PathPrefix(`/api/oauth`) || PathPrefix(`/oauth`) )
       entryPoints: [web]
       service: immich-svc
       priority: 200
@@ -32,7 +32,7 @@ http:
         - immich-login-rl
 
     jelly:
-      rule: Host(`jelly.itsa.pizza`)
+      rule: Host(`jelly.{{ primary_domain_name }}`)
       entryPoints: [web]
       service: jelly-svc
       middlewares:
@@ -41,7 +41,7 @@ http:
         - jelly-login-rl
 
     jelly-auth:
-      rule: Host(`jelly.itsa.pizza`) && PathPrefix(`/Users/AuthenticateByName`)
+      rule: Host(`jelly.{{ primary_domain_name }}`) && PathPrefix(`/Users/AuthenticateByName`)
       entryPoints: [web]
       service: jelly-svc
       priority: 200
@@ -60,7 +60,7 @@ http:
         - security-headers # optional; remove if it causes UI issues
 
     traefik-api-local:
-      rule: Host(`traefik.itsa.pizza`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+      rule: Host(`traefik.{{ primary_domain_name }}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
       entryPoints: [web]
       service: api@internal
       priority: 500
@@ -69,14 +69,14 @@ http:
         - security-headers
 
     traefik-dash:
-      rule: Host(`traefik.itsa.pizza`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))
+      rule: Host(`traefik.{{ primary_domain_name }}`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))
       entryPoints: [web]
       service: api@internal
       middlewares:
         - security-headers
 
     navidrome:
-      rule: Host(`navidrome.itsa.pizza`)
+      rule: Host(`navidrome.{{ primary_domain_name }}`)
       entryPoints: [web]
       service: navidrome-svc
       priority: 100
@@ -86,7 +86,7 @@ http:
         - music-rl
 
     navidrome-auth:
-      rule: Host(`navidrome.itsa.pizza`) && PathPrefix(`/auth`)
+      rule: Host(`navidrome.{{ primary_domain_name }}`) && PathPrefix(`/auth`)
       entryPoints: [web]
       service: navidrome-svc
       priority: 200
@@ -96,7 +96,7 @@ http:
         - navidrome-auth-rl
 
     music:
-      rule: Host(`music.itsa.pizza`)
+      rule: Host(`music.{{ primary_domain_name }}`)
       entryPoints: [web]
       service: music-svc
       priority: 100

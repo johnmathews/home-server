@@ -74,15 +74,18 @@
     owner: root
     group: root
     mode: '0644'
+  tags: portainer
 
-- name: Deploy .env file template 
+- name: Deploy .env file template
   template:
-    src: templates/.env.j2 
+    src: templates/.env.j2
     dest: /srv/apps/.env
     owner: root
     group: root
     mode: '0644'
+  tags: portainer
 
 - name: Start apps using Docker Compose
   community.docker.docker_compose_v2:
     project_src: /srv/apps
+  tags: portainer

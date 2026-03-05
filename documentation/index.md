@@ -14,3 +14,8 @@ Ansible is used to configure the home server and can be deployed using
 Static IPs are assigned on the router. The last part of the IP address should
 match the last part of the MAC address. See `~/.ssh/known_hosts` and
 `~/.ssh/config`.
+
+## Domain
+
+External access uses `itsa.pizza` via Cloudflare (DNS, Tunnel, Zero Access).
+A migration to `itsa-pizza.com` is planned — see `documentation/domain-migration.md`.

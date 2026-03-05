@@ -1,0 +1,147 @@
+# {{ ansible_managed }}
+# cloudflared tunnel configuration
+# vim: ft=yaml
+
+tunnel: e1e3b9c4-789a-4ad3-adff-a0c71bff1122
+credentials-file: /root/.cloudflared/e1e3b9c4-789a-4ad3-adff-a0c71bff1122.json
+
+ingress:
+  - hostname: {{ primary_domain_name }}
+    service: http://192.168.2.106:3002
+  - hostname: dash.{{ primary_domain_name }}
+    service: http://192.168.2.106:3002
+
+  - hostname: timer.{{ primary_domain_name }}
+    service: http://192.168.2.106:8082
+  - hostname: sre.{{ primary_domain_name }}
+    service: http://192.168.2.106:8501
+
+  - hostname: claw.{{ primary_domain_name }}
+    service: http://192.168.2.107:18789
+
+  - hostname: traefik.{{ primary_domain_name }}
+    service: http://192.168.2.108
+
+  - hostname: immich.{{ primary_domain_name }}
+    service: http://192.168.2.108
+  - hostname: share.{{ primary_domain_name }}
+    service: http://192.168.2.108
+
+  - hostname: jelly.{{ primary_domain_name }}
+    service: http://192.168.2.108
+    originRequest:
+      httpHostHeader: jelly.{{ primary_domain_name }}
+
+  - hostname: navidrome.{{ primary_domain_name }}
+    service: http://192.168.2.109:4533
+  - hostname: music.{{ primary_domain_name }}
+    service: http://192.168.2.109:9180
+  - hostname: lidarr.{{ primary_domain_name }}
+    service: http://192.168.2.105:8686
+  - hostname: slskd.{{ primary_domain_name }}
+    service: http://192.168.2.105:5030
+
+  - hostname: chat.{{ primary_domain_name }}
+    service: http://192.168.2.119:3000
+
+  - hostname: charts.{{ primary_domain_name }}
+    service: http://192.168.2.106:3000
+  - hostname: grafana.{{ primary_domain_name }}
+    service: http://192.168.2.106:3000
+  - hostname: loki.{{ primary_domain_name }}
+    service: http://192.168.2.106:3100
+  - hostname: prometheus.{{ primary_domain_name }}
+    service: http://192.168.2.115:9090
+
+  - hostname: portainer.{{ primary_domain_name }}
+    service: http://192.168.2.106:9000
+  - hostname: dozzle.{{ primary_domain_name }}
+    service: http://192.168.2.106:9999
+  - hostname: speed.{{ primary_domain_name }}
+    service: http://192.168.2.100:8080
+  - hostname: atuin.{{ primary_domain_name }}
+    service: http://192.168.2.106:8888
+
+  - hostname: files.{{ primary_domain_name }}
+    service: http://192.168.2.104:30334
+
+  - hostname: home.{{ primary_domain_name }}
+    service: http://192.168.2.102:8123
+
+  - hostname: vault.{{ primary_domain_name }}
+    service: https://192.168.2.13:8000
+    originRequest:
+      noTLSVerify: true
+  - hostname: passwords.{{ primary_domain_name }}
+    service: https://192.168.2.13:8000
+    originRequest:
+      noTLSVerify: true
+
+  - hostname: proxmox.{{ primary_domain_name }}
+    service: https://192.168.2.214:8006
+    originRequest:
+      noTLSVerify: true
+  - hostname: pve.{{ primary_domain_name }}
+    service: https://192.168.2.214:8006
+    originRequest:
+      noTLSVerify: true
+  - hostname: pbs.{{ primary_domain_name }}
+    service: https://192.168.2.200:8007
+    originRequest:
+      noTLSVerify: true
+  - hostname: bmc.{{ primary_domain_name }}
+    service: https://192.168.2.213
+    originRequest:
+      noTLSVerify: true
+
+  - hostname: uptime.{{ primary_domain_name }}
+    service: http://192.168.2.106:3001
+
+  - hostname: ads.{{ primary_domain_name }}
+    service: http://192.168.2.111
+  - hostname: adguard.{{ primary_domain_name }}
+    service: http://192.168.2.111
+
+  - hostname: seerr.{{ primary_domain_name }}
+    service: http://192.168.2.105:5055
+  - hostname: kids-seerr.{{ primary_domain_name }}
+    service: http://192.168.2.105:5056
+  - hostname: radarr.{{ primary_domain_name }}
+    service: http://192.168.2.105:7878
+  - hostname: sonarr.{{ primary_domain_name }}
+    service: http://192.168.2.105:8989
+  - hostname: sabnzbd.{{ primary_domain_name }}
+    service: http://192.168.2.105:8081
+  - hostname: qbittorrent.{{ primary_domain_name }}
+    service: http://192.168.2.105:8080
+  - hostname: tube.{{ primary_domain_name }}
+    service: http://192.168.2.116:8000
+  - hostname: kids-tube.{{ primary_domain_name }}
+    service: http://192.168.2.116:8000
+
+  - hostname: bazarr.{{ primary_domain_name }}
+    service: http://192.168.2.105:6767
+  - hostname: subs.{{ primary_domain_name }}
+    service: http://192.168.2.105:6767
+
+  - hostname: prowlarr.{{ primary_domain_name }}
+    service: http://192.168.2.105:9696
+
+  - hostname: paperless.{{ primary_domain_name }}
+    service: http://192.168.2.117:8000
+  - hostname: documents.{{ primary_domain_name }}
+    service: http://192.168.2.117:8000
+
+  - hostname: docs.{{ primary_domain_name }}
+    service: http://192.168.2.106:8000
+  - hostname: booklore.{{ primary_domain_name }}
+    service: http://192.168.2.105:6060
+  - hostname: books.{{ primary_domain_name }}
+    service: http://192.168.2.105:6060
+
+  - hostname: nas.{{ primary_domain_name }}
+    service: http://192.168.2.104
+  - hostname: truenas.{{ primary_domain_name }}
+    service: http://192.168.2.104
+
+  - service: http_status:404

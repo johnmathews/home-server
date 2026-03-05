@@ -58,8 +58,8 @@ services:
     ports:
       - "3000:8080"
     environment:
-      WEBUI_NAME: "itsa.pizza"
-      WEBUI_URL: "https://chat.itsa.pizza"
+      WEBUI_NAME: "{{ primary_domain_name }}"
+      WEBUI_URL: "https://chat.{{ primary_domain_name }}"
       ENABLE_SIGNUP: "true" # let Cloudflare Access be the gate
       ENABLE_SIGNUP_PASSWORD_CONFIRMATION: "true"
       ENABLE_OAUTH: "false" # set true only if you wire up an OAuth provider

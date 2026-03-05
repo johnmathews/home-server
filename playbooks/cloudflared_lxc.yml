@@ -1,0 +1,14 @@
+# playbooks/cloudflared_lxc.yml
+
+- name: Cloudflared LXC
+  hosts: cloudflared_lxc
+  gather_facts: true
+  become: true
+
+  roles:
+    - role: cloudflared_lxc
+      tags: cloudflared
+    - role: shell_environment
+      tags: shell
+    - role: tailscale
+      tags: tailscale

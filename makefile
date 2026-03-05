@@ -96,6 +96,9 @@ jelly:
 open-webui:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/open_webui_lxc.yml $(VAULT) $(ANSIBLE_OPTS)
 
+cloudflared:
+	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/cloudflared_lxc.yml $(VAULT) $(ANSIBLE_OPTS)
+
 openclaw:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/openclaw_lxc.yml $(VAULT) $(ANSIBLE_OPTS)
 

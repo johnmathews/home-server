@@ -38,9 +38,11 @@
     project_src: "{{ media_stack_base_dir }}"
     services:
       - gluetun
+      - qbittorrent
+      - sabnzbd
+      - slskd
     state: present
     recreate: always
-    dependencies: true
     remove_orphans: true
   become: false
 

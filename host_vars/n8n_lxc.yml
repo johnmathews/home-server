@@ -26,7 +26,7 @@ sleep_hours_plugins: []
 # n8n specific configuration
 # Note: Update these values based on your setup
 n8n_protocol: https # Change to https if using Traefik/reverse proxy
-n8n_webhook_url: "http://n8n.itsa.pizza:5678/" # Update if using reverse proxy
+n8n_webhook_url: "http://n8n.{{ primary_domain_name }}:5678/" # Update if using reverse proxy
 
 # DEPLOYMENT NOTES:
 # 1. Docker/runc compatibility: This LXC uses runc 1.2.6 instead of the bundled runc 1.3.3

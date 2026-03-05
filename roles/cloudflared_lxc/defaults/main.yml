@@ -1,0 +1,3 @@
+TZ: Europe/Amsterdam
+cloudflared_config_dir: /etc/cloudflared
+cloudflared_tunnel_name: home-server

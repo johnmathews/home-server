@@ -1,0 +1,29 @@
+# cloudflared_lxc/tasks/main.yml
+
+---
+
+- name: Ensure cloudflared config directory exists
+  ansible.builtin.file:
+    path: "{{ cloudflared_config_dir }}"
+    state: directory
+    mode: '0700'
+    owner: root
+    group: root
+  tags: cloudflared
+
+- name: Template cloudflared tunnel config
+  ansible.builtin.template:
+    src: config.yml.j2
+    dest: "{{ cloudflared_config_dir }}/config.yml"
+    owner: root
+    group: root
+    mode: '0600'
+  notify: restart cloudflared
+  tags: cloudflared
+
+- name: Ensure cloudflared service is enabled and running
+  ansible.builtin.systemd:
+    name: cloudflared
+    enabled: true
+    state: started
+  tags: cloudflared

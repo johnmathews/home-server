@@ -3,6 +3,15 @@
 ---
 
 
+- name: Configure DNS resolvers
+  template:
+    src: resolv.conf.j2
+    dest: /etc/resolv.conf
+    owner: root
+    group: root
+    mode: '0644'
+  tags: dns
+
 - name: Ensure apt cache is updated
   apt:
     update_cache: yes
@@ -42,7 +51,7 @@
   import_tasks: pve_exporter.yml
   tags: metrics
 
-- name: Set up docker 
+- name: Set up docker
   import_tasks: docker-apps.yml
   tags: docker
 

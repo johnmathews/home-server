@@ -9,8 +9,8 @@ guid: 1001
 # n8n specific
 n8n_version: latest
 n8n_protocol: http
-n8n_host: "n8n.itsa.pizza"
-n8n_webhook_url: "https://n8n.itsa.pizza:5678/"
+n8n_host: "n8n.{{ primary_domain_name }}"
+n8n_webhook_url: "https://n8n.{{ primary_domain_name }}:5678/"
 n8n_enforce_settings_file_permissions: true
 n8n_runners_enabled: true
 

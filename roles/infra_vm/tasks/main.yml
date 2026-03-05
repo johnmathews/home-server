@@ -1,5 +1,13 @@
 # infra_vm/tasks/main.yml
 
+- name: Preserve SSH host keys across reboots
+  ansible.builtin.copy:
+    dest: /etc/cloud/cloud.cfg.d/99_preserve_ssh_keys.cfg
+    content: |
+      ssh_deletekeys: false
+      ssh_genkeytypes: []
+    mode: '0644'
+
 - name: Install dependencies
   apt:
     name:

@@ -1,0 +1,6 @@
+# Managed by Ansible — do not edit manually
+# Primary: AdGuard Home (ad blocking + Unbound + Quad9 encrypted DNS)
+# Fallback: Quad9 direct (no ad blocking, used if AdGuard LXC is down)
+search home
+nameserver {{ dns_primary }}
+nameserver {{ dns_fallback }}

@@ -38,3 +38,11 @@ cadvisor_optimization_flags:
 
 # MikroTik router monitoring (MKTXP)
 mikrotik_router_ip: 192.168.2.1
+
+# DNS servers for hosts that manage /etc/resolv.conf directly (e.g. PVE)
+# VMs/LXCs with systemd-resolved get DNS via DHCP from MikroTik (which advertises AdGuard)
+dns_primary: "192.168.2.111" # AdGuard Home
+dns_fallback: "9.9.9.9" # Quad9 (matches Unbound upstream)
+
+# domain name
+primary_domain_name: "itsa.pizza"
