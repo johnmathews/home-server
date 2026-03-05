@@ -83,7 +83,7 @@ domains simultaneously. No second tunnel is needed.
 ### Cloudflare Side
 
 - [x] Register `itsa-pizza.com` on Cloudflare (nameservers already pointing to Cloudflare)
-- [ ] Create CNAME records via `cloudflared tunnel route dns` CLI on the LXC (no API needed)
+- [ ] Create CNAME records on `itsa-pizza.com` (dashboard or API — CLI cert.pem is zone-locked to `itsa.pizza`)
 - [ ] Recreate Cloudflare Zero Access policies for `itsa-pizza.com` subdomains (API or dashboard)
 
 ### Cloudflared LXC (192.168.2.101)
@@ -118,11 +118,24 @@ These services store the domain in their own config/database and may need manual
 - [x] Investigate Cloudflare API for programmatic DNS/tunnel management (see `documentation/cloudflare-api.md`)
 - [x] Deploy cloudflared role (`make cloudflared` — config templated, service restarted, shell environment configured)
 
-### Stage 1: Cloudflare Setup
+### Stage 1: Cloudflare Setup (In Progress)
 
-- [x] `itsa-pizza.com` registered on Cloudflare (nameservers already set)
-- [ ] Create CNAME records via `cloudflared tunnel route dns` CLI on the LXC
+- [x] `itsa-pizza.com` registered on Cloudflare (nameservers already set, DNS setup "full")
+- [ ] Create CNAME records for `itsa-pizza.com` subdomains -> `e1e3b9c4-789a-4ad3-adff-a0c71bff1122.cfargotunnel.com`
 - [ ] Recreate Zero Access policies for `itsa-pizza.com` subdomains (API or dashboard)
+- [ ] Clean up bad CNAME records created on `itsa.pizza` zone (e.g. `itsa-pizza.com.itsa.pizza`)
+
+**Blocker resolved:** `cloudflared tunnel route dns` cannot create records on `itsa-pizza.com` because the
+`cert.pem` at `/root/.cloudflared/cert.pem` contains a zone-locked API token for `itsa.pizza` only. The token
+is embedded in an "ARGO TUNNEL TOKEN" and includes `zoneID` for `itsa.pizza`.
+
+**Options for creating DNS records on `itsa-pizza.com`:**
+
+1. **Cloudflare dashboard** (simplest) — manually add CNAME records in the `itsa-pizza.com` DNS settings, each
+   pointing to `e1e3b9c4-789a-4ad3-adff-a0c71bff1122.cfargotunnel.com` with proxy enabled
+2. **Cloudflare API** — use an API token with `DNS:Edit` on both zones (see `cloudflare-api.md`)
+3. **Re-login** — run `cloudflared tunnel login` and select `itsa-pizza.com` to get a new cert.pem, create records,
+   then login again selecting `itsa.pizza` to restore the original cert (cert.pem only holds one zone at a time)
 
 ### Stage 2: Parallel Running (Both Domains Active)
 

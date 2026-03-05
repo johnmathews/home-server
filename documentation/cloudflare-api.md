@@ -10,20 +10,19 @@ The `cloudflared` CLI can create DNS CNAME records directly:
 cloudflared tunnel route dns home-server lidarr.itsa-pizza.com
 ```
 
-This creates a CNAME record `lidarr.itsa-pizza.com -> <tunnel-id>.cfargotunnel.com` in the matching Cloudflare zone.
-It works across zones in the same account, so hostnames on either `itsa.pizza` or `itsa-pizza.com` are handled
-automatically based on the domain suffix.
+**However**, the CLI's `cert.pem` (`/root/.cloudflared/cert.pem`) is zone-locked. It contains an API token scoped to
+a single zone (currently `itsa.pizza`). It cannot create records on `itsa-pizza.com`. The `cert.pem` is an
+"ARGO TUNNEL TOKEN" with an embedded `zoneID`.
 
-**Bulk create all DNS records from the config:**
+**Workarounds:**
 
-```sh
-for domain in $(grep hostname: /etc/cloudflared/config.yml | awk '{print $3}'); do
-  cloudflared tunnel route dns home-server "$domain"
-done
-```
+1. **Cloudflare dashboard** — manually create CNAME records in `itsa-pizza.com` DNS settings
+2. **Cloudflare API** — use a separate API token with `DNS:Edit` on both zones (see below)
+3. **Re-login** — `cloudflared tunnel login` and select `itsa-pizza.com` to get a new cert.pem (but this replaces
+   the old cert, so the CLI would then lose access to `itsa.pizza`)
 
-This is the recommended approach for the migration — simpler than the API and already available on the cloudflared LXC.
-The Cloudflare API for DNS is documented below for reference but is not needed for this migration.
+The CLI approach works fine for managing records within a single zone (e.g., the bulk update loop for `itsa.pizza`
+hostnames). For cross-zone work, use the dashboard or API.
 
 ## Redirect Rules: Not Required
 
