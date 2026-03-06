@@ -224,7 +224,7 @@
           url: http://192.168.2.105:5055/
           key: "{{ vault_jellyseerr_key }}"
     - Open-WebUI:
-        href: http://192.168.2.119:3000
+        href: https://chat.{{ primary_domain_name }}
         siteMonitor: http://192.168.2.119:3000
         icon: https://cdn.jsdelivr.net/gh/selfhst/icons/svg/open-webui.svg
     - Immich:
@@ -450,7 +450,7 @@
         widget:
           type: portainer
           url: http://192.168.2.106:9000
-          env: 5
+          env: 3
           key: "{{ vault_portainer_key }}"
     - AdGuard:
         href: http://adguard.{{ primary_domain_name }}

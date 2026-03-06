@@ -163,23 +163,26 @@ Traefik routers use a Jinja2 macro to match `Host()` on both domains.
 **Do NOT execute any Stage 4 steps without explicit permission.** Ideally both domains remain active for a significant
 crossover period.
 
-- [ ] Confirm all services work on `itsa-pizza.com`
-- [ ] Optional: set up redirects from `itsa.pizza` -> `itsa-pizza.com` (see `cloudflare-api.md`)
-- [ ] Remove old `itsa.pizza` hostnames from cloudflared config
-- [ ] Remove old Traefik router rules for `itsa.pizza`
-- [ ] Update services with internal domain references (Uptime Kuma, Home Assistant, etc.)
+- [x] Confirm all services work on `itsa-pizza.com`
+- [x] No redirects — old domain links will fail intentionally
+- [x] Remove old `itsa.pizza` hostnames from cloudflared config (removed `migration_additional_domains`)
+- [x] Remove old Traefik router rules for `itsa.pizza` (removed `migration_additional_domains`)
+- [x] Update services with internal domain references (SABnzbd host_whitelist, Immich external URL)
 - [ ] Update any external references (app configs on phones/devices, bookmarks, etc.)
-- [ ] Decide whether to keep or release `itsa.pizza` domain
+- [x] `itsa.pizza` will be allowed to expire (not renewing)
+- [ ] Remove old `itsa.pizza` Zero Access policies from Cloudflare dashboard
+- [ ] Remove old `itsa.pizza` CNAME records from Cloudflare DNS (or let them expire with the domain)
+- [x] Remove `mailcow` from Tailscale admin console (offline, service retired)
 
 ## Open Questions
 
-1. **Crossover duration**: How long to keep both domains active? Recommendation: at least 2-4 weeks.
+1. **Crossover duration**: Both domains ran in parallel from Stage 2 through Stage 4 cutover.
 
-2. **Redirects**: Optional. Without redirects, old URLs fail after cutover. Only matters if shared Immich album links
-   or similar external-facing URLs exist. See `cloudflare-api.md` for implementation details if needed.
+2. **Redirects**: Not implemented. Old `itsa.pizza` URLs will fail — this is intentional.
 
 3. **Access policies**: Duplicated via dashboard. Only 3 apps existed (2 relevant + Warp). Policies include wildcard
    `*.itsa-pizza.com` with email allowlist + service token bypass, and a bypass app for Immich/Jelly/Navidrome/Timer.
+   Old `itsa.pizza` policies can be removed from Cloudflare Access dashboard.
 
 ## SSH Access
 

@@ -46,7 +46,3 @@ dns_fallback: "9.9.9.9" # Quad9 (matches Unbound upstream)
 
 # domain name
 primary_domain_name: "itsa-pizza.com"
-
-# Additional domains served during migration (Stage 2). Remove after cutover.
-migration_additional_domains:
-  - "itsa.pizza"

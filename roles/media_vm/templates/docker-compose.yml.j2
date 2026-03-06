@@ -129,7 +129,6 @@ services:
       - PGID=${PGID}
       - UMASK=002
       - TZ=${TZ}
-      - HOST_WHITELIST=sabnzbd.{{ primary_domain_name }},192.168.2.118 # doesnt work for this image. edit sabnzbd.ini instead
     volumes:
       - /srv/media/config/sabnzbd:/config # Persistent settings
       - /mnt/nfs/downloads:/downloads
