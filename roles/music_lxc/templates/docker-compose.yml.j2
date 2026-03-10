@@ -20,6 +20,7 @@ services:
       - ND_SESSIONTIMEOUT=24h
       - ND_MUSICFOLDER=/music
       - ND_DATAFOLDER=/data
+      - ND_ENABLETRANSCODINGCONFIG=true
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost:4533/ping"]
       interval: 1m

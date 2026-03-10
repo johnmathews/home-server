@@ -102,6 +102,9 @@ cloudflared:
 openclaw:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/openclaw_lxc.yml $(VAULT) $(ANSIBLE_OPTS)
 
+dev:
+	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/dev_lxc.yml $(VAULT) $(ANSIBLE_OPTS)
+
 atuin:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/atuin.yml $(VAULT) $(ANSIBLE_OPTS)
 

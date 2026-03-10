@@ -1,0 +1,12 @@
+# playbooks/dev_lxc.yml
+
+- name: Dev LXC
+  hosts: dev_lxc
+  gather_facts: true
+  become: true
+
+  roles:
+    - role: shell_environment
+      tags: shell
+    - role: tailscale
+      tags: tailscale

@@ -1,5 +1,6 @@
 # Master playbook: orchestrates all playbooks
 - import_playbook: cloudflared_lxc.yml
+- import_playbook: dev_lxc.yml
 - import_playbook: immich_lxc.yml
 - import_playbook: infra_vm.yml
 - import_playbook: jellyfin_lxc.yml
