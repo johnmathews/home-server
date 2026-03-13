@@ -6,11 +6,12 @@
     owner: "{{ item.owner }}"
     group: "{{ item.group }}"
   loop:
-    - { path: /srv/apps/navidrome/data, owner: "{{ puid }}", group: "{{ guid }}" }
-    - { path: /srv/apps/alloy, owner: root, group: root }
+    - {path: /srv/apps/navidrome/data, owner: "{{ puid }}", group: "{{ guid }}"}
+    - {path: /srv/apps/alloy, owner: root, group: root}
   tags: alloy, docker
   notify:
     - restart alloy
+
 - name: Upload alloy config files
   copy:
     src: "{{ item.src }}"
@@ -26,6 +27,7 @@
   tags: [docker, alloy]
   notify:
     - restart alloy
+
 - name: Copy docker-compose.yml
   template:
     src: templates/docker-compose.yml.j2

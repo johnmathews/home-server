@@ -17,8 +17,8 @@ services:
       - TZ={{ TZ }}
       - ND_SCANSCHEDULE=@every 1h
       - ND_LOGLEVEL=info
-      - ND_SESSIONTIMEOUT=24h
-      - ND_MUSICFOLDER=/music
+      - ND_SESSIONTIMEOUT=72h
+      - ND_MUSICFOLDER=/music/.keep
       - ND_DATAFOLDER=/data
       - ND_ENABLETRANSCODINGCONFIG=true
     healthcheck:
@@ -41,7 +41,8 @@ services:
       - SERVER_NAME=our-music # pre-defined server name
       - SERVER_LOCK=true # When true AND name/type/url are set, only username/password can be toggled
       - SERVER_TYPE=navidrome # the allowed types are: jellyfin, navidrome, subsonic. These values are case insensitive
-      - SERVER_URL=https://navidrome.{{ primary_domain_name }} # http://address:port or https://address:port
+      - SERVER_URL=https://navidrome.{{ primary_domain_name }}
+      - REMOTE_URL=https://navidrome.{{ primary_domain_name }}
       - LEGACY_AUTHENTICATION=false # When SERVER_LOCK is true, sets the legacy (plaintext) authentication flag for Subsonic/OpenSubsonic servers
       - ANALYTICS_DISABLED=true # Set to true to disable Umami analytics tracking
     ports:

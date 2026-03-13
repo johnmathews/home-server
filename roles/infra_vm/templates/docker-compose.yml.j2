@@ -11,7 +11,7 @@ services:
 
   sre-ingest:
     image: ghcr.io/johnmathews/sre-assistant:latest
-    container_name: sre-ingest 
+    container_name: sre-ingest
     command: ["python", "-m", "scripts.ingest_runbooks"]
     environment:
       - ANONYMIZED_TELEMETRY=False
@@ -27,6 +27,7 @@ services:
     ports:
       - "8501:8501"
     restart: unless-stopped
+    mem_limit: 96m # ADDED: currently ~63MB, cap with headroom
     environment:
       - API_URL=http://sre-api:8000 # handy trick
     depends_on:
@@ -40,6 +41,7 @@ services:
     ports:
       - "8001:8000"
     restart: unless-stopped
+    mem_limit: 192m # ADDED: currently ~134MB
     env_file: .env
     volumes:
       - chroma_data:/app/.chroma_db
@@ -58,6 +60,7 @@ services:
     ports:
       - "3100:3100"
     user: "0:0" # writes to local volume
+    mem_limit: 200m # ADDED: currently ~125MB
     volumes:
       - ./loki/config.yml:/etc/loki/config.yml
       - ./loki/data:/loki # local storage
@@ -67,6 +70,7 @@ services:
     image: grafana/alloy:latest
     container_name: alloy
     restart: unless-stopped
+    mem_limit: 128m # ADDED: currently ~82MB
     environment:
       LOKI_WRITE_ENDPOINT: "http://192.168.2.106:3100/loki/api/v1/push"
       NODE_HOSTNAME: "infra"
@@ -114,6 +118,7 @@ services:
   homepage:
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
+    mem_limit: 192m # ADDED: currently ~122MB
     environment:
       PUID: 1000
       PGID: 1000
@@ -130,6 +135,7 @@ services:
   grafana:
     image: grafana/grafana-oss:latest
     container_name: grafana
+    mem_limit: 256m # ADDED: currently ~183MB, biggest consumer
     ports:
       - "3000:3000"
     volumes:
@@ -158,6 +164,7 @@ services:
     image: gcr.io/cadvisor/cadvisor:latest
     container_name: cadvisor
     restart: unless-stopped
+    mem_limit: 96m # ADDED: currently ~45MB
     ports:
       - "8080:8080"
     volumes:
@@ -172,11 +179,16 @@ services:
       - /tmp
     security_opt:
       - no-new-privileges:true
-    command: {{ cadvisor_optimization_flags | default([]) | join(' ') }}
+    command:
+      - '--housekeeping_interval=30s'
+      - '--docker_only=true'
+      - '--disable_metrics=disk,diskIO,tcp,udp,percpu,sched,process,hugetlb'
+      - '--store_container_labels=false'
 
   uptime-kuma:
     image: louislam/uptime-kuma:latest
     container_name: uptime-kuma
+    mem_limit: 192m # ADDED: currently ~142MB
     ports:
       - "3001:3001"
     environment:
@@ -260,7 +272,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
-
 
 volumes:
   chroma_data:
