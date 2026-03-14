@@ -1,0 +1,11 @@
+- name: Agent LXC
+  hosts: agent_lxc
+  gather_facts: true
+  become: true
+
+  roles:
+    - role: agent_lxc
+      tags: agent
+    - role: shell_environment
+      tags: shell
+  # tailscale installed manually via web UI (apt-key not available on Debian 13)

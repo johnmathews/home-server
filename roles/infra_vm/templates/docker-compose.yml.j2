@@ -182,8 +182,8 @@ services:
     command:
       - '--housekeeping_interval=30s'
       - '--docker_only=true'
-      - '--disable_metrics=disk,diskIO,tcp,udp,percpu,sched,process,hugetlb'
-      - '--store_container_labels=false'
+      - '--disable_metrics=tcp,udp,sched,process,hugetlb'
+      - '--store_container_labels=true'
 
   uptime-kuma:
     image: louislam/uptime-kuma:latest

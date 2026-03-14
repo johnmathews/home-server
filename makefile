@@ -99,8 +99,8 @@ open-webui:
 cloudflared:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/cloudflared_lxc.yml $(VAULT) $(ANSIBLE_OPTS)
 
-openclaw:
-	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/openclaw_lxc.yml $(VAULT) $(ANSIBLE_OPTS)
+agent:
+	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/agent_lxc.yml $(VAULT) $(ANSIBLE_OPTS)
 
 dev:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/dev_lxc.yml $(VAULT) $(ANSIBLE_OPTS)
