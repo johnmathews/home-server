@@ -1,0 +1,73 @@
+---
+# Install lazygit from prebuilt binaries
+
+- name: Check if lazygit is already installed with correct version
+  ansible.builtin.shell: |
+    set -o pipefail
+    lazygit --version 2>/dev/null | grep -oP 'version=\K[^,]+'
+  args:
+    executable: /bin/bash
+  register: lazygit_current_version
+  changed_when: false
+  failed_when: false
+
+- name: Set lazygit version without v prefix
+  ansible.builtin.set_fact:
+    lazygit_version_bare: "{{ shell_environment_lazygit_version | regex_replace('^v', '') }}"
+
+- name: Set lazygit download URL  # noqa: var-naming[no-role-prefix]
+  ansible.builtin.set_fact:
+    lazygit_url: >-
+      https://github.com/jesseduffield/lazygit/releases/download/{{
+      shell_environment_lazygit_version }}/lazygit_{{
+      lazygit_version_bare }}_linux_x86_64.tar.gz
+
+- name: Download lazygit binary archive
+  ansible.builtin.get_url:
+    url: "{{ lazygit_url }}"
+    dest: "/tmp/lazygit-{{ shell_environment_lazygit_version }}.tar.gz"
+    mode: '0644'
+    timeout: 60
+  become: true
+  when: lazygit_current_version.stdout != lazygit_version_bare
+  register: lazygit_download
+  retries: 3
+  delay: 5
+  until: lazygit_download is succeeded
+
+- name: Create lazygit extraction directory  # noqa: no-handler
+  ansible.builtin.file:
+    path: "/tmp/lazygit-{{ shell_environment_lazygit_version }}"
+    state: directory
+    mode: '0755'
+  become: true
+  when: lazygit_download is changed
+
+- name: Extract lazygit archive  # noqa: no-handler
+  ansible.builtin.unarchive:
+    src: "/tmp/lazygit-{{ shell_environment_lazygit_version }}.tar.gz"
+    dest: "/tmp/lazygit-{{ shell_environment_lazygit_version }}"
+    remote_src: true
+  become: true
+  when: lazygit_download is changed
+
+- name: Install lazygit binary  # noqa: no-handler
+  ansible.builtin.copy:
+    src: "/tmp/lazygit-{{ shell_environment_lazygit_version }}/lazygit"
+    dest: "{{ shell_environment_lazygit_bin_dir }}/lazygit"
+    remote_src: true
+    mode: '0755'
+  become: true
+  when: lazygit_download is changed
+
+- name: Remove lazygit temp files  # noqa: no-handler
+  ansible.builtin.file:
+    path: "{{ temp_item }}"
+    state: absent
+  loop:
+    - "/tmp/lazygit-{{ shell_environment_lazygit_version }}.tar.gz"
+    - "/tmp/lazygit-{{ shell_environment_lazygit_version }}"
+  loop_control:
+    loop_var: temp_item
+  become: true
+  when: lazygit_download is changed

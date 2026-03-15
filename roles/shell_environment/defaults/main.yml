@@ -86,6 +86,11 @@ shell_environment_eza_arch: "x86_64-unknown-linux-gnu"
 shell_environment_eza_install_dir: "/opt"
 shell_environment_eza_bin_dir: "/usr/local/bin"
 
+# Lazygit (binary installation)
+shell_environment_lazygit_enabled: true
+shell_environment_lazygit_version: "v0.60.0"
+shell_environment_lazygit_bin_dir: "/usr/local/bin"
+
 # Node.js (NodeSource repository)
 shell_environment_nodejs_enabled: true
 shell_environment_nodejs_major_version: "20" # LTS - Iron (until April 2026)

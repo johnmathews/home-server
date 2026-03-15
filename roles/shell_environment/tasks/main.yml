@@ -45,6 +45,11 @@
   when: shell_environment_eza_enabled | bool
   tags: [eza, ls, apps]
 
+- name: Install lazygit
+  ansible.builtin.import_tasks: lazygit.yml
+  when: shell_environment_lazygit_enabled | bool
+  tags: [lazygit, git, apps]
+
 - name: Install and configure Zsh
   ansible.builtin.import_tasks: zsh.yml
   when: shell_environment_zsh_enabled | bool
