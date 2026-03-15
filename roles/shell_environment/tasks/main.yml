@@ -55,6 +55,11 @@
   when: shell_environment_omz_enabled | bool
   tags: [omz, oh-my-zsh, shell]
 
+- name: Install Oh My Zsh third-party plugins
+  ansible.builtin.import_tasks: omz-plugins.yml
+  when: shell_environment_omz_enabled | bool
+  tags: [omz, oh-my-zsh, shell]
+
 - name: Install Powerlevel10k
   ansible.builtin.import_tasks: powerlevel10k.yml
   when: shell_environment_p10k_enabled | bool

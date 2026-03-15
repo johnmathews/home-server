@@ -24,6 +24,11 @@ shell_environment_omz_plugins:
   - kubectl
   - sudo
   - history
+  - fzf
+  - colored-man-pages
+  - extract
+  - zsh-autosuggestions
+  - zsh-syntax-highlighting
 shell_environment_omz_install_url: "https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh"
 
 # Powerlevel10k

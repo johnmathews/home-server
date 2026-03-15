@@ -6,7 +6,7 @@ theming, intelligent history management, and a comprehensive set of CLI tools an
 ## Features
 
 - **Zsh** - Modern shell with advanced completion and scripting capabilities
-- **Oh My Zsh** - Framework with plugins (git, docker, kubectl, sudo, history)
+- **Oh My Zsh** - Framework with plugins (git, docker, kubectl, sudo, history, fzf, colored-man-pages, extract, zsh-autosuggestions, zsh-syntax-highlighting)
 - **Powerlevel10k** - Fast, customizable prompt with git status and context information
 - **Atuin** - Encrypted shell history sync across all hosts with searchable database
 - **Neovim** - Modern text editor with LSP support and custom configuration
@@ -219,6 +219,21 @@ The default prompt style is "lean" with the following information:
 ```yaml
 shell_environment_p10k_style: "rainbow" # lean, classic, rainbow, pure
 ```
+
+## Autocompletion & Syntax Highlighting
+
+The role installs two third-party Oh My Zsh plugins (cloned into `~/.oh-my-zsh/custom/plugins/` per user):
+
+- **zsh-autosuggestions** - Inline grey suggestions as you type, based on command history. Accept with right arrow.
+- **zsh-syntax-highlighting** - Real-time command validation (green = valid command, red = not found).
+
+Additional completion behavior is enabled in `.zshrc`:
+
+- **`HYPHEN_INSENSITIVE="true"`** - Tab completion treats `-` and `_` as interchangeable
+- **`COMPLETION_WAITING_DOTS="true"`** - Shows dots while waiting for completion results
+- **`fzf` plugin** - Fuzzy completion for files (`Ctrl+T`) and directories (`Alt+C`)
+- **`colored-man-pages`** - Syntax-highlighted man pages
+- **`extract`** - Universal archive extraction via `extract <file>`
 
 ## Vi Mode
 

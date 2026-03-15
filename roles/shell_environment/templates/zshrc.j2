@@ -13,6 +13,10 @@ fi
 export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME="powerlevel10k/powerlevel10k"
 
+# Completion settings
+HYPHEN_INSENSITIVE="true"
+COMPLETION_WAITING_DOTS="true"
+
 # Plugins
 plugins=(
 {% for plugin in shell_environment_omz_plugins %}
@@ -21,6 +25,9 @@ plugins=(
 )
 
 source $ZSH/oh-my-zsh.sh
+
+# Autosuggestions style
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
 
 # Load Powerlevel10k config
 [[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
