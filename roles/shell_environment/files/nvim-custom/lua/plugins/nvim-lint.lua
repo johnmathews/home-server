@@ -23,6 +23,32 @@ local function stop_timer(timer, bufnr, timers)
   timers[bufnr] = nil
 end
 
+-- Configure shellcheck for zsh files to use bash mode
+-- (shellcheck doesn't natively support zsh, so we treat it as bash)
+local shellcheck_zsh = require("lint").linters.shellcheck
+shellcheck_zsh.args = {
+  "--format=json",
+  "-",
+  "--shell=bash", -- Force bash mode for zsh files
+}
+lint.linters.shellcheck_zsh = shellcheck_zsh
+
+-- Configure markdownlint to use project-specific config with global fallback
+require("lint").linters.markdownlint.args = function()
+  -- Get the directory of the current buffer
+  local file_dir = vim.fn.expand("%:p:h")
+
+  -- Find a project-local .markdownlint.json
+  local local_config = vim.fn.findfile(".markdownlint.json", file_dir .. ";")
+
+  if local_config ~= "" and vim.fn.filereadable(local_config) == 1 then
+    return { "--config", local_config }
+  else
+    -- Fall back to the global config
+    return { "--config", vim.fn.stdpath("config") .. "/.markdownlint.json" }
+  end
+end
+
 local lint_timers = {}
 lint.linters_by_ft = {
   bash = { "shellcheck" },
@@ -33,6 +59,7 @@ lint.linters_by_ft = {
   python = { "ruff" },
   sh = { "shellcheck" },
   typescript = { "eslint_d" },
+  zsh = { "shellcheck_zsh" },
 }
 
 -- Run linters on keystroke (real-time feedback) and on save

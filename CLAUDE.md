@@ -17,7 +17,7 @@ deployment, configuration, and updates using a Makefile-driven workflow.
 - **Collections**: Community Ansible collections and Prometheus collection (installed to `~/.ansible/collections/`)
 - **Configuration**: `inventory.ini` (hosts), `group_vars/all/` (global vars), `host_vars/` (per-host overrides)
 - **Documentation**: `/documentation/` directory with service-specific guides. When working on a service, always read
-  its documentation file first (e.g., `documentation/openclaw.md` for OpenClaw, `documentation/cloudflared.md` for
+  its documentation file first (e.g., `documentation/agent.md` for the Agent LXC, `documentation/cloudflared.md` for
   Cloudflare Tunnel). These contain hard-won operational details, known issues, and troubleshooting notes.
 - **Key files**: `ansible.cfg` (roles path), `makefile` (all commands), `.ansible-lint` (lint rules), `requirements.yml`
   (collection versions)
@@ -65,7 +65,7 @@ Host IPs are assigned statically on the MikroTik router. Source of truth: `inven
 | nas_vm            | 192.168.2.104  |                  | TrueNAS (NFS/SMB shares)            |
 | media-vm          | 192.168.2.105  |                  | Sonarr, Radarr, qBittorrent, etc.   |
 | infra-vm          | 192.168.2.106  |                  | Grafana, Prometheus, Loki, etc.      |
-| openclaw_lxc      | 192.168.2.107  | 100.125.185.47   | Gateway :18789, Canvas :18793        |
+| agent_lxc         | 192.168.2.107  | 100.125.185.47   | Gateway :18789, Canvas :18793        |
 | traefik_lxc       | 192.168.2.108  |                  | Reverse proxy (Traefik)              |
 | jellyfin_lxc      | 192.168.2.110  |                  | Jellyfin media server                |
 | immich_lxc        | 192.168.2.113  |                  | Immich photo management              |
@@ -80,7 +80,7 @@ Host IPs are assigned statically on the MikroTik router. Source of truth: `inven
 
 ## SSH Aliases
 
-`~/.ssh/config` defines host aliases for all hosts (e.g., `ssh openclaw` = `john@192.168.2.107`). Use the short
+`~/.ssh/config` defines host aliases for all hosts (e.g., `ssh agent` = `john@192.168.2.107`). Use the short
 alias names when SSH-ing. Run `grep "^Host " ~/.ssh/config` to list all aliases.
 
 ## Documentation Index
@@ -101,7 +101,7 @@ Service-specific guides in `/documentation/`. Read the relevant doc before worki
 - `mikrotik-exporter.md` — MikroTik router Prometheus exporter (MKTXP)
 - `monitor_nfs_smb_mounts.md` — NFS/SMB mount health monitoring
 - `navidrome.md` — Navidrome music streaming, NFS mount, Subsonic API clients
-- `openclaw.md` — OpenClaw architecture, LXC setup, macOS app, Tailscale, known issues
+- `agent.md` — OpenClaw architecture, LXC setup, macOS app, Tailscale, known issues
 - `paperless.md` — Paperless-ngx document store and training schedule
 - `quiet_hours.md` — Night-time container pausing for HDD spindown
 - `river.md` — Grafana Alloy (River config language) log shipping to Loki

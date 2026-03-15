@@ -153,7 +153,7 @@ Different hosts get their DNS configuration in different ways:
 **VMs (media-vm, infra-vm, etc.):** Use `systemd-resolved`, which gets the DNS server from MikroTik DHCP
 (`192.168.2.111`). No Ansible management needed.
 
-**LXCs (openclaw, traefik, prometheus, etc.):** Proxmox writes `/etc/resolv.conf` at container creation with
+**LXCs (agent, traefik, prometheus, etc.):** Proxmox writes `/etc/resolv.conf` at container creation with
 `192.168.2.111`. No Ansible management needed.
 
 **PVE host:** Static IP, no DHCP — manages `/etc/resolv.conf` directly. Ansible deploys a template with a primary and

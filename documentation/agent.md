@@ -131,20 +131,20 @@ the official getting-started script. Docker on this LXC is only used for the mon
 +-------------------+--------------------------+
 | Property          | Value                    |
 +-------------------+--------------------------+
-| Hostname          | openclaw_lxc             |
+| Hostname          | agent_lxc                |
 | IP address        | 192.168.2.107            |
 | SSH user          | root                     |
 | OS                | Debian 13                |
 | Timezone          | Europe/Amsterdam         |
-| Ansible role      | roles/openclaw_lxc       |
-| Playbook          | playbooks/openclaw_lxc.yml |
-| Make target       | make openclaw            |
+| Ansible role      | roles/agent_lxc          |
+| Playbook          | playbooks/agent_lxc.yml  |
+| Make target       | make agent               |
 +-------------------+--------------------------+
 ```
 
 ### What the Ansible role manages
 
-The `openclaw_lxc` role handles infrastructure around OpenClaw, **not** OpenClaw itself:
+The `agent_lxc` role handles infrastructure around OpenClaw, **not** OpenClaw itself:
 
 - Creates the `john` user
 - Sets up directory structure (`/srv/apps/`)
@@ -182,7 +182,7 @@ OpenClaw itself was installed manually via the getting-started script and is man
 ### SSH
 
 ```sh
-ssh openclaw
+ssh agent
 ```
 
 ### Web UI (Control UI / WebChat)
@@ -190,7 +190,7 @@ ssh openclaw
 The Gateway binds to `0.0.0.0:18789` (bind mode: `lan`), so it is reachable on the LAN. You can also use an SSH tunnel:
 
 ```sh
-ssh -N -L 18789:127.0.0.1:18789 openclaw
+ssh -N -L 18789:127.0.0.1:18789 agent
 ```
 
 Then open http://localhost:18789 in your browser.
@@ -201,7 +201,7 @@ To also forward the Canvas port:
 ssh -N \
   -L 18789:127.0.0.1:18789 \
   -L 18793:127.0.0.1:18793 \
-  openclaw
+  agent
 ```
 
 ### Remote access (off-network via Tailscale)
@@ -213,19 +213,19 @@ on the MacBook has two host aliases:
 +-------------------+-------------------+------------------------------------------+
 | SSH alias         | HostName          | Use when                                 |
 +-------------------+-------------------+------------------------------------------+
-| openclaw          | 192.168.2.107     | On the home LAN                          |
-| openclawt         | 100.125.185.47    | Off-network (via Tailscale)              |
+| agent             | 192.168.2.107     | On the home LAN                          |
+| agentt            | 100.125.185.47    | Off-network (via Tailscale)              |
 +-------------------+-------------------+------------------------------------------+
 ```
 
 To switch: change the **SSH target** in OpenClaw app settings (or edit `gateway.remote.sshTarget` in
-`~/.openclaw/openclaw.json`) from `openclaw` to `openclawt`. The config is hot-reloaded. Tailscale must be running on
-both the MacBook and the OpenClaw LXC.
+`~/.openclaw/openclaw.json`) from `agent` to `agentt`. The config is hot-reloaded. Tailscale must be running on
+both the MacBook and the Agent LXC.
 
 To verify Tailscale is healthy on the LXC:
 
 ```sh
-ssh openclaw
+ssh agent
 tailscale status    # Shows node state and connected peers
 ```
 
@@ -244,7 +244,7 @@ flow, but native apps cannot.
 
 ### Tailscale
 
-Tailscale is installed on the OpenClaw LXC.
+Tailscale is installed on the Agent LXC.
 
 ```
 +---------------------------+---------------------------------------------+
@@ -306,7 +306,7 @@ transport. The app allows `ws://` for localhost because the tunnel makes it appe
 2. Launch it and go through the Getting Started flow
 3. Choose "Remote over SSH" mode
 4. Fill in only the SSH target field:
-   - **SSH target**: `openclaw` (uses your `~/.ssh/config` alias)
+   - **SSH target**: `agent` (uses your `~/.ssh/config` alias)
    - **Identity file**: leave blank (SSH config handles it)
    - **Project root**: leave blank
    - **CLI path**: leave blank (auto-detected from gateway)
@@ -325,8 +325,8 @@ be added manually to the macOS-side config file at `~/.openclaw/openclaw.json`:
   "gateway": {
     "mode": "remote",
     "remote": {
-      "sshTarget": "openclaw",
-      "url": "ws://openclaw:18789",
+      "sshTarget": "agent",
+      "url": "ws://agent:18789",
       "token": "<gateway-auth-token>"
     }
   }
@@ -458,20 +458,20 @@ Credential precedence: explicit flags (`--token`) > environment variables (`OPEN
 Deploy the monitoring stack and infrastructure:
 
 ```sh
-make openclaw
+make agent
 ```
 
 To run only specific tags:
 
 ```sh
-make openclaw t=docker    # Docker compose stack only
-make openclaw t=alloy     # Alloy config only
-make openclaw t=shell     # Shell environment only
+make agent t=docker    # Docker compose stack only
+make agent t=alloy     # Alloy config only
+make agent t=shell     # Shell environment only
 ```
 
 ## Useful commands
 
-On the LXC (`ssh openclaw`):
+On the LXC (`ssh agent`):
 
 ```sh
 # Gateway service (user-level systemd, NOT system-level)

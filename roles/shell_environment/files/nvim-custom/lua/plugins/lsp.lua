@@ -82,6 +82,7 @@ mason_lspconfig.setup({
     "yamlls",
     "jsonls",
     "dockerls",
+    "taplo",
   },
 
   handlers = {
@@ -172,17 +173,24 @@ mason_lspconfig.setup({
     ["bashls"] = function()
       local has_shellcheck = (vim.fn.executable("shellcheck") == 1)
 
-      require("lspconfig").bashls.setup({
+      lspconfig.bashls.setup({
         on_attach = on_attach, -- DO NOT override publishDiagnostics here
         capabilities = capabilities,
+        filetypes = { "sh", "bash", "zsh" }, -- Attach to sh, bash, and zsh files
         settings = {
           bashIde = {
-            globPattern = "*@(.sh|.inc|.bash|.command)",
+            globPattern = "*@(.sh|.inc|.bash|.command|.zsh)",
             shellcheckPath = has_shellcheck and "shellcheck" or "", -- enable if present
             shellcheckArguments = { "-x" }, -- follow sourced files (optional)
           },
         },
       })
+
+      -- Debug: verify configuration was applied
+      vim.notify(
+        "[bashls] Configured with filetypes: " .. table.concat(lspconfig.bashls.filetypes or {}, ", "),
+        vim.log.levels.INFO
+      )
 
       if not has_shellcheck then
         vim.schedule(function()

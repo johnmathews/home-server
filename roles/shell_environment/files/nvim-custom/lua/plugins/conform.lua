@@ -1,6 +1,5 @@
 local conform = require("conform")
 conform.setup({
-
   notify_on_error = true,
 
   format_on_save = function(bufnr)
@@ -22,10 +21,20 @@ conform.setup({
     yaml = { "yamlfmt", "lsp" },
     markdown = { "prettierd" },
     sh = { "shfmt" },
+    zsh = { "shfmt" },
+    toml = { "taplo" },
   },
 
   -- Prefer project-local binaries where possible
-  formatters = { prettierd = { cwd = require("conform.util").root_file({ ".prettierrc", "package.json", ".git" }) } },
+  formatters = {
+    prettierd = {
+      prepend_args = {
+        "--parser=markdown",
+        "--prose-wrap=always",
+        "--print-width=121",
+      },
+    },
+  },
 })
 
 -- Optional mapping

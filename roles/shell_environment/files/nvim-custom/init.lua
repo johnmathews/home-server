@@ -80,10 +80,7 @@ require("mappings")
 require("autocmd")
 
 -- load custom snippets. dont remove this.
-local ok, luasnip_loader = pcall(require, "luasnip.loaders.from_lua")
-if ok then
-  luasnip_loader.load({ paths = "./lua/snippets" })
-end
+require("luasnip.loaders.from_lua").load({ paths = "./lua/snippets" })
 
 -- this is just some stuff to make syntax highlighting work in .env files
 -- Ensure the setup_env_syntax function is local to avoid polluting the global namespace

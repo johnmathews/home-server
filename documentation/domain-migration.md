@@ -151,7 +151,7 @@ Traefik routers use a Jinja2 macro to match `Host()` on both domains.
   - `documentation/cloudflared.md` — subdomain examples and service list
   - `documentation/traefik.md` — dashboard URLs and service list
   - `documentation/navidrome.md` — service access URLs
-  - `documentation/openclaw.md` — `claw.itsa-pizza.com` references
+  - `documentation/agent.md` — `claw.itsa-pizza.com` references
   - `documentation/index.md` — `charts.itsa-pizza.com` reference
   - `CLAUDE.md` — network reference table (mailcow marked retired)
   - `readme.md` — `docs.itsa-pizza.com` link

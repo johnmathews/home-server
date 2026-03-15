@@ -24,6 +24,38 @@
     cache_valid_time: 3600
   become: true
 
+- name: Install glow for markdown preview plugin
+  ansible.builtin.apt:
+    name: glow
+    state: present
+  become: true
+  register: glow_apt
+  ignore_errors: true
+
+- name: Add Charm apt key for glow (if not in default repos)
+  ansible.builtin.get_url:
+    url: https://repo.charm.sh/apt/gpg.key
+    dest: /etc/apt/keyrings/charm.gpg
+    mode: '0644'
+  become: true
+  when: glow_apt is failed
+
+- name: Add Charm apt repository for glow
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *"
+    filename: charm
+    state: present
+  become: true
+  when: glow_apt is failed
+
+- name: Install glow from Charm repository
+  ansible.builtin.apt:
+    name: glow
+    state: present
+    update_cache: true
+  become: true
+  when: glow_apt is failed
+
 - name: Install dependencies for Mason LSP servers
   ansible.builtin.apt:
     name:
