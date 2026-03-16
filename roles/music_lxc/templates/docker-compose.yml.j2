@@ -3,6 +3,14 @@
 
 services:
 
+  musicbrainz-picard:
+    image: jlesage/musicbrainz-picard
+    ports:
+      - "5800:5800"
+    volumes:
+      - "/srv/apps/musicbrainz-picard:/config:rw"
+      - "/mnt/nfs/music:/storage:rw"
+
   navidrome:
     image: deluan/navidrome:latest
     container_name: navidrome

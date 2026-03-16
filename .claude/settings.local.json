@@ -90,7 +90,12 @@
       "WebFetch(domain:docs.atuin.sh)",
       "mcp__MCP_DOCKER__list_directory",
       "mcp__MCP_DOCKER__fetch",
-      "Bash(ansible-vault view:*)"
+      "Bash(ansible-vault view:*)",
+      "Bash(fzf:*)",
+      "Bash(man fzf:*)",
+      "Bash(tmux show-option:*)",
+      "Read(//bin/**)",
+      "Bash(/bin/sh --version)"
     ],
     "deny": [],
     "ask": []

@@ -8,7 +8,8 @@
   loop:
     - {path: /srv/apps/navidrome/data, owner: "{{ puid }}", group: "{{ guid }}"}
     - {path: /srv/apps/alloy, owner: root, group: root}
-  tags: alloy, docker
+    - {path: /srv/apps/musicbrainz-picard, owner: "{{ puid }}", group: "{{ guid }}"}
+  tags: alloy, docker, navidrome, picard
   notify:
     - restart alloy
 
