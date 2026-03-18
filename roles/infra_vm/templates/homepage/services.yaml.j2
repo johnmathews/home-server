@@ -413,18 +413,18 @@
           url: http://192.168.2.106:3000
           username: "{{ vault_grafana_username }}"
           password: "{{ vault_grafana_password }}"
-    - Documentation:
+    - Server Documentation:
         href: https://docs.{{ primary_domain_name }}
         siteMonitor: http://192.168.2.106:8000
         icon: si-materialformkdocs
-    # - Mailcow:
-    #     href: https://mail.{{ primary_domain_name }}
-    #     siteMonitor: https://mail.{{ primary_domain_name }}
-    #     icon: mailcow
-    #     widget:
-    #       type: mailcow
-    #       url: https://192.168.2.103
-    #       key: "{{ vault_mailcow_readonly_api_key }}"
+    - NanoClaw Documentation:
+        href: https://agent-docs.{{ primary_domain_name }}
+        siteMonitor: http://192.168.2.107:8000
+        icon: si-materialformkdocs
+    - NanoClaw Dev Journal:
+        href: https://agent-journal.{{ primary_domain_name }}
+        siteMonitor: http://192.168.2.107:8001
+        icon: si-materialformkdocs
     - Prometheus:
         href: http://prometheus.{{ primary_domain_name }}
         siteMonitor: http://192.168.2.115:9090

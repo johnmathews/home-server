@@ -21,6 +21,21 @@
   notify: restart cloudflared
   tags: cloudflared
 
+- name: Sync tunnel config to Cloudflare API
+  ansible.builtin.uri:
+    url: "https://api.cloudflare.com/client/v4/accounts/{{ cloudflared_account_id }}/cfd_tunnel/{{ cloudflared_tunnel_id }}/configurations"
+    method: PUT
+    headers:
+      Authorization: "Bearer {{ cloudflared_api_token }}"
+      Content-Type: application/json
+    body_format: json
+    body: "{{ lookup('template', 'tunnel_config_api.json.j2') }}"
+    status_code: 200
+  delegate_to: localhost
+  become: false
+  changed_when: false
+  tags: cloudflared
+
 - name: Ensure cloudflared service is enabled and running
   ansible.builtin.systemd:
     name: cloudflared

@@ -1,10 +1,11 @@
 # {{ ansible_managed }}
 # cloudflared tunnel configuration
-# vim: ft=yaml
+# vim: ft=jinja2
+
 {% set domains = [primary_domain_name] + (migration_additional_domains | default([])) %}
 
-tunnel: e1e3b9c4-789a-4ad3-adff-a0c71bff1122
-credentials-file: /root/.cloudflared/e1e3b9c4-789a-4ad3-adff-a0c71bff1122.json
+tunnel: {{ cloudflared_tunnel_id }}
+credentials-file: /root/.cloudflared/{{ cloudflared_tunnel_id }}.json
 
 ingress:
 {% for domain in domains %}
@@ -12,6 +13,11 @@ ingress:
     service: http://192.168.2.106:3002
   - hostname: dash.{{ domain }}
     service: http://192.168.2.106:3002
+
+  - hostname: agent-journal.{{ domain }}
+    service: http://192.168.2.107:8000
+  - hostname: agent-docs.{{ domain }}
+    service: http://192.168.2.107:8001
 
   - hostname: timer.{{ domain }}
     service: http://192.168.2.106:8082

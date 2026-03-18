@@ -22,23 +22,27 @@ Main configuration file:
 
 ## Updating Configuration
 
-To apply changes to the Cloudflare Tunnel configuration:
+Edit the Ansible template and deploy:
 
 ```sh
-cloudflared tunnel --config /etc/cloudflared/config.yml ingress validate
-sudo systemctl restart cloudflared
+# 1. Edit the ingress rules
+vim roles/cloudflared_lxc/templates/config.yml.j2
+
+# 2. Update the API payload template to match (keeps remote config in sync)
+vim roles/cloudflared_lxc/templates/tunnel_config_api.json.j2
+
+# 3. Create DNS route for the new subdomain
+ssh cloudflared
 cloudflared tunnel route dns home-server <subdomain>.itsa-pizza.com
+
+# 4. Deploy (templates config, syncs to Cloudflare API, restarts if changed)
+make cloudflared
 ```
 
-## Bulk DNS Update Example
-
-Automatically update DNS routes for all configured hostnames:
-
-```sh
-for domain in $(grep hostname: /etc/cloudflared/config.yml | awk '{print $3}'); do
-  cloudflared tunnel route dns home-server "$domain"
-done
-```
+**Important:** The Cloudflare edge always pushes a remote tunnel config that overrides the local `config.yml` at
+runtime. The Ansible role works around this by PUTting the config to the Cloudflare Tunnel API on every deploy,
+keeping both in sync. Both templates (`config.yml.j2` and `tunnel_config_api.json.j2`) must be updated together
+when adding or removing hostnames.
 
 ## Logging
 
@@ -105,8 +109,9 @@ All services listed in `/etc/cloudflared/config.yml`. Key subdomains:
 
 - `itsa-pizza.com` / `dash.itsa-pizza.com` -> Homepage (192.168.2.106:3002)
 - `claw.itsa-pizza.com` -> OpenClaw (192.168.2.107:18789)
+- `agent-journal.itsa-pizza.com` -> MkDocs Journal (192.168.2.107:8000)
+- `agent-docs.itsa-pizza.com` -> MkDocs Docs (192.168.2.107:8001)
 - `charts.itsa-pizza.com` / `grafana.itsa-pizza.com` -> Grafana (192.168.2.106:3000)
-- `mail.itsa-pizza.com` -> Mailcow (192.168.2.103:443)
 - `sonarr.itsa-pizza.com`, `radarr.itsa-pizza.com`, etc. -> Media VM services
 - `paperless.itsa-pizza.com` / `documents.itsa-pizza.com` -> Paperless-ngx
 - `proxmox.itsa-pizza.com` / `pve.itsa-pizza.com` -> Proxmox UI
@@ -118,11 +123,12 @@ All services listed in `/etc/cloudflared/config.yml`. Key subdomains:
 - Playbook: `playbooks/cloudflared_lxc.yml`
 - Deploy: `make cloudflared`
 - Config template: `roles/cloudflared_lxc/templates/config.yml.j2` (uses `{{ primary_domain_name }}`)
+- API sync template: `roles/cloudflared_lxc/templates/tunnel_config_api.json.j2`
+- Vault secrets: `vault_cloudflared_account_id`, `vault_cloudflared_api_token`
 
 The LXC was originally created manually via a Proxmox community script. The Ansible role manages the tunnel
 config file, shell environment, and Tailscale.
 
 ## Domain Migration
 
-A migration from `itsa-pizza.com` to `itsa-pizza.com` is planned. See `documentation/domain-migration.md` for the full
-plan, stages, and open questions.
+Migration from `itsa.pizza` to `itsa-pizza.com` is complete. See `documentation/domain-migration.md` for history.
