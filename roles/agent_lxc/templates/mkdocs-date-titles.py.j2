@@ -1,0 +1,25 @@
+"""MkDocs hook: prepend date from YYMMDD filename prefix to page titles."""
+
+import os
+import re
+
+# Patterns for trailing dates to strip, e.g. "— Mar 18", "— 2026-03-18", "— 03/18"
+TRAILING_DATE_RE = re.compile(
+    r"\s*—?\s*"
+    r"(?:"
+    r"(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{1,2}"
+    r"|\d{2,4}[-/]\d{2}[-/]\d{2}"
+    r"|\d{1,2}/\d{1,2}"
+    r")\s*$"
+)
+
+
+def on_page_markdown(markdown, page, config, files):
+    basename = os.path.basename(page.file.src_path)
+    match = re.match(r"(\d{2})(\d{2})(\d{2})-", basename)
+    if match:
+        yy, mm, dd = match.groups()
+        formatted = f"{yy}-{mm}-{dd}"
+        title = TRAILING_DATE_RE.sub("", page.title).strip()
+        page.title = f"{formatted} — {title}"
+    return markdown

@@ -10,6 +10,7 @@ mkdocs_sites:
     docs_path: /srv/apps/nanoclaw/journal
     port: 8000
     order: desc
+    date_titles: true
   - name: docs
     site_name: NanoClaw Docs
     docs_path: /srv/apps/nanoclaw/docs

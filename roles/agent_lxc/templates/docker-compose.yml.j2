@@ -77,10 +77,13 @@ services:
     container_name: mkdocs-{{ site.name }}
     working_dir: /docs
     volumes:
-      - {{ site.docs_path }}:/docs/docs:ro
+      - {{ site.docs_path }}:/docs/docs:rw
       - ./mkdocs/{{ site.name }}/mkdocs.yml:/docs/mkdocs.yml:ro
 {% if site.order is defined %}
       - ./mkdocs/{{ site.name }}/.pages:/docs/docs/.pages:ro
+{% endif %}
+{% if site.date_titles | default(false) %}
+      - ./mkdocs/hooks:/docs/hooks:ro
 {% endif %}
     ports:
       - "{{ site.port }}:8000"

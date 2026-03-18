@@ -217,13 +217,20 @@ needed. New or renamed markdown files appear automatically via MkDocs' polling f
 
 The optional `order` field controls page sort order via the `mkdocs-awesome-pages-plugin`. Set to `desc` for
 reverse-alphabetical (newest-first for date-prefixed filenames like `YYMMDD-description.md`). Omit for default
-ascending order. The plugin is baked into a custom Docker image built from `mkdocs/Dockerfile` (extends
-`squidfunk/mkdocs-material`). The image is rebuilt automatically when the Dockerfile changes.
+ascending order.
+
+The optional `date_titles` field enables a MkDocs hook that prepends the date from the `YYMMDD-` filename prefix to
+each page title in the nav (e.g., `260318-fix-bug.md` → **26-03-18 — Fix Bug**). Any trailing date already in the
+heading is stripped automatically to avoid duplication.
+
+Both the awesome-pages plugin and the date-titles hook are baked into a custom Docker image built from
+`mkdocs/Dockerfile` (extends `squidfunk/mkdocs-material`). The image is rebuilt automatically when the Dockerfile
+changes.
 
 Each docs directory needs an `index.md` to serve a landing page. Without one, MkDocs returns a 404 on the site root.
 
 MkDocs configs are templated to `/srv/apps/mkdocs/<site-name>/mkdocs.yml` on the LXC. The source markdown directories
-are mounted read-only into the containers.
+are mounted into the containers (rw to allow Docker overlay mounts for `.pages` files).
 
 ## Access
 

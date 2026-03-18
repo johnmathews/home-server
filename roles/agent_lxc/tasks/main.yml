@@ -80,6 +80,28 @@
   loop: "{{ mkdocs_sites }}"
   vars:
     mkdocs_site_name: "{{ item.site_name }}"
+    mkdocs_date_titles: "{{ item.date_titles | default(false) }}"
+  tags: docs
+  notify:
+    - restart mkdocs
+
+- name: Create mkdocs hooks directory
+  ansible.builtin.file:
+    path: "{{ docker_compose_dir }}/mkdocs/hooks"
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+  tags: docs
+  when: mkdocs_sites | selectattr('date_titles', 'defined') | list | length > 0
+
+- name: Copy date-titles hook script
+  ansible.builtin.template:
+    src: templates/mkdocs-date-titles.py.j2
+    dest: "{{ docker_compose_dir }}/mkdocs/hooks/date-titles.py"
+    mode: '0644'
+    owner: root
+    group: root
   tags: docs
   notify:
     - restart mkdocs
