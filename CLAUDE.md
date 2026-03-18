@@ -110,6 +110,8 @@ Service-specific guides in `/documentation/`. Read the relevant doc before worki
 - `systemd.md` — systemd service management reference
 - `tailscale.md` — VPN setup, DNS privacy, remote Ansible access
 - `traefik.md` — Traefik reverse proxy dashboard and API
+- `jellyfin_lxc.md` — Jellyfin LXC setup, plugins, NFS monitoring issue, 10.11.x known issues
+- `proxmox_host_tuning.md` — ZFS ARC, KSM, VM ballooning, memory management
 - `truenas.md` — TrueNAS scripts: share refresh, disk spindown, exporter
 - `ups.md` — UPS monitoring via Network UPS Tools (NUT)
 
