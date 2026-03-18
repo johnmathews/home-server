@@ -1,0 +1,20 @@
+# vim: ft=yaml
+# Templated by Ansible — do not edit on the host
+site_name: {{ mkdocs_site_name }}
+theme:
+  name: material
+  palette:
+    primary: green
+  features:
+    - content.code.copy
+    - navigation.instant
+    - navigation.indexes
+    - navigation.tracking
+    - navigation.top
+markdown_extensions:
+  - admonition
+  - toc
+  - tables
+plugins:
+  - search
+  - awesome-pages

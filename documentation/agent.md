@@ -148,18 +148,21 @@ The `agent_lxc` role handles infrastructure around OpenClaw, **not** OpenClaw it
 
 - Creates the `john` user
 - Sets up directory structure (`/srv/apps/`)
-- Deploys the monitoring Docker Compose stack (cAdvisor, Alloy, Node Exporter)
+- Deploys the Docker Compose stack (monitoring + MkDocs documentation sites)
 - Configures Alloy for log aggregation to Loki
+- Deploys MkDocs Material sites for browsing markdown documentation
 - Applies the `shell_environment` role (CLI tools, shell config)
 
 OpenClaw itself was installed manually via the getting-started script and is managed outside of Ansible.
 
-### What runs in Docker (monitoring only)
+### What runs in Docker
 
 ```
 +-----------------+--------+--------------------------------------------------+
 | Container       | Port   | Purpose                                          |
 +-----------------+--------+--------------------------------------------------+
+| mkdocs-journal  | 8000   | NanoClaw dev journal (MkDocs Material)            |
+| syncthing       | 8384   | File sync (nanoclaw data)                        |
 | cadvisor        | 18080  | Container resource metrics                       |
 | alloy           | 12345  | Log aggregation → Loki (192.168.2.106:3100)      |
 | node_exporter   | 9100   | Host-level Prometheus metrics                    |
@@ -176,6 +179,51 @@ OpenClaw itself was installed manually via the getting-started script and is man
 | Canvas server   | 18793  | Agent-driven visual workspace                    |
 +-----------------+--------+--------------------------------------------------+
 ```
+
+### MkDocs documentation sites
+
+MkDocs Material is used to serve markdown documentation from the LXC as browsable websites. Sites are defined in the
+`mkdocs_sites` variable in `roles/agent_lxc/defaults/main.yml`. Each entry generates a Docker container, an MkDocs
+config file, and a unique port mapping.
+
+Current sites:
+
+```
++-----------------+--------+-------+-----------------------------------+
+| Site            | Port   | Order | Source path on LXC                |
++-----------------+--------+-------+-----------------------------------+
+| journal         | 8000   | desc  | /srv/apps/nanoclaw/journal        |
+| docs            | 8001   |       | /srv/apps/nanoclaw/docs           |
++-----------------+--------+-------+-----------------------------------+
+```
+
+To add a new documentation site, add an entry to the `mkdocs_sites` list:
+
+```yaml
+mkdocs_sites:
+  - name: journal
+    site_name: NanoClaw Journal
+    docs_path: /srv/apps/nanoclaw/journal
+    port: 8000
+    order: desc
+  - name: docs
+    site_name: NanoClaw Docs
+    docs_path: /srv/apps/nanoclaw/docs
+    port: 8001
+```
+
+Then deploy with `make agent t=docs`. Pages are auto-discovered from the docs directory -- no `nav:` configuration is
+needed. New or renamed markdown files appear automatically via MkDocs' polling file watcher.
+
+The optional `order` field controls page sort order via the `mkdocs-awesome-pages-plugin`. Set to `desc` for
+reverse-alphabetical (newest-first for date-prefixed filenames like `YYMMDD-description.md`). Omit for default
+ascending order. The plugin is baked into a custom Docker image built from `mkdocs/Dockerfile` (extends
+`squidfunk/mkdocs-material`). The image is rebuilt automatically when the Dockerfile changes.
+
+Each docs directory needs an `index.md` to serve a landing page. Without one, MkDocs returns a 404 on the site root.
+
+MkDocs configs are templated to `/srv/apps/mkdocs/<site-name>/mkdocs.yml` on the LXC. The source markdown directories
+are mounted read-only into the containers.
 
 ## Access
 
@@ -465,6 +513,7 @@ To run only specific tags:
 
 ```sh
 make agent t=docker    # Docker compose stack only
+make agent t=docs      # MkDocs sites + docker compose
 make agent t=alloy     # Alloy config only
 make agent t=shell     # Shell environment only
 ```

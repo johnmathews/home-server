@@ -1,8 +1,30 @@
 # vim: ft=yaml
 # openclaw_lxc/templates/docker-compose.yml.j2
-# Monitoring stack only — OpenClaw is installed natively via getting-started script
+# Monitoring stack + Syncthing — OpenClaw is installed natively via getting-started script
 
 services:
+  syncthing:
+    image: syncthing/syncthing:latest
+    container_name: syncthing
+    hostname: agent-lxc
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - /srv/apps/syncthing:/var/syncthing/config
+      - /srv/apps/nanoclaw:/var/syncthing/nanoclaw
+    ports:
+      - "8384:8384"
+      - "22000:22000/tcp"
+      - "22000:22000/udp"
+      - "21027:21027/udp"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
     container_name: cadvisor
@@ -49,6 +71,27 @@ services:
         max-size: "10m"
         max-file: "5"
 
+{% for site in mkdocs_sites %}
+  mkdocs-{{ site.name }}:
+    build: ./mkdocs
+    container_name: mkdocs-{{ site.name }}
+    working_dir: /docs
+    volumes:
+      - {{ site.docs_path }}:/docs/docs:ro
+      - ./mkdocs/{{ site.name }}/mkdocs.yml:/docs/mkdocs.yml:ro
+{% if site.order is defined %}
+      - ./mkdocs/{{ site.name }}/.pages:/docs/docs/.pages:ro
+{% endif %}
+    ports:
+      - "{{ site.port }}:8000"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+{% endfor %}
   node_exporter:
     image: quay.io/prometheus/node-exporter:latest
     container_name: node_exporter
@@ -67,3 +110,4 @@ services:
       options:
         max-size: "10m"
         max-file: "5"
+

@@ -3,3 +3,14 @@ TZ: Europe/Amsterdam
 docker_compose_dir: "/srv/apps"
 puid: 1001
 guid: 1001
+
+mkdocs_sites:
+  - name: journal
+    site_name: NanoClaw Journal
+    docs_path: /srv/apps/nanoclaw/journal
+    port: 8000
+    order: desc
+  - name: docs
+    site_name: NanoClaw Docs
+    docs_path: /srv/apps/nanoclaw/docs
+    port: 8001

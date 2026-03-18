@@ -9,11 +9,43 @@
     remove_orphans: true
   become: false
 
+- name: restart syncthing
+  community.docker.docker_compose_v2:
+    project_src: "{{ docker_compose_dir }}"
+    services:
+      - syncthing
+    state: present
+    recreate: always
+    dependencies: true
+    remove_orphans: true
+  become: false
+
 - name: restart alloy
   community.docker.docker_compose_v2:
     project_src: "{{ docker_compose_dir }}"
     services:
       - alloy
+    state: present
+    recreate: always
+    dependencies: true
+    remove_orphans: true
+  become: false
+
+- name: rebuild mkdocs
+  community.docker.docker_compose_v2:
+    project_src: "{{ docker_compose_dir }}"
+    services: "{{ mkdocs_sites | map(attribute='name') | map('regex_replace', '^', 'mkdocs-') | list }}"
+    state: present
+    build: always
+    recreate: always
+    dependencies: true
+    remove_orphans: true
+  become: false
+
+- name: restart mkdocs
+  community.docker.docker_compose_v2:
+    project_src: "{{ docker_compose_dir }}"
+    services: "{{ mkdocs_sites | map(attribute='name') | map('regex_replace', '^', 'mkdocs-') | list }}"
     state: present
     recreate: always
     dependencies: true

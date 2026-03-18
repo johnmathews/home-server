@@ -18,6 +18,15 @@
     - "{{ docker_compose_dir }}"
     - /srv/apps/alloy
 
+- name: Create syncthing config directory
+  ansible.builtin.file:
+    path: /srv/apps/syncthing
+    state: directory
+    mode: '0755'
+    owner: 1000
+    group: 1000
+  tags: syncthing
+
 - name: Upload alloy config
   ansible.builtin.copy:
     src: templates/config.alloy
@@ -30,6 +39,65 @@
   notify:
     - restart alloy
 
+- name: Upload syncthing .stignore
+  ansible.builtin.template:
+    src: templates/syncthing-stignore.j2
+    dest: /srv/apps/nanoclaw/.stignore
+    owner: 1000
+    group: 1000
+    mode: '0644'
+  become: true
+  tags: syncthing
+
+- name: Create mkdocs config directories
+  ansible.builtin.file:
+    path: "{{ docker_compose_dir }}/mkdocs/{{ item.name }}"
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+  loop: "{{ mkdocs_sites }}"
+  tags: docs
+
+- name: Copy mkdocs Dockerfile
+  ansible.builtin.template:
+    src: templates/mkdocs.Dockerfile.j2
+    dest: "{{ docker_compose_dir }}/mkdocs/Dockerfile"
+    mode: '0644'
+    owner: root
+    group: root
+  tags: docs
+  notify:
+    - rebuild mkdocs
+
+- name: Template mkdocs.yml for each site
+  ansible.builtin.template:
+    src: templates/mkdocs.yml.j2
+    dest: "{{ docker_compose_dir }}/mkdocs/{{ item.name }}/mkdocs.yml"
+    mode: '0644'
+    owner: root
+    group: root
+  loop: "{{ mkdocs_sites }}"
+  vars:
+    mkdocs_site_name: "{{ item.site_name }}"
+  tags: docs
+  notify:
+    - restart mkdocs
+
+- name: Template .pages file for sites with custom ordering
+  ansible.builtin.template:
+    src: templates/mkdocs-pages.j2
+    dest: "{{ docker_compose_dir }}/mkdocs/{{ item.name }}/.pages"
+    mode: '0644'
+    owner: root
+    group: root
+  loop: "{{ mkdocs_sites | selectattr('order', 'defined') }}"
+  vars:
+    mkdocs_order: "{{ item.order }}"
+  tags: docs
+  notify:
+    - restart mkdocs
+
 - name: Copy docker-compose.yml
   ansible.builtin.template:
     src: templates/docker-compose.yml.j2
@@ -37,6 +105,6 @@
     mode: '0644'
     owner: root
     group: root
-  tags: docker
+  tags: docker, docs
   notify:
     - restart all containers
