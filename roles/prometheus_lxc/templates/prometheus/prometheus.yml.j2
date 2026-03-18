@@ -31,6 +31,8 @@ scrape_configs:
     scrape_interval: 30s
     scrape_timeout: 15s
     static_configs:
+      - targets: ['192.168.2.107:18080']
+        labels: {hostname: 'agent'}
       - targets: ['192.168.2.214:18080']
         labels: {hostname: 'proxmox'}
       - targets: ['192.168.2.105:18080']
@@ -61,6 +63,10 @@ scrape_configs:
     static_configs:
       - targets: ['192.168.2.111:9618']
     metric_relabel_configs:
+      - source_labels: [user]
+        regex: '192\.168\.2\.107'
+        target_label: client_name
+        replacement: 'NanoClaw Agent'
       - source_labels: [user]
         regex: '100\.112\.110\.39'
         target_label: client_name
@@ -162,6 +168,8 @@ scrape_configs:
     scrape_interval: 30s
     scrape_timeout: 15s
     static_configs:
+      - targets: ['192.168.2.107:9100']
+        labels: {hostname: 'agent'}
       - targets: ['192.168.2.214:9100']
         labels: {hostname: 'proxmox'}
       - targets: ['192.168.2.104:9100']
