@@ -213,7 +213,9 @@ mkdocs_sites:
 ```
 
 Then deploy with `make agent t=docs`. Pages are auto-discovered from the docs directory -- no `nav:` configuration is
-needed. New or renamed markdown files appear automatically via MkDocs' polling file watcher.
+needed. New or renamed markdown files are detected within ~5 seconds by a polling entrypoint script (`mkdocs-entrypoint.sh`)
+that hashes the file listing every 5 seconds and restarts `mkdocs serve` when files are added or removed. This works
+around a known limitation where Docker bind mounts don't propagate inotify events for new files to the container.
 
 The optional `order` field controls page sort order via the `mkdocs-awesome-pages-plugin`. Set to `desc` for
 reverse-alphabetical (newest-first for date-prefixed filenames like `YYMMDD-description.md`). Omit for default

@@ -1,2 +1,6 @@
 FROM squidfunk/mkdocs-material:latest
 RUN pip install --no-cache-dir mkdocs-awesome-pages-plugin
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
+CMD []

@@ -1,0 +1,49 @@
+#!/bin/sh
+# Polling entrypoint for mkdocs serve inside Docker.
+# inotify doesn't detect new files on bind-mounted volumes,
+# so we poll for file additions/deletions and restart mkdocs.
+
+WATCH_DIR="/docs/docs"
+POLL_INTERVAL=5
+PID=0
+
+file_hash() {
+    find "$WATCH_DIR" -name '*.md' -type f | sort | md5sum | cut -d' ' -f1
+}
+
+start_mkdocs() {
+    mkdocs serve -a 0.0.0.0:8000 &
+    PID=$!
+}
+
+cleanup() {
+    kill $PID 2>/dev/null
+    wait $PID 2>/dev/null
+    exit 0
+}
+
+trap cleanup TERM INT
+
+LAST_HASH=$(file_hash)
+start_mkdocs
+
+while true; do
+    sleep "$POLL_INTERVAL" &
+    wait $!
+
+    # Restart if mkdocs exited unexpectedly
+    if ! kill -0 $PID 2>/dev/null; then
+        echo "mkdocs exited, restarting..."
+        start_mkdocs
+        continue
+    fi
+
+    CURRENT_HASH=$(file_hash)
+    if [ "$CURRENT_HASH" != "$LAST_HASH" ]; then
+        echo "File change detected, restarting mkdocs serve..."
+        kill $PID 2>/dev/null
+        wait $PID 2>/dev/null
+        start_mkdocs
+        LAST_HASH=$CURRENT_HASH
+    fi
+done

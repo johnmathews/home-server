@@ -70,6 +70,17 @@
   notify:
     - rebuild mkdocs
 
+- name: Copy mkdocs entrypoint script
+  ansible.builtin.template:
+    src: templates/mkdocs-entrypoint.sh.j2
+    dest: "{{ docker_compose_dir }}/mkdocs/entrypoint.sh"
+    mode: '0755'
+    owner: root
+    group: root
+  tags: docs
+  notify:
+    - rebuild mkdocs
+
 - name: Template mkdocs.yml for each site
   ansible.builtin.template:
     src: templates/mkdocs.yml.j2
