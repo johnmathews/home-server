@@ -52,7 +52,7 @@ services:
     restart: unless-stopped
     environment:
       LOKI_WRITE_ENDPOINT: "http://192.168.2.106:3100/loki/api/v1/push"
-      NODE_HOSTNAME: "openclaw"
+      NODE_HOSTNAME: "agent"
       LOG_LEVEL: "warn"
     volumes:
       - ./alloy:/etc/alloy:ro

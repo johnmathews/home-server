@@ -40,6 +40,8 @@ shell_environment_p10k_style: "lean" # lean, classic, rainbow, pure
 shell_environment_atuin_enabled: true
 shell_environment_atuin_integration: true
 shell_environment_atuin_sync_address: "http://192.168.2.106:8888"
+shell_environment_atuin_daemon: true
+shell_environment_atuin_search_mode: "daemon-fuzzy"
 
 # User targeting: Explicit users + auto-discovered users (UID >= 1000 with valid shell)
 # Both lists are combined and deduplicated. Use this to add root or other users with UID < 1000.

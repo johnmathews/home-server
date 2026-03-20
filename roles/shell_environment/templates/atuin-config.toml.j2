@@ -43,8 +43,8 @@ network_connect_timeout = 3
 network_timeout = 5
 
 ## which search mode to use
-## possible values: prefix, fulltext, fuzzy, skim
-# search_mode = "fuzzy"
+## possible values: prefix, fulltext, fuzzy, skim, daemon-fuzzy
+search_mode = "{{ shell_environment_atuin_search_mode }}"
 
 ## which filter mode to use by default
 ## possible values: "global", "host", "session", "directory", "workspace"
@@ -233,8 +233,13 @@ records = true
 # strategy = "auto"
 
 [daemon]
-## Enables using the daemon to sync. Requires the daemon to be running in the background. Start it with `atuin daemon`
+{% if shell_environment_atuin_daemon | bool %}
+enabled = true
+autostart = true
+{% else %}
 # enabled = false
+# autostart = false
+{% endif %}
 
 ## How often the daemon should sync in seconds
 # sync_frequency = 300

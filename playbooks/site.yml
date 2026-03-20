@@ -1,6 +1,6 @@
 # Master playbook: orchestrates all playbooks
 - import_playbook: cloudflared_lxc.yml
-- import_playbook: dev_lxc.yml
+# - import_playbook: dev_lxc.yml
 - import_playbook: immich_lxc.yml
 - import_playbook: infra_vm.yml
 - import_playbook: jellyfin_lxc.yml
@@ -10,7 +10,7 @@
 - import_playbook: nas.yml
 - import_playbook: nfs.yml
 - import_playbook: open_webui_lxc.yml
-- import_playbook: openclaw_lxc.yml
+- import_playbook: agent_lxc.yml
 - import_playbook: paperless_lxc.yml
 - import_playbook: prometheus_lxc.yml
 - import_playbook: pve.yml
