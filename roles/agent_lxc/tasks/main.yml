@@ -49,6 +49,16 @@
   become: true
   tags: syncthing
 
+- name: Deploy nanoclaw .env file from template
+  ansible.builtin.template:
+    src: templates/.env.j2
+    dest: /srv/apps/nanoclaw/.env
+    owner: root
+    group: root
+    mode: '0600'
+  notify: restart openclaw gateway
+  tags: nanoclaw
+
 - name: Create mkdocs config directories
   ansible.builtin.file:
     path: "{{ docker_compose_dir }}/mkdocs/{{ item.name }}"

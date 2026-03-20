@@ -43,6 +43,16 @@
     remove_orphans: true
   become: false
 
+- name: restart openclaw gateway
+  ansible.builtin.systemd:
+    name: openclaw-gateway
+    state: restarted
+    scope: user
+  become: true
+  become_user: john
+  environment:
+    XDG_RUNTIME_DIR: /run/user/1000
+
 - name: restart mkdocs
   community.docker.docker_compose_v2:
     project_src: "{{ docker_compose_dir }}"
