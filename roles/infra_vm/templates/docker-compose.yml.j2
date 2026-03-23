@@ -41,11 +41,20 @@ services:
     ports:
       - "8001:8000"
     restart: unless-stopped
-    mem_limit: 192m # ADDED: currently ~134MB
+    mem_limit: 384m # ADDED: currently ~134MB
     env_file: .env
+    environment:
+      - ANONYMIZED_TELEMETRY=False
+      - CLAUDE_CONFIG_DIR=/app/.claude
+      - HOME=/app
     volumes:
       - chroma_data:/app/.chroma_db
       - ${CONVERSATION_HISTORY_HOST_DIR}:/app/conversations
+      # Claude Agent SDK: OAuth credentials for LLM_PROVIDER=anthropic.
+      # Harmless empty-dir mount when using LLM_PROVIDER=openai.
+      - ${CLAUDE_CONFIG_DIR:-~/.claude}:/app/.claude
+      # Uncomment to persist the memory store SQLite DB:
+      - ./sre-memory.db:/app/memory.db
     healthcheck:
       test: ["CMD", "python", "-c", "import httpx; httpx.get('http://localhost:8000/health').raise_for_status()"]
       interval: 30s
