@@ -108,7 +108,7 @@
     owner: "{{ docker_user }}"
     group: docker
     mode: '0755'
-  tags: docker
+  tags: docker, docserver
 
 - name: Ensure required directories exist
   ansible.builtin.file:
@@ -134,7 +134,7 @@
     group: docker
     mode: '0644'
   notify: update docker compose stack
-  tags: docker, mikrotik_exporter
+  tags: docker, mikrotik_exporter, docserver
 
 - name: Upload .env file from template
   ansible.builtin.template:
@@ -175,6 +175,10 @@
     - restart alloy
     - restart loki
 
+- name: Include docserver tasks
+  import_tasks: docserver.yml
+  tags: docserver
+
 - name: Include homepage tasks
   import_tasks: homepage.yml
   tags: homepage
@@ -195,4 +199,4 @@
     dependencies: true
     remove_orphans: true
   become: false
-  tags: docker, mikrotik_exporter
+  tags: docker, mikrotik_exporter, docserver

@@ -1,0 +1,21 @@
+# infra_vm/tasks/docserver.yml
+
+- name: Ensure docserver directories exists
+  ansible.builtin.file:
+    path: /srv/infra/docserver/config
+    state: directory
+    owner: "{{ docker_user }}"
+    group: "{{ docker_user }}"
+    mode: '0755'
+  notify: restart docker
+  tags: docserver
+
+- name: Template docserver sources.yaml
+  ansible.builtin.template:
+    src: docserver-sources.yml.j2
+    dest: /srv/infra/docserver/config/sources.yaml
+    owner: "{{ docker_user }}"
+    group: "{{ docker_user }}"
+    mode: '0644'
+  notify: restart docker
+  tags: docserver

@@ -2,6 +2,29 @@
 # infra_vm/templates/docker-compose.yml
 
 services:
+  docserver:
+    image: ghcr.io/johnmathews/documentation-mcp-server:latest
+    container_name: documentation-mcp-server
+    restart: unless-stopped
+    stop_grace_period: 30s
+    mem_limit: 1536m # ~500MB embeddings + ChromaDB + SQLite; 1.5GB cap with headroom
+    ports:
+      - "8085:8080"
+    volumes:
+      # Persistent data (SQLite + ChromaDB + git clones)
+      - docserver-data:/data
+      # Configuration
+      - ./docserver/config/sources.yaml:/config/sources.yaml:ro
+      # Home server docs (mkdocs source on infra VM)
+      - /srv/infra/mkdocs/docs:/repos/home-server-docs:ro
+    environment:
+      - DOCSERVER_POLL_INTERVAL=300
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
   timer:
     image: ghcr.io/johnmathews/gym-timer:latest
     container_name: timer
@@ -284,3 +307,5 @@ services:
 
 volumes:
   chroma_data:
+  docserver-data:
+
