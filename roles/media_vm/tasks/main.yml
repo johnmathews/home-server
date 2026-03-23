@@ -72,14 +72,23 @@
     - "{{ media_stack_mount_dir }}/library"
     - "{{ media_stack_mount_dir }}/media"
 
-- name: Ensure hometube config directory exists
+- name: Ensure journal-agent data directory exists
   file:
-    path: "{{ media_stack_base_dir }}/config/hometube/cookies"
+    path: "{{ media_stack_base_dir }}/config/journal/data"
     state: directory
     owner: "{{ media_stack_user }}"
     group: "{{ media_stack_user }}"
     mode: '0755'
-  tags: hometube
+  tags: journal
+
+- name: Ensure journal-agent chromadb directory exists
+  file:
+    path: "{{ media_stack_base_dir }}/config/journal/chromadb"
+    state: directory
+    owner: "{{ media_stack_user }}"
+    group: "{{ media_stack_user }}"
+    mode: '0755'
+  tags: journal
 
 - name: Ensure alloy config directory exists
   file:

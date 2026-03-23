@@ -2,6 +2,44 @@
 # media_vm/files/docker-compose.yml
 
 services:
+
+  journal:
+    container_name: journal
+    image: ghcr.io/johnmathews/journal-agent:latest
+    environment:
+      - TZ=${TZ:-Europe/Amsterdam}
+      - DB_PATH=/data/journal.db
+      - CHROMADB_HOST=journal-chromadb
+      - CHROMADB_PORT=8000
+      - MCP_HOST=0.0.0.0
+      - MCP_PORT=8400
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    volumes:
+      - /srv/media/config/journal/data:/data
+    ports:
+      - "8400:8400"
+    depends_on:
+      journal-chromadb:
+        condition: service_healthy
+    restart: always
+
+  journal-chromadb:
+    container_name: journal-chromadb
+    image: ghcr.io/johnmathews/journal-chromadb:latest
+    environment:
+      - TZ=${TZ:-Europe/Amsterdam}
+    volumes:
+      - /srv/media/config/journal/chromadb:/data
+    ports:
+      - "8401:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v2/heartbeat"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: always
+
   lidarr:
     image: lscr.io/linuxserver/lidarr:latest
     container_name: lidarr
