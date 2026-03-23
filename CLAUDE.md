@@ -92,6 +92,7 @@ Service-specific guides in `/documentation/`. Read the relevant doc before worki
 - `cloudflare-api.md` — Cloudflare API reference for DNS, Tunnel, Access, and Redirect automation
 - `cloudflared.md` — Cloudflare Tunnel setup, proxied services, DNS routes, architecture
 - `domain-migration.md` — Migration plan from itsa.pizza to itsa-pizza.com (multi-session project)
+- `docserver.md` — Documentation MCP server on infra VM (indexing, search, MCP)
 - `disks.md` — Proxmox host disk management and backup storage
 - `immich_lxc.md` — Immich photo management, environment variables, vault config
 - `index.md` — Top-level project overview and conventions
@@ -111,6 +112,7 @@ Service-specific guides in `/documentation/`. Read the relevant doc before worki
 - `tailscale.md` — VPN setup, DNS privacy, remote Ansible access
 - `traefik.md` — Traefik reverse proxy dashboard and API
 - `jellyfin_lxc.md` — Jellyfin LXC setup, plugins, NFS monitoring issue, 10.11.x known issues
+- `journal_agent.md` — Journal agent and ChromaDB on media VM (MCP journaling, vector search)
 - `proxmox_host_tuning.md` — ZFS ARC, KSM, VM ballooning, memory management
 - `truenas.md` — TrueNAS scripts: share refresh, disk spindown, exporter
 - `ups.md` — UPS monitoring via Network UPS Tools (NUT)
