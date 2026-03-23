@@ -1,11 +1,11 @@
-- name: restart docker compose stack
+- name: Restart docker compose stack
   community.docker.docker_compose_v2:
     project_src: "{{ docker_compose_dir }}"
     state: present
     recreate: always
     dependencies: true
   become: false
-- name: restart alloy
+- name: Restart alloy
   community.docker.docker_compose_v2:
     project_src: "{{ docker_compose_dir }}"
     services:
@@ -14,9 +14,9 @@
     recreate: always
     dependencies: true
   become: false
-- name: restart sleep-hours timers
+- name: Restart sleep-hours timers
   become: true
-  systemd:
+  ansible.builtin.systemd:
     name: "{{ item }}"
     state: restarted
   loop:

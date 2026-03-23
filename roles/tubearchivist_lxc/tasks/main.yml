@@ -3,7 +3,7 @@
   ansible.builtin.apt:
     name: cifs-utils
     state: present
-    update_cache: yes
+    update_cache: true
 - name: Create base app directories for containers
   ansible.builtin.file:
     path: "{{ item }}"
@@ -15,9 +15,9 @@
     - /srv/apps/alloy
   tags: alloy, docker
   notify:
-    - restart alloy
+    - Restart alloy
 - name: Upload alloy config files
-  copy:
+  ansible.builtin.copy:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
     owner: "{{ puid }}"
@@ -30,14 +30,14 @@
   become: true
   tags: [docker, alloy]
   notify:
-    - restart alloy
+    - Restart alloy
 - name: Copy docker-compose.yml
-  template:
+  ansible.builtin.template:
     src: templates/docker-compose.yml.j2
     dest: /srv/apps/docker-compose.yml
     mode: '0644'
     owner: root
     group: root
   notify:
-    - restart docker compose stack
+    - Restart docker compose stack
   tags: docker, alloy
