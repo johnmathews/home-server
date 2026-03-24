@@ -4,3 +4,156 @@ cloudflared_tunnel_name: home-server
 cloudflared_tunnel_id: e1e3b9c4-789a-4ad3-adff-a0c71bff1122
 cloudflared_account_id: "{{ vault_cloudflared_account_id }}"
 cloudflared_api_token: "{{ vault_cloudflared_api_token }}"
+
+# Tunnel ingress rules — single source of truth for both config.yml and API sync.
+# Each entry has: prefix (subdomain, or "" for bare domain), service (origin URL).
+# Optional: no_tls_verify (bool), set_host_header (bool).
+cloudflared_ingress:
+  # Homepage
+  - prefix: ""
+    service: "http://192.168.2.106:3002"
+  - prefix: dash
+    service: "http://192.168.2.106:3002"
+
+  # Documentation
+  - prefix: docs
+    service: "http://192.168.2.106:3002"
+  - prefix: server-docs
+    service: "http://192.168.2.106:8000"
+  - prefix: agent-docs
+    service: "http://192.168.2.107:8001"
+  - prefix: agent-journal
+    service: "http://192.168.2.107:8000"
+
+  # Apps
+  - prefix: timer
+    service: "http://192.168.2.106:8082"
+  - prefix: sre
+    service: "http://192.168.2.106:8501"
+  - prefix: claw
+    service: "http://192.168.2.107:18789"
+
+  # Traefik / media ingress
+  - prefix: traefik
+    service: "http://192.168.2.108"
+  - prefix: immich
+    service: "http://192.168.2.108"
+  - prefix: share
+    service: "http://192.168.2.108"
+  - prefix: jelly
+    service: "http://192.168.2.108"
+    set_host_header: true
+
+  # Music
+  - prefix: navidrome
+    service: "http://192.168.2.109:4533"
+  - prefix: music
+    service: "http://192.168.2.109:9180"
+  - prefix: lidarr
+    service: "http://192.168.2.105:8686"
+  - prefix: slskd
+    service: "http://192.168.2.105:5030"
+  - prefix: picard
+    service: "http://192.168.2.109:5800"
+
+  # Chat
+  - prefix: chat
+    service: "http://192.168.2.119:3000"
+
+  # Monitoring
+  - prefix: charts
+    service: "http://192.168.2.106:3000"
+  - prefix: grafana
+    service: "http://192.168.2.106:3000"
+  - prefix: loki
+    service: "http://192.168.2.106:3100"
+  - prefix: prometheus
+    service: "http://192.168.2.115:9090"
+
+  # Infrastructure
+  - prefix: portainer
+    service: "http://192.168.2.106:9000"
+  - prefix: dozzle
+    service: "http://192.168.2.106:9999"
+  - prefix: speed
+    service: "http://192.168.2.100:8080"
+  - prefix: atuin
+    service: "http://192.168.2.106:8888"
+  - prefix: files
+    service: "http://192.168.2.104:30334"
+
+  # Home Assistant
+  - prefix: home
+    service: "http://192.168.2.102:8123"
+
+  # TLS backends
+  - prefix: vault
+    service: "https://192.168.2.13:8000"
+    no_tls_verify: true
+  - prefix: passwords
+    service: "https://192.168.2.13:8000"
+    no_tls_verify: true
+  - prefix: proxmox
+    service: "https://192.168.2.214:8006"
+    no_tls_verify: true
+  - prefix: pve
+    service: "https://192.168.2.214:8006"
+    no_tls_verify: true
+  - prefix: pbs
+    service: "https://192.168.2.200:8007"
+    no_tls_verify: true
+  - prefix: bmc
+    service: "https://192.168.2.213"
+    no_tls_verify: true
+
+  # Uptime
+  - prefix: uptime
+    service: "http://192.168.2.106:3001"
+
+  # DNS
+  - prefix: ads
+    service: "http://192.168.2.111"
+  - prefix: adguard
+    service: "http://192.168.2.111"
+
+  # Media management
+  - prefix: seerr
+    service: "http://192.168.2.105:5055"
+  - prefix: kids-seerr
+    service: "http://192.168.2.105:5056"
+  - prefix: radarr
+    service: "http://192.168.2.105:7878"
+  - prefix: sonarr
+    service: "http://192.168.2.105:8989"
+  - prefix: sabnzbd
+    service: "http://192.168.2.105:8081"
+  - prefix: qbittorrent
+    service: "http://192.168.2.105:8080"
+  - prefix: tube
+    service: "http://192.168.2.116:8000"
+  - prefix: kids-tube
+    service: "http://192.168.2.116:8000"
+  - prefix: bazarr
+    service: "http://192.168.2.105:6767"
+  - prefix: subs
+    service: "http://192.168.2.105:6767"
+  - prefix: prowlarr
+    service: "http://192.168.2.105:9696"
+
+  # Documents
+  - prefix: paperless
+    service: "http://192.168.2.117:8000"
+  - prefix: documents
+    service: "http://192.168.2.117:8000"
+
+  # Books
+  - prefix: booklore
+    service: "http://192.168.2.105:6060"
+  - prefix: books
+    service: "http://192.168.2.105:6060"
+
+  # NAS
+  - prefix: nas
+    service: "http://192.168.2.104"
+  - prefix: truenas
+    service: "http://192.168.2.104"

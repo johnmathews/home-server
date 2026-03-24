@@ -1,6 +1,5 @@
 # {{ ansible_managed }}
 # cloudflared tunnel configuration
-# vim: ft=jinja2
 
 {% set domains = [primary_domain_name] + (migration_additional_domains | default([])) %}
 
@@ -9,148 +8,19 @@ credentials-file: /root/.cloudflared/{{ cloudflared_tunnel_id }}.json
 
 ingress:
 {% for domain in domains %}
-  - hostname: {{ domain }}
-    service: http://192.168.2.106:3002
-  - hostname: dash.{{ domain }}
-    service: http://192.168.2.106:3002
-
-  - hostname: agent-journal.{{ domain }}
-    service: http://192.168.2.107:8000
-  - hostname: agent-docs.{{ domain }}
-    service: http://192.168.2.107:8001
-
-  - hostname: timer.{{ domain }}
-    service: http://192.168.2.106:8082
-  - hostname: sre.{{ domain }}
-    service: http://192.168.2.106:8501
-
-  - hostname: claw.{{ domain }}
-    service: http://192.168.2.107:18789
-
-  - hostname: traefik.{{ domain }}
-    service: http://192.168.2.108
-
-  - hostname: immich.{{ domain }}
-    service: http://192.168.2.108
-  - hostname: share.{{ domain }}
-    service: http://192.168.2.108
-
-  - hostname: jelly.{{ domain }}
-    service: http://192.168.2.108
+{% for rule in cloudflared_ingress %}
+{% set hostname = (rule.prefix + '.' + domain) if rule.prefix else domain %}
+  - hostname: {{ hostname }}
+    service: {{ rule.service }}
+{% if rule.no_tls_verify | default(false) or rule.set_host_header | default(false) %}
     originRequest:
-      httpHostHeader: jelly.{{ domain }}
-
-  - hostname: navidrome.{{ domain }}
-    service: http://192.168.2.109:4533
-  - hostname: music.{{ domain }}
-    service: http://192.168.2.109:9180
-  - hostname: lidarr.{{ domain }}
-    service: http://192.168.2.105:8686
-  - hostname: slskd.{{ domain }}
-    service: http://192.168.2.105:5030
-
-  - hostname: chat.{{ domain }}
-    service: http://192.168.2.119:3000
-
-  - hostname: charts.{{ domain }}
-    service: http://192.168.2.106:3000
-  - hostname: grafana.{{ domain }}
-    service: http://192.168.2.106:3000
-  - hostname: loki.{{ domain }}
-    service: http://192.168.2.106:3100
-  - hostname: prometheus.{{ domain }}
-    service: http://192.168.2.115:9090
-
-  - hostname: portainer.{{ domain }}
-    service: http://192.168.2.106:9000
-  - hostname: dozzle.{{ domain }}
-    service: http://192.168.2.106:9999
-  - hostname: speed.{{ domain }}
-    service: http://192.168.2.100:8080
-  - hostname: atuin.{{ domain }}
-    service: http://192.168.2.106:8888
-
-  - hostname: files.{{ domain }}
-    service: http://192.168.2.104:30334
-
-  - hostname: home.{{ domain }}
-    service: http://192.168.2.102:8123
-
-  - hostname: vault.{{ domain }}
-    service: https://192.168.2.13:8000
-    originRequest:
+{% if rule.no_tls_verify | default(false) %}
       noTLSVerify: true
-  - hostname: passwords.{{ domain }}
-    service: https://192.168.2.13:8000
-    originRequest:
-      noTLSVerify: true
-
-  - hostname: proxmox.{{ domain }}
-    service: https://192.168.2.214:8006
-    originRequest:
-      noTLSVerify: true
-  - hostname: pve.{{ domain }}
-    service: https://192.168.2.214:8006
-    originRequest:
-      noTLSVerify: true
-  - hostname: pbs.{{ domain }}
-    service: https://192.168.2.200:8007
-    originRequest:
-      noTLSVerify: true
-  - hostname: bmc.{{ domain }}
-    service: https://192.168.2.213
-    originRequest:
-      noTLSVerify: true
-
-  - hostname: uptime.{{ domain }}
-    service: http://192.168.2.106:3001
-
-  - hostname: ads.{{ domain }}
-    service: http://192.168.2.111
-  - hostname: adguard.{{ domain }}
-    service: http://192.168.2.111
-
-  - hostname: seerr.{{ domain }}
-    service: http://192.168.2.105:5055
-  - hostname: kids-seerr.{{ domain }}
-    service: http://192.168.2.105:5056
-  - hostname: radarr.{{ domain }}
-    service: http://192.168.2.105:7878
-  - hostname: sonarr.{{ domain }}
-    service: http://192.168.2.105:8989
-  - hostname: sabnzbd.{{ domain }}
-    service: http://192.168.2.105:8081
-  - hostname: qbittorrent.{{ domain }}
-    service: http://192.168.2.105:8080
-  - hostname: tube.{{ domain }}
-    service: http://192.168.2.116:8000
-  - hostname: kids-tube.{{ domain }}
-    service: http://192.168.2.116:8000
-
-  - hostname: bazarr.{{ domain }}
-    service: http://192.168.2.105:6767
-  - hostname: subs.{{ domain }}
-    service: http://192.168.2.105:6767
-
-  - hostname: prowlarr.{{ domain }}
-    service: http://192.168.2.105:9696
-
-  - hostname: paperless.{{ domain }}
-    service: http://192.168.2.117:8000
-  - hostname: documents.{{ domain }}
-    service: http://192.168.2.117:8000
-
-  - hostname: docs.{{ domain }}
-    service: http://192.168.2.106:8000
-  - hostname: booklore.{{ domain }}
-    service: http://192.168.2.105:6060
-  - hostname: books.{{ domain }}
-    service: http://192.168.2.105:6060
-
-  - hostname: nas.{{ domain }}
-    service: http://192.168.2.104
-  - hostname: truenas.{{ domain }}
-    service: http://192.168.2.104
-
+{% endif %}
+{% if rule.set_host_header | default(false) %}
+      httpHostHeader: {{ hostname }}
+{% endif %}
+{% endif %}
+{% endfor %}
 {% endfor %}
   - service: http_status:404

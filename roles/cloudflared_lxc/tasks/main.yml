@@ -36,6 +36,93 @@
   changed_when: false
   tags: cloudflared
 
+- name: Extract hostnames from tunnel config template
+  ansible.builtin.set_fact:
+    tunnel_hostnames: >-
+      {{ (lookup('template', 'config.yml.j2') | from_yaml).ingress
+         | selectattr('hostname', 'defined')
+         | map(attribute='hostname')
+         | list }}
+  tags: cloudflared
+
+- name: Look up Cloudflare zone IDs
+  ansible.builtin.uri:
+    url: "https://api.cloudflare.com/client/v4/zones?name={{ item }}"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ cloudflared_api_token }}"
+    return_content: true
+  register: zone_lookups
+  delegate_to: localhost
+  become: false
+  check_mode: false
+  changed_when: false
+  loop: "{{ [primary_domain_name] + (migration_additional_domains | default([])) }}"
+  loop_control:
+    label: "{{ item }}"
+  tags: cloudflared
+
+- name: Build zone ID map
+  ansible.builtin.set_fact:
+    cloudflared_zone_ids: >-
+      {{ cloudflared_zone_ids | default({}) | combine({item.item: item.json.result[0].id}) }}
+  loop: "{{ zone_lookups.results }}"
+  loop_control:
+    label: "{{ item.item }}"
+  tags: cloudflared
+
+- name: Fetch existing CNAME records for each zone
+  ansible.builtin.uri:
+    url: "https://api.cloudflare.com/client/v4/zones/{{ item.value }}/dns_records?type=CNAME&per_page=5000"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ cloudflared_api_token }}"
+    return_content: true
+  register: dns_lookups
+  delegate_to: localhost
+  become: false
+  check_mode: false
+  changed_when: false
+  loop: "{{ cloudflared_zone_ids | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+  tags: cloudflared
+
+- name: Determine missing DNS records
+  ansible.builtin.set_fact:
+    missing_dns_hostnames: >-
+      {{ tunnel_hostnames | difference(
+           dns_lookups.results | map(attribute='json') | map(attribute='result') | flatten | map(attribute='name') | list
+         ) }}
+  tags: cloudflared
+
+- name: Show missing DNS records to create
+  ansible.builtin.debug:
+    msg: "Creating CNAME records: {{ missing_dns_hostnames }}"
+  when: missing_dns_hostnames | length > 0
+  tags: cloudflared
+
+- name: Create missing CNAME DNS records
+  ansible.builtin.uri:
+    url: "https://api.cloudflare.com/client/v4/zones/{{ cloudflared_zone_ids[item.split('.')[-2:] | join('.')] }}/dns_records"
+    method: POST
+    headers:
+      Authorization: "Bearer {{ cloudflared_api_token }}"
+      Content-Type: application/json
+    body_format: json
+    body:
+      type: CNAME
+      name: "{{ item }}"
+      content: "{{ cloudflared_tunnel_id }}.cfargotunnel.com"
+      proxied: true
+    status_code: 200
+  delegate_to: localhost
+  become: false
+  loop: "{{ missing_dns_hostnames }}"
+  loop_control:
+    label: "{{ item }}"
+  tags: cloudflared
+
 - name: Ensure cloudflared service is enabled and running
   ansible.builtin.systemd:
     name: cloudflared

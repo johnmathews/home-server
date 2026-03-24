@@ -22,27 +22,31 @@ Main configuration file:
 
 ## Updating Configuration
 
-Edit the Ansible template and deploy:
+To add, remove, or change a tunnel route:
 
 ```sh
-# 1. Edit the ingress rules
-vim roles/cloudflared_lxc/templates/config.yml.j2
+# 1. Edit the ingress rules (single source of truth)
+vim roles/cloudflared_lxc/defaults/main.yml    # cloudflared_ingress list
 
-# 2. Update the API payload template to match (keeps remote config in sync)
-vim roles/cloudflared_lxc/templates/tunnel_config_api.json.j2
-
-# 3. Create DNS route for the new subdomain
-ssh cloudflared
-cloudflared tunnel route dns home-server <subdomain>.itsa-pizza.com
-
-# 4. Deploy (templates config, syncs to Cloudflare API, restarts if changed)
+# 2. Deploy (templates config, syncs to Cloudflare API, creates DNS records, restarts if changed)
 make cloudflared
 ```
 
+The `cloudflared_ingress` variable in `defaults/main.yml` is the single source of truth for all tunnel routes.
+Both templates (`config.yml.j2` and `tunnel_config_api.json.j2`) render from this variable, so there is no
+duplication to keep in sync.
+
+Each entry has a `prefix` (subdomain, or `""` for the bare domain), a `service` (origin URL), and optional flags:
+- `no_tls_verify: true` — for HTTPS backends with self-signed certs
+- `set_host_header: true` — sets `originRequest.httpHostHeader` to the full hostname
+
+DNS CNAME records are created automatically during deploy. The role fetches all existing CNAME records for the
+zone in a single API call, compares against the hostnames derived from the ingress variable, and creates any
+missing records pointing to the tunnel. No need to SSH into the LXC or run `cloudflared tunnel route dns` manually.
+
 **Important:** The Cloudflare edge always pushes a remote tunnel config that overrides the local `config.yml` at
 runtime. The Ansible role works around this by PUTting the config to the Cloudflare Tunnel API on every deploy,
-keeping both in sync. Both templates (`config.yml.j2` and `tunnel_config_api.json.j2`) must be updated together
-when adding or removing hostnames.
+keeping both in sync.
 
 ## Logging
 
@@ -122,12 +126,13 @@ All services listed in `/etc/cloudflared/config.yml`. Key subdomains:
 - Role: `roles/cloudflared_lxc`
 - Playbook: `playbooks/cloudflared_lxc.yml`
 - Deploy: `make cloudflared`
-- Config template: `roles/cloudflared_lxc/templates/config.yml.j2` (uses `{{ primary_domain_name }}`)
-- API sync template: `roles/cloudflared_lxc/templates/tunnel_config_api.json.j2`
+- Ingress rules: `roles/cloudflared_lxc/defaults/main.yml` (`cloudflared_ingress` variable)
+- Config template: `roles/cloudflared_lxc/templates/config.yml.j2` (renders from `cloudflared_ingress`)
+- API sync template: `roles/cloudflared_lxc/templates/tunnel_config_api.json.j2` (renders from `cloudflared_ingress`)
 - Vault secrets: `vault_cloudflared_account_id`, `vault_cloudflared_api_token`
 
 The LXC was originally created manually via a Proxmox community script. The Ansible role manages the tunnel
-config file, shell environment, and Tailscale.
+config file, DNS records, shell environment, and Tailscale.
 
 ## Domain Migration
 
