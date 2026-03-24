@@ -354,9 +354,21 @@
         icon: https://app.addy.io/favicon.ico
 
 - Documentation:
-    - Docs:
+    - Documentation (all):
         href: https://docs.{{ primary_domain_name }}
+        siteMonitor: http://192.168.2.106:3002
+        icon: si-materialformkdocs
+    - Server Documentation:
+        href: https://server-docs.{{ primary_domain_name }}
         siteMonitor: http://192.168.2.106:8000
+        icon: si-materialformkdocs
+    - NanoClaw Documentation:
+        href: https://agent-docs.{{ primary_domain_name }}
+        siteMonitor: http://192.168.2.107:8000
+        icon: si-materialformkdocs
+    - NanoClaw Dev Journal:
+        href: https://agent-journal.{{ primary_domain_name }}
+        siteMonitor: http://192.168.2.107:8001
         icon: si-materialformkdocs
 
 - Media_:
@@ -413,18 +425,6 @@
           url: http://192.168.2.106:3000
           username: "{{ vault_grafana_username }}"
           password: "{{ vault_grafana_password }}"
-    - Server Documentation:
-        href: https://docs.{{ primary_domain_name }}
-        siteMonitor: http://192.168.2.106:8000
-        icon: si-materialformkdocs
-    - NanoClaw Documentation:
-        href: https://agent-docs.{{ primary_domain_name }}
-        siteMonitor: http://192.168.2.107:8000
-        icon: si-materialformkdocs
-    - NanoClaw Dev Journal:
-        href: https://agent-journal.{{ primary_domain_name }}
-        siteMonitor: http://192.168.2.107:8001
-        icon: si-materialformkdocs
     - Prometheus:
         href: http://prometheus.{{ primary_domain_name }}
         siteMonitor: http://192.168.2.115:9090

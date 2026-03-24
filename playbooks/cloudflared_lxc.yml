@@ -9,6 +9,6 @@
     - role: cloudflared_lxc
       tags: cloudflared
     - role: shell_environment
-      tags: shell
+      tags: [shell, shell_env, terminal]
     - role: tailscale
       tags: tailscale
