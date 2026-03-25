@@ -32,7 +32,7 @@ services:
       - ./traefik/dynamic:/etc/traefik/dynamic:ro
 
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:latest
+    image: gcr.io/cadvisor/cadvisor:{{ cadvisor_version }}
     container_name: cadvisor
     restart: always
     ports:
@@ -53,7 +53,7 @@ services:
         max-file: "5"
 
   alloy:
-    image: grafana/alloy:latest
+    image: grafana/alloy:{{ alloy_version }}
     container_name: alloy
     restart: unless-stopped
     environment:

@@ -12,7 +12,7 @@ services:
       - "/mnt/nfs/music:/storage:rw"
 
   navidrome:
-    image: deluan/navidrome:latest
+    image: deluan/navidrome:{{ navidrome_version }}
     container_name: navidrome
     restart: always
     user: "{{ puid }}:{{ guid }}"
@@ -42,7 +42,7 @@ services:
         max-file: "5"
 
   feishin:
-    image: 'ghcr.io/jeffvli/feishin:latest'
+    image: 'ghcr.io/jeffvli/feishin:{{ feishin_version }}'
     container_name: feishin
     restart: unless-stopped
     environment:
@@ -57,7 +57,7 @@ services:
       - 9180:9180
 
   alloy:
-    image: grafana/alloy:latest
+    image: grafana/alloy:{{ alloy_version }}
     container_name: alloy
     restart: unless-stopped
     environment:
@@ -85,7 +85,7 @@ services:
         max-file: "5"
 
   node_exporter:
-    image: quay.io/prometheus/node-exporter:latest
+    image: quay.io/prometheus/node-exporter:{{ node_exporter_version }}
     container_name: node_exporter
     command:
       - '--path.rootfs=/host'
@@ -104,7 +104,7 @@ services:
         max-file: "5"
 
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:latest
+    image: gcr.io/cadvisor/cadvisor:{{ cadvisor_version }}
     container_name: cadvisor
     restart: always
     ports:
