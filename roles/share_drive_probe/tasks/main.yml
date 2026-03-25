@@ -1,7 +1,7 @@
 # share_drive_probe/tasks/main.yml
 
 - name: Ensure config and metrics directories exist
-  file:
+  ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     owner: root
@@ -12,7 +12,7 @@
     - "{{ share_drive_probe_textfile_dir }}"
 
 - name: Ensure textfile collector directory permissions are correct
-  file:
+  ansible.builtin.file:
     path: "{{ share_drive_probe_textfile_dir }}"
     state: directory
     owner: root
@@ -20,11 +20,11 @@
     mode: "{{ share_drive_probe_textfile_dir_mode }}"
   become: true
   notify:
-    - reload daemon
-    - restart share-drive-probe timer
+    - Reload daemon
+    - Restart share-drive-probe timer
 
 - name: Ensure probe metrics file has correct permissions (if present)
-  file:
+  ansible.builtin.file:
     path: "{{ share_drive_probe_textfile_dir }}/share_drive_probe.prom"
     state: file
     owner: root
@@ -33,11 +33,11 @@
   become: true
   ignore_errors: true
   notify:
-    - reload daemon
-    - restart share-drive-probe timer
+    - Reload daemon
+    - Restart share-drive-probe timer
 
 - name: Ensure state dir exists
-  file:
+  ansible.builtin.file:
     path: "{{ share_drive_probe_state_dir }}"
     state: directory
     owner: root
@@ -45,7 +45,7 @@
     mode: '0755'
 
 - name: Write targets file
-  copy:
+  ansible.builtin.copy:
     dest: "{{ share_drive_probe_targets_file }}"
     owner: root
     group: root
@@ -56,31 +56,31 @@
       {% endfor -%}
 
 - name: Install probe script
-  template:
+  ansible.builtin.template:
     src: templates/share_drive_probe.sh.j2
     dest: "{{ share_drive_probe_bin }}"
     owner: root
     group: root
     mode: '0755'
   notify:
-    - reload daemon
-    - run share-drive-probe service
-    - restart share-drive-probe timer
+    - Reload daemon
+    - Run share-drive-probe service
+    - Restart share-drive-probe timer
 
 - name: Install systemd service
-  template:
+  ansible.builtin.template:
     src: templates/share_drive_probe.service.j2
     dest: /etc/systemd/system/share-drive-probe.service
     mode: '0644'
   notify:
-    - reload daemon
-    - run share-drive-probe service
+    - Reload daemon
+    - Run share-drive-probe service
 
 - name: Install systemd timer
-  template:
+  ansible.builtin.template:
     src: templates/share_drive_probe.timer.j2
     dest: /etc/systemd/system/share-drive-probe.timer
     mode: '0644'
   notify:
-    - reload daemon
-    - restart share-drive-probe timer
+    - Reload daemon
+    - Restart share-drive-probe timer

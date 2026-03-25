@@ -4,18 +4,18 @@
 
 # handlers run in the order they are definied
 
-- name: reload daemon
-  systemd:
+- name: Reload daemon
+  ansible.builtin.systemd:
     daemon_reload: true
 
-- name: restart share-drive-probe timer
-  systemd:
+- name: Restart share-drive-probe timer
+  ansible.builtin.systemd:
     name: share-drive-probe.timer
     state: restarted
     enabled: true
 
-- name: run share-drive-probe service
-  systemd:
+- name: Run share-drive-probe service
+  ansible.builtin.systemd:
     name: share-drive-probe.service
     state: restarted
     enabled: false

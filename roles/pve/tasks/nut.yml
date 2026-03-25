@@ -5,7 +5,7 @@
       - nut-client
       - nut-server
     state: present
-    update_cache: yes
+    update_cache: true
 
 - name: Ensure NUT config dir exists
   ansible.builtin.file:

@@ -96,4 +96,3 @@ shell_environment_lazygit_bin_dir: "/usr/local/bin"
 # Node.js (NodeSource repository)
 shell_environment_nodejs_enabled: true
 shell_environment_nodejs_major_version: "20" # LTS - Iron (until April 2026)
-

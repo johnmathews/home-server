@@ -1,6 +1,6 @@
 # Tailscale configuration defaults
 
-tailscale_auth_key: "{{vault_tailscale_auth_key }}"
+tailscale_auth_key: "{{ vault_tailscale_auth_key }}"
 
 # Enable/disable Tailscale service
 tailscale_enabled: true

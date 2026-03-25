@@ -3,7 +3,7 @@
 ---
 
 - name: Ensure Python build dependencies are installed
-  apt:
+  ansible.builtin.apt:
     name:
       - python3-venv
       - python3-full
@@ -13,35 +13,35 @@
     update_cache: true
 
 - name: Create Glances virtualenv directory
-  file:
+  ansible.builtin.file:
     path: /opt/glances-venv
     state: directory
     mode: '0755'
 
 - name: Create a virtual environment using uv
-  command: uv venv /opt/glances-venv
+  ansible.builtin.command: uv venv /opt/glances-venv
   args:
     creates: /opt/glances-venv/pyvenv.cfg
 
 - name: Get Python major.minor version in Glances venv
-  command: /opt/glances-venv/bin/python -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')"
+  ansible.builtin.command: /opt/glances-venv/bin/python -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')"
   register: glances_python_version
   changed_when: false
 
 - name: Install Glances and dependencies in virtualenv using uv
-  command: >
+  ansible.builtin.command: >
     uv pip install --python /opt/glances-venv/bin/python 'glances[all]' fastapi uvicorn jinja2
   args:
     creates: /opt/glances-venv/bin/glances
 
 - name: Ensure jinja2 is installed in Glances venv
-  command: >
+  ansible.builtin.command: >
     uv pip install --python /opt/glances-venv/bin/python jinja2
   args:
     creates: "/opt/glances-venv/lib/python{{ glances_python_version.stdout }}/site-packages/jinja2"
 
 - name: Create Glances systemd service
-  copy:
+  ansible.builtin.copy:
     dest: /etc/systemd/system/glances.service
     content: |
       [Unit]
@@ -59,7 +59,7 @@
   notify: Restart Glances
 
 - name: Enable and start Glances
-  systemd:
+  ansible.builtin.systemd:
     name: glances
     enabled: true
     state: started

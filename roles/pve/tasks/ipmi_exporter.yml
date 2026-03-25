@@ -3,7 +3,7 @@
 ---
 
 - name: Ensure IPMI exporter directory exists
-  file:
+  ansible.builtin.file:
     path: "{{ ipmi_exporter_install_dir }}"
     state: directory
     owner: root
@@ -11,27 +11,27 @@
     mode: '0755'
 
 - name: Download IPMI exporter binary
-  get_url:
+  ansible.builtin.get_url:
     url: "https://github.com/prometheus-community/ipmi_exporter/releases/download/v{{ ipmi_exporter_version }}/ipmi_exporter-{{ ipmi_exporter_version }}.linux-amd64.tar.gz"
     dest: "/tmp/ipmi_exporter.tar.gz"
     mode: '0644'
 
 - name: Extract IPMI exporter binary
-  unarchive:
+  ansible.builtin.unarchive:
     src: "/tmp/ipmi_exporter.tar.gz"
     dest: "{{ ipmi_exporter_install_dir }}"
-    remote_src: yes
+    remote_src: true
     creates: "{{ ipmi_exporter_install_dir }}/ipmi_exporter-{{ ipmi_exporter_version }}.linux-amd64/ipmi_exporter"
 
 - name: Create symlink to stable binary path
-  file:
+  ansible.builtin.file:
     src: "{{ ipmi_exporter_install_dir }}/ipmi_exporter-{{ ipmi_exporter_version }}.linux-amd64/ipmi_exporter"
     dest: "{{ ipmi_exporter_install_dir }}/ipmi_exporter"
     state: link
-    force: yes
+    force: true
 
 - name: Deploy IPMI exporter config
-  template:
+  ansible.builtin.template:
     src: ipmi.yml.j2
     dest: "{{ ipmi_exporter_install_dir }}/ipmi.yml"
     owner: root
@@ -40,7 +40,7 @@
   notify: Restart ipmi_exporter
 
 - name: Create ipmi_exporter systemd unit
-  copy:
+  ansible.builtin.copy:
     dest: /etc/systemd/system/ipmi_exporter.service
     owner: root
     group: root
@@ -62,7 +62,7 @@
     - Restart ipmi_exporter
 
 - name: Ensure ipmi_exporter is enabled and running
-  systemd:
+  ansible.builtin.systemd:
     name: ipmi_exporter
-    enabled: yes
+    enabled: true
     state: started

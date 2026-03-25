@@ -1,20 +1,20 @@
 - name: Install client packages
   become: true
-  apt:
+  ansible.builtin.apt:
     name: "{{ nfs_client_packages }}"
     state: present
-    update_cache: yes
+    update_cache: true
 
 - name: Ensure /mnt/nfs exists
   become: true
-  file:
+  ansible.builtin.file:
     path: /mnt/nfs
     state: directory
     mode: "0755"
 
 
 - name: Ensure nfs group exists
-  group:
+  ansible.builtin.group:
     name: "{{ nfs_user_name }}"
     # gid: "{{ nfs_group_gid }}"
     state: present
@@ -22,7 +22,7 @@
   register: nfs_group
 
 - name: Ensure nfs user exists
-  user:
+  ansible.builtin.user:
     name: "{{ nfs_user_name }}"
     state: present
     system: true
@@ -33,13 +33,13 @@
   when: nfs_group is changed
 
 - name: Check if UID already exists
-  command: "getent passwd {{ nfs_user_uid }}"
+  ansible.builtin.command: "getent passwd {{ nfs_user_uid }}"
   register: existing_uid
   changed_when: false
   failed_when: false
 
 - name: Ensure NFS user exists (only if UID not already defined)
-  user:
+  ansible.builtin.user:
     name: "{{ nfs_user_name }}"
     state: present
     system: true
@@ -50,19 +50,12 @@
   when: existing_uid.stdout == ""
 
 
-
-
-
-
-
-
-
 - name: Detect automount capability
-  set_fact:
+  ansible.builtin.set_fact:
     nfs_can_systemd_automount: "{{ (ansible_service_mgr == 'systemd') and (ansible_virtualization_type != 'lxc') }}"
 
 - name: Prepare mountpoints that are not already mounted
-  include_tasks: prepare_mount.yml
+  ansible.builtin.include_tasks: prepare_mount.yml
   loop: "{{ nfs_shares }}"
   loop_control:
     loop_var: nfs_item
@@ -83,9 +76,9 @@
     opts: "{{ _opts }}"
     state: present
 
-- name: systemd daemon-reload
+- name: Systemd daemon-reload
   become: true
-  systemd:
+  ansible.builtin.systemd:
     daemon_reload: true
 
 - name: Enable+start systemd automount units (VMs only)
@@ -93,7 +86,7 @@
   when: nfs_can_systemd_automount
   loop: "{{ nfs_shares }}"
   loop_control: { label: "{{ item.name }}" }
-  systemd:
+  ansible.builtin.systemd:
     name: "{{ (item.mountpoint | regex_replace('^/', '') | regex_replace('/', '-')) }}.automount"
     enabled: true
     state: started
@@ -103,19 +96,19 @@
   loop: "{{ nfs_shares }}"
   loop_control:
     label: "{{ item.name }}"
-  command: "systemctl show -p ActiveState {{ (item.mountpoint | regex_replace('^/', '') | regex_replace('/', '-')) }}.automount"
+  ansible.builtin.command: "systemctl show -p ActiveState {{ (item.mountpoint | regex_replace('^/', '') | regex_replace('/', '-')) }}.automount"
   changed_when: false
   when: nfs_can_systemd_automount
 
 - name: Include autofs setup (LXCs only)
   when: not nfs_can_systemd_automount
-  include_tasks: autofs.yml
+  ansible.builtin.include_tasks: autofs.yml
 
 - name: Trigger first access
   become: true
   loop: "{{ nfs_shares }}"
   loop_control: { label: "{{ item.name }}" }
-  command: "bash -lc 'timeout 5s ls -d {{ item.mountpoint }}/{{ item.name }} >/dev/null 2>&1 || true'"
+  ansible.builtin.command: "bash -lc 'timeout 5s ls -d {{ item.mountpoint }}/{{ item.name }} >/dev/null 2>&1 || true'"
   changed_when: false
   failed_when: false
 
@@ -124,12 +117,12 @@
   loop: "{{ nfs_shares }}"
   loop_control:
     label: "{{ item.name }}"
-  shell: |
+  ansible.builtin.shell: |
     echo -n "{{ item.name }}: "
     if mountpoint -q {{ item.mountpoint }}; then echo "mounted"; else echo "not mounted (automount armed)"; fi
   register: _mount_status
   changed_when: false
 
 - name: Debug mount status
-  debug:
+  ansible.builtin.debug:
     var: _mount_status.results | map(attribute='stdout') | list

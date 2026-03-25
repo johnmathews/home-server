@@ -1,20 +1,20 @@
 # Master playbook: orchestrates all playbooks
-- import_playbook: cloudflared_lxc.yml
+- import_playbook: cloudflared_lxc.yml  # noqa: name[play]
 # - import_playbook: dev_lxc.yml
-- import_playbook: immich_lxc.yml
-- import_playbook: infra_vm.yml
-- import_playbook: jellyfin_lxc.yml
-- import_playbook: key_server.yml
-- import_playbook: media_vm.yml
-- import_playbook: music_lxc.yml
-- import_playbook: nas.yml
-- import_playbook: nfs.yml
-- import_playbook: open_webui_lxc.yml
-- import_playbook: agent_lxc.yml
-- import_playbook: paperless_lxc.yml
-- import_playbook: prometheus_lxc.yml
-- import_playbook: pve.yml
-- import_playbook: share_drive_probe.yml
-- import_playbook: shell_environment.yml
-- import_playbook: tailscale.yml
-- import_playbook: tubearchivist_lxc.yml
+- import_playbook: immich_lxc.yml  # noqa: name[play]
+- import_playbook: infra_vm.yml  # noqa: name[play]
+- import_playbook: jellyfin_lxc.yml  # noqa: name[play]
+- import_playbook: key_server.yml  # noqa: name[play]
+- import_playbook: media_vm.yml  # noqa: name[play]
+- import_playbook: music_lxc.yml  # noqa: name[play]
+- import_playbook: nas.yml  # noqa: name[play]
+- import_playbook: nfs.yml  # noqa: name[play]
+- import_playbook: open_webui_lxc.yml  # noqa: name[play]
+- import_playbook: agent_lxc.yml  # noqa: name[play]
+- import_playbook: paperless_lxc.yml  # noqa: name[play]
+- import_playbook: prometheus_lxc.yml  # noqa: name[play]
+- import_playbook: pve.yml  # noqa: name[play]
+- import_playbook: share_drive_probe.yml  # noqa: name[play]
+- import_playbook: shell_environment.yml  # noqa: name[play]
+- import_playbook: tailscale.yml  # noqa: name[play]
+- import_playbook: tubearchivist_lxc.yml  # noqa: name[play]

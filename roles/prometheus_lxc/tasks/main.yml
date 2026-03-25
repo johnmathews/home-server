@@ -19,19 +19,19 @@
   ansible.builtin.file:
     path: "{{ docker_compose_dir }}/prometheus/data"
     state: directory
-    recurse: yes
+    recurse: true
     owner: "65534"
     group: "65534"
   tags: prometheus
 
 - name: Template Prometheus config
-  template:
+  ansible.builtin.template:
     src: prometheus/prometheus.yml.j2
     dest: "{{ docker_compose_dir }}/prometheus/prometheus.yml"
     owner: root
     group: docker
     mode: '0644'
-  notify: restart prometheus
+  notify: Restart prometheus
   tags: prometheus
 
 - name: Copy UPS Prometheus rules
@@ -41,11 +41,11 @@
     owner: root
     group: docker
     mode: '0644'
-  notify: restart prometheus
+  notify: Restart prometheus
   tags: prometheus
 
-- name: Upload alloy config files 
-  copy:
+- name: Upload alloy config files
+  ansible.builtin.copy:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
     owner: "{{ puid }}"
@@ -54,20 +54,20 @@
   loop:
     - alloy:
       src: templates/config.alloy
-      dest: /srv/apps/alloy/config.alloy 
+      dest: /srv/apps/alloy/config.alloy
   become: true
   tags: alloy
-  notify: 
-    - restart alloy
+  notify:
+    - Restart alloy
 
 # Copy environment and compose files
 - name: Copy docker-compose.yml
-  template:
+  ansible.builtin.template:
     src: templates/docker-compose.yml.j2
     dest: /srv/apps/docker-compose.yml
     mode: '0644'
     owner: root
     group: root
   tags: docker
-  notify: 
-    - restart docker compose stack
+  notify:
+    - Restart docker compose stack

@@ -3,28 +3,28 @@
 ---
 
 - name: Ensure mkdocs docs directory exists
-  file:
+  ansible.builtin.file:
     path: /srv/infra/mkdocs/docs
     state: directory
     owner: "{{ docker_user }}"
     group: "{{ docker_user }}"
     mode: '0755'
-  notify: restart mkdocs
+  notify: Restart mkdocs
 
 - name: Template mkdocs.yml
-  template:
+  ansible.builtin.template:
     src: mkdocs.yml.j2
     dest: /srv/infra/mkdocs/mkdocs.yml
     owner: "{{ docker_user }}"
     group: "{{ docker_user }}"
     mode: '0644'
-  notify: restart mkdocs
+  notify: Restart mkdocs
 
 - name: Copy project markdown docs into mkdocs docs dir
-  copy:
+  ansible.builtin.copy:
     src: ../documentation/
     dest: /srv/infra/mkdocs/docs/
     owner: "{{ docker_user }}"
     group: "{{ docker_user }}"
     mode: '0644'
-  notify: restart mkdocs
+  notify: Restart mkdocs

@@ -1,7 +1,7 @@
 # roles/paperless_lxc/tasks/mount-smb.yml
 
 - name: Create mount points for SMB shares
-  file:
+  ansible.builtin.file:
     path: "/mnt/{{ item.name }}"
     state: directory
     owner: root
@@ -10,7 +10,7 @@
   loop: "{{ smb_shares }}"
 
 - name: Create SMB credentials file
-  copy:
+  ansible.builtin.copy:
     dest: /etc/smb-credentials
     content: |
       username={{ smb_media_vm_username }}
@@ -30,6 +30,6 @@
   register: fstab_entries
 
 - name: Reload systemd units if fstab changed
-  systemd:
+  ansible.builtin.systemd:
     daemon_reload: true
   when: fstab_entries is changed

@@ -3,6 +3,6 @@
 ---
 
 - name: Restart key-server service
-  systemd:
+  ansible.builtin.systemd:
     name: key-server
     state: restarted

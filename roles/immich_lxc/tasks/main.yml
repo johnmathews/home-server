@@ -4,11 +4,11 @@
   ansible.builtin.apt:
     name: cifs-utils
     state: present
-    update_cache: yes
+    update_cache: true
 
 # ensure CIFS tools are present (inside the container)
 - name: Ensure CIFS client packages are installed
-  apt:
+  ansible.builtin.apt:
     name: cifs-utils
     state: present
   become: true
@@ -28,7 +28,7 @@
   tags: alloy, immich
 
 - name: Deploy .env file template
-  template:
+  ansible.builtin.template:
     src: templates/.env.j2
     dest: /srv/apps/.env
     owner: root
@@ -37,7 +37,7 @@
   tags: docker
 
 - name: Deploy immich api file
-  template:
+  ansible.builtin.template:
     src: files/immich_api_key.secret
     dest: /srv/apps/immich/immich_api_key.secret
     owner: root
@@ -46,7 +46,7 @@
   tags: docker
 
 - name: Upload alloy config files
-  copy:
+  ansible.builtin.copy:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
     owner: "{{ puid }}"
@@ -58,7 +58,7 @@
       dest: /srv/apps/alloy/config.alloy
   become: true
   tags: alloy
-  notify: restart alloy
+  notify: Restart alloy
 
 - name: Template Docker Compose file
   ansible.builtin.template:
@@ -67,7 +67,7 @@
     owner: root
     group: root
     mode: '0644'
-  notify: restart docker compose stack
+  notify: Restart docker compose stack
   tags: docker
 
 - name: Set Immich environment variables

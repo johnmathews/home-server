@@ -41,20 +41,20 @@
   tags: deno
 
 - name: Install Docker using official role
-  import_role:
+  ansible.builtin.import_role:
     name: geerlingguy.docker
   tags: docker
 
 - name: Add user to docker group
-  user:
+  ansible.builtin.user:
     name: john
     groups: docker
-    append: yes
+    append: true
   become: true
   tags: docker
 
 - name: Create media stack base directory
-  file:
+  ansible.builtin.file:
     path: "{{ media_stack_base_dir | dirname }}"
     state: directory
     mode: '0755'
@@ -73,7 +73,7 @@
     - "{{ media_stack_mount_dir }}/media"
 
 - name: Ensure journal-agent data directory exists
-  file:
+  ansible.builtin.file:
     path: "{{ media_stack_base_dir }}/config/journal/data"
     state: directory
     owner: "{{ media_stack_user }}"
@@ -82,7 +82,7 @@
   tags: journal
 
 - name: Ensure journal-agent chromadb directory exists
-  file:
+  ansible.builtin.file:
     path: "{{ media_stack_base_dir }}/config/journal/chromadb"
     state: directory
     owner: "{{ media_stack_user }}"
@@ -91,7 +91,7 @@
   tags: journal
 
 - name: Ensure alloy config directory exists
-  file:
+  ansible.builtin.file:
     path: "{{ media_stack_base_dir }}/config/alloy"
     state: directory
     owner: "{{ media_stack_user }}"
@@ -100,7 +100,7 @@
   tags: alloy
 
 - name: Ensure gluetun config directory exists
-  file:
+  ansible.builtin.file:
     path: "{{ media_stack_base_dir }}/config/gluetun/auth"
     state: directory
     owner: "{{ media_stack_user }}"
@@ -109,7 +109,7 @@
   tags: gluetun
 
 - name: Re-create qbittorrent config directory
-  file:
+  ansible.builtin.file:
     path: "{{ media_stack_base_dir }}/config/qBittorrent"
     state: directory
     owner: "{{ media_stack_user }}"
@@ -130,16 +130,16 @@
   tags: qbittorrent
 
 - name: Copy docker-compose.yml
-  template:
+  ansible.builtin.template:
     src: templates/docker-compose.yml.j2
     dest: /srv/media/docker-compose.yml
     mode: '0644'
   notify:
-    - restart media stack
+    - Restart media stack
   tags: docker, portainer
 
 - name: Upload alloy config file
-  copy:
+  ansible.builtin.copy:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
     owner: "{{ puid }}"
@@ -151,30 +151,30 @@
       dest: /srv/media/config/alloy/config.alloy
   become: true
   tags: [alloy]
-  notify: restart alloy
+  notify: Restart alloy
 
 - name: Create environment file from template
-  template:
+  ansible.builtin.template:
     src: .env.j2
     dest: /srv/media/.env
     mode: '0600'
-  notify: restart media stack
+  notify: Restart media stack
   tags: docker, portainer
 
 - name: Create gluetun config file from template
-  template:
+  ansible.builtin.template:
     src: templates/gluetun/gluetun_config.toml.j2
     dest: /srv/media/config/gluetun/config.toml
     mode: '0600'
-  notify: restart gluetun
+  notify: Restart gluetun
   tags: gluetun
 
 - name: Create gluetun auth file from template
-  template:
+  ansible.builtin.template:
     src: templates/gluetun/gluetun_auth.toml.j2
     dest: /srv/media/config/gluetun/auth/config.toml
     mode: '0600'
-  notify: restart gluetun
+  notify: Restart gluetun
   tags: gluetun
 
 - name: Ensure .env and docker-compose.yml are owned by "john"
@@ -184,7 +184,7 @@
     group: "{{ media_stack_user }}"
   loop:
     - /srv/media/.env
-  notify: restart media stack
+  notify: Restart media stack
   tags: docker
 
 - name: Ensure Radarr config directory has correct UID/GID
@@ -234,7 +234,7 @@
     owner: "{{ puid }}"
     group: "{{ guid }}"
     mode: '0600'
-  notify: restart media stack
+  notify: Restart media stack
   tags: slskd, docker
 
 - name: Ensure Soularr config directory has correct UID/GID
@@ -254,7 +254,7 @@
     owner: "{{ puid }}"
     group: "{{ guid }}"
     mode: '0600'
-  notify: restart media stack
+  notify: Restart media stack
   tags: soularr, docker
 
 - name: Set permissions of file browser config directory

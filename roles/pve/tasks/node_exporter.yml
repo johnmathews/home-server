@@ -51,7 +51,7 @@
 
 #       [Install]
 #       WantedBy=multi-user.target
-#   notify: 
+#   notify:
 #     - Restart node_exporter
 #     - Reload systemd
 

@@ -3,42 +3,41 @@
 ---
 
 - name: Ensure homepage config directory exists
-  file:
+  ansible.builtin.file:
     path: /srv/infra/homepage/config
     state: directory
     owner: "{{ docker_user }}"
     group: "{{ docker_user }}"
     mode: '0755'
-  notify: restart homepage
+  notify: Restart homepage
 
 - name: Upload homepage config files to infra VM
-  copy:
+  ansible.builtin.copy:
     src: "{{ item }}"
     dest: "/srv/infra/homepage/config/{{ item | basename }}"
-    owner: "{{docker_user }}"
-    group: "{{docker_user }}"
+    owner: "{{ docker_user }}"
+    group: "{{ docker_user }}"
     mode: '0644'
   with_fileglob:
     - "files/homepage_config/*"
   register: homepage_config_uploads
   become: true
-  notify: restart homepage
+  notify: Restart homepage
 
 - name: Template homepage services.yaml
-  template:
+  ansible.builtin.template:
     src: homepage/services.yaml.j2
     dest: /srv/infra/homepage/config/services.yaml
     owner: "{{ docker_user }}"
     group: "{{ docker_user }}"
     mode: '0644'
-  notify: restart homepage
+  notify: Restart homepage
 
 - name: Template homepage bookmarks.yaml
-  template:
+  ansible.builtin.template:
     src: homepage/bookmarks.yaml.j2
     dest: /srv/infra/homepage/config/bookmarks.yaml
     owner: "{{ docker_user }}"
     group: "{{ docker_user }}"
     mode: '0644'
-  notify: restart homepage
-
+  notify: Restart homepage

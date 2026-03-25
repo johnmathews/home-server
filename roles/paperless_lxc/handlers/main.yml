@@ -1,4 +1,4 @@
-- name: restart all containers
+- name: Restart all containers
   community.docker.docker_compose_v2:
     project_src: "{{ docker_compose_dir }}"
     state: present
@@ -6,7 +6,7 @@
     dependencies: true
   become: false
 
-- name: restart paperless
+- name: Restart paperless
   community.docker.docker_compose_v2:
     project_src: "{{ docker_compose_dir }}"
     services:
@@ -18,7 +18,7 @@
     dependencies: true
   become: false
 
-- name: restart alloy
+- name: Restart alloy
   community.docker.docker_compose_v2:
     project_src: "{{ docker_compose_dir }}"
     services:
@@ -28,9 +28,9 @@
     dependencies: true
   become: false
 
-- name: restart sleep-hours timers
+- name: Restart sleep-hours timers
   become: true
-  systemd:
+  ansible.builtin.systemd:
     name: "{{ item }}"
     state: restarted
   loop:

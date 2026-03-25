@@ -1,11 +1,11 @@
 # infra_vm/handlers/main.yml
 
 - name: Restart ipmi_exporter
-  systemd:
+  ansible.builtin.systemd:
     name: ipmi_exporter
     state: restarted
 
-- name: update docker compose stack
+- name: Update docker compose stack
   community.docker.docker_compose_v2:
     project_src: "{{ docker_compose_dir }}"
     state: present
@@ -14,7 +14,7 @@
     remove_orphans: true
   become: false
 
-- name: restart grafana
+- name: Restart grafana
   community.docker.docker_compose_v2:
     project_src: "{{ docker_compose_dir }}"
     services:
@@ -25,7 +25,7 @@
     remove_orphans: true
   become: false
 
-- name: restart alloy
+- name: Restart alloy
   community.docker.docker_compose_v2:
     project_src: "{{ docker_compose_dir }}"
     services:
@@ -36,7 +36,7 @@
     remove_orphans: true
   become: false
 
-- name: restart loki
+- name: Restart loki
   community.docker.docker_compose_v2:
     project_src: "{{ docker_compose_dir }}"
     services:
@@ -47,7 +47,7 @@
     remove_orphans: true
   become: false
 
-- name: restart homepage
+- name: Restart homepage
   community.docker.docker_compose_v2:
     project_src: "{{ docker_compose_dir }}"
     services:
@@ -58,7 +58,7 @@
     remove_orphans: true
   become: false
 
-- name: restart mkdocs
+- name: Restart mkdocs
   community.docker.docker_compose_v2:
     project_src: "{{ docker_compose_dir }}"
     services:
@@ -69,7 +69,7 @@
     remove_orphans: true
   become: false
 
-- name: restart mikrotik_exporter
+- name: Restart mikrotik_exporter
   community.docker.docker_compose_v2:
     project_src: "{{ docker_compose_dir }}"
     services:
@@ -80,7 +80,7 @@
     remove_orphans: true
   become: false
 
-- name: restart docker
+- name: Restart docker
   ansible.builtin.service:
     name: docker
     state: restarted

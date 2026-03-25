@@ -3,28 +3,28 @@
 ---
 
 - name: Restart node_exporter
-  systemd:
+  ansible.builtin.systemd:
     name: node_exporter
     state: restarted
 
 - name: Reload systemd
-  systemd:
-    daemon_reload: yes
+  ansible.builtin.systemd:
+    daemon_reload: true
 
 - name: Restart ipmi_exporter
-  systemd:
+  ansible.builtin.systemd:
     name: ipmi_exporter
     state: restarted
-    enabled: yes
+    enabled: true
 
 - name: Restart pve_exporter
-  systemd:
+  ansible.builtin.systemd:
     name: pve_exporter
     state: restarted
-    enabled: yes
+    enabled: true
 
 - name: Restart Glances
-  systemd:
+  ansible.builtin.systemd:
     name: glances
     state: restarted
 
@@ -52,7 +52,7 @@
 
 - name: Restart smartctl_exporter
   become: true
-  systemd:
+  ansible.builtin.systemd:
     name: smartctl_exporter
     state: restarted
 
@@ -62,7 +62,7 @@
     name: hd-idle
     state: restarted
 
-- name: restart alloy
+- name: Restart alloy
   community.docker.docker_compose_v2:
     project_src: "{{ docker_compose_dir }}"
     services:

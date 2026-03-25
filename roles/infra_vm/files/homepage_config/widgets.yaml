@@ -13,7 +13,6 @@
 - glances:
     url: http://192.168.2.214:61208
     version: 4
-    cpu: true 
+    cpu: true
     memory: true
-    uptime: true 
-
+    uptime: true
