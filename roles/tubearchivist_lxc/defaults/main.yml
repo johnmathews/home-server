@@ -1,9 +1,10 @@
-TZ: Europe/Amsterdam
-proxmox_api_user: "api@pve"
-docker_compose_dir: /srv/apps
 media_stack_user: john
 media_stack_group: john
-puid: 1001
-guid: 1001
 tubearchivist_host: "https://tube.{{ primary_domain_name }} 192.168.2.116:8000"
 ta_username: john
+
+# Docker image versions
+tubearchivist_version: "v0.4.12"
+alloy_version: "v1.5.1"
+node_exporter_version: "v1.8.2"
+cadvisor_version: "v0.49.1"

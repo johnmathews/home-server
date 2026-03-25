@@ -40,3 +40,15 @@ dns_fallback: "9.9.9.9" # Quad9 (matches Unbound upstream)
 
 # domain name
 primary_domain_name: "itsa-pizza.com"
+
+# Common defaults shared across roles (override in role defaults or host_vars as needed)
+TZ: Europe/Amsterdam
+puid: 1001
+guid: 1001
+docker_user: john
+docker_compose_dir: "/srv/apps"
+proxmox_api_user: "api@pve"
+
+# Monitoring infrastructure
+loki_write_endpoint: "http://192.168.2.106:3100/loki/api/v1/push"
+infra_vm_ip: "192.168.2.106"

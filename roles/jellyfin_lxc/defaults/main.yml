@@ -1,12 +1,9 @@
-TZ: Europe/Amsterdam
-proxmox_api_user: "api@pve"
-
-puid: 1001
-guid: 1001
-
 smb_username: smb_user
 smb_server: 192.168.2.104
 
 truenas_ip: "192.168.2.104"
 
-docker_compose_dir: "/srv/apps"
+# Docker image versions (jellyfin_lxc uses static files, not templates - versions are literal)
+alloy_version: "v1.5.1"
+cadvisor_version: "v0.49.1"
+node_exporter_version: "v1.8.2"
