@@ -121,7 +121,7 @@ lint-paths:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/validate-paths.yml $(VAULT) $(ANSIBLE_OPTS)
 
 requirements:
-	.venv/bin/ansible-galaxy install -r requirements.yml && uv pip install -r requirements.txt
+	.venv/bin/ansible-galaxy role install -r requirements.yml -p ~/.ansible/roles && .venv/bin/ansible-galaxy collection install -r requirements.yml && uv pip install -r requirements.txt
 
 # ───────────── Quality Checks ─────────────
 check:
