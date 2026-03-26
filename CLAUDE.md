@@ -87,15 +87,18 @@ alias names when SSH-ing. Run `grep "^Host " ~/.ssh/config` to list all aliases.
 
 Service-specific guides in `/documentation/`. Read the relevant doc before working on a service.
 
+- `adding-a-new-service.md` — Step-by-step guide for adding a new service to the infrastructure
 - `adguard-unbound.md` — DNS privacy and ad blocking (MikroTik → AdGuard → Unbound → Quad9)
 - `ansible_build_commands.md` — Make commands and tags quick reference
 - `cloudflare-api.md` — Cloudflare API reference for DNS, Tunnel, Access, and Redirect automation
 - `cloudflared.md` — Cloudflare Tunnel setup, proxied services, DNS routes, architecture
+- `disaster-recovery.md` — Backup architecture, recovery scenarios, and rebuild procedures
 - `domain-migration.md` — Migration plan from itsa.pizza to itsa-pizza.com (multi-session project)
 - `docserver.md` — Documentation MCP server on infra VM (indexing, search, MCP)
 - `disks.md` — Proxmox host disk management and backup storage
-- `immich_lxc.md` — Immich photo management, environment variables, vault config
+- `immich_lxc.md` — Immich photo management, Docker stack, NFS mounts, ML, mobile app
 - `index.md` — Top-level project overview and conventions
+- `infra_vm.md` — Infrastructure VM services (Grafana, Loki, Homepage, Portainer, Atuin, etc.)
 - `iperf3-speedtest.md` — Network speed testing between server and clients
 - `key_server.md` — TrueNAS dataset encryption key server
 - `media_vm.md` — Media VM services (Mullvad VPN, qBittorrent, Sonarr, Radarr)
@@ -103,18 +106,22 @@ Service-specific guides in `/documentation/`. Read the relevant doc before worki
 - `monitor_nfs_smb_mounts.md` — NFS/SMB mount health monitoring
 - `navidrome.md` — Navidrome music streaming, NFS mount, Subsonic API clients
 - `agent.md` — OpenClaw architecture, LXC setup, macOS app, Tailscale, known issues
-- `paperless.md` — Paperless-ngx document store and training schedule
+- `open_webui_lxc.md` — Open WebUI LLM chat interface, OpenAI backend, Docker setup
+- `paperless.md` — Paperless-ngx document store, Docker stack, NFS/SMB, training schedule
+- `prometheus_lxc.md` — Prometheus metrics collection, scrape targets, retention, adding hosts
 - `quiet_hours.md` — Night-time container pausing for HDD spindown
 - `river.md` — Grafana Alloy (River config language) log shipping to Loki
 - `share_drives_nfs_smb.md` — NFS/SMB share setup and Ansible automation
 - `shell_environment.md` — Zsh, Powerlevel10k, CLI tools across all hosts
 - `systemd.md` — systemd service management reference
 - `tailscale.md` — VPN setup, DNS privacy, remote Ansible access
-- `traefik.md` — Traefik reverse proxy dashboard and API
+- `traefik.md` — Traefik reverse proxy, routing architecture, rate limiting, adding services
+- `tubearchivist_lxc.md` — TubeArchivist YouTube archiver, Elasticsearch, Jellyfin integration
 - `jellyfin_lxc.md` — Jellyfin LXC setup, plugins, NFS monitoring issue, 10.11.x known issues
 - `journal_agent.md` — Journal agent and ChromaDB on media VM (MCP journaling, vector search)
 - `proxmox_host_tuning.md` — ZFS ARC, KSM, VM ballooning, memory management
 - `truenas.md` — TrueNAS scripts: share refresh, disk spindown, exporter
+- `upgrade-procedures.md` — How to upgrade Docker images, Proxmox, TrueNAS, and dependencies
 - `ups.md` — UPS monitoring via Network UPS Tools (NUT)
 
 ## Editing Guardrails
