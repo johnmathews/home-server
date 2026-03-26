@@ -9,7 +9,7 @@
     mode: '0644'
 
 - name: Install dependencies
-  apt:
+  ansible.builtin.apt:
     name:
       - apt-transport-https
       - ca-certificates
@@ -17,10 +17,10 @@
       - software-properties-common
       - qemu-guest-agent
     state: present
-    update_cache: yes
+    update_cache: true
 
 - name: Install Python 3 and pip
-  apt:
+  ansible.builtin.apt:
     name:
       - python3
       - python3-pip
@@ -28,55 +28,56 @@
     state: present
 
 - name: Install pipx
-  apt:
+  ansible.builtin.apt:
     name: pipx
     state: present
 
 - name: Ensure pipx binary path is available
-  shell: |
+  ansible.builtin.shell: |
     pipx ensurepath
   args:
     executable: /bin/bash
   environment:
     PATH: "{{ ansible_env.PATH }}:/home/{{ docker_user }}/.local/bin"
+  become: true
   become_user: "{{ docker_user }}"
 
 - name: Install uv using pipx
   become: true
   become_user: "{{ docker_user }}"
-  shell: |
+  ansible.builtin.shell: |
     pipx install uv
   environment:
     PATH: "{{ ansible_env.PATH }}:/home/{{ docker_user }}/.local/bin"
   tags: [docker]
 
 - name: Add Docker GPG key
-  apt_key:
+  ansible.builtin.apt_key:
     url: https://download.docker.com/linux/ubuntu/gpg
     state: present
   tags: [docker]
 
 - name: Add Docker repository
-  apt_repository:
+  ansible.builtin.apt_repository:
     repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu jammy stable
     state: present
   tags: [docker]
 
 - name: Install Docker packages
-  apt:
+  ansible.builtin.apt:
     name:
       - docker-ce
       - docker-ce-cli
       - containerd.io
     state: latest
-    update_cache: yes
+    update_cache: true
   tags: [docker]
 
 - name: Add user to docker group
-  user:
+  ansible.builtin.user:
     name: "{{ docker_user }}"
     groups: docker
-    append: yes
+    append: true
   tags: [docker]
 
 - name: Ensure Docker config directory exists
@@ -98,11 +99,11 @@
     owner: root
     group: root
     mode: '0644'
-  notify: restart docker
+  notify: Restart docker
   tags: docker
 
 - name: Create Docker Compose directory
-  file:
+  ansible.builtin.file:
     path: /srv/infra
     state: directory
     owner: "{{ docker_user }}"
@@ -124,16 +125,16 @@
   loop_control:
     label: "{{ item.path }}"
   tags: [grafana, loki, alloy]
-  notify: "restart {{ item.name }}"
+  notify: "Restart {{ item.name }}"
 
 - name: Template Docker Compose file
-  template:
+  ansible.builtin.template:
     src: docker-compose.yml.j2
     dest: /srv/infra/docker-compose.yml
     owner: "{{ docker_user }}"
     group: docker
     mode: '0644'
-  notify: update docker compose stack
+  notify: Update docker compose stack
   tags: docker, mikrotik_exporter, docserver
 
 - name: Upload .env file from template
@@ -152,15 +153,15 @@
     owner: 472
     group: 472
     mode: '0600'
-  notify: restart grafana
+  notify: Restart grafana
   tags: grafana
 
 - name: Upload alloy and loki config files
-  copy:
+  ansible.builtin.copy:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
-    owner: "{{docker_user }}"
-    group: "{{docker_user }}"
+    owner: "{{ docker_user }}"
+    group: "{{ docker_user }}"
     mode: '0644'
   loop:
     - alloy:
@@ -172,23 +173,23 @@
   become: true
   tags: [docker, loki, alloy]
   notify:
-    - restart alloy
-    - restart loki
+    - Restart alloy
+    - Restart loki
 
 - name: Include docserver tasks
-  import_tasks: docserver.yml
+  ansible.builtin.import_tasks: docserver.yml
   tags: docserver
 
 - name: Include homepage tasks
-  import_tasks: homepage.yml
+  ansible.builtin.import_tasks: homepage.yml
   tags: homepage
 
 - name: Include mkdocs tasks
-  import_tasks: mkdocs.yml
+  ansible.builtin.import_tasks: mkdocs.yml
   tags: docs, docker
 
 - name: Include mikrotik_exporter tasks
-  import_tasks: mikrotik_exporter.yml
+  ansible.builtin.import_tasks: mikrotik_exporter.yml
   tags: mikrotik_exporter
 
 - name: Launch containers

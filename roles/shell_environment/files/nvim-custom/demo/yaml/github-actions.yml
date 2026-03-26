@@ -10,7 +10,7 @@
 name: Demo CI/CD Workflow
 
 # Try: gr on push to see all references to this trigger
-on:
+"on":
   push:
     branches:
       - main

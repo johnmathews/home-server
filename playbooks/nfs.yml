@@ -3,7 +3,7 @@
 ---
 
 - name: Configure NFS drives on all specified hosts
-  hosts: nfs_clients 
+  hosts: nfs_clients
   become: true
 
   roles:

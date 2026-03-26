@@ -15,7 +15,7 @@
     owner: "{{ docker_user }}"
     group: "{{ docker_user }}"
     mode: '0644'
-  notify: restart mikrotik_exporter
+  notify: Restart mikrotik_exporter
 
 - name: Template _mikrotik_exporter.conf
   ansible.builtin.template:
@@ -24,4 +24,4 @@
     owner: "{{ docker_user }}"
     group: "{{ docker_user }}"
     mode: '0644'
-  notify: restart mikrotik_exporter
+  notify: Restart mikrotik_exporter

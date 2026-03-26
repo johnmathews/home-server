@@ -3,15 +3,15 @@
 ---
 
 - name: Ensure Python 3 is installed
-  apt:
+  ansible.builtin.apt:
     name:
       - python3
       - python3-venv
     state: present
-    update_cache: yes
+    update_cache: true
 
 - name: Ensure textfile collector directory exists
-  file:
+  ansible.builtin.file:
     path: /var/lib/node_exporter/textfile_collector
     state: directory
     owner: root
@@ -19,7 +19,7 @@
     mode: '0755'
 
 - name: Copy radeontop exporter script
-  copy:
+  ansible.builtin.copy:
     src: radeontop-exporter.py
     dest: /usr/local/bin/radeontop-exporter.py
     mode: '0755'
@@ -27,27 +27,27 @@
     group: root
 
 - name: Ensure radeontop is installed
-  apt:
+  ansible.builtin.apt:
     name: radeontop
     state: present
-    update_cache: yes
+    update_cache: true
 
 - name: Ensure systemd service unit for radeontop-exporter
-  template:
+  ansible.builtin.template:
     src: radeontop-exporter.service.j2
     dest: /etc/systemd/system/radeontop-exporter.service
     mode: '0644'
   notify: Reload systemd
 
 - name: Ensure systemd timer unit for radeontop-exporter
-  template:
+  ansible.builtin.template:
     src: radeontop-exporter.timer.j2
     dest: /etc/systemd/system/radeontop-exporter.timer
     mode: '0644'
   notify: Reload systemd
 
 - name: Enable and start radeontop-exporter timer
-  systemd:
+  ansible.builtin.systemd:
     name: radeontop-exporter.timer
     enabled: true
     state: started

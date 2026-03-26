@@ -4,7 +4,7 @@
   ansible.builtin.apt:
     name: cifs-utils
     state: present
-    update_cache: yes
+    update_cache: true
 
 # - name: Create directory for SMB credentials
 #   ansible.builtin.file:
@@ -32,7 +32,7 @@
 #     state: present
 #     create: yes
 #   loop: "{{ smb_shares }}"
-#   notify: restart docker
+#   notify: Restart docker
 
 # - name: Create local mount point
 #   ansible.builtin.file:
@@ -40,7 +40,7 @@
 #     state: directory
 #     mode: '0755'
 #   loop: "{{ smb_shares }}"
-#   notify: restart docker
+#   notify: Restart docker
 
 # - name: Mount SMB shares
 #   mount:
@@ -50,7 +50,7 @@
 #     opts: credentials=/etc/smb/.smbcredentials,iocharset=utf8,noperm,nofail,vers=3.1.1
 #     state: mounted
 #   loop: "{{ smb_shares }}"
-#   notify: restart docker
+#   notify: Restart docker
 
 - name: Create base app directories for containers
   ansible.builtin.file:
@@ -63,11 +63,11 @@
     - /srv/apps/jellyfin/appdata
     - /srv/apps/jellyfin/cache
     - /srv/apps/alloy
-  notify: restart docker
+  notify: Restart docker
   tags: [docker, alloy]
 
 - name: Upload alloy config files
-  copy:
+  ansible.builtin.copy:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
     owner: "{{ puid }}"
@@ -79,7 +79,7 @@
       dest: /srv/apps/alloy/config.alloy
   become: true
   tags: docker,alloy
-  notify: restart alloy
+  notify: Restart alloy
 
 - name: Copy dockerfile
   ansible.builtin.copy:
@@ -88,7 +88,7 @@
     owner: root
     group: root
     mode: '0644'
-  notify: restart docker
+  notify: Restart docker
   tags: docker
 
 - name: Copy Docker Compose file
@@ -98,5 +98,5 @@
     owner: root
     group: root
     mode: '0644'
-  notify: restart docker
+  notify: Restart docker
   tags: docker,alloy

@@ -6,7 +6,7 @@
     owner: root
     group: root
     mode: '0644'
-  notify: restart sleep-hours timers
+  notify: Restart sleep-hours timers
   # This single template is used for all four operations via systemd templating:
   # docker-sleep@pause.service → %i=pause
   # docker-sleep@unpause.service → %i=unpause
@@ -21,7 +21,7 @@
     owner: root
     group: root
     mode: '0644'
-  notify: restart sleep-hours timers
+  notify: Restart sleep-hours timers
 
 - name: Install unpause timer
   become: true
@@ -31,7 +31,7 @@
     owner: root
     group: root
     mode: '0644'
-  notify: restart sleep-hours timers
+  notify: Restart sleep-hours timers
 
 - name: Install stop timer
   become: true
@@ -41,7 +41,7 @@
     owner: root
     group: root
     mode: '0644'
-  notify: restart sleep-hours timers
+  notify: Restart sleep-hours timers
 
 - name: Install start timer
   become: true
@@ -51,7 +51,7 @@
     owner: root
     group: root
     mode: '0644'
-  notify: restart sleep-hours timers
+  notify: Restart sleep-hours timers
 
 - name: Remove legacy standalone stop and start service files
   become: true
@@ -61,7 +61,7 @@
   loop:
     - /etc/systemd/system/docker-sleep@stop.service
     - /etc/systemd/system/docker-sleep@start.service
-  notify: restart sleep-hours timers
+  notify: Restart sleep-hours timers
 
 - name: Enable and start timers
   become: true

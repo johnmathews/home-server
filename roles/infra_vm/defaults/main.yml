@@ -3,11 +3,30 @@
 docker_user: john
 docker_compose_dir: /srv/infra
 
+# Docker image versions
+docserver_version: "latest"
+documentation_ui_version: "latest"
+gym_timer_version: "latest"
+sre_assistant_version: "latest"
+loki_version: "3.4.2"
+alloy_version: "v1.5.1"
+mkdocs_material_version: "9.6.12"
+homepage_version: "v0.9.13"
+grafana_version: "11.6.0"
+node_exporter_version: "v1.8.2"
+cadvisor_version: "v0.49.1"
+uptime_kuma_version: "1.23.16"
+dozzle_version: "v8.12.8"
+portainer_ce_version: "2.24.1"
+mktxp_version: "latest"
+container_status_exporter_version: "latest"
+atuin_version: "v18.4.0"
+
 smb_infra_vm_username: infra_vm
 
 # trueNAS
 # smb_server: 192.168.2.104
 
 # smb_shares:
-# - name: logs 
+# - name: logs
 # target: /mnt/truenas/logs

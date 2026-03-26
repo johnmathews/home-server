@@ -2,7 +2,7 @@
 services:
 
   jellyfin:
-    # image: dockerfile uses the official image and adds yt-dlp 
+    # image: dockerfile uses the official image and adds yt-dlp
     build:
       context: ./
       dockerfile: Dockerfile
@@ -57,7 +57,7 @@ services:
         hard: 65536
 
   alloy:
-    image: grafana/alloy:latest
+    image: grafana/alloy:v1.5.1
     container_name: alloy
     restart: unless-stopped
     environment:
@@ -65,12 +65,12 @@ services:
       NODE_HOSTNAME: "jellyfin"
       LOG_LEVEL: "warn"
     volumes:
-      # config 
+      # config
       - ./alloy:/etc/alloy:ro
-      # docker 
+      # docker
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      # journalctl  
+      # journalctl
       - /var/log/journal:/var/log/journal:ro
       - /run/log/journal:/run/log/journal:ro
       - /etc/machine-id:/etc/machine-id:ro
@@ -88,7 +88,7 @@ services:
         max-file: "5"
 
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:latest
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
     container_name: cadvisor
     restart: always
     ports:
@@ -109,7 +109,7 @@ services:
         max-file: "5"
 
   node_exporter:
-    image: quay.io/prometheus/node-exporter:latest
+    image: quay.io/prometheus/node-exporter:v1.8.2
     container_name: node_exporter
     command:
       - '--path.rootfs=/host'

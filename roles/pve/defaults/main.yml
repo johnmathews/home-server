@@ -12,14 +12,13 @@ ipmi_exporter_version: "1.10.0"
 ipmi_exporter_install_dir: "/opt/ipmi_exporter"
 ipmi_exporter_listen_port: 9290
 
-
 # node_exporter
 # use container instead
 # node_exporter_version: "1.9.1"
 # node_exporter_install_dir: "/opt/node_exporter"
 # node_exporter_listen_port: 9100
 
-#smartmon
+# smartmon
 smartmon_exporter_version: "0.11.0"
 smartmon_exporter_install_dir: "/opt/smartmon_exporter"
 smartmon_exporter_listen_port: 9633
@@ -33,7 +32,7 @@ pve_exporter_listen_port: 9221
 hdparm_disk_id: /dev/disk/by-id/ata-ST3000DM007-1WY10G_ZFN1TN5X # this is the PBS HDD.
 # hdparm_disk_id: /dev/sdg # this is the PBS HDD.
 hdparm_apm: 128
-#12: 1 minute, 120: 10 minutes, 241: 30 mins, 242: 60 minutes, 243: 90 minutes, 244: 120 minutes
+# 12: 1 minute, 120: 10 minutes, 241: 30 mins, 242: 60 minutes, 243: 90 minutes, 244: 120 minutes
 hdparm_spindown: 242  # doesnt work for 60 mins or longer.
 
 ### NUT #############################
@@ -57,6 +56,13 @@ nut_admin_pass: "{{ vault_nut_admin_pass }}"
 nut_mon_user: "monuser"
 nut_mon_pass: "{{ vault_nut_mon_pass }}"
 
+
+# Docker image versions
+alloy_version: "v1.5.1"
+disk_status_exporter_version: "latest"
+node_exporter_version: "v1.8.2"
+cadvisor_version: "v0.49.1"
+portainer_agent_version: "2.24.1"
 
 # alloy container
 puid: 1001

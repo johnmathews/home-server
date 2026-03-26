@@ -3,7 +3,7 @@
 ---
 
 - name: Install dependencies
-  apt:
+  ansible.builtin.apt:
     name:
       - apt-transport-https
       - ca-certificates
@@ -11,10 +11,10 @@
       - jq
       - software-properties-common
     state: present
-    update_cache: yes
+    update_cache: true
 
 - name: Install Python 3 and pip
-  apt:
+  ansible.builtin.apt:
     name:
       - python3
       - python3-pip
@@ -22,29 +22,30 @@
     state: present
 
 - name: Install pipx
-  apt:
+  ansible.builtin.apt:
     name: pipx
     state: present
 
 - name: Ensure pipx binary path is available
-  shell: |
+  ansible.builtin.shell: |
     pipx ensurepath
   args:
     executable: /bin/bash
   environment:
     PATH: "{{ ansible_env.PATH }}:/home/{{ server_user }}/.local/bin"
+  become: true
   become_user: "{{ server_user }}"
 
 - name: Install uv using pipx
   become: true
   become_user: "{{ server_user }}"
-  shell: |
+  ansible.builtin.shell: |
     pipx install uv
   environment:
     PATH: "{{ ansible_env.PATH }}:/home/{{ server_user }}/.local/bin"
 
 - name: Create app directory
-  file:
+  ansible.builtin.file:
     path: /opt/key_server
     state: directory
     owner: "{{ server_user }}"
@@ -52,7 +53,7 @@
     mode: '0755'
 
 - name: Upload FastAPI app
-  template:
+  ansible.builtin.template:
     src: key-server-main.py.j2
     dest: /opt/key_server/main.py
     owner: "{{ server_user }}"
@@ -60,8 +61,9 @@
     mode: '0644'
 
 - name: Create virtual environment using uv
+  become: true
   become_user: "{{ server_user }}"
-  shell: |
+  ansible.builtin.shell: |
     /home/{{ server_user }}/.local/bin/uv venv /opt/key_server/.venv
   args:
     creates: /opt/key_server/.venv
@@ -69,8 +71,9 @@
     PATH: "/home/{{ server_user }}/.local/bin:{{ ansible_env.PATH }}"
 
 - name: Install python packages inlcuding FastAPI in venv
+  become: true
   become_user: "{{ server_user }}"
-  shell: |
+  ansible.builtin.shell: |
     source /opt/key_server/.venv/bin/activate && uv pip install fastapi uvicorn[standard] python-dotenv prometheus-fastapi-instrumentator
   args:
     executable: /bin/bash
@@ -79,7 +82,7 @@
   notify: Restart key-server service
 
 - name: Set environment variable with dataset keys
-  copy:
+  ansible.builtin.copy:
     dest: /opt/key_server/.env
     content: |
       DATASET_KEYS_JSON={{ vault_truenas_dataset_keys_json | to_json }}
@@ -87,14 +90,14 @@
   notify: Restart key-server service
 
 - name: Ensure .env is owned and readable by the FastAPI user
-  file:
+  ansible.builtin.file:
     path: /opt/key_server/.env
     owner: "{{ server_user }}"
     group: "{{ server_user }}"
     mode: "0600"
 
 - name: Create systemd service file
-  copy:
+  ansible.builtin.copy:
     dest: /etc/systemd/system/key-server.service
     content: |
       [Unit]
@@ -113,16 +116,16 @@
     mode: '0644'
 
 - name: Restart key-server service
-  systemd:
+  ansible.builtin.systemd:
     name: key-server
     state: restarted
 
 - name: Reload systemd daemon
-  systemd:
-    daemon_reload: yes
+  ansible.builtin.systemd:
+    daemon_reload: true
 
 - name: Enable and start key-server
-  systemd:
+  ansible.builtin.systemd:
     name: key-server
-    enabled: yes
+    enabled: true
     state: started

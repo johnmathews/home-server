@@ -5,7 +5,7 @@
 
 services:
   alloy:
-    image: grafana/alloy:latest
+    image: grafana/alloy:{{ alloy_version }}
     container_name: alloy
     restart: unless-stopped
     environment:
@@ -36,7 +36,7 @@ services:
 
   # for the proxmox backup server HDD
   disk-status-exporter:
-    image: ghcr.io/johnmathews/disk_status_exporter:latest
+    image: ghcr.io/johnmathews/disk_status_exporter:{{ disk_status_exporter_version }}
     container_name: disk_status_exporter
     restart: always
     ports:
@@ -46,7 +46,7 @@ services:
     privileged: true  # recommended to access /dev/sdX and run smartctl
 
   node_exporter:
-    image: quay.io/prometheus/node-exporter:latest
+    image: quay.io/prometheus/node-exporter:{{ node_exporter_version }}
     container_name: node_exporter
     command:
       - '--path.rootfs=/host'
@@ -62,7 +62,7 @@ services:
       - '/var/lib/node_exporter/textfile_collector:/textfile:ro'
 
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:latest
+    image: gcr.io/cadvisor/cadvisor:{{ cadvisor_version }}
     container_name: cadvisor
     restart: unless-stopped
     ports:
@@ -97,7 +97,7 @@ services:
       - "9199:9199"   # Prometheus scrape
 
   portainer-agent:
-    image: portainer/agent:latest
+    image: portainer/agent:{{ portainer_agent_version }}
     container_name: portainer_agent
     restart: always
     security_opt:

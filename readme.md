@@ -228,7 +228,7 @@ as SMB shares, and the SMB shares must exist in order to be able to connect to t
 Infra VM - Setup using [Ubuntu 22.04 VM](https://community-scripts.github.io/ProxmoxVE/scripts?id=ubuntu2204-vm) script.
 This VM will host the monitoring and dashboard applications.
 
-    Reserved IP: `192.168.2.105`
+    Reserved IP: `192.168.2.106`
 
         Advanced Settings:
          VMID: `106`

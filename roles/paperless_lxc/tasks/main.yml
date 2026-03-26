@@ -1,31 +1,31 @@
 # roles/paperless_lxc/tasks/main.yml
 
-- name: ensure cifs-utils is installed
+- name: Ensure cifs-utils is installed
   ansible.builtin.apt:
     name: cifs-utils
     state: present
-    update_cache: yes
+    update_cache: true
 
-- name: ensure paperless system group exists with fixed gid
+- name: Ensure paperless system group exists with fixed gid
   ansible.builtin.group:
     name: paperless
     gid: "{{ pgid }}"
-    system: yes
+    system: true
     state: present
   tags: paperless
 
-- name: ensure paperless system user exists with fixed uid/gid
+- name: Ensure paperless system user exists with fixed uid/gid
   ansible.builtin.user:
     name: paperless
     uid: "{{ puid }}"
     group: paperless
-    system: yes
+    system: true
     shell: /usr/sbin/nologin
-    create_home: no
+    create_home: false
     state: present
   tags: paperless
 
-- name: create base app directories for containers
+- name: Create base app directories for containers
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
@@ -40,14 +40,14 @@
     - /srv/apps/promtail
   tags: docker
 
-- name: ensure correct directory ownership
+- name: Ensure correct directory ownership
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     owner: 999
     group: 999
     mode: '0700'
-  notify: restart all containers
+  notify: Restart all containers
   tags: paperless
   loop:
     - /srv/apps/paperless/data
@@ -55,21 +55,21 @@
     - /srv/apps/paperless/redisdata
 
 # not needed - only the other clients need the SMB share. the LXC can use only the NFS share
-- name: create smb share
-  import_tasks: mount-smb.yml
+- name: Create smb share
+  ansible.builtin.import_tasks: mount-smb.yml
   when: false # never run
   tags: smb
 
-- name: create environment file from template
+- name: Create environment file from template
   ansible.builtin.template:
     src: .env.j2
     dest: "{{ docker_compose_dir }}/.env"
     mode: '0600'
-  notify: restart paperless
+  notify: Restart paperless
   tags: docker
 
-- name: upload config files
-  copy:
+- name: Upload config files
+  ansible.builtin.copy:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
     owner: "{{ puid }}"
@@ -81,9 +81,9 @@
       dest: /srv/apps/alloy/config.alloy
   become: true
   tags: alloy
-  notify: restart alloy
+  notify: Restart alloy
 
-- name: copy docker-compose.yml
+- name: Copy docker-compose.yml
   ansible.builtin.template:
     src: templates/docker-compose.yml.j2
     dest: "{{ docker_compose_dir }}/docker-compose.yml"
@@ -91,7 +91,7 @@
     owner: root
     group: root
   tags: docker
-  notify: restart all containers
+  notify: Restart all containers
 
 - name: Add consumer health check cron job
   ansible.builtin.cron:
@@ -101,5 +101,5 @@
       [ $(docker exec paperless-webserver find /usr/src/paperless/consume -type f -mmin +5 2>/dev/null | wc -l) -gt 0 ]
       && [ $(docker logs --since 10m paperless-webserver 2>&1 | grep -c 'paperless.consumer') -eq 0 ]
       && docker exec paperless-webserver s6-svc -r /run/service/svc-consumer/
-    user: root
+    ansible.builtin.user: root
   tags: consumer-health

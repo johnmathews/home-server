@@ -1,10 +1,10 @@
-TZ: Europe/Amsterdam
-proxmox_api_user: "api@pve"
-docker_compose_dir: "/srv/apps"
-docker_user: john
-puid: 1001
-guid: 1001
 pgid: 1001
+
+# Docker image versions
+paperless_version: "2.14.7"
+node_exporter_version: "v1.8.2"
+alloy_version: "v1.5.1"
+cadvisor_version: "v0.49.1"
 
 # SMB is NOT necessary. The paperless instance itself connects the the paperless datastore via NFS.
 # other clients, phones, laptops etc connect to paperless datastore via SMB which is a trueNAS dataset and independent of the paperless service.

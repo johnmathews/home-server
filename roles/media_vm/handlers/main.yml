@@ -1,9 +1,9 @@
-# a hander is a deferred action. it runs once at the end of a play only if a task has 
-# triggered it using `notify`. if it is triggered multiple times it still only runs once. 
+# a hander is a deferred action. it runs once at the end of a play only if a task has
+# triggered it using `notify`. if it is triggered multiple times it still only runs once.
 # often used for restarting a service, or rebooting a machine.
 
 
-- name: restart media stack
+- name: Restart media stack
   community.docker.docker_compose_v2:
     project_src: "{{ media_stack_base_dir }}"
     state: present # bring up/ensure running
@@ -11,7 +11,7 @@
     remove_orphans: true
   become: false
 
-- name: restart qbittorrent
+- name: Restart qbittorrent
   community.docker.docker_compose_v2:
     project_src: "{{ media_stack_base_dir }}"
     services:
@@ -22,7 +22,7 @@
     remove_orphans: true
   become: false
 
-- name: restart alloy
+- name: Restart alloy
   community.docker.docker_compose_v2:
     project_src: "{{ media_stack_base_dir }}"
     services:
@@ -33,7 +33,7 @@
     remove_orphans: true
   become: false
 
-- name: restart gluetun
+- name: Restart gluetun
   community.docker.docker_compose_v2:
     project_src: "{{ media_stack_base_dir }}"
     services:
@@ -46,9 +46,9 @@
     remove_orphans: true
   become: false
 
-- name: restart sleep-hours timers
+- name: Restart sleep-hours timers
   become: true
-  systemd:
+  ansible.builtin.systemd:
     name: "{{ item }}"
     state: restarted
     enabled: true

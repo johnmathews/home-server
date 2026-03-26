@@ -43,7 +43,10 @@ LIMIT_ARG := $(if $(strip $(LIMIT)),--limit $(LIMIT),)
 ANSIBLE_OPTS := $(TAGS_ARG) $(SKIP_ARG) $(LIMIT_ARG) $(EXTRA)
 
 # Declare all available commands as .PHONY (always run)
-.PHONY: all site nas cloud_image media help
+.PHONY: all site pve nas mail media infra key traefik immich tube prometheus \
+        paperless media-dl music jelly open-webui cloudflared agent dev atuin \
+        shell nfs share_drive_probe tailscale lint-paths requirements \
+        check lint clean ci help
 
 
 all: site
@@ -116,6 +119,9 @@ share_drive_probe:
 
 tailscale:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/tailscale.yml $(VAULT) $(ANSIBLE_OPTS)
+
+nfs:
+	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/nfs.yml $(VAULT) $(ANSIBLE_OPTS)
 
 lint-paths:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/validate-paths.yml $(VAULT) $(ANSIBLE_OPTS)

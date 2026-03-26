@@ -4,7 +4,7 @@
 
 services:
   syncthing:
-    image: syncthing/syncthing:latest
+    image: syncthing/syncthing:{{ syncthing_version }}
     container_name: syncthing
     hostname: agent-lxc
     restart: unless-stopped
@@ -26,7 +26,7 @@ services:
         max-file: "5"
 
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:latest
+    image: gcr.io/cadvisor/cadvisor:{{ cadvisor_version }}
     container_name: cadvisor
     restart: always
     ports:
@@ -47,7 +47,7 @@ services:
         max-file: "5"
 
   alloy:
-    image: grafana/alloy:latest
+    image: grafana/alloy:{{ alloy_version }}
     container_name: alloy
     restart: unless-stopped
     environment:
@@ -96,7 +96,7 @@ services:
 
 {% endfor %}
   node_exporter:
-    image: quay.io/prometheus/node-exporter:latest
+    image: quay.io/prometheus/node-exporter:{{ node_exporter_version }}
     container_name: node_exporter
     command:
       - '--path.rootfs=/host'

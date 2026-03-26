@@ -9,8 +9,8 @@
     - /mnt/swift/apps/alloy
   tags: alloy-configuration
 
-- name: Upload alloy config files 
-  copy:
+- name: Upload alloy config files
+  ansible.builtin.copy:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
     owner: root

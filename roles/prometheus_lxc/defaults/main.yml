@@ -1,8 +1,6 @@
-TZ: Europe/Amsterdam
-
-proxmox_api_user: "api@pve"
-docker_compose_dir: "/srv/apps"
-docker_user: john
-
-puid: 1001
-guid: 1001
+---
+# Docker image versions
+cadvisor_version: "v0.49.1"
+alloy_version: "v1.5.1"
+prometheus_version: "v3.2.1"
+node_exporter_version: "v1.8.2"

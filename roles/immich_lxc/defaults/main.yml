@@ -1,11 +1,9 @@
-TZ: Europe/Amsterdam
-
-proxmox_api_user: "api@pve"
-
-puid: 1001
-guid: 1001
-
-docker_compose_dir: "/srv/apps"
+# Docker image versions
+image_borders_version: "latest"
+immich_public_proxy_version: "1.6.1"
+cadvisor_version: "v0.49.1"
+node_exporter_version: "v1.8.2"
+alloy_version: "v1.5.1"
 
 # One-time permission fix for facebook-albums
 # Set to true to run, then set back to false after successful execution

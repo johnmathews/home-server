@@ -1,19 +1,34 @@
 # media_vm/defaults/main.yml
 
+# Docker image versions
+journal_agent_version: "latest"
+journal_chromadb_version: "latest"
+lidarr_version: "2.11.2"
+slskd_version: "0.22.5"
+soularr_version: "0.5.0"
+sabnzbd_version: "4.4.1"
+booklore_version: "1.5.0"
+sonarr_version: "4.0.14"
+radarr_version: "5.21.1"
+flaresolverr_version: "v3.3.21"
+prowlarr_version: "1.32.2"
+jellyseerr_version: "2.3.0"
+alloy_version: "v1.5.1"
+node_exporter_version: "v1.8.2"
+cadvisor_version: "v0.49.1"
+portainer_agent_version: "2.24.1"
+
 # defaults/main.yml has the lowest priority. host_vars/media-vm.yml has highest priority.
-# Changing this will require you to `cd /src/media && docker compose logs qbittorrent` 
+# Changing this will require you to `cd /src/media && docker compose logs qbittorrent`
 # to get the new temp password. Then in qBittorrent set the old password again
 reset_qbittorrent_config: false
 # qbittorrent_password_hash: 16c5e9c9b842bd6bf78aafa66643304e0cfe2586
 
-TZ: Europe/Amsterdam
 proxmox_api_host: "{{ hostvars['pve']['ansible_host'] }}"
 media_stack_base_dir: /srv/media
 media_stack_mount_dir: /mnt/media
 media_stack_user: john
 media_stack_group: john
-puid: 1001
-guid: 1001
 media_stack_services:
   jellyfin_port: 8096
   qbittorrent_port: 8080

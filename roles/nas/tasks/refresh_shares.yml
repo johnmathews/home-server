@@ -1,5 +1,5 @@
 - name: Upload refresh_shares script to TrueNAS
-  template:
+  ansible.builtin.template:
     src: templates/refresh_shares.sh.j2
     dest: /mnt/swift/scripts/refresh_shares.sh
     mode: '0755'

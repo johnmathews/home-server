@@ -1,6 +1,6 @@
 ---
 
-- name: restart all containers 
+- name: Restart all containers
   community.docker.docker_compose_v2:
     project_src: "{{ docker_compose_dir }}"
     state: present
@@ -9,7 +9,7 @@
     remove_orphans: true
   become: false
 
-- name: restart open-webui 
+- name: Restart open-webui
   community.docker.docker_compose_v2:
     project_src: "{{ docker_compose_dir }}"
     services:
@@ -20,7 +20,7 @@
     remove_orphans: true
   become: false
 
-- name: restart alloy
+- name: Restart alloy
   community.docker.docker_compose_v2:
     project_src: "{{ docker_compose_dir }}"
     services:

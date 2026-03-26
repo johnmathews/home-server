@@ -5,7 +5,7 @@ services:
 
   journal:
     container_name: journal
-    image: ghcr.io/johnmathews/journal-agent:latest
+    image: ghcr.io/johnmathews/journal-agent:{{ journal_agent_version }}
     environment:
       - TZ=${TZ:-Europe/Amsterdam}
       - DB_PATH=/data/journal.db
@@ -27,7 +27,7 @@ services:
 
   journal-chromadb:
     container_name: journal-chromadb
-    image: ghcr.io/johnmathews/journal-chromadb:latest
+    image: ghcr.io/johnmathews/journal-chromadb:{{ journal_chromadb_version }}
     environment:
       - TZ=${TZ:-Europe/Amsterdam}
     volumes:
@@ -42,7 +42,7 @@ services:
     restart: always
 
   lidarr:
-    image: lscr.io/linuxserver/lidarr:latest
+    image: lscr.io/linuxserver/lidarr:{{ lidarr_version }}
     container_name: lidarr
     user: "${PUID}:${PGID}"
     environment:
@@ -66,7 +66,7 @@ services:
     restart: always
 
   slskd:
-    image: slskd/slskd:latest
+    image: slskd/slskd:{{ slskd_version }}
     container_name: slskd
     user: "${PUID}:${PGID}"
     environment:
@@ -83,7 +83,7 @@ services:
     restart: always
 
   soularr:
-    image: mrusse08/soularr:latest
+    image: mrusse08/soularr:{{ soularr_version }}
     container_name: soularr
     user: "${PUID}:${PGID}"
     environment:
@@ -161,7 +161,7 @@ services:
 
   # smb shares
   sabnzbd:
-    image: lscr.io/linuxserver/sabnzbd:latest
+    image: lscr.io/linuxserver/sabnzbd:{{ sabnzbd_version }}
     container_name: sabnzbd
     environment:
       - PUID=${PUID}
@@ -184,7 +184,7 @@ services:
     restart: always
 
   booklore:
-    image: booklore/booklore:latest
+    image: booklore/booklore:{{ booklore_version }}
     container_name: booklore
     environment:
       - USER_ID=1001
@@ -233,7 +233,7 @@ services:
       retries: 10
 
   sonarr:
-    image: linuxserver/sonarr:latest
+    image: linuxserver/sonarr:{{ sonarr_version }}
     container_name: sonarr
     user: "${PUID}:${PGID}"
     environment:
@@ -258,7 +258,7 @@ services:
     restart: always
 
   radarr:
-    image: linuxserver/radarr:latest
+    image: linuxserver/radarr:{{ radarr_version }}
     container_name: radarr
     user: "${PUID}:${PGID}"
     environment:
@@ -283,8 +283,8 @@ services:
     restart: always
 
   flaresolverr:
-    # DockerHub mirror flaresolverr/flaresolverr:latest
-    image: ghcr.io/flaresolverr/flaresolverr:latest
+    # DockerHub mirror flaresolverr/flaresolverr
+    image: ghcr.io/flaresolverr/flaresolverr:{{ flaresolverr_version }}
     container_name: flaresolverr
     environment:
       - LOG_LEVEL=${LOG_LEVEL:-info}
@@ -296,7 +296,7 @@ services:
     restart: always
 
   prowlarr:
-    image: lscr.io/linuxserver/prowlarr:latest
+    image: lscr.io/linuxserver/prowlarr:{{ prowlarr_version }}
     container_name: prowlarr
     environment:
       - PUID=${PUID}
@@ -309,7 +309,7 @@ services:
     restart: always
 
   jellyseerr:
-    image: fallenbagel/jellyseerr:latest
+    image: fallenbagel/jellyseerr:{{ jellyseerr_version }}
     container_name: jellyseerr
     ports:
       - 5055:5055
@@ -335,7 +335,7 @@ services:
     restart: always
 
   alloy:
-    image: grafana/alloy:latest
+    image: grafana/alloy:{{ alloy_version }}
     container_name: alloy
     restart: always
     environment:
@@ -363,7 +363,7 @@ services:
         max-file: "5"
 
   node_exporter:
-    image: quay.io/prometheus/node-exporter:latest
+    image: quay.io/prometheus/node-exporter:{{ node_exporter_version }}
     container_name: node_exporter
     command:
       - '--path.rootfs=/host'
@@ -378,7 +378,7 @@ services:
       - '/var/lib/node_exporter/textfile_collector:/textfile:ro'
 
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:latest
+    image: gcr.io/cadvisor/cadvisor:{{ cadvisor_version }}
     container_name: cadvisor
     restart: unless-stopped
     ports:
@@ -397,7 +397,7 @@ services:
       - no-new-privileges:true
 
   portainer-agent:
-    image: portainer/agent:latest
+    image: portainer/agent:{{ portainer_agent_version }}
     container_name: portainer_agent
     restart: always
     security_opt:

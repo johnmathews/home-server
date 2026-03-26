@@ -1,19 +1,19 @@
 - name: Set up script to unlock datasets using key server
-  import_tasks: key_server.yml
+  ansible.builtin.import_tasks: key_server.yml
   tags: key
 
 - name: Set up script to spindown HDDs if idle
-  import_tasks: spindown_hdds.yml
+  ansible.builtin.import_tasks: spindown_hdds.yml
   tags: hdds
 
 - name: Set up script to refresh NFS/SMB shares on boot
-  import_tasks: refresh_shares.yml
+  ansible.builtin.import_tasks: refresh_shares.yml
   tags: refresh-shares
 
 - name: Deploy alloy configuration
-  import_tasks: alloy_configuration.yml
+  ansible.builtin.import_tasks: alloy_configuration.yml
   tags: alloy-configuration
 
 - name: Set up script to safely reboot TrueNAS
-  import_tasks: safe_reboot.yml
+  ansible.builtin.import_tasks: safe_reboot.yml
   tags: safe-reboot

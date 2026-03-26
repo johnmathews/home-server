@@ -2,7 +2,7 @@
 
 ---
 
-- name: restart cloudflared
+- name: Restart cloudflared
   ansible.builtin.systemd:
     name: cloudflared
     state: restarted

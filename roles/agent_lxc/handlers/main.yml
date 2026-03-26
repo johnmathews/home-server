@@ -1,6 +1,6 @@
 ---
 
-- name: restart all containers
+- name: Restart all containers
   community.docker.docker_compose_v2:
     project_src: "{{ docker_compose_dir }}"
     state: present
@@ -10,7 +10,7 @@
     remove_orphans: true
   become: false
 
-- name: restart syncthing
+- name: Restart syncthing
   community.docker.docker_compose_v2:
     project_src: "{{ docker_compose_dir }}"
     services:
@@ -21,7 +21,7 @@
     remove_orphans: true
   become: false
 
-- name: restart alloy
+- name: Restart alloy
   community.docker.docker_compose_v2:
     project_src: "{{ docker_compose_dir }}"
     services:
@@ -32,7 +32,7 @@
     remove_orphans: true
   become: false
 
-- name: rebuild mkdocs
+- name: Rebuild mkdocs
   community.docker.docker_compose_v2:
     project_src: "{{ docker_compose_dir }}"
     services: "{{ mkdocs_sites | map(attribute='name') | map('regex_replace', '^', 'mkdocs-') | list }}"
@@ -43,7 +43,7 @@
     remove_orphans: true
   become: false
 
-- name: restart openclaw gateway
+- name: Restart openclaw gateway
   ansible.builtin.systemd:
     name: openclaw-gateway
     state: restarted
@@ -53,7 +53,7 @@
   environment:
     XDG_RUNTIME_DIR: /run/user/1000
 
-- name: restart mkdocs
+- name: Restart mkdocs
   community.docker.docker_compose_v2:
     project_src: "{{ docker_compose_dir }}"
     services: "{{ mkdocs_sites | map(attribute='name') | map('regex_replace', '^', 'mkdocs-') | list }}"

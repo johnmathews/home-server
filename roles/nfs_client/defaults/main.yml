@@ -10,7 +10,7 @@ nfs_user_uid: 1001
 nfs_user_gid: 1001
 nfs_group_gid: 1001
 
-#  NFS options: 
+#  NFS options:
 #
 #  hard vs soft (default):
 #    - soft mounts trade data integrity for responsiveness, while hard mounts trade responsiveness for data integrity.
@@ -25,12 +25,12 @@ nfs_group_gid: 1001
 
 # do we want x-systemd.automount on LXCs?
 nfs_opts_items:
-  - _netdev 
+  - _netdev
   - hard
-  - nofail 
-  - retrans=3 
-  - timeo=50 
-  - x-systemd.automount 
-  - x-systemd.idle-timeout=180s 
+  - nofail
+  - retrans=3
+  - timeo=50
+  - x-systemd.automount
+  - x-systemd.idle-timeout=180s
 
 nfs_opts_default: "{{ nfs_opts_items | join(',') }}"

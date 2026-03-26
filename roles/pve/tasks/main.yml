@@ -4,7 +4,7 @@
 
 
 - name: Configure DNS resolvers
-  template:
+  ansible.builtin.template:
     src: resolv.conf.j2
     dest: /etc/resolv.conf
     owner: root
@@ -13,33 +13,33 @@
   tags: dns
 
 - name: Ensure apt cache is updated
-  apt:
-    update_cache: yes
+  ansible.builtin.apt:
+    update_cache: true
     cache_valid_time: 3600
   tags: docker, metrics
 
 - name: Install libraries and dependencies
-  apt:
+  ansible.builtin.apt:
     name:
       - apt-transport-https
       - ca-certificates
       - curl
       - gnupg
       - lsb-release
-      - smartmontools 
+      - smartmontools
       - sysstat
       - cifs-utils
     state: present
   tags: docker, metrics
 
 - name: Ensure keyring directory exists
-  file:
+  ansible.builtin.file:
     path: /etc/apt/keyrings
     state: directory
     mode: '0755'
 
 - name: Set up IPMI exporter
-  import_tasks: ipmi_exporter.yml
+  ansible.builtin.import_tasks: ipmi_exporter.yml
   tags: metrics
 
 # - name: Set up Node exporter
@@ -48,38 +48,38 @@
 #   tags: [metrics]
 
 - name: Set up Proxmox exporter
-  import_tasks: pve_exporter.yml
+  ansible.builtin.import_tasks: pve_exporter.yml
   tags: metrics
 
 - name: Set up docker
-  import_tasks: docker-apps.yml
+  ansible.builtin.import_tasks: docker-apps.yml
   tags: docker
 
 # smartctl disk metrics
 - name: Setup smartctl_exporter
-  import_tasks: smartctl.yml
+  ansible.builtin.import_tasks: smartctl.yml
   tags: metrics, smartctl
 
 # hd-idle disk spindown settings
 - name: Setup hd-idle
-  import_tasks: hd-idle.yml
+  ansible.builtin.import_tasks: hd-idle.yml
   tags: hd-idle
 
 # iGPU metrics
 - name: Install radeontop metrics exporter
-  import_tasks: radeontop-exporter.yml
+  ansible.builtin.import_tasks: radeontop-exporter.yml
   tags: metrics, media, radeontop
 
 # for homepage
 - name: Install glances
-  import_tasks: glances.yml
+  ansible.builtin.import_tasks: glances.yml
   tags: [metrics, glances]
- 
-- name: Setup hdparm for HDD power management 
-  import_tasks: hdparm.yml
+
+- name: Setup hdparm for HDD power management
+  ansible.builtin.import_tasks: hdparm.yml
   tags: [hdd, hdparm]
 
-# NUT 
-- name: Setup NUT 
-  import_tasks: nut.yml
+# NUT
+- name: Setup NUT
+  ansible.builtin.import_tasks: nut.yml
   tags: [nut]

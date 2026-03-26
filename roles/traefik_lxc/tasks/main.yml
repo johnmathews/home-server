@@ -13,42 +13,42 @@
   tags: traefik
 
 - name: Copy Alloy config
-  copy:
+  ansible.builtin.copy:
     src: files/config.alloy
     dest: "{{ docker_compose_dir }}/alloy/config.alloy"
     owner: root
     group: docker
     mode: '0644'
-  notify: restart alloy
+  notify: Restart alloy
   tags: alloy
 
 - name: Template Traefik config
-  template:
+  ansible.builtin.template:
     src: traefik.yml.j2
     dest: "{{ docker_compose_dir }}/traefik/traefik.yml"
     owner: root
     group: docker
     mode: '0644'
-  notify: restart traefik
+  notify: Restart traefik
   tags: traefik
 
 - name: Template Traefik dynamic routers
-  template:
+  ansible.builtin.template:
     src: routers.yml.j2
     dest: "{{ docker_compose_dir }}/traefik/dynamic/routers.yml"
     owner: root
     group: docker
     mode: '0644'
-  notify: restart traefik
+  notify: Restart traefik
   tags: traefik
 
 - name: Copy docker-compose.yml
-  template:
+  ansible.builtin.template:
     src: templates/docker-compose.yml.j2
     dest: "{{ docker_compose_dir }}/docker-compose.yml"
     mode: '0644'
     owner: root
     group: root
   notify:
-    - restart docker compose stack
+    - Restart docker compose stack
   tags: docker

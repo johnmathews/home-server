@@ -10,7 +10,7 @@
 - name: Configure hdparm for PBS disk
   ansible.builtin.blockinfile:
     path: /etc/hdparm.conf
-    create: yes
+    create: true
     block: |
       {{ hdparm_disk_id }} {
           spindown_time = {{ hdparm_spindown }}

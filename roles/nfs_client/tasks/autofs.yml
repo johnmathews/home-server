@@ -1,17 +1,17 @@
 ---
 
 - name: Install autofs (LXCs only)
-  become: yes
+  become: true
   when: not nfs_can_systemd_automount
-  apt:
+  ansible.builtin.apt:
     name: autofs
     state: present
-    update_cache: yes
+    update_cache: true
 
 - name: Configure autofs master map (LXCs only)
-  become: yes
+  become: true
   when: not nfs_can_systemd_automount
-  copy:
+  ansible.builtin.copy:
     dest: /etc/auto.master.d/nfs.autofs
     mode: '0644'
     content: |
@@ -19,9 +19,9 @@
   notify: Restart autofs
 
 - name: Build /etc/auto.nfs from nfs_shares (LXCs only)
-  become: yes
+  become: true
   when: not nfs_can_systemd_automount
-  copy:
+  ansible.builtin.copy:
     dest: /etc/auto.nfs
     mode: '0644'
     content: |
@@ -31,9 +31,9 @@
   notify: Restart autofs
 
 - name: Ensure autofs is enabled and running (LXCs only)
-  become: yes
+  become: true
   when: not nfs_can_systemd_automount
-  systemd:
+  ansible.builtin.systemd:
     name: autofs
     enabled: true
     state: restarted

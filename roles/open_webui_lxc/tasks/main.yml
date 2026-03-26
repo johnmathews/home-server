@@ -6,13 +6,13 @@
   ansible.builtin.apt:
     name: cifs-utils
     state: present
-    update_cache: yes
+    update_cache: true
 
-- name: Ensure {{ app_name }} system group exists with fixed GID
+- name: Ensure system group exists with fixed GID
   ansible.builtin.group:
     name: "{{ app_name }}"
     gid: "{{ pgid }}"
-    system: yes
+    system: true
     state: present
 
 - name: Ensure user exists with fixed UID/GID
@@ -20,9 +20,9 @@
     name: "{{ app_name }}"
     uid: "{{ puid }}"
     group: "{{ app_name }}"
-    system: yes
+    system: true
     shell: /usr/sbin/nologin
-    create_home: no
+    create_home: false
     state: present
 
 - name: Create base app directories
@@ -43,7 +43,7 @@
     owner: "{{ puid }}"
     group: "{{ pgid }}"
     mode: '0770'
-  notify: restart open-webui
+  notify: Restart open-webui
 
 - name: Create environment file from template
   ansible.builtin.template:
@@ -51,11 +51,11 @@
     dest: "{{ docker_compose_dir }}/.env"
     mode: '0600'
   notify:
-    - restart all containers
-  tags: docker 
+    - Restart all containers
+  tags: docker
 
-- name: Upload alloy config files 
-  copy:
+- name: Upload alloy config files
+  ansible.builtin.copy:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
     owner: "{{ puid }}"
@@ -64,11 +64,11 @@
   loop:
     - alloy:
       src: templates/config.alloy
-      dest: /srv/apps/alloy/config.alloy 
+      dest: /srv/apps/alloy/config.alloy
   become: true
-  tags: alloy 
-  notify: 
-    - restart alloy
+  tags: alloy
+  notify:
+    - Restart alloy
 
 - name: Copy docker-compose.yml
   ansible.builtin.template:
@@ -77,6 +77,6 @@
     mode: '0644'
     owner: root
     group: root
-  tags: docker 
+  tags: docker
   notify:
-    - restart all containers
+    - Restart all containers

@@ -3,7 +3,7 @@
 
 services:
   docserver:
-    image: ghcr.io/johnmathews/documentation-mcp-server:latest
+    image: ghcr.io/johnmathews/documentation-mcp-server:{{ docserver_version }}
     container_name: documentation-mcp-server
     restart: unless-stopped
     stop_grace_period: 30s
@@ -28,7 +28,7 @@ services:
         max-file: "3"
 
   documentation-ui:
-    image: ghcr.io/johnmathews/documentation-ui:latest
+    image: ghcr.io/johnmathews/documentation-ui:{{ documentation_ui_version }}
     container_name: documentation-ui
     restart: unless-stopped
     ports:
@@ -44,14 +44,14 @@ services:
         max-file: "3"
 
   timer:
-    image: ghcr.io/johnmathews/gym-timer:latest
+    image: ghcr.io/johnmathews/gym-timer:{{ gym_timer_version }}
     container_name: timer
     ports:
       - "8082:80"
     restart: unless-stopped
 
   sre-ingest:
-    image: ghcr.io/johnmathews/sre-assistant:latest
+    image: ghcr.io/johnmathews/sre-assistant:{{ sre_assistant_version }}
     container_name: sre-ingest
     command: ["python", "-m", "scripts.ingest_runbooks"]
     environment:
@@ -62,7 +62,7 @@ services:
     profiles: ["setup"]
 
   sre-ui:
-    image: ghcr.io/johnmathews/sre-assistant:latest
+    image: ghcr.io/johnmathews/sre-assistant:{{ sre_assistant_version }}
     container_name: sre-ui
     command: ["streamlit", "run", "src/ui/app.py", "--server.port", "8501", "--server.address", "0.0.0.0"]
     ports:
@@ -76,7 +76,7 @@ services:
         condition: service_healthy
 
   sre-api:
-    image: ghcr.io/johnmathews/sre-assistant:latest
+    image: ghcr.io/johnmathews/sre-assistant:{{ sre_assistant_version }}
     container_name: sre-api
     user: "1001:1001"
     ports:
@@ -104,7 +104,7 @@ services:
       start_period: 15s
 
   loki:
-    image: grafana/loki:latest
+    image: grafana/loki:{{ loki_version }}
     container_name: loki
     command: ["-config.file=/etc/loki/config.yml"]
     ports:
@@ -117,7 +117,7 @@ services:
     restart: unless-stopped
 
   alloy:
-    image: grafana/alloy:latest
+    image: grafana/alloy:{{ alloy_version }}
     container_name: alloy
     restart: unless-stopped
     mem_limit: 128m # ADDED: currently ~82MB
@@ -146,7 +146,7 @@ services:
         max-file: "5"
 
   mkdocs:
-    image: squidfunk/mkdocs-material:latest
+    image: squidfunk/mkdocs-material:{{ mkdocs_material_version }}
     container_name: mkdocs
     working_dir: /docs
     volumes:
@@ -166,7 +166,7 @@ services:
       - "5201:5201/udp" # UDP
 
   homepage:
-    image: ghcr.io/gethomepage/homepage:latest
+    image: ghcr.io/gethomepage/homepage:{{ homepage_version }}
     container_name: homepage
     mem_limit: 192m # ADDED: currently ~122MB
     environment:
@@ -183,7 +183,7 @@ services:
     restart: always
 
   grafana:
-    image: grafana/grafana-oss:latest
+    image: grafana/grafana-oss:{{ grafana_version }}
     container_name: grafana
     mem_limit: 256m # ADDED: currently ~183MB, biggest consumer
     ports:
@@ -194,7 +194,7 @@ services:
     restart: always
 
   node-exporter:
-    image: prom/node-exporter:latest
+    image: prom/node-exporter:{{ node_exporter_version }}
     container_name: node-exporter
     restart: always
     ports:
@@ -211,7 +211,7 @@ services:
       - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($|/)'
 
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:latest
+    image: gcr.io/cadvisor/cadvisor:{{ cadvisor_version }}
     container_name: cadvisor
     restart: unless-stopped
     mem_limit: 96m # ADDED: currently ~45MB
@@ -236,7 +236,7 @@ services:
       - '--store_container_labels=true'
 
   uptime-kuma:
-    image: louislam/uptime-kuma:latest
+    image: louislam/uptime-kuma:{{ uptime_kuma_version }}
     container_name: uptime-kuma
     mem_limit: 192m # ADDED: currently ~142MB
     ports:
@@ -248,7 +248,7 @@ services:
     restart: always
 
   dozzle:
-    image: amir20/dozzle:latest
+    image: amir20/dozzle:{{ dozzle_version }}
     container_name: dozzle
     ports:
       - "9999:8080"
@@ -257,7 +257,7 @@ services:
     restart: always
 
   portainer:
-    image: portainer/portainer-ce:latest
+    image: portainer/portainer-ce:{{ portainer_ce_version }}
     container_name: portainer
     ports:
       - "9000:9000"
@@ -267,7 +267,7 @@ services:
     restart: always
 
   mikrotik_exporter:
-    image: ghcr.io/akpw/mktxp:latest
+    image: ghcr.io/akpw/mktxp:{{ mktxp_version }}
     container_name: mikrotik_exporter
     command: mktxp --cfg-dir /etc/mktxp export
     ports:
@@ -277,7 +277,7 @@ services:
     restart: always
 
   container-health-exporter:
-    image: ghcr.io/johnmathews/container-status-exporter:latest
+    image: ghcr.io/johnmathews/container-status-exporter:{{ container_status_exporter_version }}
     container_name: container-status-exporter
     ports:
       - "8081:8081"
@@ -292,7 +292,7 @@ services:
   atuin:
     restart: always
     container_name: atuin
-    image: ghcr.io/atuinsh/atuin:latest
+    image: ghcr.io/atuinsh/atuin:{{ atuin_version }}
     command: start
     volumes:
       - "/srv/infra/atuin:/config"
