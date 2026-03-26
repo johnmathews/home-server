@@ -2,8 +2,10 @@
 
 ## What Changed
 
-Implemented the documentation improvement plan from the 2026-03-25 engineering evaluation.
-All Tier 1, 2, and 3 items completed.
+Merged the unmerged `eng-lint-and-security-fixes` worktree from the 2026-03-25 engineering
+evaluation (6 commits: security fixes, lint cleanup, Docker version pinning, variable
+centralization). Then implemented the documentation improvement plan. All Tier 1, 2, and 3
+items completed.
 
 ### New Documentation Files (7 created)
 
