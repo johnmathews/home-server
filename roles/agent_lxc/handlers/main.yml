@@ -6,6 +6,7 @@
     state: present
     build: always
     recreate: always
+    pull: never
     dependencies: true
     remove_orphans: true
   become: false
@@ -17,6 +18,7 @@
       - syncthing
     state: present
     recreate: always
+    pull: never
     dependencies: true
     remove_orphans: true
   become: false
@@ -28,6 +30,7 @@
       - alloy
     state: present
     recreate: always
+    pull: never
     dependencies: true
     remove_orphans: true
   become: false
@@ -39,6 +42,7 @@
     state: present
     build: always
     recreate: always
+    pull: never
     dependencies: true
     remove_orphans: true
   become: false
@@ -59,6 +63,7 @@
     services: "{{ mkdocs_sites | map(attribute='name') | map('regex_replace', '^', 'mkdocs-') | list }}"
     state: present
     recreate: always
+    pull: never
     dependencies: true
     remove_orphans: true
   become: false

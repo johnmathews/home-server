@@ -3,6 +3,7 @@
     project_src: "{{ docker_compose_dir }}"
     state: present
     recreate: always
+    pull: never
     dependencies: true
   become: false
 - name: Restart alloy
@@ -12,5 +13,6 @@
       - alloy
     state: present
     recreate: always
+    pull: never
     dependencies: true
   become: false

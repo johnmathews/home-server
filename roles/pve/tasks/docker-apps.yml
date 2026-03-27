@@ -88,4 +88,5 @@
 - name: Start apps using Docker Compose
   community.docker.docker_compose_v2:
     project_src: /srv/apps
+    pull: never
   tags: portainer

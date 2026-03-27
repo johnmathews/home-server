@@ -8,6 +8,7 @@
     project_src: "{{ media_stack_base_dir }}"
     state: present # bring up/ensure running
     recreate: always # force-recreate changed services
+    pull: never
     remove_orphans: true
   become: false
 
@@ -18,6 +19,7 @@
       - qbittorrent
     state: present
     recreate: always
+    pull: never
     dependencies: true
     remove_orphans: true
   become: false
@@ -29,6 +31,7 @@
       - alloy
     state: present
     recreate: always
+    pull: never
     dependencies: true
     remove_orphans: true
   become: false
@@ -40,9 +43,9 @@
       - gluetun
       - qbittorrent
       - sabnzbd
-      - slskd
     state: present
     recreate: always
+    pull: never
     remove_orphans: true
   become: false
 

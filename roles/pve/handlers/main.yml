@@ -69,5 +69,6 @@
       - alloy
     state: present
     recreate: always
+    pull: never
     dependencies: true
   become: false
