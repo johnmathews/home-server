@@ -25,17 +25,17 @@ user that has access to the relevant datasets.
 
 ### Overview
 
-Lidarr manages wanted albums, slskd is a self-hosted Soulseek P2P client (routed through Mullvad VPN via gluetun), and
+Lidarr manages wanted albums, slskd is a self-hosted Soulseek P2P client, and
 Soularr bridges the two by polling Lidarr's wanted list and downloading via slskd. Downloaded music lands on NFS at
 `/mnt/nfs/music` where Navidrome (on the music LXC) already reads from.
 
 ### Architecture
 
 ```
-Lidarr (:8686)          Soularr (daemon)         slskd (:5030 via gluetun)
+Lidarr (:8686)          Soularr (daemon)         slskd (:5030, :50300)
    │                       │                        │
    │  wanted albums        │  polls every 5min      │  Soulseek P2P (:50300)
-   │◄──────────────────────│───────────────────────►│──── VPN (Mullvad) ────► peers
+   │◄──────────────────────│───────────────────────►│────────────────────────► peers
    │                       │                        │
    │  imports completed    │                        │  downloads to
    │  downloads to /music  │                        │  /downloads/slskd
@@ -55,8 +55,8 @@ Lidarr (:8686)          Soularr (daemon)         slskd (:5030 via gluetun)
 | Port  | Service   | Notes                                     |
 +-------+-----------+-------------------------------------------+
 | 8686  | Lidarr    | Web UI (direct, not behind VPN)            |
-| 5030  | slskd     | Web UI (exposed via gluetun)               |
-| 50300 | slskd     | Soulseek P2P (exposed via gluetun)         |
+| 5030  | slskd     | Web UI (direct, own network)               |
+| 50300 | slskd     | Soulseek P2P (direct, own network)         |
 +-------+-----------+-------------------------------------------+
 ```
 
@@ -117,11 +117,11 @@ Soularr search failures are common and usually not a problem — it retries on t
 
 ### Network routing
 
-- slskd uses `network_mode: service:gluetun` — all traffic goes through Mullvad VPN
-- Soularr reaches slskd at `http://gluetun:5030` (they share gluetun's network namespace)
-- Soularr reaches Lidarr at `http://lidarr:8686` (Lidarr is on the default compose network)
-- gluetun exposes slskd's WebUI (:5030) and Soulseek P2P (:50300) ports
-- `FIREWALL_VPN_INPUT_PORTS` includes 50300 so gluetun allows incoming Soulseek connections
+- slskd runs on the default Docker compose network (not behind VPN) — this allows Soulseek peers to connect directly on port 50300 for uploads
+- Soularr reaches slskd at `http://slskd:5030` (both on the default compose network)
+- Soularr reaches Lidarr at `http://lidarr:8686` (also on the default compose network)
+- slskd exposes its own WebUI (:5030) and Soulseek P2P (:50300) ports directly
+- Previously slskd was behind gluetun/Mullvad VPN, but Mullvad removed port forwarding support (July 2023), making uploads impossible — peers could not connect to port 50300 through the VPN
 
 ### Configuration files
 
@@ -129,7 +129,7 @@ Soularr search failures are common and usually not a problem — it retries on t
   - Soulseek credentials: `vault_slskd_soulseek_username`, `vault_slskd_soulseek_password`
   - WebUI credentials: `vault_slskd_web_username`, `vault_slskd_web_password`
   - API key (for Soularr): `vault_slskd_api_key`
-  - Gluetun VPN integration: **disabled** — redundant since `network_mode: service:gluetun` already enforces VPN at the network level
+  - VPN integration: **disabled** — slskd is not behind a VPN
 - **Soularr**: `roles/media_vm/templates/soularr/config.ini.j2` — Ansible-managed, deployed on every run
   - Lidarr API key: `vault_lidarr_api_key`
   - slskd API key: `vault_slskd_api_key`
@@ -166,11 +166,10 @@ during quiet hours to allow HDD spindown.
 - Check logs: `ssh media "docker logs slskd --tail 20"`
 - Look for `INVALIDPASS` — means username exists but password doesn't match
 
-#### slskd stuck on "Waiting for VPN client"
-- VPN integration was disabled because `network_mode: service:gluetun` already enforces VPN at the Docker network level
-- If re-enabled, slskd polls gluetun's control API and refuses to connect to Soulseek until it gets a valid VPN IP
-- The 409 Conflict errors on searches are a symptom of slskd not being connected to the Soulseek network
-- Fix: ensure `integration.vpn.enabled: false` in `slskd.yml.j2`
+#### slskd not uploading / peers can't download
+- slskd must expose port 50300 directly (not behind VPN) so Soulseek peers can connect
+- Verify port is reachable: check `docker port slskd` shows 50300
+- If slskd was moved back behind gluetun, uploads will break — Mullvad has no port forwarding
 
 #### Soularr can't resolve hostnames
 - Startup race condition — usually resolves on next poll cycle (5 minutes)

@@ -72,14 +72,13 @@ services:
     environment:
       - SLSKD_REMOTE_CONFIGURATION=true
       - TZ=${TZ}
+    ports:
+      - 5030:5030   # slskd WebUI
+      - 50300:50300  # Soulseek P2P
     volumes:
       - /srv/media/config/slskd:/app
       - /mnt/nfs/downloads/slskd:/downloads
       - /mnt/nfs/music/lidarr:/music:ro
-    network_mode: "service:gluetun"
-    depends_on:
-      gluetun:
-        condition: service_healthy
     restart: always
 
   soularr:
@@ -108,8 +107,6 @@ services:
       - 8081:8081 # sabnzbd WebUI, set in config file.
       - 6881:6881/udp
       - 8000:8000/tcp # control server port
-      - 5030:5030 # slskd WebUI
-      - 50300:50300 # Soulseek P2P
     volumes:
       - /srv/media/config/gluetun:/gluetun
     healthcheck:
@@ -120,7 +117,7 @@ services:
     environment:
       # NO PORT FORWARDING 
       - FIREWALL=on
-      - FIREWALL_VPN_INPUT_PORTS="3189,6881,50300"
+      - FIREWALL_VPN_INPUT_PORTS="3189,6881"
       - VPN_SERVICE_PROVIDER=${VPN_SERVICE_PROVIDER}
       - VPN_TYPE=wireguard
       - WIREGUARD_ENDPOINT=${WIREGUARD_ENDPOINT}
