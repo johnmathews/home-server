@@ -11,9 +11,14 @@ Most services run as Docker containers with pinned image versions in role defaul
 1. Check the current version in `roles/<service>/defaults/main.yml`
 2. Check the upstream release notes for breaking changes
 3. Update the version variable (e.g., `jellyfin_version: "10.10.6"`)
-4. Deploy: `make <service>`
-5. Verify the service starts and works correctly
-6. Check logs: `ssh <service>` then `docker logs <container_name>`
+4. Pull the new image on the host: `ssh <host> "cd /srv/<stack> && docker compose pull <service>"`
+5. Deploy: `make <service>`
+6. Verify the service starts and works correctly
+7. Check logs: `ssh <service>` then `docker logs <container_name>`
+
+**Note:** Ansible handlers use `pull: never` — they will not pull images automatically.
+You must pull new images manually (step 4) before deploying. This prevents unexpected
+image changes during config-only deploys.
 
 ### Monitoring sidecar upgrades
 
