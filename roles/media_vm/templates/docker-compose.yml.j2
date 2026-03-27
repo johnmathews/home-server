@@ -41,29 +41,30 @@ services:
       retries: 3
     restart: always
 
-  lidarr:
-    image: lscr.io/linuxserver/lidarr:{{ lidarr_version }}
-    container_name: lidarr
-    user: "${PUID}:${PGID}"
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - UMASK=002
-      - TZ=${TZ}
-    volumes:
-      - /srv/media/config/lidarr:/config
-      - /mnt/nfs/music/lidarr:/music
-      - /mnt/nfs/downloads:/downloads
-    ports:
-      - "8686:8686"
-    depends_on:
-      qbittorrent:
-        condition: service_healthy
-      sabnzbd:
-        condition: service_started
-      prowlarr:
-        condition: service_started
-    restart: always
+  # lidarr: disabled — using slskd standalone, bypassing Lidarr metadata matching
+  # lidarr:
+  #   image: lscr.io/linuxserver/lidarr:{{ lidarr_version }}
+  #   container_name: lidarr
+  #   user: "${PUID}:${PGID}"
+  #   environment:
+  #     - PUID=${PUID}
+  #     - PGID=${PGID}
+  #     - UMASK=002
+  #     - TZ=${TZ}
+  #   volumes:
+  #     - /srv/media/config/lidarr:/config
+  #     - /mnt/nfs/music/lidarr:/music
+  #     - /mnt/nfs/downloads:/downloads
+  #   ports:
+  #     - "8686:8686"
+  #   depends_on:
+  #     qbittorrent:
+  #       condition: service_healthy
+  #     sabnzbd:
+  #       condition: service_started
+  #     prowlarr:
+  #       condition: service_started
+  #   restart: always
 
   slskd:
     image: slskd/slskd:{{ slskd_version }}
@@ -78,20 +79,21 @@ services:
     volumes:
       - /srv/media/config/slskd:/app
       - /mnt/nfs/downloads/slskd:/downloads
-      - /mnt/nfs/music/lidarr:/music:ro
+      - /mnt/nfs/music/slskd:/music:ro
     restart: always
 
-  soularr:
-    image: mrusse08/soularr:{{ soularr_version }}
-    container_name: soularr
-    user: "${PUID}:${PGID}"
-    environment:
-      - TZ=${TZ}
-      - SCRIPT_INTERVAL=300
-    volumes:
-      - /srv/media/config/soularr:/data
-      - /mnt/nfs/downloads/slskd:/downloads
-    restart: always
+  # soularr: disabled — was the Lidarr↔slskd bridge, no longer needed
+  # soularr:
+  #   image: mrusse08/soularr:{{ soularr_version }}
+  #   container_name: soularr
+  #   user: "${PUID}:${PGID}"
+  #   environment:
+  #     - TZ=${TZ}
+  #     - SCRIPT_INTERVAL=300
+  #   volumes:
+  #     - /srv/media/config/soularr:/data
+  #     - /mnt/nfs/downloads/slskd:/downloads
+  #   restart: always
 
   gluetun:
     image: qmcgaw/gluetun

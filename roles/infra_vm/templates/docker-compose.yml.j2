@@ -61,20 +61,6 @@ services:
       - chroma_data:/app/.chroma_db
     profiles: ["setup"]
 
-  sre-ui:
-    image: ghcr.io/johnmathews/sre-assistant:{{ sre_assistant_version }}
-    container_name: sre-ui
-    command: ["streamlit", "run", "src/ui/app.py", "--server.port", "8501", "--server.address", "0.0.0.0"]
-    ports:
-      - "8501:8501"
-    restart: unless-stopped
-    mem_limit: 96m # ADDED: currently ~63MB, cap with headroom
-    environment:
-      - API_URL=http://sre-api:8000 # handy trick
-    depends_on:
-      sre-api:
-        condition: service_healthy
-
   sre-api:
     image: ghcr.io/johnmathews/sre-assistant:{{ sre_assistant_version }}
     container_name: sre-api
@@ -82,8 +68,8 @@ services:
     ports:
       - "8001:8000"
     restart: unless-stopped
-    mem_limit: 384m # ADDED: currently ~134MB
-    env_file: .env
+    mem_limit: 768m
+    env_file: .env # gets all the env vars in the file automatically
     environment:
       - ANONYMIZED_TELEMETRY=False
       - CLAUDE_CONFIG_DIR=/app/.claude
@@ -102,6 +88,20 @@ services:
       timeout: 10s
       retries: 3
       start_period: 15s
+
+  sre-ui:
+    image: ghcr.io/johnmathews/sre-assistant:{{ sre_assistant_version }}
+    container_name: sre-ui
+    command: ["streamlit", "run", "src/ui/app.py", "--server.port", "8501", "--server.address", "0.0.0.0"]
+    ports:
+      - "8501:8501"
+    restart: unless-stopped
+    mem_limit: 96m # ADDED: currently ~63MB, cap with headroom
+    environment:
+      - API_URL=http://sre-api:8000 # handy trick
+    depends_on:
+      sre-api:
+        condition: service_healthy
 
   loki:
     image: grafana/loki:{{ loki_version }}
