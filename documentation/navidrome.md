@@ -128,12 +128,14 @@ Role chain: `nfs_client` → `share_drive_probe` → `music_lxc` → `shell_envi
 
 ## Music Sources
 
-Music files arrive in `/mnt/nfs/music` from two sources:
+Navidrome has multiple libraries. Music files arrive from different sources:
 
-- **gm** (manual) — downloads to `/mnt/nfs/music/Artist/Album/` directly
-- **Lidarr + Soularr + slskd** (automated) — runs on the Media VM (192.168.2.105). Soularr polls Lidarr's wanted list, searches Soulseek via slskd, and Lidarr imports completed downloads to `/mnt/nfs/music`. See `documentation/media_vm.md` for details.
+- **releases library** (`/mnt/nfs/music/releases`) — existing organized music collection
+- **slskd library** (`/mnt/nfs/music/slskd`) — music downloaded via slskd (standalone Soulseek client on Media VM). After downloading, approved albums are moved from `/mnt/nfs/downloads/slskd/` to `/mnt/nfs/music/slskd/Artist/Album/`. See `documentation/media_vm.md` for details.
 
-Navidrome scans hourly (`ND_SCANSCHEDULE=1h`) and picks up files from both sources automatically.
+Navidrome scans hourly (`ND_SCANSCHEDULE=1h`) and picks up files from all libraries automatically.
+
+**History**: The slskd library replaced an automated Lidarr + Soularr + slskd pipeline (disabled 2026-03-27) due to Lidarr's metadata matching rejecting valid downloads.
 
 ## Music Library Organization
 
