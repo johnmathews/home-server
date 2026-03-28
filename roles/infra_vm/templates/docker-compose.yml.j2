@@ -32,7 +32,7 @@ services:
     container_name: documentation-ui
     restart: unless-stopped
     ports:
-      - "3002:3000"
+      - "3003:3000"
     environment:
       - API_URL=http://docserver:8080
     depends_on:

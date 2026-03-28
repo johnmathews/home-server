@@ -16,7 +16,7 @@ cloudflared_ingress:
 
   # Documentation
   - prefix: docs
-    service: "http://192.168.2.106:3002"
+    service: "http://192.168.2.106:3003"
   - prefix: server-docs
     service: "http://192.168.2.106:8000"
   - prefix: agent-docs

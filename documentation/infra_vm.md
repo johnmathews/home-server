@@ -24,7 +24,7 @@ tools run here.
 +----------------------------+-----------------------------------------------------+-------+-----------------------------+
 | Container                  | Image                                               | Port  | URL                         |
 +----------------------------+-----------------------------------------------------+-------+-----------------------------+
-| documentation-ui           | ghcr.io/johnmathews/documentation-ui:latest         | 3002  | itsa-pizza.com              |
+| documentation-ui           | ghcr.io/johnmathews/documentation-ui:latest         | 3003  | docs.itsa-pizza.com         |
 | documentation-mcp-server   | ghcr.io/johnmathews/documentation-mcp-server:latest | 8085  | -                           |
 | grafana                    | grafana/grafana-oss:latest                          | 3000  | grafana.itsa-pizza.com      |
 | loki                       | grafana/loki:latest                                 | 3100  | loki.itsa-pizza.com         |
@@ -69,7 +69,7 @@ tools run here.
 
 ### Documentation
 
-- **Documentation UI** — Custom documentation browser served at the root domain (port 3002).
+- **Documentation UI** — Custom documentation browser served at docs.itsa-pizza.com (port 3003).
   Connects to the docserver API.
 - **Documentation MCP Server** — Indexes documentation from git repos and local mkdocs. Stores
   embeddings in ChromaDB. Memory limit: 1.5GB. See `documentation/docserver.md` for details.
@@ -152,7 +152,7 @@ All services accessible via Cloudflare Tunnel with Zero Access:
 +-----------+--------------------+
 | (root)    | Homepage (3002)    |
 | dash      | Homepage (3002)    |
-| docs      | Homepage (3002)    |
+| docs      | Docs UI (3003)     |
 | charts    | Grafana (3000)     |
 | grafana   | Grafana (3000)     |
 | loki      | Loki (3100)        |
