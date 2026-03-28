@@ -140,7 +140,10 @@ clean:
 	rm -f *.retry
 	rm -f .ansible.log
 
-ci: lint check
+check-ports:
+	python3 scripts/check-duplicate-ports.py
+
+ci: lint check-ports check
 
 # ───────────── Help Message ───────────────
 help:
