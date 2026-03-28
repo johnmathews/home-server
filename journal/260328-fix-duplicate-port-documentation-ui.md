@@ -31,6 +31,19 @@ Wired into the CI pipeline:
 Added tests in `tests/test_check_duplicate_ports.py` (7 tests covering duplicates, TCP/UDP distinction,
 quoted/unquoted ports, service name tracking, edge cases).
 
+## Deploy fix: docker_compose_dir variable precedence
+
+Running `make infra tags=docker` failed with `"/srv/apps" is not a directory`. The infra VM role
+default (`docker_compose_dir: /srv/infra`) was being silently overridden by `group_vars/all/main.yml`
+which sets `docker_compose_dir: "/srv/apps"` — group_vars has higher Ansible precedence than role
+defaults.
+
+Fixed by adding `docker_compose_dir: /srv/infra` to `host_vars/infra-vm.yml` (host_vars wins over
+group_vars). Also corrected stale `/srv/apps` references in `documentation/infra_vm.md`.
+
+After deploy, Homepage container was slow to start (~2 min) because the entrypoint runs
+`chown -R 1000:1000 /app` on every recreate. Not a code issue — just takes time on each restart.
+
 ## Remaining
 
 The Cloudflare Access issue (root domain behind Zero Trust login) is a separate configuration change

@@ -12,7 +12,7 @@ tools run here.
 +-----------------------+--------------------------------------------------+
 | Host                  | infra-vm (192.168.2.106)                         |
 | SSH                   | ssh infra (user: john)                           |
-| Docker compose dir    | /srv/apps                                        |
+| Docker compose dir    | /srv/infra                                       |
 | Ansible               | make infra                                       |
 | Role                  | roles/infra_vm                                   |
 +-----------------------+--------------------------------------------------+
@@ -175,9 +175,9 @@ All services accessible via Cloudflare Tunnel with Zero Access:
 /srv/infra/homepage/config/  — Homepage dashboard config
 /srv/infra/mikrotik_exporter/— MKTXP config
 /srv/infra/mkdocs/           — MkDocs source files
-/srv/apps/loki/              — Loki data and config
-/srv/apps/alloy/             — Alloy config
-/srv/apps/docserver/         — Docserver config
+/srv/infra/loki/             — Loki data and config
+/srv/infra/alloy/            — Alloy config
+/srv/infra/docserver/        — Docserver config
 ```
 
 ## Related Documentation

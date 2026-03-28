@@ -8,3 +8,7 @@ collections/
 *.secret
 router_backups/
 .ansible/
+__pycache__/
+*.pyc
+htmlcov/
+.pytest_cache/
