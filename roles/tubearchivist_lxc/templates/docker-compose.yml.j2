@@ -18,7 +18,7 @@ services:
       - HOST_GID=1000
       - ES_URL=http://archivist-es:9200
       - ELASTIC_PASSWORD={{ vault_ta_elastic_search_password }}
-      - REDIS_HOST=archivist-redis
+      - REDIS_CON=redis://archivist-redis:6379
       - TA_HOST={{ tubearchivist_host }}
       - TA_USERNAME={{ ta_username }}
       - TA_PASSWORD={{ vault_ta_password }}
