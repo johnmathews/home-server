@@ -1,3 +1,5 @@
+# Set to true to enable the probe timer (survives reboots)
+share_drive_probe_enabled: false
 # How often to probe (systemd timer)
 share_drive_probe_interval: 5m
 share_drive_probe_interval_minutes: 5

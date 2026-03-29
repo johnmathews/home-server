@@ -2,6 +2,14 @@
 
 There is a task called `share_drive_probe`. It's added to all the playbooks.
 
+## Enabling / Disabling
+
+The probe is controlled by `share_drive_probe_enabled` (default: `false` in
+`roles/share_drive_probe/defaults/main.yml`). Set it to `true` in
+`group_vars/all/main.yml` (or a host-specific override) and run `make site
+tags=shares` to re-enable. The setting controls both the systemd `enabled`
+flag (survives reboots) and the running state.
+
 ## Setup and Deployment (Ansible)
 
 `make site tags=shares`

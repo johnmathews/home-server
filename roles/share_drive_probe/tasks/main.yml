@@ -84,3 +84,10 @@
   notify:
     - Reload daemon
     - Restart share-drive-probe timer
+
+- name: Manage share-drive-probe timer state
+  ansible.builtin.systemd:
+    name: share-drive-probe.timer
+    state: "{{ 'started' if share_drive_probe_enabled else 'stopped' }}"
+    enabled: "{{ share_drive_probe_enabled }}"
+    daemon_reload: true

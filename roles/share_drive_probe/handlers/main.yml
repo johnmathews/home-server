@@ -11,11 +11,12 @@
 - name: Restart share-drive-probe timer
   ansible.builtin.systemd:
     name: share-drive-probe.timer
-    state: restarted
-    enabled: true
+    state: "{{ 'restarted' if share_drive_probe_enabled else 'stopped' }}"
+    enabled: "{{ share_drive_probe_enabled }}"
 
 - name: Run share-drive-probe service
   ansible.builtin.systemd:
     name: share-drive-probe.service
     state: restarted
     enabled: false
+  when: share_drive_probe_enabled
