@@ -263,20 +263,6 @@
         siteMonitor: http://192.168.2.105:8989/
         description: TV Series Manager
         icon: sonarr
-        widget:
-          type: sonarr
-          url: http://192.168.2.105:8989/
-          key: "{{ vault_sonarr_key }}"
-          enableQueue: false
-    - Lidarr:
-        href: https://lidarr.{{ primary_domain_name }}
-        siteMonitor: http://192.168.2.105:8686
-        description: music
-        icon: lidarr
-        widget:
-          type: lidarr
-          url: http://192.168.2.105:8686
-          key: "{{ vault_lidarr_api_key }}"
     - Slskd:
         href: https://slskd.{{ primary_domain_name }}
         siteMonitor: http://192.168.2.105:5030
@@ -314,10 +300,6 @@
         siteMonitor: http://192.168.2.105:8081/
         description: Usenet download client
         icon: sabnzbd
-        widget:
-          type: sabnzbd
-          url: http://192.168.2.105:8081/
-          key: "{{ vault_sabnzbd_key }}"
     - qBittorrent:
         href: http://qbittorrent.{{ primary_domain_name }}
         siteMonitor: http://192.168.2.105:8080
@@ -356,7 +338,7 @@
 - Documentation:
     - Documentation (all):
         href: https://docs.{{ primary_domain_name }}
-        siteMonitor: http://192.168.2.106:3002
+        siteMonitor: http://192.168.2.106:3003
         icon: si-materialformkdocs
     - Server Documentation:
         href: https://server-docs.{{ primary_domain_name }}

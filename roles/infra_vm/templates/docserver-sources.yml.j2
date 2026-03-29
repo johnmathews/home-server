@@ -1,36 +1,48 @@
 sources:
- - name: "SRE-agent"
-   path: "https://github.com/johnmathews/sre-assistant.git"
-   branch: "main"
-   is_remote: true
- - name: "home-server"
-   path: "https://${GITHUB_TOKEN}@github.com/johnmathews/home-server.git"
-   branch: "main"
-   is_remote: true
- - name: "unified-documentation-app"
-   path: "https://github.com/johnmathews/documentation-mcp-server"
-   branch: "main"
-   is_remote: true
- - name: "journal-insights-agent"
-   path: "https://github.com/johnmathews/journal-agent"
-   branch: "main"
-   is_remote: true
- - name: "nanoclaw-personal-ai-assistant"
-   path: "https://github.com/johnmathews/nanoclaw"
-   branch: "main"
-   is_remote: true
- - name: "timer-app"
-   path: "https://github.com/johnmathews/gym-timer"
-   branch: "main"
-   is_remote: true
- - name: "disk-status-exporter"
-   path: "https://github.com/johnmathews/disk_status_exporter"
-   branch: "main"
-   is_remote: true
- - name: "container-status-exporter"
-   path: "https://github.com/johnmathews/container-status-exporter"
-   branch: "main"
-   is_remote: true
+  - name: "SRE-agent"
+    path: "https://github.com/johnmathews/sre-assistant.git"
+    branch: "main"
+    is_remote: true
+  - name: "home-server"
+    path: "https://${GITHUB_TOKEN}@github.com/johnmathews/home-server.git"
+    branch: "main"
+    is_remote: true
+  - name: "unified-documentation-app"
+    path: "https://github.com/johnmathews/documentation-mcp-server"
+    branch: "main"
+    is_remote: true
+  - name: "journal-insights-agent"
+    path: "https://github.com/johnmathews/journal-agent"
+    branch: "main"
+    is_remote: true
+  - name: "nanoclaw-personal-ai-assistant"
+    path: "https://github.com/johnmathews/nanoclaw"
+    branch: "main"
+    is_remote: true
+  - name: "timer-app"
+    path: "https://github.com/johnmathews/gym-timer"
+    branch: "main"
+    is_remote: true
+  - name: "disk-status-exporter"
+    path: "https://github.com/johnmathews/disk_status_exporter"
+    branch: "main"
+    is_remote: true
+  - name: "container-status-exporter"
+    path: "https://github.com/johnmathews/container-status-exporter"
+    branch: "main"
+    is_remote: true
+  - name: "Document Stream"
+    path: "https://github.com/johnmathews/DocumentStream"
+    branch: "main"
+    is_remote: true
+    patterns:
+      - "**/*.pdf"
+      - "**/*.md"
+      - "docs/**/*.md"
+      - "journal/**/*.md"
+      - ".engineering-team/**/*.md"
+      - "CLAUDE.md"
+      - "README.md"
 
 poll_interval: 300 # Seconds between index cycles
 data_dir: "/data" # Persistent storage path

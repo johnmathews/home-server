@@ -2,30 +2,6 @@
 (function waitForRevalidate() {
   console.log("Custom JS loaded");
 
-  const revalidate = document.getElementById("revalidate");
-
-  if (!revalidate) {
-    console.warn("#revalidate element not found");
-    return;
-  }
-
-  const tabList = document.querySelector("#tabs ul");
-
-  if (!revalidate || !tabList) {
-    console.warn("#tabs ul not found");
-    // Retry next frame
-    requestAnimationFrame(waitForRevalidate);
-    return;
-  }
-
-  // Create a new <li> and move the revalidate button into it
-  const newListItem = document.createElement("li");
-  // newListItem.classList.add("custom-revalidate-tab"); // optional for styling
-  newListItem.appendChild(revalidate);
-  tabList.appendChild(newListItem);
-
-  console.log("#revalidate moved to #tabs ul as last <li>");
-
   // Function to find and highlight CPU usage values
   function highlightCpuUsage() {
     console.log("Searching for CPU usage values...");

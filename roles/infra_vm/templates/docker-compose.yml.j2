@@ -169,11 +169,11 @@ services:
   homepage:
     image: ghcr.io/gethomepage/homepage:{{ homepage_version }}
     container_name: homepage
-    mem_limit: 192m # ADDED: currently ~122MB
+    mem_limit: 192m
     environment:
       PUID: 1000
       PGID: 1000
-      HOMEPAGE_ALLOWED_HOSTS: "192.168.2.106:3002,dash.{{ primary_domain_name }},{{ primary_domain_name }}{% for d in migration_additional_domains | default([]) %},dash.{{ d }},{{ d }}{% endfor %}"
+      HOMEPAGE_ALLOWED_HOSTS: "192.168.2.106:3002,{{ primary_domain_name }}"
     ports:
       - 3002:3000
     env_file:

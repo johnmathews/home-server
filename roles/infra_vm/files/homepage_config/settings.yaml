@@ -18,6 +18,11 @@ layout:
     initiallyCollapsed: false
     style: row
     columns: 4
+  Documentation:
+    tab: Infra
+    initiallyCollapsed: false
+    style: row
+    columns: 6
   NAS:
     tab: Infra
     initiallyCollapsed: false
@@ -55,11 +60,6 @@ layout:
     initiallyCollapsed: false
     style: row
     columns: 2
-  Documentation:
-    tab: Notes
-    initiallyCollapsed: false
-    style: row
-    columns: 6
   Media_:
     tab: Notes
     initiallyCollapsed: false
