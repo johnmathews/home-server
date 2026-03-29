@@ -63,6 +63,35 @@ loki.source.journal "share_drive_probe" {
   forward_to = [loki.process.drop_logs.receiver]
 }
 
+loki.relabel "truenas_syslog" {
+
+	// forward_to = [] // not sure if this is necessary.
+
+  rule {
+    source_labels = ["__syslog_message_app_name"]
+    target_label  = "service_name"
+  }
+  rule {
+    source_labels = ["__syslog_message_hostname"]
+    target_label  = "hostname"
+  }
+}
+
+loki.source.syslog "truenas" {
+  listener {
+    address               = "0.0.0.0:1514"
+    protocol              = "udp"
+    syslog_format         = "rfc3164"
+    use_incoming_timestamp = true
+    rfc3164_default_to_current_year = true
+    labels                = { job = "truenas-syslog" }
+  }
+
+  relabel_rules = loki.relabel.truenas_syslog.rules
+  forward_to    = [loki.process.drop_logs.receiver]
+}
+
+
 loki.process "drop_logs" {
   // 0) Drop very old entries to avoid "entry too old" errors
   stage.drop {
