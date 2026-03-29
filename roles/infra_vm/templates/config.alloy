@@ -80,14 +80,14 @@ loki.source.syslog "truenas" {
   listener {
     address               = "0.0.0.0:1514"
     protocol              = "udp"
-    syslog_format         = "rfc3164"
+    syslog_format         = "rfc5424"
     use_incoming_timestamp = true
-    rfc3164_default_to_current_year = true
     labels                = { job = "truenas-syslog" }
   }
 
   relabel_rules = loki.relabel.truenas_syslog.rules
-  forward_to    = [loki.process.drop_logs.receiver]
+  // Skip drop_logs — syslog entries don't need the older_than filter
+  forward_to    = [loki.process.normalize.receiver]
 }
 
 
@@ -98,28 +98,23 @@ loki.process "drop_logs" {
     drop_counter_reason = "too_old"
   }
 
+  // 0b) Drop entries exceeding Loki's 256KB max entry size
+  stage.drop {
+    longer_than         = "256KB"
+    drop_counter_reason = "too_large"
+  }
+
   forward_to = [loki.process.normalize.receiver]
 }
 
 loki.process "normalize" {
-  // 1) try logfmt first (e.g., "level=INFO")
-  stage.regex {
-    expression = "^\\s*[A-Za-z_][A-Za-z0-9_.-]*=\\S+(?:\\s+[A-Za-z_][A-Za-z0-9_.-]*=\\S+){1,}\\s*$"
-  }
-  stage.template {
-    source   = "looks_logfmt"
-    template = "{{ if .RegexMatch }}1{{ end }}"
-  }
+  // 1) try logfmt first — only on lines that contain "level="
   stage.match {
-    selector = "{looks_logfmt=\"1\"}"
-    stage.logfmt { 
-      mapping = { level = "detected_level" } 
+    selector = "{hostname=~\".+\"} |~ \"level=\""
+    stage.logfmt {
+      mapping = { "level" = "detected_level" }
     }
   }
-  // simple and works but throws harmless errors if row cannot be parsed. 
-  //stage.logfmt {
-  //  mapping = { "level" = "detected_level" }
-  //}
 
 
   // 2) fallback regex if logfmt didn’t set it
