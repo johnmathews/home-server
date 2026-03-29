@@ -64,8 +64,7 @@ loki.source.journal "share_drive_probe" {
 }
 
 loki.relabel "truenas_syslog" {
-
-	// forward_to = [] // not sure if this is necessary.
+  forward_to = []
 
   rule {
     source_labels = ["__syslog_message_app_name"]
