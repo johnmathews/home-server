@@ -64,6 +64,7 @@ shell_environment_cli_tools:
   - tree
   - bat
   - tmux
+  - rsync
 
 # uv Python package manager (installer script)
 shell_environment_uv_enabled: true
