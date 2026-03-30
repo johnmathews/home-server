@@ -10,6 +10,18 @@ The probe is controlled by `share_drive_probe_enabled` (default: `false` in
 tags=shares` to re-enable. The setting controls both the systemd `enabled`
 flag (survives reboots) and the running state.
 
+**Important:** When disabling the probe, Ansible stops the timer but does not
+remove the `.prom` file. Node exporter will keep serving the stale metrics,
+making Grafana look like the probe is still active. After disabling, manually
+delete the leftover file on each host:
+
+```sh
+rm /var/lib/node_exporter/textfile_collector/share_drive_probe.prom
+```
+
+Hosts that run the probe are listed under `[share_drive_clients]` in
+`inventory.ini`, plus `pve`.
+
 ## Setup and Deployment (Ansible)
 
 `make site tags=shares`
