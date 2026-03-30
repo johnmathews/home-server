@@ -7,7 +7,7 @@
     owner: "{{ docker_user }}"
     group: "{{ docker_user }}"
     mode: '0755'
-  notify: Restart docker
+  notify: Restart docserver
   tags: docserver
 
 - name: Template docserver sources.yaml
@@ -17,5 +17,5 @@
     owner: "{{ docker_user }}"
     group: "{{ docker_user }}"
     mode: '0644'
-  notify: Restart docker
+  notify: Restart docserver
   tags: docserver

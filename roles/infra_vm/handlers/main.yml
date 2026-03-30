@@ -91,3 +91,15 @@
   ansible.builtin.service:
     name: docker
     state: restarted
+
+- name: Restart docserver
+  community.docker.docker_compose_v2:
+    project_src: "{{ docker_compose_dir }}"
+    services:
+      - documentation-ui,documentation-server
+    state: present
+    recreate: always
+    pull: never
+    dependencies: true
+    remove_orphans: true
+  become: false

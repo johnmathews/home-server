@@ -4,7 +4,7 @@
 services:
   docserver:
     image: ghcr.io/johnmathews/documentation-mcp-server:{{ docserver_version }}
-    container_name: documentation-mcp-server
+    container_name: documentation-server
     restart: unless-stopped
     stop_grace_period: 30s
     mem_limit: 1536m # ~500MB embeddings + ChromaDB + SQLite; 1.5GB cap with headroom
