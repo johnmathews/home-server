@@ -201,4 +201,4 @@
     dependencies: true
     remove_orphans: true
   become: false
-  tags: docker, mikrotik_exporter, docserver
+  tags: docker, mikrotik_exporter

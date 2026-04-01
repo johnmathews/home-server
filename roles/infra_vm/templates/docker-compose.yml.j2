@@ -29,7 +29,7 @@ services:
 
   documentation-ui:
     image: ghcr.io/johnmathews/documentation-ui:{{ documentation_ui_version }}
-    container_name: documentation-ui
+    container_name: documentation-webapp
     restart: unless-stopped
     ports:
       - "3003:3000"

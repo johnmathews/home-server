@@ -3,27 +3,27 @@
 # Monitoring stack + Syncthing — NanoClaw runs natively as a systemd user service
 
 services:
-  syncthing:
-    image: syncthing/syncthing:{{ syncthing_version }}
-    container_name: syncthing
-    hostname: agent-lxc
-    restart: unless-stopped
-    environment:
-      - PUID=1000
-      - PGID=1000
-    volumes:
-      - /srv/apps/syncthing:/var/syncthing/config
-      - /srv/apps/nanoclaw:/var/syncthing/nanoclaw
-    ports:
-      - "8384:8384"
-      - "22000:22000/tcp"
-      - "22000:22000/udp"
-      - "21027:21027/udp"
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "5"
+  # syncthing:
+  #   image: syncthing/syncthing:{{ syncthing_version }}
+  #   container_name: syncthing
+  #   hostname: agent-lxc
+  #   restart: unless-stopped
+  #   environment:
+  #     - PUID=1000
+  #     - PGID=1000
+  #   volumes:
+  #     - /srv/apps/syncthing:/var/syncthing/config
+  #     - /srv/apps/nanoclaw:/var/syncthing/nanoclaw
+  #   ports:
+  #     - "8384:8384"
+  #     - "22000:22000/tcp"
+  #     - "22000:22000/udp"
+  #     - "21027:21027/udp"
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "10m"
+  #       max-file: "5"
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:{{ cadvisor_version }}
