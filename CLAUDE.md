@@ -65,7 +65,7 @@ Host IPs are assigned statically on the MikroTik router. Source of truth: `inven
 | nas_vm            | 192.168.2.104  |                  | TrueNAS (NFS/SMB shares)            |
 | media-vm          | 192.168.2.105  |                  | Sonarr, Radarr, qBittorrent, etc.   |
 | infra-vm          | 192.168.2.106  |                  | Grafana, Prometheus, Loki, etc.      |
-| agent_lxc         | 192.168.2.107  | 100.125.185.47   | Gateway :18789, Canvas :18793        |
+| agent_lxc         | 192.168.2.107  | 100.125.185.47   | NanoClaw Gateway :18790              |
 | traefik_lxc       | 192.168.2.108  |                  | Reverse proxy (Traefik)              |
 | jellyfin_lxc      | 192.168.2.110  |                  | Jellyfin media server                |
 | immich_lxc        | 192.168.2.113  |                  | Immich photo management              |
@@ -105,7 +105,7 @@ Service-specific guides in `/documentation/`. Read the relevant doc before worki
 - `mikrotik-exporter.md` — MikroTik router Prometheus exporter (MKTXP)
 - `monitor_nfs_smb_mounts.md` — NFS/SMB mount health monitoring
 - `navidrome.md` — Navidrome music streaming, NFS mount, Subsonic API clients
-- `agent.md` — OpenClaw architecture, LXC setup, macOS app, Tailscale, known issues
+- `agent.md` — NanoClaw architecture, LXC setup, macOS app, Tailscale, known issues
 - `open_webui_lxc.md` — Open WebUI LLM chat interface, OpenAI backend, Docker setup
 - `paperless.md` — Paperless-ngx document store, Docker stack, NFS/SMB, training schedule
 - `prometheus_lxc.md` — Prometheus metrics collection, scrape targets, retention, adding hosts

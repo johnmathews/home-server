@@ -173,14 +173,14 @@ This will:
 - Start the Tailscale daemon
 - Display the assigned Tailscale IP
 
-### Note: OpenClaw LXC (manual install)
+### Note: NanoClaw LXC (manual install)
 
-Tailscale on the OpenClaw LXC (`192.168.2.107`) was installed **manually**, not via the Ansible `tailscale` role.
+Tailscale on the NanoClaw LXC (`192.168.2.107`) was installed **manually**, not via the Ansible `tailscale` role.
 Debian 13 (Trixie) does not ship `apt-key`, so the standard Tailscale install script fails. The workaround uses the
 modern signed-by keyring method:
 
 ```bash
-# As root on the OpenClaw LXC:
+# As root on the NanoClaw LXC:
 curl -fsSL https://pkgs.tailscale.com/stable/debian/trixie.noarmor.gpg \
   | tee /usr/share/keyrings/tailscale-archive-keyring.gpg > /dev/null
 curl -fsSL https://pkgs.tailscale.com/stable/debian/trixie.tailscale-keyring.list \
@@ -189,7 +189,7 @@ apt-get update && apt-get install -y tailscale
 tailscale up
 ```
 
-Tailscale IP: `100.125.185.47` / MagicDNS: `openclaw.flicker-enigmatic.ts.net`
+Tailscale IP: `100.125.185.47` / MagicDNS: `openclaw.flicker-enigmatic.ts.net` (hostname predates NanoClaw rename)
 
 If other Debian 13 LXCs need Tailscale in the future, the Ansible role should be updated with this keyring method.
 

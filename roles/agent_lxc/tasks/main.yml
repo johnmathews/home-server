@@ -56,7 +56,7 @@
     owner: root
     group: root
     mode: '0600'
-  notify: Restart openclaw gateway
+  notify: Restart nanoclaw
   tags: nanoclaw
 
 - name: Create mkdocs config directories

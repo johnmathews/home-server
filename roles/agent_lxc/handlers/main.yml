@@ -47,9 +47,9 @@
     remove_orphans: true
   become: false
 
-- name: Restart openclaw gateway
+- name: Restart nanoclaw
   ansible.builtin.systemd:
-    name: openclaw-gateway
+    name: nanoclaw
     state: restarted
     scope: user
   become: true
