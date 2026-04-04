@@ -3,7 +3,7 @@
 
 services:
   docserver:
-    image: ghcr.io/johnmathews/documentation-mcp-server:{{ docserver_version }}
+    image: ghcr.io/johnmathews/unified-documentation-server:{{ docserver_version }}
     container_name: documentation-server
     restart: unless-stopped
     stop_grace_period: 30s
@@ -28,7 +28,7 @@ services:
         max-file: "3"
 
   documentation-ui:
-    image: ghcr.io/johnmathews/documentation-ui:{{ documentation_ui_version }}
+    image: ghcr.io/johnmathews/unified-documentation-webapp:{{ documentation_ui_version }}
     container_name: documentation-webapp
     restart: unless-stopped
     ports:
@@ -258,7 +258,7 @@ services:
     restart: always
 
   portainer:
-    image: portainer/portainer-ce:{{ portainer_ce_version }}
+    image: portainer/portainer-ce
     container_name: portainer
     ports:
       - "9000:9000"
@@ -270,6 +270,7 @@ services:
   mikrotik_exporter:
     image: ghcr.io/akpw/mktxp:{{ mktxp_version }}
     container_name: mikrotik_exporter
+    user: "1001:1001"
     command: mktxp --cfg-dir /etc/mktxp export
     ports:
       - "49090:49090"

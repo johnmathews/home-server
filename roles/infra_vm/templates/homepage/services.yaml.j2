@@ -194,6 +194,11 @@
         siteMonitor: http://192.168.2.109:9180
         description: Music Player
         icon: feishin
+    - Slskd:
+        href: https://slskd.{{ primary_domain_name }}
+        siteMonitor: http://192.168.2.105:5030
+        description: music
+        icon: slskd
     - Navidrome:
         href: http://navidrome.{{ primary_domain_name }}
         siteMonitor: http://192.168.2.109:4533
@@ -230,8 +235,12 @@
     - Immich:
         href: http://immich.{{ primary_domain_name }}
         siteMonitor: http://192.168.2.113:2283
-        description: photos
-        icon: immich
+        description:
+        widget:
+          type: immich
+          url: http://192.168.2.113:2283
+          key: "{{ vault_immich_api_key_homepage }}"
+          version: 2
     - BookLore:
         href: https://books.{{ primary_domain_name }}
         siteMonitor: http://192.168.2.105:6060
@@ -263,11 +272,11 @@
         siteMonitor: http://192.168.2.105:8989/
         description: TV Series Manager
         icon: sonarr
-    - Slskd:
-        href: https://slskd.{{ primary_domain_name }}
-        siteMonitor: http://192.168.2.105:5030
-        description: music
-        icon: slskd
+        widget:
+          type: sonarr
+          url: http://192.168.2.105:8989/
+          key: "{{ vault_sonarr_key }}"
+          enableQueue: false
     - Gluetun:
         href: http://192.168.2.105:8000/v1/publicip/ip
         siteMonitor: http://192.168.2.105:8000/v1/publicip/ip
@@ -300,6 +309,10 @@
         siteMonitor: http://192.168.2.105:8081/
         description: Usenet download client
         icon: sabnzbd
+        widget:
+          type: sabnzbd
+          url: http://192.168.2.105:8081/
+          key: "{{ vault_sabnzbd_key }}"
     - qBittorrent:
         href: http://qbittorrent.{{ primary_domain_name }}
         siteMonitor: http://192.168.2.105:8080

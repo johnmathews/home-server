@@ -2,7 +2,8 @@
 
 ## Overview
 
-Navidrome is a self-hosted music server and streamer, compatible with the Subsonic API. Runs as a Docker container inside a dedicated Proxmox LXC, with music files served from TrueNAS via NFS.
+Navidrome is a self-hosted music server and streamer, compatible with the Subsonic API. Runs as a Docker container inside
+a dedicated Proxmox LXC, with music files served from TrueNAS via NFS.
 
 ## Architecture
 
@@ -10,10 +11,10 @@ Navidrome is a self-hosted music server and streamer, compatible with the Subson
                     Cloudflare Tunnel
                          │
            ┌─────────────┼─────────────────┐
-           │             │                 │
+           │             │                     │
 navidrome.itsa-pizza.com  music.itsa-pizza.com     │
            │             │             │
-           ▼             ▼             │
+           ▼             ▼                     │
        Traefik (192.168.2.108:80)      │
            │             │             │
            ▼             ▼             │
@@ -51,12 +52,17 @@ navidrome.itsa-pizza.com  music.itsa-pizza.com     │
 
 ### Public routing
 
-Both `navidrome.itsa-pizza.com` and `music.itsa-pizza.com` are routed through the Cloudflare Tunnel to Traefik (192.168.2.108:80). Cloudflare Access is **not** applied to these subdomains — Subsonic API clients (play:Sub, flo, Feishin desktop) cannot send custom auth headers, so Access would block them. Instead, Traefik applies rate limiting (`music-rl` middleware: 60 req/s average, 30 burst) on the Navidrome route. Feishin (music) doesn't need its own rate limiter — it's a static web app that connects to `navidrome.itsa-pizza.com` from the browser, where `music-rl` already protects the API.
+Both `navidrome.itsa-pizza.com` and `music.itsa-pizza.com` are routed through the Cloudflare Tunnel to Traefik
+(192.168.2.108:80). Cloudflare Access is **not** applied to these subdomains — Subsonic API clients (play:Sub, flo,
+Feishin desktop) cannot send custom auth headers, so Access would block them. Instead, Traefik applies rate limiting
+(`music-rl` middleware: 60 req/s average, 30 burst) on the Navidrome route. Feishin (music) doesn't need its own rate
+limiter — it's a static web app that connects to `navidrome.itsa-pizza.com` from the browser, where `music-rl` already
+protects the API.
 
 ## Ports
 
 | Port  | Service       | Purpose                |
-|-------|---------------|------------------------|
+| ----- | ------------- | ---------------------- |
 | 4533  | Navidrome     | Web UI + Subsonic API  |
 | 9180  | Feishin       | Web player UI          |
 | 9100  | Node Exporter | Host metrics           |
@@ -74,7 +80,8 @@ The NFS share must be configured on TrueNAS with authorization for `192.168.2.0/
 
 ## SQLite Database
 
-Navidrome stores its database (users, playlists, play counts, etc.) in `/srv/apps/navidrome/data` on the **local LXC disk** — NOT on NFS. This is critical: SQLite on NFS causes corruption due to broken file locking.
+Navidrome stores its database (users, playlists, play counts, etc.) in `/srv/apps/navidrome/data` on the **local LXC
+disk** — NOT on NFS. This is critical: SQLite on NFS causes corruption due to broken file locking.
 
 ## Deployment
 
@@ -102,16 +109,19 @@ make music t=shell        # Only shell environment
 Navidrome is compatible with the Subsonic API. Recommended clients:
 
 ### iPhone / iPad
+
 - **play:Sub** — intuitive, automatic caching, CarPlay support
 - **flo** — modern SwiftUI client, offline listening, Last.fm scrobbling
 
 ### macOS / Desktop
+
 - **Feishin** — modern player with MPV backend, smart playlists, lyrics (macOS/Linux/Windows)
 - **Supersonic** — lightweight, gapless playback, equalizer, DLNA casting
 
 Full list of compatible apps: https://www.navidrome.org/apps/
 
 ### Client configuration
+
 - **Server URL**: `https://navidrome.itsa-pizza.com` (works from any network)
 - **LAN-only URL**: `http://192.168.2.109:4533` (alternative for local use)
 - **Username/password**: create accounts in the Navidrome web UI
@@ -131,15 +141,19 @@ Role chain: `nfs_client` → `share_drive_probe` → `music_lxc` → `shell_envi
 Navidrome has multiple libraries. Music files arrive from different sources:
 
 - **releases library** (`/mnt/nfs/music/releases`) — existing organized music collection
-- **slskd library** (`/mnt/nfs/music/slskd`) — music downloaded via slskd (standalone Soulseek client on Media VM). After downloading, approved albums are moved from `/mnt/nfs/downloads/slskd/` to `/mnt/nfs/music/slskd/Artist/Album/`. See `documentation/media_vm.md` for details.
+- **slskd library** (`/mnt/nfs/music/slskd`) — music downloaded via slskd (standalone Soulseek client on Media VM). After
+  downloading, approved albums are moved from `/mnt/nfs/downloads/slskd/` to `/mnt/nfs/music/slskd/Artist/Album/`. See
+  `documentation/media_vm.md` for details.
 
 Navidrome scans hourly (`ND_SCANSCHEDULE=1h`) and picks up files from all libraries automatically.
 
-**History**: The slskd library replaced an automated Lidarr + Soularr + slskd pipeline (disabled 2026-03-27) due to Lidarr's metadata matching rejecting valid downloads.
+**History**: The slskd library replaced an automated Lidarr + Soularr + slskd pipeline (disabled 2026-03-27) due to
+Lidarr's metadata matching rejecting valid downloads.
 
 ## Music Library Organization
 
-Navidrome **ignores folder names and file names entirely** — it organizes your library based solely on embedded metadata tags. However, a clean folder structure is still recommended for your own sanity and compatibility with other tools.
+Navidrome **ignores folder names and file names entirely** — it organizes your library based solely on embedded metadata
+tags. However, a clean folder structure is still recommended for your own sanity and compatibility with other tools.
 
 ### Folder structure
 
@@ -171,8 +185,10 @@ Highly recommended: **Genre**, **Year/Date**, **Disc Number** (for multi-disc al
 
 ### Multi-artist and compilation albums
 
-- Use multi-valued tags (`ARTISTS` / `ALBUMARTISTS`) when possible — Navidrome parses these more accurately than separator-based strings like "Artist1 feat. Artist2"
-- For compilations: set Album Artist to "Various Artists" and enable the compilation flag (`TCMP=1` for ID3/MP3, `COMPILATION=1` for FLAC/Vorbis)
+- Use multi-valued tags (`ARTISTS` / `ALBUMARTISTS`) when possible — Navidrome parses these more accurately than
+  separator-based strings like "Artist1 feat. Artist2"
+- For compilations: set Album Artist to "Various Artists" and enable the compilation flag (`TCMP=1` for ID3/MP3,
+  `COMPILATION=1` for FLAC/Vorbis)
 
 ### Album artwork
 
@@ -182,38 +198,49 @@ Navidrome searches for artwork in this order (configurable via `CoverArtPriority
 2. Embedded images in the media file tags
 3. External services (Last.fm)
 
-**Best practice: do both.** Embed the cover art in each file's tags (portable — art travels with the file if moved), and also drop a `cover.jpg` in each album folder (fastest for Navidrome to find). MusicBrainz Picard can do both in one pass.
+**Best practice: do both.** Embed the cover art in each file's tags (portable — art travels with the file if moved), and
+also drop a `cover.jpg` in each album folder (fastest for Navidrome to find). MusicBrainz Picard can do both in one pass.
 
 ### Tagging tools
 
-- **MusicBrainz Picard** (macOS/Linux/Windows) — looks up metadata from the MusicBrainz database, writes tags, embeds artwork, saves `cover.jpg`, and can rename/reorganize files. Uses AcoustID audio fingerprinting so it can identify files even with zero existing metadata. Works on files after ripping — you don't need to tag at rip time.
-- **beets** (CLI, macOS/Linux/Windows) — automated music library manager with MusicBrainz integration, good for large batch operations.
+- **MusicBrainz Picard** (macOS/Linux/Windows) — looks up metadata from the MusicBrainz database, writes tags, embeds
+  artwork, saves `cover.jpg`, and can rename/reorganize files. Uses AcoustID audio fingerprinting so it can identify
+  files even with zero existing metadata. Works on files after ripping — you don't need to tag at rip time.
+- **beets** (CLI, macOS/Linux/Windows) — automated music library manager with MusicBrainz integration, good for large
+  batch operations.
 
 Both are recommended in the Navidrome documentation.
 
 ## Troubleshooting
 
 ### Navidrome shows empty library
+
 - Check NFS mount: `ssh music "ls /mnt/nfs/music/"`
 - If empty, verify TrueNAS NFS share is configured and the LXC IP is authorized
 - Trigger manual scan from Navidrome web UI: Settings > Scan
 
 ### Container won't start
+
 - Check Docker status: `ssh music "docker ps -a"`
 - Check logs: `ssh music "docker logs navidrome"`
 
 ### Health check
+
 ```bash
 ssh music "docker exec navidrome wget -qO- http://localhost:4533/ping"
 ```
-The `/ping` endpoint returns a simple response and does NOT touch NFS — safe even if the mount is stale. The Docker healthcheck uses `wget` (not `curl`) since the Navidrome image doesn't ship `curl`.
+
+The `/ping` endpoint returns a simple response and does NOT touch NFS — safe even if the mount is stale. The Docker
+healthcheck uses `wget` (not `curl`) since the Navidrome image doesn't ship `curl`.
 
 ### NFS issues
+
 - Navidrome starts fine even if NFS is unavailable (autofs ghost mount)
 - When NFS recovers, the next hourly scan picks up the music files
 - SQLite database is on local disk, never affected by NFS issues
 
 ### Logs
+
 - Docker logs: `ssh music "docker logs navidrome --tail 50"`
 - Alloy ships all container logs to Loki at 192.168.2.106:3100
 - Query in Grafana: `{hostname="music", container="navidrome"}`

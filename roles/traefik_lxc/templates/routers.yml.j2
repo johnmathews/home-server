@@ -177,8 +177,9 @@ http:
 
     music-rl:
       rateLimit:
-        average: 60
-        burst: 30
+        average: 200
+        period: 1s
+        burst: 300
         sourceCriterion:
           requestHeaderName: CF-Connecting-IP
 
