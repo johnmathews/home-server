@@ -8,7 +8,7 @@
     group: "{{ docker_user }}"
     mode: '0755'
   notify: Restart docserver
-  tags: docserver
+  tags: docserver, documentation
 
 - name: Template docserver sources.yaml
   ansible.builtin.template:
@@ -18,4 +18,4 @@
     group: "{{ docker_user }}"
     mode: '0644'
   notify: Restart docserver
-  tags: docserver
+  tags: docserver, documentation

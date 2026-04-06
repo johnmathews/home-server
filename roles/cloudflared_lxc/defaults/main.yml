@@ -17,6 +17,8 @@ cloudflared_ingress:
   # Documentation
   - prefix: docs
     service: "http://192.168.2.106:3003"
+  - prefix: docs-mcp
+    service: "http://192.168.2.106:8085"
   - prefix: server-docs
     service: "http://192.168.2.106:8000"
   - prefix: agent-docs
@@ -29,6 +31,8 @@ cloudflared_ingress:
     service: "http://192.168.2.106:8082"
   - prefix: sre
     service: "http://192.168.2.106:8501"
+  - prefix: sre-mcp
+    service: "http://192.168.2.106:8001"
   - prefix: claw
     service: "http://192.168.2.107:18789"
 

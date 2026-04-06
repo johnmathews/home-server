@@ -135,7 +135,7 @@
     group: docker
     mode: '0644'
   notify: Update docker compose stack
-  tags: docker, mikrotik_exporter, docserver, homepage
+  tags: docker, mikrotik_exporter, docserver, homepage, documentation
 
 - name: Upload .env file from template
   ansible.builtin.template:
@@ -178,7 +178,7 @@
 
 - name: Include docserver tasks
   ansible.builtin.import_tasks: docserver.yml
-  tags: docserver
+  tags: docserver, documentation
 
 - name: Include homepage tasks
   ansible.builtin.import_tasks: homepage.yml
@@ -186,7 +186,7 @@
 
 - name: Include mkdocs tasks
   ansible.builtin.import_tasks: mkdocs.yml
-  tags: docs, docker
+  tags: docs, docker, documentaton
 
 - name: Include mikrotik_exporter tasks
   ansible.builtin.import_tasks: mikrotik_exporter.yml

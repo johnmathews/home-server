@@ -1,8 +1,8 @@
 # Docker image versions
-syncthing_version: "1.28.1"
-cadvisor_version: "v0.49.1"
-alloy_version: "v1.5.1"
-node_exporter_version: "v1.8.2"
+syncthing_version: "latest"
+cadvisor_version: "latest"
+alloy_version: "latest"
+node_exporter_version: "latest"
 
 mkdocs_sites:
   - name: journal

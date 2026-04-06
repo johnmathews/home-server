@@ -2,7 +2,10 @@
 
 sources:
   - name: "SRE-agent"
-    path: "https://github.com/johnmathews/sre-assistant.git"
+    path: "https://github.com/johnmathews/sre-agent.git"
+    branch: "main"
+  - name: "SRE-webapp"
+    path: "https://github.com/johnmathews/sre-webapp.git"
     branch: "main"
   - name: "home-server"
     path: "https://${GITHUB_TOKEN}@github.com/johnmathews/home-server.git"
@@ -28,7 +31,7 @@ sources:
   - name: "container-status-exporter"
     path: "https://github.com/johnmathews/container-status-exporter"
     branch: "main"
-  - name: "Document Stream"
+  - name: "Document Stream (k8s)"
     path: "https://github.com/johnmathews/DocumentStream"
     branch: "main"
     patterns:
