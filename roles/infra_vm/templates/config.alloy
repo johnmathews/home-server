@@ -108,6 +108,12 @@ loki.process "drop_logs" {
 }
 
 loki.process "normalize" {
+
+  stage.match {
+		selector = "{service_name=\"TNAUDIT_MIDDLEWARE\"}"
+		action = "drop"
+	}
+
   // 1) try logfmt first — only on lines that contain "level="
   stage.match {
     selector = "{hostname=~\".+\"} |~ \"level=\""

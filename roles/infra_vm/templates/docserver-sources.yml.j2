@@ -13,6 +13,12 @@ sources:
   - name: "unified-documentation-web-app"
     path: "https://github.com/johnmathews/unified-documentation-webapp"
     branch: "main"
+  - name: "m3"
+    path: "https://github.com/johnmathews/m3"
+    branch: "main"
+    patterns:
+      - research/*md"
+      - "**/*.md"
   - name: "document-stream-(k8s)"
     path: "https://github.com/johnmathews/DocumentStream"
     branch: "main"
@@ -43,5 +49,5 @@ sources:
     path: "https://${GITHUB_TOKEN}@github.com/johnmathews/home-server.git"
     branch: "main"
 
-poll_interval: 30 # Seconds between index cycles
+poll_interval: 120 # Seconds between index cycles
 data_dir: "/data" # Persistent storage path
