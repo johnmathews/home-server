@@ -25,8 +25,7 @@ documentation search and retrieval service, indexing git-hosted documentation so
 Sources are defined in `roles/infra_vm/templates/docserver-sources.yml.j2`, which is templated to
 `/srv/infra/docserver/config/sources.yaml` on the infra VM.
 
-The poll interval is set to 300 seconds (5 minutes) via both the `DOCSERVER_POLL_INTERVAL` environment variable and the
-`poll_interval` field in `sources.yaml`.
+The poll interval is set to 120 seconds (2 minutes) via the `poll_interval` field in `sources.yaml`.
 
 ## Ansible
 
