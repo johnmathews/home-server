@@ -2,9 +2,17 @@
 # media_vm/files/docker-compose.yml
 
 services:
+  journal-webapp:
+    container_name: journal-webapp
+    image: ghcr.io/johnmathews/journal-webapp:latest
+    ports:
+      - "8402:80"
+    depends_on:
+      - journal-server
+    restart: unless-stopped
 
-  journal:
-    container_name: journal
+  journal-server:
+    container_name: journal-server
     image: ghcr.io/johnmathews/journal-agent:{{ journal_agent_version }}
     environment:
       - TZ=${TZ:-Europe/Amsterdam}
@@ -16,6 +24,7 @@ services:
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - MCP_ALLOWED_HOSTS=${MCP_ALLOWED_HOSTS}
+      - SLACK_BOT_TOKEN=${SLACK_BOT_TOKEN}
     volumes:
       - /srv/media/config/journal/data:/data
     ports:
