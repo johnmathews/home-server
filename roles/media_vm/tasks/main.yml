@@ -107,11 +107,14 @@
     group: "{{ guid }}"
     mode: '0644'
   loop:
+    - mood-scoring:
+      src: templates/journal/moods/mood-dimensions.toml
+      dest: /srv/media/config/journal/mood-dimensions.toml
     - people:
-      src: templates/context/people.md
+      src: templates/journal/context/people.md
       dest: /srv/media/config/journal/context/people.md
     - places:
-      src: templates/context/places.md
+      src: templates/journal/context/places.md
       dest: /srv/media/config/journal/context/places.md
   become: true
   tags: journal
