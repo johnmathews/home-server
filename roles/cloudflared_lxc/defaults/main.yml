@@ -26,6 +26,10 @@ cloudflared_ingress:
   - prefix: agent-journal
     service: "http://192.168.2.107:8000"
 
+  # Journal-insights
+  - prefix: journal-insights
+    service: "http://192.168.2.105:8402"
+
   # Apps
   - prefix: timer
     service: "http://192.168.2.106:8082"

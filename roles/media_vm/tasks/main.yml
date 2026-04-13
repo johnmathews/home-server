@@ -72,7 +72,7 @@
     - "{{ media_stack_mount_dir }}/library"
     - "{{ media_stack_mount_dir }}/media"
 
-- name: Ensure journal-agent data directory exists
+- name: Ensure journal-server data directory exists
   ansible.builtin.file:
     path: "{{ media_stack_base_dir }}/config/journal/data"
     state: directory
@@ -81,13 +81,39 @@
     mode: '0755'
   tags: journal
 
-- name: Ensure journal-agent chromadb directory exists
+- name: Ensure journal-server chromadb directory exists
   ansible.builtin.file:
     path: "{{ media_stack_base_dir }}/config/journal/chromadb"
     state: directory
     owner: "{{ media_stack_user }}"
     group: "{{ media_stack_user }}"
     mode: '0755'
+  tags: journal
+
+- name: Ensure journal-server context directory exists
+  ansible.builtin.file:
+    path: "{{ media_stack_base_dir }}/config/journal/context"
+    state: directory
+    owner: "{{ media_stack_user }}"
+    group: "{{ media_stack_user }}"
+    mode: '0755'
+  tags: journal
+
+- name: Upload journal-server context files
+  ansible.builtin.copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ puid }}"
+    group: "{{ guid }}"
+    mode: '0644'
+  loop:
+    - people:
+      src: templates/context/people.md
+      dest: /srv/media/config/journal/context/people.md
+    - places:
+      src: templates/context/places.md
+      dest: /srv/media/config/journal/context/places.md
+  become: true
   tags: journal
 
 - name: Ensure alloy config directory exists

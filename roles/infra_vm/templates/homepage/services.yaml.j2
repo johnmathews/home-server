@@ -199,6 +199,11 @@
         siteMonitor: http://192.168.2.105:5030
         description: music
         icon: slskd
+    - Journal Insights:
+        href: http://journal-insights.{{ primary_domain_name }}
+        siteMonitor: http://192.168.2.105:8402
+        description: Semantic Text Analysis
+        icon: mdi-book-open-variant-outline
     - Navidrome:
         href: http://navidrome.{{ primary_domain_name }}
         siteMonitor: http://192.168.2.109:4533
@@ -210,15 +215,6 @@
           user: john
           token: "{{ vault_navidrome_token }}"
           salt: x7384k
-    - Tubearchivist:
-        href: https://tube.{{ primary_domain_name }}
-        siteMonitor: https://tube.{{ primary_domain_name }}
-        description: Kids youtube archive
-        icon: sh-youtube
-        widget:
-          type: tubearchivist
-          url: http://192.168.2.116:8000
-          key: "{{ vault_tubearchivist_key }}"
     - Jellyseerr:
         href: https://seerr.{{ primary_domain_name }}
         siteMonitor: http://192.168.2.105:5055/
@@ -256,6 +252,15 @@
           type: paperlessngx
           url: http://192.168.2.117:8000
           key: "{{ vault_paperless_key }}"
+    - Tubearchivist:
+        href: https://tube.{{ primary_domain_name }}
+        siteMonitor: https://tube.{{ primary_domain_name }}
+        description: Kids youtube archive
+        icon: sh-youtube
+        widget:
+          type: tubearchivist
+          url: http://192.168.2.116:8000
+          key: "{{ vault_tubearchivist_key }}"
     - Radarr:
         href: https://radarr.{{ primary_domain_name }}
         siteMonitor: http://192.168.2.105:7878
