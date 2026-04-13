@@ -34,6 +34,7 @@ services:
     volumes:
       - /srv/media/config/journal/data:/data
       - /srv/media/config/journal/context:/app/context
+      - /srv/media/config/journal/moods/mood-dimensions.toml:/app/config/mood-dimensions.toml:ro
     ports:
       - "8400:8400"
     depends_on:
