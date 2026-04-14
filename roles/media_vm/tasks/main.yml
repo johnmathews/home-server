@@ -165,7 +165,7 @@
     mode: '0644'
   notify:
     - Restart media stack
-  tags: docker, portainer
+  tags: docker, portainer, journal
 
 - name: Upload alloy config file
   ansible.builtin.copy:
@@ -188,7 +188,7 @@
     dest: /srv/media/.env
     mode: '0600'
   notify: Restart media stack
-  tags: docker, portainer
+  tags: docker, portainer, journal
 
 - name: Create gluetun config file from template
   ansible.builtin.template:
@@ -214,7 +214,7 @@
   loop:
     - /srv/media/.env
   notify: Restart media stack
-  tags: docker
+  tags: docker, journal
 
 - name: Ensure Radarr config directory has correct UID/GID
   ansible.builtin.file:
@@ -236,16 +236,6 @@
     mode: '0755'
   tags: sonarr,docker
 
-- name: Ensure Lidarr config directory has correct UID/GID
-  ansible.builtin.file:
-    path: "{{ media_stack_base_dir }}/config/lidarr"
-    state: directory
-    recurse: true
-    owner: "{{ puid }}"
-    group: "{{ guid }}"
-    mode: '0755'
-  tags: lidarr,docker
-
 - name: Ensure slskd config directory has correct UID/GID
   ansible.builtin.file:
     path: "{{ media_stack_base_dir }}/config/slskd"
@@ -265,26 +255,6 @@
     mode: '0600'
   notify: Restart media stack
   tags: slskd, docker
-
-- name: Ensure Soularr config directory has correct UID/GID
-  ansible.builtin.file:
-    path: "{{ media_stack_base_dir }}/config/soularr"
-    state: directory
-    recurse: true
-    owner: "{{ puid }}"
-    group: "{{ guid }}"
-    mode: '0755'
-  tags: soularr, docker
-
-- name: Deploy Soularr config template
-  ansible.builtin.template:
-    src: templates/soularr/config.ini.j2
-    dest: "{{ media_stack_base_dir }}/config/soularr/config.ini"
-    owner: "{{ puid }}"
-    group: "{{ guid }}"
-    mode: '0600'
-  notify: Restart media stack
-  tags: soularr, docker
 
 - name: Set permissions of file browser config directory
   ansible.builtin.command: chown -R 1001:1001 "{{ media_stack_base_dir }}/config/filebrowser"

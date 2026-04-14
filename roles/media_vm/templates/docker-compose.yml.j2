@@ -31,10 +31,13 @@ services:
       - OCR_CONTEXT_DIR=./context
       - OCR_CONTEXT_CACHE_TTL=1h
       - JOURNAL_ENABLE_MOOD_SCORING=true
+      - OCR_PROVIDER=${JOURNAL_INSIGHTS_APP_OCR_PROVIDER}
+      - OCR_MODEL=${OCR_MODEL}
+      - GOOGLE_API_KEY=${GOOGLE_GEMINI_JOURNAL_INSIGHTS_API_KEY}
     volumes:
       - /srv/media/config/journal/data:/data
       - /srv/media/config/journal/context:/app/context
-      - /srv/media/config/journal/moods/mood-dimensions.toml:/app/config/mood-dimensions.toml:ro
+      - /srv/media/config/journal/mood-dimensions.toml:/app/config/mood-dimensions.toml:ro
     ports:
       - "8400:8400"
     depends_on:
@@ -56,7 +59,8 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-    restart: always
+      start_period: 10s
+      start_interval: 2s
 
   slskd:
     image: slskd/slskd:{{ slskd_version }}
