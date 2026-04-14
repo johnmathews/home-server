@@ -39,10 +39,14 @@ Internet -> Cloudflare Edge (TLS) -> Tunnel -> cloudflared LXC -> Traefik (192.1
 | jelly           | jelly.itsa-pizza.com           | 192.168.2.110:8096    |
 | navidrome       | navidrome.itsa-pizza.com       | 192.168.2.109:4533    |
 | music           | music.itsa-pizza.com           | 192.168.2.109:9180    |
+| timer           | timer.itsa-pizza.com           | 192.168.2.106:8082    |
+| docs            | docs.itsa-pizza.com            | 192.168.2.106:3003    |
 +-----------------+-------------------------------+-----------------------+
 ```
 
-These domains have a Cloudflare Zero Access bypass policy, so Traefik applies rate limiting as compensation.
+These domains bypass Cloudflare Zero Access — either because native apps/APIs can't handle auth redirects (jellyfin,
+immich, navidrome, music) or because they are intentionally public (timer, docs). Traefik applies rate limiting as a
+compensating security control.
 
 ## Configuration Files
 
@@ -56,7 +60,7 @@ Deployed to `/srv/apps/traefik/traefik.yml`. Defines:
 - **API dashboard** enabled (insecure mode for LAN access)
 - **Prometheus metrics** with router labels
 - **File provider** watching `/etc/traefik/dynamic/` for dynamic config changes
-- **Transport timeouts** set to 600s (for long-running media streams)
+- **Transport timeouts**: `readTimeout` and `writeTimeout` set to 0 (unlimited) for multi-hour media streams; `idleTimeout` at 600s for idle keep-alive cleanup. Safe because only cloudflared (LAN) connects to this entrypoint.
 
 ### Dynamic config: `routers.yml.j2`
 
@@ -80,8 +84,9 @@ multiple domains (for domain migration compatibility). Priority values ensure sp
 | immich-login-rl     | Rate limit: 200/s avg, 300 burst on auth routes    |
 | jelly-login-rl      | Rate limit: 60/s avg, 30 burst on general routes   |
 | jelly-auth-rl       | Rate limit: 5/min, 3 burst on login endpoint       |
-| music-rl            | Rate limit: 60/s avg, 30 burst                     |
+| music-rl            | Rate limit: 200/s avg, 300 burst (navidrome)       |
 | navidrome-auth-rl   | Rate limit: 5/min, 3 burst on auth endpoint        |
+| public-rl           | Rate limit: 200/s avg, 300 burst (public services) |
 +---------------------+-----------------------------------------------------+
 ```
 

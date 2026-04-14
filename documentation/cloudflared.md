@@ -108,6 +108,8 @@ All services listed in `/etc/cloudflared/config.yml`. Key subdomains:
 - `share.itsa-pizza.com` -> Traefik -> Immich shared albums
 - `navidrome.itsa-pizza.com` -> Traefik -> Navidrome (192.168.2.109:4533)
 - `music.itsa-pizza.com` -> Traefik -> Feishin (192.168.2.109:9180)
+- `timer.itsa-pizza.com` -> Traefik -> Gym Timer (192.168.2.106:8082)
+- `docs.itsa-pizza.com` -> Traefik -> Documentation Server (192.168.2.106:3003)
 
 **Direct (with Zero Access):**
 

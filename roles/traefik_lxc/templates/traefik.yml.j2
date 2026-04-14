@@ -13,9 +13,9 @@ entryPoints:
         # - 172.16.0.0/12   # dont know
     transport:
       respondingTimeouts:
-        readTimeout: 600s
-        idleTimeout: 600s
-        writeTimeout: 600s
+        readTimeout: 0     # unlimited — safe because only cloudflared (LAN) connects here
+        writeTimeout: 0    # unlimited — required for multi-hour audio/video streams
+        idleTimeout: 600s  # close idle keep-alive connections after 10 min
 
 api:
   dashboard: true

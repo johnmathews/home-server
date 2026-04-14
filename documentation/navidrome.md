@@ -54,10 +54,12 @@ navidrome.itsa-pizza.com  music.itsa-pizza.com     │
 
 Both `navidrome.itsa-pizza.com` and `music.itsa-pizza.com` are routed through the Cloudflare Tunnel to Traefik
 (192.168.2.108:80). Cloudflare Access is **not** applied to these subdomains — Subsonic API clients (play:Sub, flo,
-Feishin desktop) cannot send custom auth headers, so Access would block them. Instead, Traefik applies rate limiting
-(`music-rl` middleware: 60 req/s average, 30 burst) on the Navidrome route. Feishin (music) doesn't need its own rate
-limiter — it's a static web app that connects to `navidrome.itsa-pizza.com` from the browser, where `music-rl` already
-protects the API.
+Feishin desktop) cannot send custom auth headers, so Access would block them. Traefik applies rate limiting as a
+compensating control: `music-rl` (200 req/s average, 300 burst) on the Navidrome route, and `public-rl` (200 req/s
+average, 300 burst) on the Feishin route. Traefik's `readTimeout` and `writeTimeout` are set to 0 (unlimited) to
+support multi-hour audio streams. Without this, the default timeouts would kill streams after the timeout period.
+The `idleTimeout` remains at 600s for keep-alive cleanup. This is safe because Traefik only accepts connections from
+cloudflared on the LAN.
 
 ## Ports
 

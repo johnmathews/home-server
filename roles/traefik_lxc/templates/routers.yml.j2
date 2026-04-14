@@ -106,6 +106,27 @@ http:
       middlewares:
         - force-https-proto
         - security-headers
+        - public-rl
+
+    timer:
+      rule: {{ host('timer') }}
+      entryPoints: [web]
+      service: timer-svc
+      priority: 100
+      middlewares:
+        - force-https-proto
+        - security-headers
+        - public-rl
+
+    docs:
+      rule: {{ host('docs') }}
+      entryPoints: [web]
+      service: docs-svc
+      priority: 100
+      middlewares:
+        - force-https-proto
+        - security-headers
+        - public-rl
 
   services:
     immich-svc:
@@ -136,6 +157,18 @@ http:
       loadBalancer:
         servers:
           - url: "http://192.168.2.109:9180"
+        passHostHeader: true
+
+    timer-svc:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.2.106:8082"
+        passHostHeader: true
+
+    docs-svc:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.2.106:3003"
         passHostHeader: true
 
   middlewares:
@@ -188,6 +221,14 @@ http:
         average: 5
         period: 1m
         burst: 3
+        sourceCriterion:
+          requestHeaderName: CF-Connecting-IP
+
+    public-rl:
+      rateLimit:
+        average: 200
+        period: 1s
+        burst: 300
         sourceCriterion:
           requestHeaderName: CF-Connecting-IP
 

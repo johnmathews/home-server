@@ -14,9 +14,10 @@ cloudflared_ingress:
   - prefix: dash
     service: "http://192.168.2.106:3002"
 
-  # Documentation
+  # Documentation (via Traefik — no Zero Access, rate-limited)
   - prefix: docs
-    service: "http://192.168.2.106:3003"
+    service: "http://192.168.2.108"
+    set_host_header: true
   - prefix: docs-mcp
     service: "http://192.168.2.106:8085"
   - prefix: server-docs
@@ -30,9 +31,10 @@ cloudflared_ingress:
   - prefix: journal-insights
     service: "http://192.168.2.105:8402"
 
-  # Apps
+  # Apps (via Traefik — no Zero Access, rate-limited)
   - prefix: timer
-    service: "http://192.168.2.106:8082"
+    service: "http://192.168.2.108"
+    set_host_header: true
   - prefix: sre
     service: "http://192.168.2.106:8501"
   - prefix: sre-mcp
@@ -51,11 +53,13 @@ cloudflared_ingress:
     service: "http://192.168.2.108"
     set_host_header: true
 
-  # Music
+  # Music (via Traefik — no Zero Access, rate-limited)
   - prefix: navidrome
-    service: "http://192.168.2.109:4533"
+    service: "http://192.168.2.108"
+    set_host_header: true
   - prefix: music
-    service: "http://192.168.2.109:9180"
+    service: "http://192.168.2.108"
+    set_host_header: true
   - prefix: lidarr
     service: "http://192.168.2.105:8686"
   - prefix: slskd
