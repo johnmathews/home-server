@@ -7,8 +7,6 @@ services:
     image: ghcr.io/johnmathews/journal-webapp:latest
     ports:
       - "8402:80"
-    environment:
-      - JOURNAL_API_TOKEN=${JOURNAL_API_TOKEN}
     depends_on:
       - journal-server
     restart: unless-stopped
@@ -27,13 +25,21 @@ services:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - MCP_ALLOWED_HOSTS=${MCP_ALLOWED_HOSTS}
       - SLACK_BOT_TOKEN=${SLACK_BOT_TOKEN}
-      - JOURNAL_API_TOKEN=${JOURNAL_API_TOKEN}
+      # - JOURNAL_API_TOKEN=${JOURNAL_API_TOKEN}
       - OCR_CONTEXT_DIR=./context
       - OCR_CONTEXT_CACHE_TTL=1h
       - JOURNAL_ENABLE_MOOD_SCORING=true
       - OCR_PROVIDER=${JOURNAL_INSIGHTS_APP_OCR_PROVIDER}
       - OCR_MODEL=${OCR_MODEL}
       - GOOGLE_API_KEY=${GOOGLE_GEMINI_JOURNAL_INSIGHTS_API_KEY}
+      - JOURNAL_SECRET_KEY=${JOURNAL_SECRET_KEY}
+      - SMTP_USERNAME=${SMTP_USERNAME}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - SMTP_FROM_EMAIL=${SMTP_FROM_EMAIL}
+      - APP_BASE_URL=${APP_BASE_URL}
+      - REGISTRATION_ENABLED=${REGISTRATION_ENABLED}
+      - OCR_DUAL_PASS=true
+      - PREPROCESS_IMAGES=true
     volumes:
       - /srv/media/config/journal/data:/data
       - /srv/media/config/journal/context:/app/context
