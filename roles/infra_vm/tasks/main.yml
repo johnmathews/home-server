@@ -115,17 +115,28 @@
   ansible.builtin.file:
     path: "{{ item.path }}"
     state: directory
-    owner: root
-    group: root
+    owner: "{{ item.owner | default('root') }}"
+    group: "{{ item.group | default('root') }}"
     mode: '0755'
   loop:
     - {name: grafana, path: /srv/infra/grafana}
     - {name: loki, path: /srv/infra/loki/data}
     - {name: alloy, path: /srv/infra/alloy/data}
+    - {name: timer, path: /srv/infra/timer, owner: "{{ docker_user }}", group: docker}
   loop_control:
     label: "{{ item.path }}"
-  tags: [grafana, loki, alloy]
+  tags: [grafana, loki, alloy, timer]
   notify: "Restart {{ item.name }}"
+
+- name: Template timer config file
+  ansible.builtin.template:
+    src: timer-app-presets.yml.j2
+    dest: /srv/infra/timer/presets.yml
+    owner: "{{ docker_user }}"
+    group: docker
+    mode: '0644'
+  notify: Update timer
+  tags: timer
 
 - name: Template Docker Compose file
   ansible.builtin.template:
@@ -144,7 +155,7 @@
     owner: "{{ docker_user }}"
     group: docker
     mode: '0600'
-  tags: atuin,docker
+  tags: atuin, docker, sre
 
 - name: Upload grafana config.ini
   ansible.builtin.template:

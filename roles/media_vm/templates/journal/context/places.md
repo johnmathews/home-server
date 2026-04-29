@@ -1,1 +1,3 @@
-- I live in a village called Spaarndam in the Netherlands. I live near a city called Haarlem.
+- I live in a village called Spaarndam in the Netherlands.
+- I live near a city called Haarlem.
+- In Amsterdam there is a business district called "Zuidas" that is also known as "Amsterdam Zuid" or just "Zuid".

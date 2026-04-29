@@ -25,7 +25,6 @@ services:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - MCP_ALLOWED_HOSTS=${MCP_ALLOWED_HOSTS}
       - SLACK_BOT_TOKEN=${SLACK_BOT_TOKEN}
-      # - JOURNAL_API_TOKEN=${JOURNAL_API_TOKEN}
       - OCR_CONTEXT_DIR=./context
       - OCR_CONTEXT_CACHE_TTL=1h
       - JOURNAL_ENABLE_MOOD_SCORING=true
@@ -40,6 +39,8 @@ services:
       - REGISTRATION_ENABLED=${REGISTRATION_ENABLED}
       - OCR_DUAL_PASS=true
       - PREPROCESS_IMAGES=true
+      - PUSHOVER_USER_KEY=${PUSHOVER_USER_KEY}
+      - PUSHOVER_APP_API_TOKEN=${PUSHOVER_APP_API_TOKEN}
     volumes:
       - /srv/media/config/journal/data:/data
       - /srv/media/config/journal/context:/app/context

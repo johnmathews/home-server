@@ -2,31 +2,6 @@
 # infra_vm/templates/docker-compose.yml
 
 services:
-  documentation-server:
-    image: ghcr.io/johnmathews/unified-documentation-server:{{ docserver_version }}
-    container_name: documentation-server
-    restart: unless-stopped
-    stop_grace_period: 30s
-    init: true
-    mem_limit: 512m
-    ports:
-      - "8085:8080"
-    volumes:
-      # Persistent data (SQLite + ChromaDB + git clones)
-      - docserver-data:/data
-      # Configuration
-      - ./docserver/config/sources.yaml:/config/sources.yaml:ro
-      # Home server docs (mkdocs source on infra VM)
-      - /srv/infra/mkdocs/docs:/repos/home-server-docs:ro
-    environment:
-      - DOCSERVER_POLL_INTERVAL=300
-      - GITHUB_TOKEN=${GITHUB_TOKEN}
-      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY_UNIFIED_DOCUMENTATION_SERVER}
-    logging:
-      driver: json-file
-      options:
-        max-size: "10m"
-        max-file: "3"
 
   documentation-webapp:
     image: ghcr.io/johnmathews/unified-documentation-webapp:{{ documentation_ui_version }}
@@ -44,9 +19,67 @@ services:
         max-size: "5m"
         max-file: "3"
 
+  documentation-server:
+    image: ghcr.io/johnmathews/unified-documentation-server:latest
+    container_name: documentation-server
+    restart: unless-stopped
+    stop_grace_period: 30s
+    init: true
+    depends_on:
+      documentation-chroma:
+        condition: service_healthy
+    mem_limit: 512m
+    mem_reservation: 200m
+    ports:
+      - "8085:8080"
+    volumes:
+      # Persistent data (SQLite + git clones + cached ONNX model). Chroma
+      # vectors live in the chroma-data volume mounted on the chroma
+      # service above.
+      - docserver-data:/data
+      - ./docserver/config/sources.yaml:/config/sources.yaml:ro
+    environment:
+      - DOCSERVER_POLL_INTERVAL=300
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY_UNIFIED_DOCUMENTATION_SERVER}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - DOCSERVER_CHAT_MODEL=claude-opus-4-7
+      - DOCSERVER_CHROMA_HOST=chroma
+      - DOCSERVER_CHROMA_PORT=8000
+      - DOCSERVER_INGEST_MEM_LIMIT_MB=400
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  documentation-chroma:
+    image: chromadb/chroma:1.5.8
+    container_name: documentation-chroma
+    restart: unless-stopped
+    command: ["run", "--path", "/chroma-data", "--host", "0.0.0.0", "--port", "8000"]
+    volumes:
+      - documentation-chroma-data:/chroma-data
+    expose:
+      - "8000"
+    mem_limit: 256m
+    mem_reservation: 100m
+    healthcheck:
+      test: ["CMD", "/bin/bash", "-c", "</dev/tcp/127.0.0.1/8000"]
+      interval: 30s
+      timeout: 5s
+      start_period: 30s
+      retries: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "3"
+
   timer:
     image: ghcr.io/johnmathews/gym-timer:{{ gym_timer_version }}
     container_name: timer
+    volumes:
+      - ./timer/:/config
     ports:
       - "8082:80"
     restart: unless-stopped
@@ -334,4 +367,4 @@ services:
 volumes:
   chroma_data:
   docserver-data:
-
+  documentation-chroma-data:
