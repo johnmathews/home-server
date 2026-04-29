@@ -206,8 +206,8 @@
 - name: Launch containers
   community.docker.docker_compose_v2:
     project_src: "{{ docker_compose_dir }}"
-    state: restarted
-    recreate: always
+    state: present
+    recreate: auto
     pull: never
     dependencies: true
     remove_orphans: true

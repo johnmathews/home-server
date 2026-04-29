@@ -63,8 +63,19 @@ Standard task structure:
 - name: Restart <service> docker compose stack
   community.docker.docker_compose_v2:
     project_src: "{{ <service>_docker_compose_dir }}"
-    state: restarted
+    state: present
+    recreate: always
+    pull: never
+    remove_orphans: true
 ```
+
+> **Do not use `state: restarted`** here. That maps to `docker compose restart`,
+> which only restarts existing containers in place — it will not pick up changes
+> to ports, env vars, mounts, image tags, or labels. A handler fires precisely
+> because a config changed, so it must recreate the container, not just restart it.
+> Use `state: present` + `recreate: always` (handlers — scoped to a known-changed
+> service) or `state: present` + `recreate: auto` (top-level converge tasks — let
+> compose diff the config hash and recreate only what changed).
 
 ### docker-compose.yml.j2
 

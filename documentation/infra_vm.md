@@ -198,3 +198,37 @@ All services accessible via Cloudflare Tunnel with Zero Access:
 - **Docserver high memory**: ChromaDB embeddings use ~500MB. If hitting the 1.5GB limit,
   check number of indexed repos in `sources.yaml`
 - **Atuin sync failing**: Check PostgreSQL health: `docker logs atuin_database`
+- **`make infra tags=docker` fails with `port is already allocated`**: Zombie compose
+  containers (names prefixed with a 12-char hex hash, e.g. `956930400e05_uptime-kuma`)
+  are holding ports. These are leftovers from an interrupted `recreate: always` run.
+  Clean them up:
+
+  ```sh
+  ssh infra-vm "docker ps -a --filter label=com.docker.compose.project=infra \
+    --format '{{.Names}}' | grep -E '^[0-9a-f]{12}_' | xargs -r docker rm -f"
+  ```
+
+  Then re-run the deploy. If many services are affected, a full
+  `cd /srv/infra && docker compose down --remove-orphans && docker compose up -d`
+  is faster.
+
+## Deploy Model (How `make infra` Converges the Stack)
+
+The "Launch containers" task in `roles/infra_vm/tasks/main.yml` runs
+`docker_compose_v2` with `state: present` and `recreate: auto`. This means:
+
+- Compose diffs the rendered `docker-compose.yml` against the running stack
+  using each container's `com.docker.compose.config-hash` label.
+- Only services whose config actually changed are recreated.
+- `remove_orphans: true` deletes containers for services that were removed
+  from the compose file.
+
+**Why not `state: restarted`?** That maps to `docker compose restart`, which only
+stops/starts existing containers in place. Container config is immutable after
+creation, so a restart will silently keep the old port mappings, env vars, mounts,
+and image tag — even after you've edited the template. Always use `state: present`
+for converge tasks.
+
+**Handlers** (e.g. `Restart grafana`, `Restart loki`) use `recreate: always`
+because they fire only when a specific config file changed — forcing recreate of
+the affected service is exactly what's wanted there.
