@@ -20,32 +20,39 @@ tools run here.
 
 ## Service Inventory
 
+Image tags use Jinja variables (e.g. `{{ grafana_version }}`) defined in `group_vars/all/main.yml`; only a few
+services pin `:latest` directly. Container names are stable.
+
 ```
 +----------------------------+-----------------------------------------------------+-------+-----------------------------+
 | Container                  | Image                                               | Port  | URL                         |
 +----------------------------+-----------------------------------------------------+-------+-----------------------------+
-| documentation-ui           | ghcr.io/johnmathews/documentation-ui:latest         | 3003  | docs.itsa-pizza.com         |
-| documentation-mcp-server   | ghcr.io/johnmathews/documentation-mcp-server:latest | 8085  | -                           |
-| grafana                    | grafana/grafana-oss:latest                          | 3000  | grafana.itsa-pizza.com      |
-| loki                       | grafana/loki:latest                                 | 3100  | loki.itsa-pizza.com         |
-| alloy                      | grafana/alloy:latest                                | 12345 | -                           |
-| homepage                   | ghcr.io/gethomepage/homepage:latest                 | 3002  | dash.itsa-pizza.com         |
-| uptime-kuma                | louislam/uptime-kuma:latest                         | 3001  | uptime.itsa-pizza.com       |
-| portainer                  | portainer/portainer-ce:latest                       | 9000  | portainer.itsa-pizza.com    |
-| dozzle                     | amir20/dozzle:latest                                | 9999  | dozzle.itsa-pizza.com       |
-| mkdocs                     | squidfunk/mkdocs-material:latest                    | 8000  | server-docs.itsa-pizza.com  |
-| timer                      | ghcr.io/johnmathews/gym-timer:latest                | 8082  | timer.itsa-pizza.com        |
-| sre-ui                     | ghcr.io/johnmathews/sre-assistant:latest            | 8501  | sre.itsa-pizza.com          |
-| sre-api                    | ghcr.io/johnmathews/sre-assistant:latest            | 8001  | -                           |
-| mikrotik_exporter          | ghcr.io/akpw/mktxp:latest                          | 49090 | -                           |
-| container-status-exporter  | ghcr.io/johnmathews/container-status-exporter:latest| 8081  | -                           |
-| atuin                      | ghcr.io/atuinsh/atuin:latest                        | 8888  | atuin.itsa-pizza.com        |
+| documentation-webapp       | ghcr.io/johnmathews/unified-documentation-webapp    | 3003  | docs.itsa-pizza.com         |
+| documentation-server       | ghcr.io/johnmathews/unified-documentation-server    | 8085  | -                           |
+| documentation-chroma       | chromadb/chroma:1.5.8                               | 8000* | -                           |
+| grafana                    | grafana/grafana-oss                                 | 3000  | grafana.itsa-pizza.com      |
+| loki                       | grafana/loki                                        | 3100  | loki.itsa-pizza.com         |
+| alloy                      | grafana/alloy                                       | 12345 | -                           |
+| homepage                   | ghcr.io/gethomepage/homepage                        | 3002  | dash.itsa-pizza.com         |
+| uptime-kuma                | louislam/uptime-kuma                                | 3001  | uptime.itsa-pizza.com       |
+| portainer                  | portainer/portainer-ce                              | 9000  | portainer.itsa-pizza.com    |
+| dozzle                     | amir20/dozzle                                       | 9999  | dozzle.itsa-pizza.com       |
+| mkdocs                     | squidfunk/mkdocs-material                           | 8000  | server-docs.itsa-pizza.com  |
+| timer                      | ghcr.io/johnmathews/gym-timer                       | 8082  | timer.itsa-pizza.com        |
+| sre-webapp                 | ghcr.io/johnmathews/sre-webapp:latest               | 8501  | sre.itsa-pizza.com          |
+| sre-agent                  | ghcr.io/johnmathews/sre-agent                       | 8001  | -                           |
+| sre-ingest                 | ghcr.io/johnmathews/sre-agent                       | -     | -                           |
+| mikrotik_exporter          | ghcr.io/akpw/mktxp                                  | 49090 | -                           |
+| container-status-exporter  | ghcr.io/johnmathews/container-status-exporter       | 8081  | -                           |
+| atuin                      | ghcr.io/atuinsh/atuin                               | 8888  | atuin.itsa-pizza.com        |
 | atuin_database             | postgres:14                                         | -     | -                           |
-| node-exporter              | prom/node-exporter:latest                           | 9100  | -                           |
-| cadvisor                   | gcr.io/cadvisor/cadvisor:latest                     | 8080  | -                           |
+| node-exporter              | prom/node-exporter                                  | 9100  | -                           |
+| cadvisor                   | gcr.io/cadvisor/cadvisor                            | 8080  | -                           |
 | iperf3                     | networkstatic/iperf3                                | 5201  | -                           |
 +----------------------------+-----------------------------------------------------+-------+-----------------------------+
 ```
+
+`*` documentation-chroma's port 8000 is internal-only on the docker network; not published on the host.
 
 ## Service Groups
 
@@ -69,19 +76,22 @@ tools run here.
 
 ### Documentation
 
-- **Documentation UI** — Custom documentation browser served at docs.itsa-pizza.com (port 3003).
+- **documentation-webapp** — Custom documentation browser served at docs.itsa-pizza.com (port 3003).
   Connects to the docserver API.
-- **Documentation MCP Server** — Indexes documentation from git repos and local mkdocs. Stores
-  embeddings in ChromaDB. Memory limit: 1.5GB. See `documentation/docserver.md` for details.
+- **documentation-server** — Indexes documentation from git repos and local mkdocs, exposes an MCP
+  API on port 8085. Memory limit: 2GB (1GB reservation). Talks to `documentation-chroma` for vector
+  storage. See `documentation/docserver.md` for details.
+- **documentation-chroma** — Dedicated ChromaDB sidecar (chromadb/chroma:1.5.8). Internal-only on
+  port 8000. Memory limit: 256MB. The server depends on this being healthy before starting.
 - **MkDocs** — Renders home server documentation as a static site. Source at
   `/srv/infra/mkdocs/docs`, served at port 8000.
 
 ### SRE Assistant
 
-- **SRE UI** — Streamlit-based SRE assistant interface. Memory limit: 96MB.
-- **SRE API** — Backend API with ChromaDB for runbook search. Uses Claude Agent SDK for LLM
-  interactions. Memory limit: 384MB. Health check via Python httpx.
-- **SRE Ingest** — One-time ingestion job for runbooks (runs with Docker profile `setup`).
+- **sre-webapp** — Streamlit-based SRE assistant interface. Memory limit: 64MB.
+- **sre-agent** — Backend agent service. Uses Claude Agent SDK for LLM interactions. Memory
+  limit: 768MB. Health check via Python httpx.
+- **sre-ingest** — One-time ingestion job for runbooks (runs with Docker profile `setup`).
 
 ### Exporters and Metrics
 
@@ -109,14 +119,15 @@ Several containers have explicit memory limits to prevent the VM from being over
 +--------------------------+--------+-----------+
 | Container                | Limit  | Typical   |
 +--------------------------+--------+-----------+
-| documentation-mcp-server | 1536MB | ~500MB    |
+| documentation-server     | 2GB    | ~500MB    |
+| documentation-chroma     | 256MB  | varies    |
 | grafana                  | 256MB  | ~183MB    |
 | loki                     | 200MB  | ~125MB    |
 | uptime-kuma              | 192MB  | ~142MB    |
 | homepage                 | 192MB  | ~122MB    |
 | alloy                    | 128MB  | ~82MB     |
-| sre-api                  | 384MB  | ~134MB    |
-| sre-ui                   | 96MB   | ~63MB     |
+| sre-agent                | 768MB  | ~134MB    |
+| sre-webapp               | 64MB   | ~40MB     |
 | cadvisor                 | 96MB   | ~45MB     |
 +--------------------------+--------+-----------+
 ```
@@ -195,8 +206,9 @@ All services accessible via Cloudflare Tunnel with Zero Access:
   accepting writes: `curl http://192.168.2.106:3100/ready`
 - **Homepage blank**: Verify config files in `/srv/infra/homepage/config/` and check
   `HOMEPAGE_ALLOWED_HOSTS` includes the domain being accessed
-- **Docserver high memory**: ChromaDB embeddings use ~500MB. If hitting the 1.5GB limit,
-  check number of indexed repos in `sources.yaml`
+- **Docserver high memory**: documentation-server has a 2GB limit. If approaching it, check the
+  number of indexed repos in `sources.yaml` and inspect `documentation-chroma` separately — vector
+  store growth shows up in that container, not the server.
 - **Atuin sync failing**: Check PostgreSQL health: `docker logs atuin_database`
 - **`make infra tags=docker` fails with `port is already allocated`**: Zombie compose
   containers (names prefixed with a 12-char hex hash, e.g. `956930400e05_uptime-kuma`)
