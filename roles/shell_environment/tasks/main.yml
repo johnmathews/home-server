@@ -8,12 +8,10 @@
     executable: /bin/bash
   register: shell_users_raw
   changed_when: false
-  tags: [always]
 
 - name: Set target users (explicit + discovered, deduplicated)
   ansible.builtin.set_fact:
     target_shell_users: "{{ ((shell_environment_shell_users + (shell_users_raw.stdout_lines | default([]))) | reject('equalto', '') | select('match', '^[^:]+:[^:]+:[^:]+$') | list | unique) }}"
-  tags: [always]
 
 - name: Install shell environment prerequisites
   ansible.builtin.apt:
@@ -22,7 +20,6 @@
       - acl
     state: present
     update_cache: true
-  tags: [always]
 
 - name: Install Neovim
   ansible.builtin.import_tasks: neovim.yml

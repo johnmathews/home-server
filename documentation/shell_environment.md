@@ -59,6 +59,14 @@ Deploy to all hosts:
 make site tags=shell
 ```
 
+### Tag Behavior
+
+The role's prerequisite tasks (user discovery, target-user fact, `git`/`acl` install) are **not** tagged `always`.
+This keeps the role fully isolated when other plays run with sub-tag selections (e.g. `tags=journal`). The trade-off:
+sub-tags scoped to individual tools (`tags=zsh`, `tags=neovim`, etc.) require that the role has been deployed at
+least once with `tags=shell` (or a full play run) so user discovery and apt prerequisites are in place. Day-to-day
+this is invisible — fresh hosts get the full role; per-tool tweaks happen on hosts that already have the prereqs.
+
 ## Shell Aliases
 
 The role provides numerous aliases for common operations:
