@@ -28,8 +28,8 @@ services:
     depends_on:
       documentation-chroma:
         condition: service_healthy
-    mem_limit: 512m
-    mem_reservation: 200m
+    mem_limit: 2g
+    mem_reservation: 1g
     ports:
       - "8085:8080"
     volumes:
@@ -43,9 +43,8 @@ services:
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY_UNIFIED_DOCUMENTATION_SERVER}
       - GITHUB_TOKEN=${GITHUB_TOKEN}
       - DOCSERVER_CHAT_MODEL=claude-opus-4-7
-      - DOCSERVER_CHROMA_HOST=chroma
+      - DOCSERVER_CHROMA_HOST=documentation-chroma
       - DOCSERVER_CHROMA_PORT=8000
-      - DOCSERVER_INGEST_MEM_LIMIT_MB=400
     logging:
       driver: json-file
       options:
@@ -65,7 +64,7 @@ services:
     mem_reservation: 100m
     healthcheck:
       test: ["CMD", "/bin/bash", "-c", "</dev/tcp/127.0.0.1/8000"]
-      interval: 30s
+      interval: 10s
       timeout: 5s
       start_period: 30s
       retries: 3

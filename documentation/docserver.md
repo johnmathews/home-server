@@ -2,30 +2,48 @@
 
 ## Overview
 
-The docserver runs on the **infra VM** (192.168.2.106) as a Docker container. It provides an MCP-compatible
-documentation search and retrieval service, indexing git-hosted documentation sources and making them queryable.
+The docserver runs on the **infra VM** (192.168.2.106) as three Docker containers: a webapp UI, the MCP server
+itself, and a dedicated ChromaDB instance for vector storage. It provides an MCP-compatible documentation search
+and retrieval service, indexing git-hosted documentation sources and making them queryable from Claude Code and
+other MCP clients.
 
 ## Architecture
 
-- **Image**: `ghcr.io/johnmathews/documentation-mcp-server:latest`
-- **Container name**: `documentation-mcp-server`
-- **Port**: 8085 (host) -> 8080 (container)
-- **Memory limit**: 1536 MB (embeddings + ChromaDB + SQLite)
+| Container               | Image                                                       | Host port | Memory             |
+|-------------------------|-------------------------------------------------------------|-----------|--------------------|
+| `documentation-webapp`  | `ghcr.io/johnmathews/unified-documentation-webapp:<ver>`    | (varies)  | (defaults)         |
+| `documentation-server`  | `ghcr.io/johnmathews/unified-documentation-server:latest`   | 8085      | 2 GB (1 GB res.)   |
+| `documentation-chroma`  | `chromadb/chroma:1.5.8`                                     | (internal)| 256 MB (100 MB res.)|
+
+The server depends on `documentation-chroma` being healthy before starting (compose `condition: service_healthy`).
+The chroma container's healthcheck uses a TCP probe (`</dev/tcp/127.0.0.1/8000`) on a 10s interval.
 
 ## Volumes
 
 | Mount                                       | Container path                  | Purpose                      |
-|---------------------------------------------|--------------------------------|------------------------------|
-| `docserver-data` (named volume)             | `/data`                        | SQLite, ChromaDB, git clones |
-| `./docserver/config/sources.yaml`           | `/config/sources.yaml` (ro)    | Source configuration         |
-| `/srv/infra/mkdocs/docs`                    | `/repos/home-server-docs` (ro) | Local MkDocs documentation   |
+|---------------------------------------------|---------------------------------|------------------------------|
+| `docserver-data` (named volume)             | `/data`                         | SQLite, git clones           |
+| `documentation-chroma-data` (named volume)  | `/chroma-data`                  | ChromaDB vector store        |
+| `./docserver/config/sources.yaml`           | `/config/sources.yaml` (ro)     | Source configuration         |
+| `/srv/infra/mkdocs/docs`                    | `/repos/home-server-docs` (ro)  | Local MkDocs documentation   |
+
+## Environment Variables
+
+Set in `roles/infra_vm/templates/docker-compose.yml.j2`:
+
+| Variable                       | Value                                       |
+|--------------------------------|---------------------------------------------|
+| `ANTHROPIC_API_KEY`             | from vault (`vault_anthropic_api_key_unified_documentation_server`) |
+| `GITHUB_TOKEN`                  | from vault                                  |
+| `DOCSERVER_CHAT_MODEL`          | `claude-opus-4-7`                           |
+| `DOCSERVER_CHROMA_HOST`         | `documentation-chroma` (compose service name) |
+| `DOCSERVER_CHROMA_PORT`         | `8000`                                      |
 
 ## Configuration
 
 Sources are defined in `roles/infra_vm/templates/docserver-sources.yml.j2`, which is templated to
-`/srv/infra/docserver/config/sources.yaml` on the infra VM.
-
-The poll interval is set to 120 seconds (2 minutes) via the `poll_interval` field in `sources.yaml`.
+`/srv/infra/docserver/config/sources.yaml` on the infra VM. The poll interval is set to 120 seconds (2 minutes)
+via the `poll_interval` field.
 
 ## Ansible
 
