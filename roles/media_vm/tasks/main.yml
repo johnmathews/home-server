@@ -99,24 +99,28 @@
     mode: '0755'
   tags: journal
 
-- name: Upload journal-server context files
+- name: Upload journal-server mood dimensions
   ansible.builtin.copy:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
+    src: templates/journal/moods/mood-dimensions.toml
+    dest: "{{ media_stack_base_dir }}/config/journal/mood-dimensions.toml"
     owner: "{{ puid }}"
     group: "{{ guid }}"
     mode: '0644'
-  loop:
-    - mood-scoring:
-      src: templates/journal/moods/mood-dimensions.toml
-      dest: /srv/media/config/journal/mood-dimensions.toml
-    - people:
-      src: templates/journal/context/people.md
-      dest: /srv/media/config/journal/context/people.md
-    - places:
-      src: templates/journal/context/places.md
-      dest: /srv/media/config/journal/context/places.md
   become: true
+  notify: Restart journal-insights
+  tags: journal
+
+- name: Upload journal-server context files
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ media_stack_base_dir }}/config/journal/context/{{ item | basename }}"
+    owner: "{{ puid }}"
+    group: "{{ guid }}"
+    mode: '0644'
+  with_fileglob:
+    - "{{ role_path }}/templates/journal/context/*.md"
+  become: true
+  notify: Restart journal-insights
   tags: journal
 
 - name: Ensure alloy config directory exists

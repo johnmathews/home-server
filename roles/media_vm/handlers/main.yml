@@ -1,41 +1,37 @@
-# a hander is a deferred action. it runs once at the end of a play only if a task has
-# triggered it using `notify`. if it is triggered multiple times it still only runs once.
-# often used for restarting a service, or rebooting a machine.
+# A handler is a deferred action. It runs once at the end of a play only if a task has
+# triggered it using `notify`. If it is triggered multiple times it still only runs once.
+# Often used for restarting a service, or rebooting a machine.
+#
+# Handlers run in the order they are declared here, NOT in notify order. Underlying
+# services (e.g. gluetun) should be declared before any handler that subsumes them.
 
-
+# Notified when docker-compose.yml, .env, slskd config, or file ownership changes.
+# Full-stack recreate; the only handler that should remove orphans.
 - name: Restart media stack
   community.docker.docker_compose_v2:
     project_src: "{{ media_stack_base_dir }}"
-    state: present # bring up/ensure running
-    recreate: always # force-recreate changed services
-    pull: never
-    remove_orphans: true
-  become: false
-
-- name: Restart qbittorrent
-  community.docker.docker_compose_v2:
-    project_src: "{{ media_stack_base_dir }}"
-    services:
-      - qbittorrent
     state: present
     recreate: always
     pull: never
-    dependencies: true
     remove_orphans: true
   become: false
 
-- name: Restart alloy
+# Notified when journal context files or mood-dimensions.toml change.
+- name: Restart journal-insights
   community.docker.docker_compose_v2:
     project_src: "{{ media_stack_base_dir }}"
     services:
-      - alloy
+      - journal-server
+      - journal-webapp
+      - journal-chromadb
     state: present
     recreate: always
     pull: never
-    dependencies: true
-    remove_orphans: true
   become: false
 
+# Notified when gluetun config or VPN auth changes. Cycles VPN-routed services
+# (qbittorrent, sabnzbd) because they share gluetun's network namespace.
+# Declared before alloy so any later "alloy" handler doesn't run before its deps.
 - name: Restart gluetun
   community.docker.docker_compose_v2:
     project_src: "{{ media_stack_base_dir }}"
@@ -46,9 +42,20 @@
     state: present
     recreate: always
     pull: never
-    remove_orphans: true
   become: false
 
+# Notified when alloy config file changes.
+- name: Restart alloy
+  community.docker.docker_compose_v2:
+    project_src: "{{ media_stack_base_dir }}"
+    services:
+      - alloy
+    state: present
+    recreate: always
+    pull: never
+  become: false
+
+# Notified when sleep-hours timers are reconfigured.
 - name: Restart sleep-hours timers
   become: true
   ansible.builtin.systemd:
