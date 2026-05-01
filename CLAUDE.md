@@ -108,6 +108,7 @@ Service-specific guides in `/documentation/`. Read the relevant doc before worki
 - `agent.md` — NanoClaw architecture, LXC setup, macOS app, Tailscale, known issues
 - `open_webui_lxc.md` — Open WebUI LLM chat interface, OpenAI backend, Docker setup
 - `paperless.md` — Paperless-ngx document store, Docker stack, NFS/SMB, training schedule
+- `pbs.md` — Proxmox Backup Server: datastore, schedule, retention, restore procedure
 - `prometheus_lxc.md` — Prometheus metrics collection, scrape targets, retention, adding hosts
 - `quiet_hours.md` — Night-time container pausing for HDD spindown
 - `river.md` — Grafana Alloy (River config language) log shipping to Loki
@@ -123,6 +124,7 @@ Service-specific guides in `/documentation/`. Read the relevant doc before worki
 - `truenas.md` — TrueNAS scripts: share refresh, disk spindown, exporter
 - `upgrade-procedures.md` — How to upgrade Docker images, Proxmox, TrueNAS, and dependencies
 - `ups.md` — UPS monitoring via Network UPS Tools (NUT)
+- `vault.md` — Ansible Vault: layout, conventions, edit/rotate, recovery considerations
 
 ## Editing Guardrails
 
