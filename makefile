@@ -44,7 +44,7 @@ ANSIBLE_OPTS := $(TAGS_ARG) $(SKIP_ARG) $(LIMIT_ARG) $(EXTRA)
 
 # Declare all available commands as .PHONY (always run)
 .PHONY: all site pve nas mail media infra key traefik immich tube prometheus \
-        paperless media-dl music jelly open-webui cloudflared agent dev atuin \
+        paperless media-dl music jelly open-webui cloudflared agent atuin \
         shell nfs share_drive_probe tailscale lint-paths requirements \
         check lint clean ci help
 
@@ -104,9 +104,6 @@ cloudflared:
 
 agent:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/agent_lxc.yml $(VAULT) $(ANSIBLE_OPTS)
-
-dev:
-	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/dev_lxc.yml $(VAULT) $(ANSIBLE_OPTS)
 
 atuin:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/atuin.yml $(VAULT) $(ANSIBLE_OPTS)

@@ -1,6 +1,5 @@
 # Master playbook: orchestrates all playbooks
 - import_playbook: cloudflared_lxc.yml  # noqa: name[play]
-# - import_playbook: dev_lxc.yml
 - import_playbook: immich_lxc.yml  # noqa: name[play]
 - import_playbook: infra_vm.yml  # noqa: name[play]
 - import_playbook: jellyfin_lxc.yml  # noqa: name[play]
