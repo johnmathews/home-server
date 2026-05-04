@@ -87,6 +87,7 @@ services:
     image: ghcr.io/johnmathews/sre-agent:{{ sre_assistant_version }}
     container_name: sre-ingest
     command: ["python", "-m", "scripts.ingest_runbooks"]
+    user: 1001:1001
     environment:
       - ANONYMIZED_TELEMETRY=False
     env_file: .env
@@ -107,6 +108,7 @@ services:
       - ANONYMIZED_TELEMETRY=False
       - CLAUDE_CONFIG_DIR=/app/.claude
       - HOME=/app
+      - DOCUMENTATION_MCP_URL=${DOCUMENTATION_MCP_URL}
     volumes:
       - chroma_data:/app/.chroma_db
       - ${CONVERSATION_HISTORY_HOST_DIR}:/app/conversations

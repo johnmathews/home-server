@@ -22,7 +22,7 @@ layout:
     tab: Infra
     initiallyCollapsed: false
     style: row
-    columns: 6
+    columns: 4
   NAS:
     tab: Infra
     initiallyCollapsed: false

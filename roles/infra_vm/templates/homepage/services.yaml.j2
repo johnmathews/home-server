@@ -415,6 +415,11 @@
         description: "- Unlock datasets\n- Refresh shares"
 
 - Infra:
+    - SRE Agent:
+        href: http://sre.{{ primary_domain_name }}
+        siteMonitor: http://192.168.2.106:8501/
+        description: Site Reliability Engineer
+        icon: squirrel-servers-manager
     - Grafana:
         href: https://charts.{{ primary_domain_name }}/d/dekkfibh9454wb/home-server?from=now-24h&to=now&timezone=browser%3Fkiosk&refresh=10s
         siteMonitor: http://192.168.2.106:3000
