@@ -128,6 +128,58 @@ http:
         - security-headers
         - public-rl
 
+    homepage:
+      rule: {% for d in all_domains %}Host(`{{ d }}`){% if not loop.last %} || {% endif %}{% endfor %}
+
+      entryPoints: [web]
+      service: homepage-svc
+      priority: 100
+      middlewares:
+        - force-https-proto
+        - security-headers
+        - public-rl
+
+    uptime:
+      rule: {{ host('uptime') }}
+      entryPoints: [web]
+      service: uptime-svc
+      priority: 100
+      middlewares:
+        - force-https-proto
+        - security-headers
+        - public-rl
+
+    speed:
+      rule: {{ host('speed') }}
+      entryPoints: [web]
+      service: speed-svc
+      priority: 100
+      middlewares:
+        - force-https-proto
+        - security-headers
+        - public-rl
+
+    sre:
+      rule: {{ host('sre') }}
+      entryPoints: [web]
+      service: sre-svc
+      priority: 100
+      middlewares:
+        - force-https-proto
+        - security-headers
+        - public-rl
+        - sre-auth
+
+    stats:
+      rule: ({{ host('stats') }}) && ( PathPrefix(`/public-dashboards`) || PathPrefix(`/public/`) || PathPrefix(`/api/public/`) )
+      entryPoints: [web]
+      service: grafana-svc
+      priority: 100
+      middlewares:
+        - force-https-proto
+        - security-headers
+        - public-rl
+
   services:
     immich-svc:
       loadBalancer:
@@ -169,6 +221,36 @@ http:
       loadBalancer:
         servers:
           - url: "http://192.168.2.106:3003"
+        passHostHeader: true
+
+    homepage-svc:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.2.106:3002"
+        passHostHeader: true
+
+    uptime-svc:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.2.106:3001"
+        passHostHeader: true
+
+    speed-svc:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.2.100:8080"
+        passHostHeader: true
+
+    sre-svc:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.2.106:8501"
+        passHostHeader: true
+
+    grafana-svc:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.2.106:3000"
         passHostHeader: true
 
   middlewares:
@@ -231,6 +313,13 @@ http:
         burst: 300
         sourceCriterion:
           requestHeaderName: CF-Connecting-IP
+
+    sre-auth:
+      basicAuth:
+        users:
+{% for user in vault_sre_basicauth_users %}
+          - "{{ user }}"
+{% endfor %}
 
     security-headers:
       headers:

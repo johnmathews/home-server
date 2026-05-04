@@ -8,16 +8,30 @@ cloudflared_api_token: "{{ vault_cloudflared_api_token }}"
 # Each entry has: prefix (subdomain, or "" for bare domain), service (origin URL).
 # Optional: no_tls_verify (bool), set_host_header (bool).
 cloudflared_ingress:
-  # Homepage
+  # Public services (via Traefik — no Zero Access, rate-limited)
   - prefix: ""
-    service: "http://192.168.2.106:3002"
-  - prefix: dash
-    service: "http://192.168.2.106:3002"
-
-  # Documentation (via Traefik — no Zero Access, rate-limited)
+    service: "http://192.168.2.108"
+    set_host_header: true
   - prefix: docs
     service: "http://192.168.2.108"
     set_host_header: true
+  - prefix: timer
+    service: "http://192.168.2.108"
+    set_host_header: true
+  - prefix: uptime
+    service: "http://192.168.2.108"
+    set_host_header: true
+  - prefix: speed
+    service: "http://192.168.2.108"
+    set_host_header: true
+  - prefix: sre
+    service: "http://192.168.2.108"
+    set_host_header: true
+  - prefix: stats
+    service: "http://192.168.2.108"
+    set_host_header: true
+
+  # Documentation (direct — behind Zero Access)
   - prefix: docs-mcp
     service: "http://192.168.2.106:8085"
   - prefix: server-docs
@@ -31,12 +45,7 @@ cloudflared_ingress:
   - prefix: journal-insights
     service: "http://192.168.2.105:8402"
 
-  # Apps (via Traefik — no Zero Access, rate-limited)
-  - prefix: timer
-    service: "http://192.168.2.108"
-    set_host_header: true
-  - prefix: sre
-    service: "http://192.168.2.106:8501"
+  # Apps (direct — behind Zero Access)
   - prefix: sre-mcp
     service: "http://192.168.2.106:8001"
   - prefix: claw
@@ -86,8 +95,6 @@ cloudflared_ingress:
     service: "http://192.168.2.106:9000"
   - prefix: dozzle
     service: "http://192.168.2.106:9999"
-  - prefix: speed
-    service: "http://192.168.2.100:8080"
   - prefix: atuin
     service: "http://192.168.2.106:8888"
   - prefix: files
@@ -117,10 +124,6 @@ cloudflared_ingress:
     service: "https://192.168.2.213"
     no_tls_verify: true
 
-  # Uptime
-  - prefix: uptime
-    service: "http://192.168.2.106:3001"
-
   # DNS
   - prefix: ads
     service: "http://192.168.2.111"
@@ -142,11 +145,7 @@ cloudflared_ingress:
     service: "http://192.168.2.105:8080"
   - prefix: tube
     service: "http://192.168.2.116:8000"
-  - prefix: kids-tube
-    service: "http://192.168.2.116:8000"
   - prefix: bazarr
-    service: "http://192.168.2.105:6767"
-  - prefix: subs
     service: "http://192.168.2.105:6767"
   - prefix: prowlarr
     service: "http://192.168.2.105:9696"
@@ -165,6 +164,4 @@ cloudflared_ingress:
 
   # NAS
   - prefix: nas
-    service: "http://192.168.2.104"
-  - prefix: truenas
     service: "http://192.168.2.104"

@@ -80,10 +80,10 @@ There are two routing paths:
 1. **Direct to service** — Most services are routed directly from the tunnel to their internal IP/port. These are
    protected by Cloudflare Zero Access policies which require authentication before allowing access.
 
-2. **Via Traefik** — Jellyfin, Immich, Navidrome, and Music are routed through Traefik (192.168.2.108) instead of
-   directly to the service. These services bypass Cloudflare Zero Access because their native apps and APIs don't
-   work with Zero Access authentication redirects. Traefik applies rate limiting on auth endpoints as a compensating
-   control.
+2. **Via Traefik** — Services routed through Traefik (192.168.2.108) bypass Cloudflare Zero Access. This
+   includes native apps that break with auth redirects (Jellyfin, Immich, Navidrome, Music), public portfolio
+   services (Homepage, Uptime, Speed, Docs, Timer), and services with alternative auth (SRE uses BasicAuth,
+   Stats uses path-restricted Grafana public dashboards). Traefik applies rate limiting on all routes.
 
 ```
 Internet -> Cloudflare Edge (TLS) -> Tunnel -> cloudflared LXC
@@ -94,7 +94,7 @@ Internet -> Cloudflare Edge (TLS) -> Tunnel -> cloudflared LXC
                           (+ Zero Access)                    (bypass Zero Access,
                                                               + rate limiting)
                           e.g. grafana, sonarr,              e.g. jellyfin, immich,
-                          radarr, paperless, etc.            navidrome, music
+                          radarr, paperless, etc.            homepage, uptime, sre
 ```
 
 ## Proxied Services
@@ -103,6 +103,7 @@ All services listed in `/etc/cloudflared/config.yml`. Key subdomains:
 
 **Via Traefik (bypass Zero Access):**
 
+- `itsa-pizza.com` -> Traefik -> Homepage (192.168.2.106:3002)
 - `jelly.itsa-pizza.com` -> Traefik -> Jellyfin (192.168.2.110:8096)
 - `immich.itsa-pizza.com` -> Traefik -> Immich (192.168.2.113:2283)
 - `share.itsa-pizza.com` -> Traefik -> Immich shared albums
@@ -110,10 +111,13 @@ All services listed in `/etc/cloudflared/config.yml`. Key subdomains:
 - `music.itsa-pizza.com` -> Traefik -> Feishin (192.168.2.109:9180)
 - `timer.itsa-pizza.com` -> Traefik -> Gym Timer (192.168.2.106:8082)
 - `docs.itsa-pizza.com` -> Traefik -> Documentation Server (192.168.2.106:3003)
+- `uptime.itsa-pizza.com` -> Traefik -> Uptime Kuma (192.168.2.106:3001)
+- `speed.itsa-pizza.com` -> Traefik -> Speedtest (192.168.2.100:8080)
+- `sre.itsa-pizza.com` -> Traefik -> SRE Streamlit (192.168.2.106:8501) [BasicAuth]
+- `stats.itsa-pizza.com` -> Traefik -> Grafana public dashboards (192.168.2.106:3000) [path-restricted]
 
 **Direct (with Zero Access):**
 
-- `itsa-pizza.com` / `dash.itsa-pizza.com` -> Homepage (192.168.2.106:3002)
 - `claw.itsa-pizza.com` -> NanoClaw (192.168.2.107:18790)
 - `agent-journal.itsa-pizza.com` -> MkDocs Journal (192.168.2.107:8000)
 - `agent-docs.itsa-pizza.com` -> MkDocs Docs (192.168.2.107:8001)

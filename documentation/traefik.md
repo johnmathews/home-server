@@ -31,22 +31,28 @@ Internet -> Cloudflare Edge (TLS) -> Tunnel -> cloudflared LXC -> Traefik (192.1
 ## Services Behind Traefik
 
 ```
-+-----------------+-------------------------------+-----------------------+
-| Router          | Domain                        | Backend               |
-+-----------------+-------------------------------+-----------------------+
-| immich          | immich.itsa-pizza.com          | 192.168.2.113:2283    |
-| immich-share    | share.itsa-pizza.com           | 192.168.2.113:3000    |
-| jelly           | jelly.itsa-pizza.com           | 192.168.2.110:8096    |
-| navidrome       | navidrome.itsa-pizza.com       | 192.168.2.109:4533    |
-| music           | music.itsa-pizza.com           | 192.168.2.109:9180    |
-| timer           | timer.itsa-pizza.com           | 192.168.2.106:8082    |
-| docs            | docs.itsa-pizza.com            | 192.168.2.106:3003    |
-+-----------------+-------------------------------+-----------------------+
++-----------------+-------------------------------+-----------------------+-------------------+
+| Router          | Domain                        | Backend               | Auth              |
++-----------------+-------------------------------+-----------------------+-------------------+
+| immich          | immich.itsa-pizza.com          | 192.168.2.113:2283    | None (app auth)   |
+| immich-share    | share.itsa-pizza.com           | 192.168.2.113:3000    | None (app auth)   |
+| jelly           | jelly.itsa-pizza.com           | 192.168.2.110:8096    | None (app auth)   |
+| navidrome       | navidrome.itsa-pizza.com       | 192.168.2.109:4533    | None (app auth)   |
+| music           | music.itsa-pizza.com           | 192.168.2.109:9180    | None (app auth)   |
+| timer           | timer.itsa-pizza.com           | 192.168.2.106:8082    | None (public)     |
+| docs            | docs.itsa-pizza.com            | 192.168.2.106:3003    | None (public)     |
+| homepage        | itsa-pizza.com                 | 192.168.2.106:3002    | None (public)     |
+| uptime          | uptime.itsa-pizza.com          | 192.168.2.106:3001    | None (public)     |
+| speed           | speed.itsa-pizza.com           | 192.168.2.100:8080    | None (public)     |
+| sre             | sre.itsa-pizza.com             | 192.168.2.106:8501    | BasicAuth         |
+| stats           | stats.itsa-pizza.com           | 192.168.2.106:3000    | Path-restricted   |
++-----------------+-------------------------------+-----------------------+-------------------+
 ```
 
 These domains bypass Cloudflare Zero Access — either because native apps/APIs can't handle auth redirects (jellyfin,
-immich, navidrome, music) or because they are intentionally public (timer, docs). Traefik applies rate limiting as a
-compensating security control.
+immich, navidrome, music), because they are intentionally public for portfolio demos (homepage, timer, docs, uptime,
+speed), or because they use alternative authentication (sre uses BasicAuth, stats uses path restriction to only expose
+Grafana public dashboards). Traefik applies rate limiting as a compensating security control on all routes.
 
 ## Configuration Files
 
@@ -87,6 +93,7 @@ multiple domains (for domain migration compatibility). Priority values ensure sp
 | music-rl            | Rate limit: 200/s avg, 300 burst (navidrome)       |
 | navidrome-auth-rl   | Rate limit: 5/min, 3 burst on auth endpoint        |
 | public-rl           | Rate limit: 200/s avg, 300 burst (public services) |
+| sre-auth            | BasicAuth gate for SRE app (credentials in vault)   |
 +---------------------+-----------------------------------------------------+
 ```
 
