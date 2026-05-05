@@ -1,0 +1,107 @@
+# Mood Dimensions
+
+Source of truth for the per-entry scoring pipeline and the dashboard mood chart.
+
+Each dimension defines one facet. The fields are:
+
+- **name** — stable canonical key stored in `mood_scores.dimension`. Must be snake_case and unique. Rename with care: renaming here orphans historical scores under the old name until pruned with `journal backfill-mood --prune-retired`.
+- **positive_pole** — human-readable label for the high end of the scale. Appears in the LLM prompt, the chart legend, and the dashboard dimension toggle.
+- **negative_pole** — label for the low end. For unipolar facets this is typically "absence of *positive_pole*".
+- **scale_type** — one of `bipolar` (score range −1..+1, with 0 as a meaningful neutral) or `unipolar` (score range 0..+1, with 0 meaning "absent" rather than "opposite"). Picks the right shape for facets where the negative pole is genuinely absence (apathy, indifference) rather than an opposite feeling.
+- **notes** — one or two sentences of scoring criteria that go into the LLM prompt verbatim. Stable re-interpretation after an edit happens via `journal backfill-mood --force`.
+
+## Editing the facet set
+
+- **Adding a facet:** append a new `[[dimension]]` block, then optionally run `journal backfill-mood --stale-only` to score historical entries against the new facet. Old entries without the facet are stored sparsely as `null` and do not require a migration.
+- **Removing a facet:** delete the block. Historical scores under the retired name are preserved by default; pass `--prune-retired` to delete them if you're sure you want them gone.
+- **Editing a facet:** edit in place and run `journal backfill-mood --force` so the LLM reinterprets every entry against the new criteria. Scores persist under the same `name`, so the chart continuity is preserved.
+
+Ordering is load-bearing only for chart display — the dashboard renders lines in the order defined here. Current ordering groups facets by kind: affect axes (valence, arousal), psychological needs (agency, fulfillment, connection), active negative affect (frustration), stance (proactive_reactive).
+
+---
+
+## joy_sadness
+
+- **Positive pole:** joy
+- **Negative pole:** sadness
+- **Scale:** bipolar (−1..+1)
+
+Predominantly joyful / pleasant / light-hearted (+1) vs predominantly sad / unpleasant / heavy-hearted (−1). The valence axis — how good or bad the entry feels overall, regardless of activation level. Score 0 when neither pole dominates or the entry reads as emotionally flat. Small positive values (+0.2) for mild good moods; reserve +1 for genuine elation.
+
+Distinct from frustration. Sadness (loss, disappointment, melancholy) is not the same as frustration (irritation, anger, blocked goals). "Got rejected from the job, feeling low" scores joy_sadness strongly negative and frustration low. "Bug ate my afternoon, fuming" scores frustration high and joy_sadness near zero.
+
+---
+
+## energy_fatigue
+
+- **Positive pole:** energetic
+- **Negative pole:** tired
+- **Scale:** bipolar (−1..+1)
+
+Energetic / alert (+1) vs tired / drained (−1). The arousal axis — how high or low the writer's activation level is, independent of valence. You can be energetic-and-anxious or tired-and-content.
+
+Score on the bodily / cognitive sense of activation, not the emotional tone. "Buzzing with caffeine, three meetings deep" scores energy high regardless of how the meetings went. "Exhausted by 3pm, dragging through the afternoon" scores energy low regardless of mood.
+
+---
+
+## agency
+
+- **Positive pole:** agency
+- **Negative pole:** apathy
+- **Scale:** unipolar (0..+1)
+
+How strongly does the entry convey a sense of agency — feeling in control, capable of acting on the writer's environment? Score 0 when the entry shows apathy or resignation (absence of agency). Score 1 when the writer is clearly taking initiative or feels capable of shaping outcomes. Unipolar because apathy is felt as absence, not as an active opposite of agency.
+
+Distinct from fulfillment. Agency is about capability and control; fulfillment is about meaning and rightness. "Cleared the inbox, ran errands, ticked every box, felt nothing about any of it" scores agency high and fulfillment low — efficient but hollow. "Sat with grandmother in hospice, didn't do anything, but it mattered" scores agency low and fulfillment high.
+
+---
+
+## fulfillment
+
+- **Positive pole:** meaningful fulfillment
+- **Negative pole:** indifference
+- **Scale:** unipolar (0..+1)
+
+How strongly does the entry convey a sense of meaning or fulfillment? Score 0 for indifference (absence of felt meaning) and 1 for strong fulfillment / rightness. Unipolar because indifference reads as absence rather than opposition.
+
+Distinct from joy — you can be joyful without feeling fulfilled (a fun party that felt empty afterwards), and fulfilled without joy (a difficult but meaningful conversation). Distinct from agency — fulfillment is meaning, agency is capability. "Cleared the inbox, felt nothing" scores fulfillment low despite high agency. "Sat with grandmother in hospice, didn't do anything, but it mattered" scores fulfillment high despite low agency. Distinct from connection — fulfillment can come from solo work; not all meaning is social.
+
+---
+
+## connection
+
+- **Positive pole:** connected
+- **Negative pole:** isolated
+- **Scale:** unipolar (0..+1)
+
+How strongly does the entry convey a sense of connection — feeling related to other people, in tune with someone, part of something beyond the self? Score 0 for solitary or disconnected entries (alone, or going through the motions with others present). Score 1 for strong connection: a deep conversation, shared joy, feeling held or holding someone else.
+
+Unipolar because the absence of connection reads as solitude rather than as an active opposite. Loneliness — felt isolation despite wanting connection — also scores 0 here; the negative emotional tone of loneliness lands on joy_sadness, not here.
+
+Distinct from fulfillment. A meaningful solo project scores fulfillment high and connection 0. A pleasant but shallow chat scores connection moderate and fulfillment 0. The richest entries often score both high together.
+
+---
+
+## frustration
+
+- **Positive pole:** frustrated
+- **Negative pole:** calm
+- **Scale:** unipolar (0..+1)
+
+How strongly does the entry convey frustration, anger, or irritation — the active negative-affect family of blocked goals, things not going the writer's way, or feeling thwarted by people or circumstances? Score 0 for entries with no frustration signal. Score 1 for strong sustained anger.
+
+Unipolar because the opposite of frustration is calm / no friction — the absence rather than an active opposite. Resignation lands on agency (low), not here.
+
+Distinct from joy_sadness. Frustration is angry-at-something; sadness is heavy-hearted. They co-occur often but are distinct. "Stuck in traffic, livid" scores frustration high and joy_sadness only mildly negative. "Funeral was lovely but hard" scores joy_sadness strongly negative and frustration near 0.
+
+---
+
+## proactive_reactive
+
+- **Positive pole:** proactive
+- **Negative pole:** reactive
+- **Scale:** bipolar (−1..+1)
+
+Proactive / initiating / setting the day's agenda (+1) vs reactive / responding to external pressures / pushed around by events (−1). Score 0 for a balanced mix.
+
+This is a stance dimension — about behavior and how the day was structured — rather than a feeling. Score it from how the writer spent their time, not from how they felt about it. A reactive day can feel fulfilling (helping a colleague through a fire) and a proactive day can feel hollow (executing a checklist nobody asked for).
