@@ -168,7 +168,6 @@ http:
         - force-https-proto
         - security-headers
         - public-rl
-        - sre-auth
 
     stats:
       rule: ({{ host('stats') }}) && ( PathPrefix(`/public-dashboards`) || PathPrefix(`/public/`) || PathPrefix(`/api/public/`) )
@@ -313,13 +312,6 @@ http:
         burst: 300
         sourceCriterion:
           requestHeaderName: CF-Connecting-IP
-
-    sre-auth:
-      basicAuth:
-        users:
-{% for user in vault_sre_basicauth_users %}
-          - "{{ user }}"
-{% endfor %}
 
     security-headers:
       headers:

@@ -93,7 +93,6 @@ multiple domains (for domain migration compatibility). Priority values ensure sp
 | music-rl            | Rate limit: 200/s avg, 300 burst (navidrome)       |
 | navidrome-auth-rl   | Rate limit: 5/min, 3 burst on auth endpoint        |
 | public-rl           | Rate limit: 200/s avg, 300 burst (public services) |
-| sre-auth            | BasicAuth gate for SRE app (credentials in vault)   |
 +---------------------+-----------------------------------------------------+
 ```
 

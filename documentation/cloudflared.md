@@ -82,8 +82,9 @@ There are two routing paths:
 
 2. **Via Traefik** — Services routed through Traefik (192.168.2.108) bypass Cloudflare Zero Access. This
    includes native apps that break with auth redirects (Jellyfin, Immich, Navidrome, Music), public portfolio
-   services (Homepage, Uptime, Speed, Docs, Timer), and services with alternative auth (SRE uses BasicAuth,
-   Stats uses path-restricted Grafana public dashboards). Traefik applies rate limiting on all routes.
+   services (Homepage, Uptime, Speed, Docs, Timer, SRE), and services with alternative auth (Stats uses
+   path-restricted Grafana public dashboards). Traefik applies rate limiting on all routes. Auth for the
+   SRE app is handled by a Cloudflare Zero Access policy applied to `sre.itsa-pizza.com` at the edge.
 
 ```
 Internet -> Cloudflare Edge (TLS) -> Tunnel -> cloudflared LXC
@@ -113,7 +114,7 @@ All services listed in `/etc/cloudflared/config.yml`. Key subdomains:
 - `docs.itsa-pizza.com` -> Traefik -> Documentation Server (192.168.2.106:3003)
 - `uptime.itsa-pizza.com` -> Traefik -> Uptime Kuma (192.168.2.106:3001)
 - `speed.itsa-pizza.com` -> Traefik -> Speedtest (192.168.2.100:8080)
-- `sre.itsa-pizza.com` -> Traefik -> SRE Streamlit (192.168.2.106:8501) [BasicAuth]
+- `sre.itsa-pizza.com` -> Traefik -> SRE Streamlit (192.168.2.106:8501) [Zero Access]
 - `stats.itsa-pizza.com` -> Traefik -> Grafana public dashboards (192.168.2.106:3000) [path-restricted]
 
 **Direct (with Zero Access):**
