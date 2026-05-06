@@ -1,8 +1,6 @@
 # vim: ft=yaml
 # traefik_lxc/files/docker-compose.yml
 
----
-
 services:
 
   traefik:
@@ -12,24 +10,24 @@ services:
     environment:
       - TZ=Europe/Amsterdam
     command:
-      # Only HTTP locally; Cloudflare Tunnel will connect over HTTP
       - "--entrypoints.web.address=:80"
-      # Use file provider (we'll mount dynamic config files)
       - "--providers.file.directory=/etc/traefik/dynamic"
       - "--providers.file.watch=true"
-      # Logs
       - "--log.level=INFO"
       - "--accesslog=true"
-      # Enable Docker provider
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
     ports:
       - "80:80"
       - "8080:8080"
     volumes:
-      # Static + dynamic config files (no docker.sock needed on this host)
       - ./traefik/traefik.yml:/etc/traefik/traefik.yml:ro
       - ./traefik/dynamic:/etc/traefik/dynamic:ro
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:{{ cadvisor_version }}
@@ -43,7 +41,7 @@ services:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
       - /var/lib/docker/:/var/lib/docker:ro
       - /var/run:/var/run:ro
-    privileged: false  # required for some metrics, but `true` makes it scan /dev/** and in an LXC /dev/series/by-id does not exist.
+    privileged: false # required for some metrics, but `true` makes it scan /dev/** and in an LXC /dev/series/by-id does not exist.
     security_opt:
       - no-new-privileges:true
     logging:
@@ -61,19 +59,14 @@ services:
       NODE_HOSTNAME: "traefik"
       LOG_LEVEL: "warn"
     volumes:
-      # config 
-      - ./alloy:/etc/alloy:ro 
-      # docker 
+      - ./alloy:/etc/alloy:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      # journalctl  
       - /var/log/journal:/var/log/journal:ro
       - /run/log/journal:/run/log/journal:ro
       - /etc/machine-id:/etc/machine-id:ro
     command: >
-      run --server.http.listen-addr=0.0.0.0:12345 --stability.level=experimental
-      --storage.path=/var/lib/alloy/data
-      /etc/alloy/config.alloy
+      run --server.http.listen-addr=0.0.0.0:12345 --stability.level=experimental --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
     ports:
       - "12345:12345"
     logging:
