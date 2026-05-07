@@ -7,6 +7,10 @@ services:
     image: ghcr.io/johnmathews/unified-documentation-webapp:{{ documentation_ui_version }}
     container_name: documentation-webapp
     restart: unless-stopped
+    # Stateless SvelteKit proxy. Steady state ~50 MB; bounded per-request
+    # buffer of one downloaded file (max 5 MB) for inline rendering.
+    mem_limit: 192m
+    mem_reservation: 64m
     ports:
       - "3003:3000"
     environment:
@@ -28,8 +32,19 @@ services:
     depends_on:
       documentation-chroma:
         condition: service_healthy
-    mem_limit: 2g
-    mem_reservation: 1g
+    # Memory budget on a 1.95 GB host (infra VM) sharing RAM with the
+    # observability stack (Loki, Grafana, Alloy, exporters). 768 MB caps
+    # the container BELOW the VM's available memory so the cgroup OOM can
+    # actually fire — the kernel's OOM killer will pick the highest-RSS
+    # process in the cgroup (the embedding worker subprocess) cleanly,
+    # rather than falling through to a global OOM that degrades the host.
+    # Do NOT raise without raising the VM's available RAM.
+    mem_limit: 768m
+    mem_reservation: 256m
+    # Mark this container as the preferred OOM victim on the host so any
+    # global memory pressure kills the embedding subprocess before
+    # touching the observability stack (which has oom_score_adj: -500).
+    oom_score_adj: 500
     ports:
       - "8085:8080"
     volumes:
@@ -39,7 +54,12 @@ services:
       - docserver-data:/data
       - ./docserver/config/sources.yaml:/config/sources.yaml:ro
     environment:
-      - DOCSERVER_POLL_INTERVAL=300
+      # 30-minute polling. Each cycle spawns a worker subprocess that
+      # loads the ONNX embedding model (~110 MB on disk, ~1+ GB resident
+      # for a real-content cycle on large sources) and exits — RSS is
+      # released back to the OS. Going below 1800 multiplies the chance
+      # of a real-content cycle landing during peak memory of co-tenants.
+      - DOCSERVER_POLL_INTERVAL=1800
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY_UNIFIED_DOCUMENTATION_SERVER}
       - GITHUB_TOKEN=${GITHUB_TOKEN}
       - DOCSERVER_CHAT_MODEL=claude-opus-4-7
@@ -151,6 +171,9 @@ services:
       - "3100:3100"
     user: "0:0" # writes to local volume
     mem_limit: 200m # ADDED: currently ~125MB
+    # Observability backstop: protect from the host OOM killer so a
+    # docserver memory spike cannot blind us to the rest of the homelab.
+    oom_score_adj: -500
     volumes:
       - ./loki/config.yml:/etc/loki/config.yml
       - ./loki/data:/loki # local storage
@@ -161,6 +184,7 @@ services:
     container_name: alloy
     restart: unless-stopped
     mem_limit: 128m # ADDED: currently ~82MB
+    oom_score_adj: -500  # Observability backstop, see loki above.
     environment:
       LOKI_WRITE_ENDPOINT: "http://192.168.2.106:3100/loki/api/v1/push"
       NODE_HOSTNAME: "infra"
@@ -227,6 +251,7 @@ services:
     image: grafana/grafana-oss:{{ grafana_version }}
     container_name: grafana
     mem_limit: 256m # ADDED: currently ~183MB, biggest consumer
+    oom_score_adj: -500  # Observability backstop, see loki above.
     ports:
       - "3000:3000"
     volumes:
@@ -238,6 +263,7 @@ services:
     image: prom/node-exporter:{{ node_exporter_version }}
     container_name: node-exporter
     restart: always
+    oom_score_adj: -500  # Observability backstop, see loki above.
     ports:
       - "9100:9100"
     pid: "host"
@@ -256,6 +282,7 @@ services:
     container_name: cadvisor
     restart: unless-stopped
     mem_limit: 96m # ADDED: currently ~45MB
+    oom_score_adj: -500  # Observability backstop, see loki above.
     ports:
       - "8080:8080"
     volumes:
