@@ -39,8 +39,8 @@ services:
     # process in the cgroup (the embedding worker subprocess) cleanly,
     # rather than falling through to a global OOM that degrades the host.
     # Do NOT raise without raising the VM's available RAM.
-    mem_limit: 768m
-    mem_reservation: 256m
+    mem_limit: 1024m
+    mem_reservation: 512m
     # Mark this container as the preferred OOM victim on the host so any
     # global memory pressure kills the embedding subprocess before
     # touching the observability stack (which has oom_score_adj: -500).
@@ -184,7 +184,7 @@ services:
     container_name: alloy
     restart: unless-stopped
     mem_limit: 128m # ADDED: currently ~82MB
-    oom_score_adj: -500  # Observability backstop, see loki above.
+    oom_score_adj: -500 # Observability backstop, see loki above.
     environment:
       LOKI_WRITE_ENDPOINT: "http://192.168.2.106:3100/loki/api/v1/push"
       NODE_HOSTNAME: "infra"
@@ -251,7 +251,7 @@ services:
     image: grafana/grafana-oss:{{ grafana_version }}
     container_name: grafana
     mem_limit: 256m # ADDED: currently ~183MB, biggest consumer
-    oom_score_adj: -500  # Observability backstop, see loki above.
+    oom_score_adj: -500 # Observability backstop, see loki above.
     ports:
       - "3000:3000"
     volumes:
@@ -263,7 +263,7 @@ services:
     image: prom/node-exporter:{{ node_exporter_version }}
     container_name: node-exporter
     restart: always
-    oom_score_adj: -500  # Observability backstop, see loki above.
+    oom_score_adj: -500 # Observability backstop, see loki above.
     ports:
       - "9100:9100"
     pid: "host"
@@ -282,7 +282,7 @@ services:
     container_name: cadvisor
     restart: unless-stopped
     mem_limit: 96m # ADDED: currently ~45MB
-    oom_score_adj: -500  # Observability backstop, see loki above.
+    oom_score_adj: -500 # Observability backstop, see loki above.
     ports:
       - "8080:8080"
     volumes:
