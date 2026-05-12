@@ -125,6 +125,7 @@ services:
     mem_limit: 768m
     env_file: .env # gets all the env vars in the file automatically
     environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY_SRE_AGENT}
       - ANONYMIZED_TELEMETRY=False
       - CLAUDE_CONFIG_DIR=/app/.claude
       - HOME=/app
