@@ -365,7 +365,6 @@ services:
     command:
       - '--path.rootfs=/host'
       - '--collector.textfile.directory=/textfile'
-    # network_mode: host
     ports:
       - "9100:9100"
     pid: host
@@ -373,6 +372,7 @@ services:
     volumes:
       - '/:/host:ro,rslave'
       - '/var/lib/node_exporter/textfile_collector:/textfile:ro'
+      - '/run/udev:/run/udev:ro'
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:{{ cadvisor_version }}
