@@ -19,3 +19,13 @@
     mode: '0644'
   notify: Restart docserver
   tags: docserver, documentation
+
+- name: Template docserver document-types.yaml
+  ansible.builtin.template:
+    src: docserver-doctypes.yml.j2
+    dest: /srv/infra/docserver/config/document-types.yaml
+    owner: "{{ docker_user }}"
+    group: "{{ docker_user }}"
+    mode: '0644'
+  notify: Restart docserver
+  tags: docserver, documentation
