@@ -28,4 +28,4 @@ smb_opts_items:
 smb_opts: "{{ smb_opts_items | join(',') }}"
 
 # Library (paperless replacement; ghcr image tag = git commit sha of release)
-library_version: "fd9c27676ab7486dffe1327bc61bff4dc527e4bf"
+library_version: "ddde3ed680ec2c156e249b0da5f7d6246a08efb2"
