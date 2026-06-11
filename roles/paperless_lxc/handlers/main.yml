@@ -46,7 +46,7 @@
     services:
       - library-db
       - library-migrate
-      - library-api
+      - library-webserver
       - library-worker
     state: present
     recreate: always

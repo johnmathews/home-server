@@ -68,7 +68,7 @@ services:
 
   # Library (github.com/johnmathews/library) — paperless-ngx replacement,
   # sharing this LXC during the transition. Own Postgres: paperless-db is
-  # stopped nightly by sleep_hours, and Library's API must stay up.
+  # stopped nightly by sleep_hours, and Library's web app must stay up.
   library-db:
     container_name: library-db
     image: docker.io/library/postgres:17
@@ -87,7 +87,7 @@ services:
       retries: 5
 
   # One-shot: applies alembic migrations, exits 0. Safe to re-run on every
-  # deploy; api/worker wait for it via service_completed_successfully.
+  # deploy; webserver/worker wait for it via service_completed_successfully.
   library-migrate:
     container_name: library-migrate
     image: ghcr.io/johnmathews/library:{{ library_version }}
@@ -99,8 +99,8 @@ services:
         condition: service_healthy
     restart: "no"
 
-  library-api:
-    container_name: library-api
+  library-webserver:
+    container_name: library-webserver
     image: ghcr.io/johnmathews/library:{{ library_version }}
     restart: always
     ports:
