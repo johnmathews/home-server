@@ -38,7 +38,20 @@
     - /srv/apps/paperless/redisdata
     - /srv/apps/alloy
     - /srv/apps/promtail
+    - /srv/apps/library/pgdata
   tags: docker
+
+# No mode here: the TrueNAS NFSv4 ACLs reject chmod (EPERM) — chown works.
+- name: Create library data directories on the NFS share (owned by the image's app uid)
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: 999
+    group: 999
+  loop:
+    - /mnt/nfs/paperless/library
+    - /mnt/nfs/paperless/library-consume
+  tags: library
 
 - name: Ensure correct directory ownership
   ansible.builtin.file:
@@ -101,5 +114,5 @@
       [ $(docker exec paperless-webserver find /usr/src/paperless/consume -type f -mmin +5 2>/dev/null | wc -l) -gt 0 ]
       && [ $(docker logs --since 10m paperless-webserver 2>&1 | grep -c 'paperless.consumer') -eq 0 ]
       && docker exec paperless-webserver s6-svc -r /run/service/svc-consumer/
-    ansible.builtin.user: root
+    user: root
   tags: consumer-health

@@ -26,3 +26,6 @@ smb_opts_items:
   - x-systemd.idle-timeout=60s
   - x-systemd.mount-timeout=30s
 smb_opts: "{{ smb_opts_items | join(',') }}"
+
+# Library (paperless replacement; ghcr image tag = git commit sha of release)
+library_version: "e20113e319ca8976f4a7481d405bd72ed017503c"

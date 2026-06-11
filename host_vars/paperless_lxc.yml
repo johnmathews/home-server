@@ -22,6 +22,10 @@ sleep_hours_stop_containers:
   - paperless-webserver
   - paperless-broker
   - paperless-db
+  # library-worker polls the NFS consume dir (would keep TrueNAS HDDs awake);
+  # its startup sweep ingests anything dropped overnight. library-api and
+  # library-db stay up so the web app keeps working at night.
+  - library-worker
 
 # Monitor integration (pause/resume monitoring during sleep hours)
 sleep_hours_kuma_map:

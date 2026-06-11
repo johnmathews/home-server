@@ -66,6 +66,85 @@ services:
       timeout: 5s
       retries: 5
 
+  # Library (github.com/johnmathews/library) — paperless-ngx replacement,
+  # sharing this LXC during the transition. Own Postgres: paperless-db is
+  # stopped nightly by sleep_hours, and Library's API must stay up.
+  library-db:
+    container_name: library-db
+    image: docker.io/library/postgres:17
+    restart: always
+    volumes:
+      - "{{ docker_compose_dir }}/library/pgdata:/var/lib/postgresql/data"
+    environment:
+      POSTGRES_DB: library
+      POSTGRES_USER: library
+      POSTGRES_PASSWORD: ${LIBRARY_DB_PASSWORD}
+      TZ: ${TZ}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U library -d library"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # One-shot: applies alembic migrations, exits 0. Safe to re-run on every
+  # deploy; api/worker wait for it via service_completed_successfully.
+  library-migrate:
+    container_name: library-migrate
+    image: ghcr.io/johnmathews/library:{{ library_version }}
+    command: ["alembic", "upgrade", "head"]
+    environment:
+      LIBRARY_DATABASE_URL: postgresql+asyncpg://library:${LIBRARY_DB_PASSWORD}@library-db:5432/library
+    depends_on:
+      library-db:
+        condition: service_healthy
+    restart: "no"
+
+  library-api:
+    container_name: library-api
+    image: ghcr.io/johnmathews/library:{{ library_version }}
+    restart: always
+    ports:
+      - "8010:8000"
+    env_file: .env
+    environment:
+      LIBRARY_DATABASE_URL: postgresql+asyncpg://library:${LIBRARY_DB_PASSWORD}@library-db:5432/library
+      LIBRARY_DATA_DIR: /data
+    volumes:
+      - "/mnt/nfs/paperless/library:/data"
+    depends_on:
+      library-db:
+        condition: service_healthy
+      library-migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      # curl is not in the slim image; the stdlib is.
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz')"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  library-worker:
+    container_name: library-worker
+    image: ghcr.io/johnmathews/library:{{ library_version }}
+    restart: always
+    command: ["python", "-m", "library.worker"]
+    env_file: .env
+    environment:
+      LIBRARY_DATABASE_URL: postgresql+asyncpg://library:${LIBRARY_DB_PASSWORD}@library-db:5432/library
+      LIBRARY_DATA_DIR: /data
+      LIBRARY_CONSUME_DIR: /consume
+      # The consume dir is an NFS mount; inotify does not cross it.
+      LIBRARY_CONSUME_FORCE_POLLING: "true"
+    volumes:
+      - "/mnt/nfs/paperless/library:/data"
+      - "/mnt/nfs/paperless/library-consume:/consume"
+    depends_on:
+      library-db:
+        condition: service_healthy
+      library-migrate:
+        condition: service_completed_successfully
+
   node_exporter:
     image: quay.io/prometheus/node-exporter:{{ node_exporter_version }}
     container_name: node_exporter

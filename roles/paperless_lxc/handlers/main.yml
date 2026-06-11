@@ -39,3 +39,17 @@
   loop:
     - docker-sleep@pause.timer
     - docker-sleep@unpause.timer
+
+- name: Restart library
+  community.docker.docker_compose_v2:
+    project_src: "{{ docker_compose_dir }}"
+    services:
+      - library-db
+      - library-migrate
+      - library-api
+      - library-worker
+    state: present
+    recreate: always
+    pull: never
+    dependencies: true
+  become: false
