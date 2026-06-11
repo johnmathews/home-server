@@ -8,6 +8,7 @@ cloudflared_api_token: "{{ vault_cloudflared_api_token }}"
 # Each entry has: prefix (subdomain, or "" for bare domain), service (origin URL).
 # Optional: no_tls_verify (bool), set_host_header (bool).
 cloudflared_ingress:
+  # if local network address is 192.168.2.108 and there is no port then it goes via traefik 
   # Public services (via Traefik — no Zero Access, rate-limited)
   - prefix: ""
     service: "http://192.168.2.108"
@@ -30,6 +31,10 @@ cloudflared_ingress:
   - prefix: stats
     service: "http://192.168.2.108"
     set_host_header: true
+
+  # Relay on agent lxc 
+  - prefix: relay
+    service: "http://192.168.2.107:7800"
 
   # Documentation (direct — behind Zero Access)
   - prefix: docs-mcp
@@ -69,8 +74,6 @@ cloudflared_ingress:
   - prefix: music
     service: "http://192.168.2.108"
     set_host_header: true
-  - prefix: lidarr
-    service: "http://192.168.2.105:8686"
   - prefix: slskd
     service: "http://192.168.2.105:5030"
   - prefix: picard
@@ -155,6 +158,8 @@ cloudflared_ingress:
     service: "http://192.168.2.117:8000"
   - prefix: documents
     service: "http://192.168.2.117:8000"
+  - prefix: library
+    service: "http://192.168.2.117:8010"
 
   # Books
   - prefix: booklore
