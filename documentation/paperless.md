@@ -93,6 +93,12 @@ Accessible via Cloudflare Tunnel with Zero Access protection (not via Traefik):
 - Uses centralized `docker_compose_dir: /srv/apps`
 - SMB mount configuration with credentials file, NTLMv2, systemd automount
 - PUID/GUID: 1001
+- **Image versions track `latest`** (`paperless_version`, `node_exporter_version`,
+  `alloy_version`, `cadvisor_version`). They previously held stale pins below the
+  images actually running on the host; re-rendering compose against them attempted
+  a destructive paperless downgrade. If re-pinning to explicit versions, first
+  pull and verify the image on the host, and never pin paperless below the
+  deployed version (schema downgrades are unsupported and corrupt the DB).
 
 ### Tasks
 
@@ -102,7 +108,33 @@ Accessible via Cloudflare Tunnel with Zero Access protection (not via Traefik):
 ## Vault Variables Used
 
 - SMB credentials (via `vault_smb_media_vm_password`)
+- `vault_library_db_password` — Postgres password for the co-hosted Library
+  stack (`library-db`, user/db `library`). Rendered into `.env` as
+  `LIBRARY_DB_PASSWORD` and interpolated by compose into both the DB container
+  and the app DSN.
+- `vault_library_anthropic_api_key` (optional) — Claude API key for Library
+  metadata extraction; templated only when defined.
 - Other secrets in `.env.j2` template
+
+### Rotating the Library DB password
+
+Postgres only reads `POSTGRES_PASSWORD` on first volume init, so changing the
+vault value alone does **not** update the role on the existing `pgdata` volume.
+Full rotation:
+
+1. Update `vault_library_db_password`:
+   `ansible-vault edit group_vars/all/vault.yml --vault-password-file=.vault_pass.txt`
+2. Render the new `.env` to the host: `make paperless TAGS=docker`
+3. Alter the live role (local socket is trust auth):
+   `ssh paperless 'docker exec library-db psql -U library -d library -c "ALTER USER library WITH PASSWORD '\''<new>'\''"'`
+4. Recreate the Library services so they reconnect with the new credential:
+   `ssh paperless 'cd /srv/apps && docker compose up -d --pull never library-db library-migrate library-webserver library-worker'`
+5. Verify: `library-migrate` exits 0, `library-webserver` `/healthz` returns 200,
+   the new password authenticates and the old one is rejected.
+
+Use an alphanumeric password — the value flows through both `.env` `${...}`
+interpolation and the `postgresql+asyncpg://library:<pw>@library-db/library` DSN,
+so URL/shell metacharacters will break it.
 
 ## Backup Strategy
 
