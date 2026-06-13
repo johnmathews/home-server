@@ -58,6 +58,7 @@ services:
       - STNOUPGRADE=1
     volumes:
       - /srv/apps/syncthing:/var/syncthing
+      - /srv/apps/nanoclaw:/var/nanoclaw
     logging:
       driver: "json-file"
       options:
