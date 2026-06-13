@@ -1,5 +1,13 @@
 # Docker image versions
+relay_version: "latest"
 syncthing_version: "latest"
+
+# Synced folder roots under /srv/apps/syncthing; each gets the shared .stignore
+syncthing_folders:
+  - horizons
+  - relay
+  - meeting-assistant
+  - screenshots
 cadvisor_version: "latest"
 alloy_version: "latest"
 node_exporter_version: "latest"

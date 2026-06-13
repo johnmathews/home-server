@@ -81,9 +81,17 @@ The role provides numerous aliases for common operations:
 
 ### Git
 
+Shell aliases (most `g*` aliases come from the Oh My Zsh `git` plugin):
+
 - `gst` - git status
-- `glog` - git log --oneline --graph
-- `gtr` - git log --oneline --graph --all
+- `glog` - git log --oneline -10
+- `gtr` - git tr (the `tr` git alias: full colored graph of all refs)
+- `gr` - git remote -v update
+
+Git **config aliases** (`git <name>`) are deployed via `~/.gitconfig_managed`
+(see [Managed git config](#managed-git-config) below): `tr`, `s`, `co`, `ci`,
+`ca`, `amend`, `go`, `di`, `dm`, `fb`, `fc`, `fm`, `ft`, `l`, `lceb`, `reb`,
+`retag`, `remotes`, `branches`, `contributors`, `credit`, `tags`.
 
 ### Navigation
 
@@ -104,6 +112,31 @@ The role provides numerous aliases for common operations:
 - `cl` - clear screen and list files
 - `x` - exit
 - `reload` - reload zsh configuration
+- `clean` - recursively find and delete `.DS_Store` files (`find . -type f -name '*.DS_Store' -ls -delete`)
+
+## Managed git config
+
+The role deploys a curated git config to every target user as
+`~/.gitconfig_managed` (template: `templates/gitconfig.j2`, task:
+`tasks/git.yml`). It contains:
+
+- **Aliases** - the `git <name>` aliases listed in the [Git](#git) section,
+  mirrored from the maintainer's laptop (curated subset; joke/Mac-specific
+  aliases like `dad` and `p` are excluded).
+- **Portable config** - colors, `push.default=simple`, `push.followTags`,
+  `init.defaultBranch=main`, `help.autocorrect`, `merge.log`, `diff.renames`,
+  and whitespace handling.
+
+Mac-specific settings are intentionally **omitted** so git keeps working on the
+servers: the `diff-so-fancy` pager, `osxkeychain` credential helper, `gpg2`
+program, `git-lfs` filters, and pack tuning.
+
+The managed file is wired in via an `[include]` block appended to each user's
+`~/.gitconfig` (managed by `blockinfile`), so existing identity
+(`user.name` / `user.email`) and any other local settings are **preserved**,
+not overwritten. Disable with `shell_environment_git_config_enabled: false`.
+
+Run just this part: `make shell TAGS=gitconfig`.
 
 ## Customization
 

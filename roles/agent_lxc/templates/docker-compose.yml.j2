@@ -3,27 +3,66 @@
 # Monitoring stack + Syncthing — NanoClaw runs natively as a systemd user service
 
 services:
-  # syncthing:
-  #   image: syncthing/syncthing:{{ syncthing_version }}
-  #   container_name: syncthing
-  #   hostname: agent-lxc
-  #   restart: unless-stopped
-  #   environment:
-  #     - PUID=1000
-  #     - PGID=1000
-  #   volumes:
-  #     - /srv/apps/syncthing:/var/syncthing/config
-  #     - /srv/apps/nanoclaw:/var/syncthing/nanoclaw
-  #   ports:
-  #     - "8384:8384"
-  #     - "22000:22000/tcp"
-  #     - "22000:22000/udp"
-  #     - "21027:21027/udp"
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "10m"
-  #       max-file: "5"
+  relay:
+    image: ghcr.io/johnmathews/relay:{{ relay_version }}
+    container_name: relay
+    restart: unless-stopped
+    # Image's relay user is uid 10001; this override runs the container as
+    # the same uid:gid syncthing uses (PUID=1000), so the bind-mounted
+    # /srv/apps/relay/{data,.pi} directories are read/writable without a
+    # chown dance. Adjust if your LXC user differs.
+    user: "1000:1000"
+    ports:
+      - "7800:7800"
+    environment:
+      # RELAY_HOST=0.0.0.0 and PI_AGENT_SDK=1 are baked into the image
+      # ENV (ADR-51). Override RELAY_OTEL_EXPORT here if you wire up
+      # Langfuse on this LXC; see docs/observability.md in the relay
+      # repo.
+      RELAY_PORT: "7800"
+      # RELAY_OTEL_EXPORT: langfuse
+      # RELAY_LANGFUSE_HOST: http://host.docker.internal:3000
+      # RELAY_LANGFUSE_PUBLIC_KEY: pk-lf-...
+      # RELAY_LANGFUSE_SECRET_KEY: sk-lf-...
+    volumes:
+      # SQLite event store (the orchestrator's source of truth).
+      - /srv/apps/relay/data:/app/.relay
+      # Pi OAuth credential — populate once on the host before first
+      # `docker compose up`:
+      #   sudo -u "#1000" env PI_AGENT_SDK=1 HOME=/srv/apps/relay pi
+      # (completes OAuth in a browser, writes /srv/apps/relay/.pi/agent/auth.json)
+      - /srv/apps/relay/.pi:/home/relay/.pi
+      # Project trees relay will manage. Relay stores ABSOLUTE project
+      # paths in its DB and the in-container agent must see those same
+      # paths, so use identity bind mounts (host:container same path),
+      # NOT remapping into /workspace or similar. Add one entry per
+      # project root you want relay to drive. Common choices on this
+      # LXC: the syncthing tree (gets you everything synced from your
+      # workstation), or specific subdirs.
+      - /srv/apps/syncthing:/srv/apps/syncthing
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  syncthing:
+    image: syncthing/syncthing:{{ syncthing_version }}
+    container_name: syncthing
+    hostname: agent-lxc
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - STNOUPGRADE=1
+    volumes:
+      - /srv/apps/syncthing:/var/syncthing
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:{{ cadvisor_version }}

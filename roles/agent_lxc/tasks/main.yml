@@ -1,4 +1,3 @@
----
 
 - name: Create john user
   ansible.builtin.user:
@@ -17,6 +16,8 @@
   loop:
     - "{{ docker_compose_dir }}"
     - /srv/apps/alloy
+    - /srv/apps/relay/data
+    - /srv/apps/relay/.pi
 
 - name: Create syncthing config directory
   ansible.builtin.file:
@@ -25,6 +26,16 @@
     mode: '0755'
     owner: 1000
     group: 1000
+  tags: syncthing
+
+- name: Create syncthing folder roots
+  ansible.builtin.file:
+    path: "/srv/apps/syncthing/{{ item }}"
+    state: directory
+    mode: '0755'
+    owner: 1000
+    group: 1000
+  loop: "{{ syncthing_folders }}"
   tags: syncthing
 
 - name: Upload alloy config
@@ -39,14 +50,15 @@
   notify:
     - Restart alloy
 
-- name: Upload syncthing .stignore
+- name: Upload syncthing .stignore to each synced folder
   ansible.builtin.template:
     src: templates/syncthing-stignore.j2
-    dest: /srv/apps/nanoclaw/.stignore
+    dest: "/srv/apps/syncthing/{{ item }}/.stignore"
     owner: 1000
     group: 1000
     mode: '0644'
   become: true
+  loop: "{{ syncthing_folders }}"
   tags: syncthing
 
 - name: Deploy nanoclaw .env file from template

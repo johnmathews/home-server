@@ -1,0 +1,29 @@
+---
+# Deploy managed git config (aliases + portable defaults) per user.
+# The managed file is included from each user's ~/.gitconfig so that
+# existing identity (user.name / user.email) and any local settings
+# are preserved.
+
+- name: Deploy managed git config (aliases + portable defaults)
+  ansible.builtin.template:
+    src: gitconfig.j2
+    dest: "{{ item.split(':')[1] }}/.gitconfig_managed"
+    owner: "{{ item.split(':')[0] }}"
+    group: "{{ item.split(':')[0] }}"
+    mode: '0644'
+  loop: "{{ target_shell_users }}"
+  become: true
+
+- name: Include managed git config from each user's ~/.gitconfig
+  ansible.builtin.blockinfile:
+    path: "{{ item.split(':')[1] }}/.gitconfig"
+    create: true
+    owner: "{{ item.split(':')[0] }}"
+    group: "{{ item.split(':')[0] }}"
+    mode: '0644'
+    marker: "# {mark} ANSIBLE MANAGED - shell_environment git include"
+    block: |
+      [include]
+      	path = ~/.gitconfig_managed
+  loop: "{{ target_shell_users }}"
+  become: true

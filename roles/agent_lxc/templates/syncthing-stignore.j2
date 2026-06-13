@@ -1,7 +1,9 @@
-node_modules
-dist
-.git
-data/sessions
-logs
-store
-*.lock
+// Managed by Ansible (roles/agent_lxc). Keep in sync with the MacBook-side
+// .stignore in ~/projects/syncthing/agent-lxc/<folder>/.stignore — mismatched
+// ignores cause "directory has been deleted on a remote device but is not
+// empty" warnings.
+// (?d) lets Syncthing delete these items when removing a parent directory.
+(?d).DS_Store
+(?d)node_modules
+(?d).venv
+(?d)__pycache__

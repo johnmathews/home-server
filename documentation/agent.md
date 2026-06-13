@@ -149,7 +149,7 @@ NanoClaw itself was installed manually and is managed as a systemd user service 
 +-----------------+--------+--------------------------------------------------+
 | mkdocs-journal  | 8000   | NanoClaw dev journal (MkDocs Material)            |
 | mkdocs-docs     | 8001   | NanoClaw documentation (MkDocs Material)          |
-| syncthing       | 8384   | File sync (nanoclaw data)                        |
+| syncthing       | 8384   | File sync with MacBook (dev folders)             |
 | cadvisor        | 18080  | Container resource metrics                       |
 | alloy           | 12345  | Log aggregation -> Loki (192.168.2.106:3100)      |
 | node_exporter   | 9100   | Host-level Prometheus metrics                    |
@@ -175,6 +175,31 @@ NanoClaw itself was installed manually and is managed as a systemd user service 
 | NanoClaw Gateway| 18790  | Bound to 0.0.0.0, systemd user service           |
 +-----------------+--------+--------------------------------------------------+
 ```
+
+### Syncthing
+
+Syncthing (host network mode, GUI on `:8384`) syncs dev folders between the LXC and the MacBook
+(device "MacBook Pro"). Folder roots live under `/srv/apps/syncthing/` (`horizons`, `relay`,
+`meeting-assistant`, `screenshots`), mounted into the container at `/var/syncthing`. The folder
+list is the `syncthing_folders` variable in `roles/agent_lxc/defaults/main.yml`.
+
+**Ignore patterns:** every synced folder gets the same `.stignore`
+(`roles/agent_lxc/templates/syncthing-stignore.j2`): `.DS_Store`, `node_modules`, `.venv`,
+`__pycache__`, all with the `(?d)` prefix so Syncthing may delete them when removing a parent
+directory. The MacBook side must carry the **same** patterns
+(`~/projects/syncthing/agent-lxc/<folder>/.stignore`) — mismatched ignores cause persistent
+`Failed to sync ... directory has been deleted on a remote device but is not empty` warnings
+(this happened with Claude worktrees containing `node_modules`/`.venv`; thousands of warnings
+per week until ignores were aligned on 2026-06-10).
+
+**Known log noise (benign):**
+
+- `Failed to acquire open port ... NAT-PMP@192.168.2.1 ... connection refused` — the MikroTik
+  does not run NAT-PMP/UPnP. Harmless; both devices connect directly over the LAN. Silence it by
+  disabling NAT traversal (GUI: Actions → Settings → Connections → uncheck "Enable NAT
+  traversal", or `syncthing cli ... config options nat-enabled set false` inside the container).
+- `Failed to exchange Hello messages (device=VI7EDPA... error=EOF)` — the MacBook went to sleep
+  mid-handshake. Resolves itself when the laptop wakes; not actionable.
 
 ### MkDocs documentation sites
 

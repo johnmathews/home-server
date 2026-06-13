@@ -76,6 +76,7 @@ alias x='exit'
 alias reload='exec $SHELL -l'
 alias readme='vi readme.md'
 alias todo="grep -rHn 'TODO' --exclude='*.{.pyc,.swp,}' --exclude-dir={.git,htmlcov,}"
+alias clean="find . -type f -name '*.DS_Store' -ls -delete"
 
 # History and jobs
 alias shi='history'

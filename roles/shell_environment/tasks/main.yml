@@ -8,10 +8,12 @@
     executable: /bin/bash
   register: shell_users_raw
   changed_when: false
+  tags: [always]
 
 - name: Set target users (explicit + discovered, deduplicated)
   ansible.builtin.set_fact:
     target_shell_users: "{{ ((shell_environment_shell_users + (shell_users_raw.stdout_lines | default([]))) | reject('equalto', '') | select('match', '^[^:]+:[^:]+:[^:]+$') | list | unique) }}"
+  tags: [always]
 
 - name: Install shell environment prerequisites
   ansible.builtin.apt:
@@ -79,6 +81,11 @@
 - name: Configure shell integration
   ansible.builtin.import_tasks: shell-integration.yml
   tags: [integration, shell]
+
+- name: Deploy git config (aliases + portable defaults)
+  ansible.builtin.import_tasks: git.yml
+  when: shell_environment_git_config_enabled | bool
+  tags: [gitconfig, aliases, shell]
 
 - name: Install additional CLI tools and configurations
   ansible.builtin.import_tasks: apps.yml
