@@ -25,7 +25,7 @@
     state: present
   tags: paperless
 
-- name: Create base app directories for containers
+- name: Create container config directories (root-owned)
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
@@ -33,13 +33,26 @@
     owner: root
     group: root
   loop:
-    - /srv/apps/paperless/data
-    - /srv/apps/paperless/pgdata
-    - /srv/apps/paperless/redisdata
     - /srv/apps/alloy
     - /srv/apps/promtail
-    - /srv/apps/library/pgdata
-  tags: docker
+  tags: [docker, paperless]
+
+- name: Create data directories with container-managed ownership
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ item.owner }}"
+    group: "{{ item.group | default(0) }}"
+    mode: "{{ item.mode }}"
+  loop:
+    # paperless app data — owned by the paperless app uid (puid)
+    - {path: /srv/apps/paperless/data, owner: "{{ puid }}", group: "{{ pgid }}", mode: '0755'}
+    # postgres data dirs — uid 999 inside the image, must be 0700
+    - {path: /srv/apps/paperless/pgdata, owner: 999, mode: '0700'}
+    - {path: /srv/apps/library/pgdata, owner: 999, mode: '0700'}
+    # redis data — uid 999
+    - {path: /srv/apps/paperless/redisdata, owner: 999, mode: '0755'}
+  tags: [docker, paperless]
 
 # No mode here: the TrueNAS NFSv4 ACLs reject chmod (EPERM) — chown works.
 - name: Create library data directories on the NFS share (owned by the image's app uid)
@@ -52,20 +65,6 @@
     - /mnt/nfs/paperless/library
     - /mnt/nfs/paperless/library-consume
   tags: library
-
-- name: Ensure correct directory ownership
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: directory
-    owner: 999
-    group: 999
-    mode: '0700'
-  notify: Restart all containers
-  tags: paperless
-  loop:
-    - /srv/apps/paperless/data
-    - /srv/apps/paperless/pgdata
-    - /srv/apps/paperless/redisdata
 
 # not needed - only the other clients need the SMB share. the LXC can use only the NFS share
 - name: Create smb share
@@ -89,9 +88,7 @@
     group: "{{ guid }}"
     mode: '0644'
   loop:
-    - alloy:
-      src: templates/config.alloy
-      dest: /srv/apps/alloy/config.alloy
+    - {src: templates/config.alloy, dest: /srv/apps/alloy/config.alloy}
   become: true
   tags: alloy
   notify: Restart alloy
@@ -111,8 +108,6 @@
     name: "paperless consumer health check"
     minute: "*/5"
     job: >-
-      [ $(docker exec paperless-webserver find /usr/src/paperless/consume -type f -mmin +5 2>/dev/null | wc -l) -gt 0 ]
-      && [ $(docker logs --since 10m paperless-webserver 2>&1 | grep -c 'paperless.consumer') -eq 0 ]
-      && docker exec paperless-webserver s6-svc -r /run/service/svc-consumer/
+      [ $(docker exec paperless-webserver find /usr/src/paperless/consume -type f -mmin +5 2>/dev/null | wc -l) -gt 0 ] && [ $(docker logs --since 10m paperless-webserver 2>&1 | grep -c 'paperless.consumer') -eq 0 ] && docker exec paperless-webserver s6-svc -r /run/service/svc-consumer/
     user: root
   tags: consumer-health
