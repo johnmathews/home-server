@@ -71,7 +71,7 @@ services:
   # stopped nightly by sleep_hours, and Library's web app must stay up.
   library-db:
     container_name: library-db
-    image: docker.io/library/postgres:17
+    image: pgvector/pgvector:pg17
     restart: always
     volumes:
       - "{{ docker_compose_dir }}/library/pgdata:/var/lib/postgresql/data"
@@ -99,6 +99,21 @@ services:
         condition: service_healthy
     restart: "no"
 
+  # Local bge-m3 embeddings for semantic Ask (docs/ask.md). CPU inference;
+  # downloads the model (~2 GB) into embedder-cache on first start.
+  library-embedder:
+    container_name: library-embedder
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.7
+    restart: always
+    # Small batch token budget: we embed page-sized chunks, so the default
+    # 16384 is needless and its warmup allocation OOMs on a shared 8 GB host.
+    command: ["--model-id", "BAAI/bge-m3", "--auto-truncate", "--max-batch-tokens", "2048"]
+    mem_limit: 6g
+    environment:
+      TZ: ${TZ}
+    volumes:
+      - "{{ docker_compose_dir }}/library/embedder-cache:/data"
+
   library-webserver:
     container_name: library-webserver
     image: ghcr.io/johnmathews/library:{{ library_version }}
@@ -109,6 +124,8 @@ services:
     environment:
       LIBRARY_DATABASE_URL: postgresql+asyncpg://library:${LIBRARY_DB_PASSWORD}@library-db:5432/library
       LIBRARY_DATA_DIR: /data
+      LIBRARY_EMBEDDING_SERVICE_URL: http://library-embedder:80
+      LIBRARY_ANTHROPIC_API_KEY: "{{ vault_library_anthropic_api_key }}"
     volumes:
       - "/mnt/nfs/paperless/library:/data"
     depends_on:
@@ -116,6 +133,8 @@ services:
         condition: service_healthy
       library-migrate:
         condition: service_completed_successfully
+      library-embedder:
+        condition: service_started
     healthcheck:
       # curl is not in the slim image; the stdlib is.
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz')"]
@@ -136,6 +155,8 @@ services:
       LIBRARY_CONSUME_DIR: /consume
       # The consume dir is an NFS mount; inotify does not cross it.
       LIBRARY_CONSUME_FORCE_POLLING: "true"
+      LIBRARY_EMBEDDING_SERVICE_URL: http://library-embedder:80
+      LIBRARY_ANTHROPIC_API_KEY: "{{ vault_library_anthropic_api_key }}"
     volumes:
       - "/mnt/nfs/paperless/library:/data"
       - "/mnt/nfs/paperless/library-consume:/consume"
@@ -144,6 +165,8 @@ services:
         condition: service_healthy
       library-migrate:
         condition: service_completed_successfully
+      library-embedder:
+        condition: service_started
 
   node_exporter:
     image: quay.io/prometheus/node-exporter:{{ node_exporter_version }}

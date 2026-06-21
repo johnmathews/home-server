@@ -58,8 +58,22 @@ loki.process "drop_logs" {
     drop_counter_reason = "too_old"
   }
 
+
+
+	// Drop cosmetic Syncthing LAN connection-race warnings. These are the
+	// loser side of simultaneous mutual dials (IPv4 + IPv6 link-local) and
+	// fire while the peer IS online — not a connectivity problem.
+	stage.match {
+		selector = "{container=\"syncthing\"}"
+		stage.drop {
+			expression          = "Failed to exchange Hello messages|Failed TLS handshake"
+			drop_counter_reason = "syncthing_conn_noise"
+		}
+	}
+
   forward_to = [loki.process.normalize.receiver]
 }
+
 
 loki.process "normalize" {
   // 1) try logfmt first (e.g., "level=INFO")
