@@ -40,6 +40,52 @@ make site          # Execute full provisioning
 - `SKIP=tagname` or `s=tagname` — skip specific tag
 - `LIMIT=hostname` or `l=hostname` — limit to one host
 
+## Deployment Model
+
+**Everything is deployed by Ansible. Never hand-edit config on a host — it gets overwritten on the next run.**
+
+The naming convention ties the whole repo together. For a host like `paperless_lxc`:
+
+```
+make paperless  ->  playbooks/paperless_lxc.yml  ->  roles/paperless_lxc/  ->  host paperless_lxc
+```
+
+`make <target>` runs one playbook, which imports one (sometimes more) role. Target names are
+abbreviated (`make jelly`, `make tube`, `make media`); the playbook and role keep the full name. Run
+`grep -E '^[a-z_-]+:' makefile` to see every target, or read `documentation/ansible_build_commands.md`
+for targets + common tags.
+
+**Docker services follow one pattern.** Dockerized hosts have
+`roles/<host>/templates/docker-compose.yml.j2` (and usually `.env.j2`). On `make <host>`, Ansible
+renders these into the host's compose dir and a handler/task runs `docker compose up -d` to apply the
+change. So:
+
+- To change a container (image, env, ports, volumes), edit the role's `docker-compose.yml.j2` / `.env`
+  vars, then `make <host>` — do **not** `ssh` in and edit the compose file directly.
+- Vars come from `group_vars/all/`, `host_vars/<host>/`, and Ansible Vault (secrets — see
+  `documentation/vault.md`).
+- `roles/paperless_lxc` is a good reference for the template-then-restart shape.
+
+**VMs vs LXCs.** Hosts ending in `_vm` (`nas_vm`, `media-vm`, `infra-vm`, `mailcow-vm`) are full VMs;
+`*_lxc` are LXC containers; `pve` is the Proxmox host itself and `pbs` the backup server. LXCs are
+defined/managed on `pve`. The distinction matters when investigating: you SSH to the guest for its
+services, but to `pve` for guest lifecycle (start/stop/config).
+
+## Investigating Live State
+
+Prefer the connected MCP servers over ad-hoc SSH when answering "what's happening" questions — they're
+faster and read-only:
+
+- **`sre-agent` MCP** — Proxmox guest list/config (`proxmox_*`), Loki logs (`loki_query_logs`),
+  Prometheus metrics (`prometheus_*`), TrueNAS (`truenas_*`), PBS backups (`pbs_*`), Grafana
+  (`grafana_*`), and `runbook_search`. Use this first to inspect logs, metrics, and host/guest status.
+- **`docs` MCP** — searchable index of this project's docs and journals (`search_docs`, `query_docs`).
+  Use for "how does X work / why was Y done" before grepping files.
+
+When you do need a shell, SSH via the aliases below (`ssh <host>`), then the usual `docker compose ps`,
+`docker compose logs`, `journalctl -u <svc>`, `systemctl status`. Note NanoClaw runs as a **user**
+systemd unit — use `systemctl --user` on the agent host (see `documentation/agent.md`).
+
 ## Code Style Guidelines
 
 - **YAML formatting**: Follow `.ansible-lint` warn_list (trailing spaces, empty lines, line-length)
