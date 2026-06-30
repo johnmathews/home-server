@@ -57,7 +57,7 @@ services:
         hard: 65536
 
   alloy:
-    image: grafana/alloy:v1.5.1
+    image: grafana/alloy:v1.17.1
     container_name: alloy
     restart: unless-stopped
     environment:
@@ -89,7 +89,7 @@ services:
         max-file: "5"
 
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    image: gcr.io/cadvisor/cadvisor:v0.55.1
     container_name: cadvisor
     restart: always
     ports:
@@ -110,7 +110,7 @@ services:
         max-file: "5"
 
   node_exporter:
-    image: quay.io/prometheus/node-exporter:v1.8.2
+    image: quay.io/prometheus/node-exporter:v1.11.1
     container_name: node_exporter
     command:
       - '--path.rootfs=/host'
