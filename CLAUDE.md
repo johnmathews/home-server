@@ -142,6 +142,7 @@ Service-specific guides in `/documentation/`. Read the relevant doc before worki
 - `domain-migration.md` — Migration plan from itsa.pizza to itsa-pizza.com (multi-session project)
 - `docserver.md` — Documentation MCP server on infra VM (indexing, search, MCP)
 - `disks.md` — Proxmox host disk management and backup storage
+- `home-assistant-doorbell.md` — Reolink doorbell two-way audio via go2rtc + WebRTC in Home Assistant
 - `immich_lxc.md` — Immich photo management, Docker stack, NFS mounts, ML, mobile app
 - `index.md` — Top-level project overview and conventions
 - `infra_vm.md` — Infrastructure VM services (Grafana, Loki, Homepage, Portainer, Atuin, etc.)
