@@ -23,7 +23,19 @@ Everything about the Reolink video doorbell at the front door — what it does, 
 
 Open Home Assistant → **Doorbell** in the left sidebar (the 🔔 icon). Live video starts immediately.
 
-- **Hearing sound:** in the phone app it usually plays automatically. In a desktop browser, autoplay rules may start the video muted — click the speaker icon once, or permanently allow sound for the Home Assistant site (Chrome: click the icon left of the address bar → Site settings → Sound → Allow. Firefox: same menu → Autoplay → Allow Audio and Video). After that it always opens with sound.
+- **Hearing sound:** every browser starts videos **muted** until you've given that
+  site a one-time sound permission — this is a browser privacy rule that Home
+  Assistant cannot override. Do this once per device on the address you actually
+  use (`https://home.johnmathews.is`):
+  - **Chrome:** click the tune/lock icon left of the address bar → Site settings →
+    **Sound → Allow**.
+  - **Firefox:** click the permissions icon left of the address bar →
+    **Autoplay → Allow Audio and Video** (or Settings → Privacy & Security →
+    Autoplay → manage exceptions).
+  - **iPhone app:** iOS gives no permanent setting — tap the **speaker icon** on
+    the video's control bar once per viewing. It's always visible at the bottom of
+    the card.
+  After the desktop permission is set, the video opens with sound every time.
 - **Your microphone is always off** unless Talk mode is on. With Talk mode off, the microphone-enabled player isn't even loaded, so the browser releases the mic completely (no recording indicator). You can watch and listen without the doorbell broadcasting anything from inside the house.
 
 ### Good to know
@@ -94,18 +106,12 @@ views:
  - title: Doorbell
    icon: mdi:doorbell-video
    cards:
-    - type: conditional # default: listen-only, mic never opened
-      conditions:
-       - condition: state
-         entity: input_boolean.doorbell_talk_mode
-         state: "off"
-      card:
-       type: custom:webrtc-camera
-       url: doorbell # go2rtc stream name, NOT the Reolink entity
-       media: video,audio
-       muted: false # start unmuted where the client allows it
-       title: Front Door
-    - type: conditional # talk mode: mic-enabled card mounts
+    - type: custom:webrtc-camera # ALWAYS mounted - never reloads on talk toggle
+      url: doorbell # go2rtc stream name, NOT the Reolink entity
+      media: video,audio
+      ui: true # card's own control bar (persistent volume button)
+      title: Front Door
+    - type: conditional # talk mode: separate SEND-ONLY mic session mounts
       conditions:
        - condition: state
          entity: input_boolean.doorbell_talk_mode
@@ -113,9 +119,8 @@ views:
       card:
        type: custom:webrtc-camera
        url: doorbell
-       media: video,audio,microphone
-       muted: false
-       title: Front Door — TALKING
+       media: microphone
+       title: 🎤 Microphone live — you are transmitting
     - type: tile
       entity: input_boolean.doorbell_talk_mode
       name: Talk mode (microphone)
@@ -129,7 +134,20 @@ views:
        action: more-info # long-press still opens details
 ```
 
-The conditional-card pattern (not a mute button) is deliberate: with talk mode off, the mic-requesting player is unmounted entirely and the browser releases the microphone.
+Design rationale:
+
+- **The video card is unconditional** so toggling talk mode never remounts it. (An
+  earlier design swapped two conditional video cards; every remount reset the
+  browser's mute state.) The mic runs as a **second, send-only go2rtc session**
+  (`media: microphone`) that mounts/unmounts with the toggle — unmounting fully
+  releases the browser microphone, which is why this is a conditional card and not
+  a mute button.
+- **Mute/autoplay semantics** (from the card source): the player starts unmuted
+  and *auto-mutes itself* when the browser rejects unmuted autoplay
+  (`play().catch(() => video.muted = true)`). The card's `muted:` option is
+  mute-only — `muted: false` does nothing. Sound-on-open therefore depends
+  entirely on the per-site browser permission (see "How to use it"); there is no
+  server-side setting.
 
 - **Helper**: `input_boolean.doorbell_talk_mode`. NOTE: this is a persistent,
   house-wide switch, not a per-visit default — if left on it stays on for everyone.
@@ -154,7 +172,9 @@ siren.front_door_siren                    doorbell siren
 - **No mic icon in talk mode** — you are on plain HTTP (secure-context block), or mic permission was denied for the site.
 - **Card badge shows MSE instead of RTC** — WebRTC failed to negotiate; check `nc -z 192.168.2.102 8555` from the client and the `webrtc.candidates` block.
 - **Distorted/robotic talkback audio** — change the ffmpeg line to a single codec: `ffmpeg:doorbell#audio=pcma`.
-- **No sound on desktop until clicked** — browser autoplay policy; allow sound for the HA site (see "How to use it" above).
+- **Video starts muted** — browser autoplay policy (per device, per site); grant
+  the sound/autoplay permission for `https://home.johnmathews.is` (see "How to use
+  it" above). On iOS there is no permission — one tap on the speaker icon.
 - **"stream not found"** — the WebRTC integration spun up its own go2rtc instead of reusing HA's built-in one; point it at the built-in instance.
 - **Inspect live state** (read-only, no auth): `curl http://192.168.2.102:1984/api/streams | jq .`
 

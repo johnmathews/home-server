@@ -49,3 +49,18 @@ title: Front Door
   unmuted. Browser autoplay policy still wins where it applies: Firefox needs the
   per-site Autoplay → "Allow Audio and Video" permission; the iOS companion app
   needs one tap on the speaker icon per stream start.
+
+## Phase 4 (same day): no-reload talk toggle + mute truth
+
+- User noticed toggling talk mode reloaded the video card (conditional-card swap
+  remounts the player, which resets to muted). Redesigned: the video card is now
+  **unconditional** (never remounts); talk mode mounts a separate **send-only mic
+  card** (`media: microphone`) — a second go2rtc session on the same stream.
+- Read the card source (webrtc-camera.js / video-rtc.js): the player starts
+  unmuted and auto-mutes on `play()` rejection; the `muted:` config option is
+  mute-only, so the earlier `muted: false` was a no-op (corrected in docs).
+  Sound-on-open is purely a per-site browser permission: Chrome Site settings →
+  Sound → Allow; Firefox Autoplay → Allow Audio and Video (on
+  `https://home.johnmathews.is`); iOS has no permission, one tap required.
+- Added `ui: true` to the video card for a persistent control bar with a
+  one-tap volume button (helps iOS especially).
