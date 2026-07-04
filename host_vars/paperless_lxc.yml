@@ -2,12 +2,17 @@ nfs_shares:
   - name: paperless
     mountpoint: /mnt/nfs/paperless
     target: /mnt/tank/paperless
+  - name: document-store
+    mountpoint: /mnt/nfs/document-store
+    target: /mnt/tank/document-store
 
 # even though the paperless lxc doesnt need the smb share itself, we can still toggle 
 # it off during quiet hours to avoid other clients waking up truenas HDDs.
 smb_shares:
   - name: paperless
     target: /mnt/paperless
+  - name: document-store
+    target: /mnt/document-store
 
 # NFS/SMB share control: During quiet hours, shares are automatically disabled
 # before pausing/stopping containers, then re-enabled after resuming/starting.

@@ -127,7 +127,7 @@ services:
       LIBRARY_EMBEDDING_SERVICE_URL: http://library-embedder:80
       LIBRARY_ANTHROPIC_API_KEY: "{{ vault_library_anthropic_api_key }}"
     volumes:
-      - "/mnt/nfs/paperless/library:/data"
+      - "/mnt/nfs/document-store/data:/data"
     depends_on:
       library-db:
         condition: service_healthy
@@ -158,8 +158,8 @@ services:
       LIBRARY_EMBEDDING_SERVICE_URL: http://library-embedder:80
       LIBRARY_ANTHROPIC_API_KEY: "{{ vault_library_anthropic_api_key }}"
     volumes:
-      - "/mnt/nfs/paperless/library:/data"
-      - "/mnt/nfs/paperless/library-consume:/consume"
+      - "/mnt/nfs/document-store/data:/data"
+      - "/mnt/nfs/document-store/consume:/consume"
     depends_on:
       library-db:
         condition: service_healthy

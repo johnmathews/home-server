@@ -54,16 +54,22 @@
     - {path: /srv/apps/paperless/redisdata, owner: 999, mode: '0755'}
   tags: [docker, paperless]
 
-# No mode here: the TrueNAS NFSv4 ACLs reject chmod (EPERM) — chown works.
-- name: Create library data directories on the NFS share (owned by the image's app uid)
+# Owner only — no mode, no group. The document-store dataset uses NFSv4 ACLs
+# (Multiprotocol preset), which reject chmod AND chgrp over NFS (EPERM); only
+# chown succeeds. Setting owner=999 (the library image's `app` uid) is
+# sufficient: the containers write as uid 999, so owning the dir with the
+# default 0755 (owner rwx) is all they need. SMB/iPhone access is granted
+# separately via the dataset's NFSv4 ACL in the TrueNAS UI, not via unix group.
+# Library app data lives on its own document-store dataset — NOT the paperless
+# dataset and NOT the media `library` dataset.
+- name: Create library data directories on the document-store NFS share (owned by the image's app uid)
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     owner: 999
-    group: 999
   loop:
-    - /mnt/nfs/paperless/library
-    - /mnt/nfs/paperless/library-consume
+    - /mnt/nfs/document-store/data
+    - /mnt/nfs/document-store/consume
   tags: library
 
 # not needed - only the other clients need the SMB share. the LXC can use only the NFS share
