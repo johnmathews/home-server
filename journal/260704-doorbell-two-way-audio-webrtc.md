@@ -44,4 +44,24 @@ title: Front Door
   dashboard was less invasive.
 - The card must reference the go2rtc stream name (`url: doorbell`), not the Reolink
   integration's camera entity — the auto-generated stream lacks the backchannel.
-- Full write-up: `documentation/home-assistant-doorbell.md`.
+
+## Phase 2 (same day): notifications + mic-off-by-default
+
+- Created `automation.doorbell_pressed_notify_phones`: on
+  `binary_sensor.front_door_visitor` press, parallel push (with camera snapshot,
+  time-sensitive, tap opens `/front-door`) to both phones. Created via
+  `POST /api/config/automation/config/<id>`; test-fired successfully.
+- Reworked the Doorbell dashboard for privacy: `input_boolean.doorbell_talk_mode`
+  gates two conditional cards — default is a listen-only card
+  (`media: video,audio`); toggling talk mode unmounts it and mounts a
+  mic-enabled card (`media: video,audio,microphone`). Unmounting fully releases
+  the browser microphone (better than a mute button).
+- Speaker audio "on by default" is limited by browser autoplay policy on desktop —
+  fix is allowing sound for the HA site in browser site settings; companion app
+  plays sound automatically.
+- Talkback delay ~1–2 s is the doorbell firmware's jitter buffer; the outgoing
+  audio path has no transcode hop (browsers speak PCMA/PCMU natively in WebRTC),
+  so nothing to tune server-side.
+- The RF-paired Reolink chime rings independently of HA/network — unaffected.
+- Full write-up: `documentation/doorbell.md` (supersedes
+  `home-assistant-doorbell.md`, now in `documentation/archive/`).
