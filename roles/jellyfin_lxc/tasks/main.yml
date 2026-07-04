@@ -88,7 +88,7 @@
     owner: root
     group: root
     mode: '0644'
-  notify: Restart docker
+  notify: Rebuild jellyfin image
   tags: docker
 
 - name: Copy Docker Compose file

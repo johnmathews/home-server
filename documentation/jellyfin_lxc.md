@@ -137,9 +137,11 @@ media info; the file itself had been in the library (corrupt) since 2025-10.
    ffprobe falls back to a sane path and completes with full valid JSON in seconds (verified on
    the bad file and 486 swept files; a 4K remux probes fine through it). The wrapper converts any
    future balloon into a graceful completion **with metadata saved**, so no retry loop can form.
-   `ffmpeg` itself is not wrapped (transcodes legitimately need memory). Rebuild after changing:
-   `make jelly TAGS=docker`, then `ssh jelly "cd /srv/apps && docker compose build jellyfin && docker compose up -d jellyfin"`
-   (the Ansible handler recreates containers but does not rebuild images).
+   `ffmpeg` itself is not wrapped (transcodes legitimately need memory). Dockerfile changes are
+   applied by `make jelly` — the "Copy dockerfile" task notifies the "Rebuild jellyfin image"
+   handler (`build: always`, added 2026-07-04), which rebuilds and recreates the container.
+   The rebuild reuses the locally cached base image (`pull: never`), so it can't silently
+   upgrade Jellyfin; it does refresh yt-dlp (ADD-from-URL layer).
 
 **Diagnosis recipe for "Jellyfin down N minutes, self-recovered":** check pve journal for memcg OOM
 kills first. To catch a runaway live:

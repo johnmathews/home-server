@@ -1,5 +1,22 @@
 ---
 
+# Rebuild the custom jellyfin image when the dockerfile changes. Listed before
+# "Restart docker" so a combined dockerfile+compose change builds first. Without
+# this, a dockerfile change deploys the file but never takes effect (compose
+# recreate does not rebuild). pull: never keeps the locally cached base image,
+# so a rebuild cannot silently upgrade Jellyfin. Note: the ADD <url> yt-dlp layer
+# re-downloads on rebuild, so yt-dlp refreshes to latest as a side effect.
+- name: Rebuild jellyfin image
+  community.docker.docker_compose_v2:
+    project_src: "{{ docker_compose_dir }}"
+    services:
+      - jellyfin
+    state: present
+    build: always
+    recreate: always
+    pull: never
+  become: false
+
 - name: Restart docker
   community.docker.docker_compose_v2:
     project_src: "{{ docker_compose_dir }}"
