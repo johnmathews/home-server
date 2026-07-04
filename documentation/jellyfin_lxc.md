@@ -2,24 +2,30 @@
 
 - IP: 192.168.2.110
 - SSH: `ssh jelly`
-- Ansible: `make jellyfin`, role: `roles/jellyfin_lxc`
-- LXC config: 8 CPU cores, 4096 MB RAM
+- Ansible: `make jelly`, role: `roles/jellyfin_lxc`
+- LXC config: 12 CPU cores, 6144 MB RAM (was 4 GB; raised ~2026-06-28)
 - Docker compose: `roles/jellyfin_lxc/files/docker-compose.yml`
 
 ## Containers
 
-| Container     | Port  | Image                                   |
-|---------------|-------|-----------------------------------------|
-| jellyfin      | 8096  | jellyfin-with-yt-dlp:latest (custom)    |
-| alloy         | 12345 | grafana/alloy:latest                    |
-| cadvisor      | 18080 | gcr.io/cadvisor/cadvisor:latest         |
-| node_exporter | 9100  | quay.io/prometheus/node-exporter:latest |
-| portainer_agent|      | portainer/agent:latest                  |
+| Container     | Port  | Image                                    |
+|---------------|-------|------------------------------------------|
+| jellyfin      | 8096  | jellyfin-with-yt-dlp:latest (custom)     |
+| alloy         | 12345 | grafana/alloy:v1.5.1                     |
+| cadvisor      | 18080 | gcr.io/cadvisor/cadvisor:v0.49.1         |
+| node_exporter | 9100  | quay.io/prometheus/node-exporter:v1.8.2  |
+| portainer_agent|      | portainer/agent:latest                   |
+
+The jellyfin container runs with `mem_limit: 4g` / `mem_reservation: 1g` — **the limit must stay
+below the LXC's 6 GB** (see the ffprobe OOM brownout section for why). The sidecars are capped
+too (alloy/cadvisor 512m, node_exporter 128m; ~10× their typical usage) so no single container
+can starve the LXC.
 
 ## Jellyfin version
 
-As of 2026-03-17: **Jellyfin 10.11.2** (latest is 10.11.6). Uses `jellyfin/jellyfin:latest`
-base image with yt-dlp added via custom Dockerfile.
+As of 2026-07-04: **Jellyfin 10.11.7** (image built 2026-04-01 from `jellyfin/jellyfin:latest`
+with yt-dlp added via custom Dockerfile — the tag is `latest`, so the actual version only moves
+when the image is rebuilt).
 
 ## NFS media mounts
 
@@ -30,10 +36,15 @@ base image with yt-dlp added via custom Dockerfile.
 /mnt/nfs/youtube-kids→ /youtube-kids   (read-only, TubeArchivist library)
 ```
 
-## Libraries (15 total)
+## Libraries (18 total)
 
-Collections, Create, Gym, Humanity, Kids Movies, Kids Shows, Kids Youtube,
-Math + Engineering, Movies, Music, Our Movies, Shows, Sport, Travel, YouTube.
+Collections, Create, Gym, Heavy Club Basics, Heavy Club Exercise Tutorials, Humanity,
+Kettlebell Compilations, Kids Movies, Kids Shows, Kids Youtube, Math + Engineering, Movies,
+Our Movies, Shows, Sport, Travel, Turkish Get-Up, Ukraine Lectures.
+
+The five club/kettlebell/Ukraine libraries were added 2026-07-01, each pointing at a
+`/movies/youtube/<subdir>` path. **New libraries default to real-time monitoring ON** — turn it
+off when creating NFS-backed libraries (see below).
 
 Library configs: `/srv/apps/jellyfin/appdata/root/default/<name>/options.xml`
 
@@ -45,11 +56,14 @@ Library configs: `/srv/apps/jellyfin/appdata/root/default/<name>/options.xml`
 - Subtitle Extract
 - TMDb Box Sets
 - TubeArchivistMetadata (+ Kids variant)
-- YouTube Metadata (two versions installed: 1.0.3.12 and 1.0.3.15)
+- YouTube Metadata (single version `1.0.3.15`; the duplicate-folder landmine was cleaned 2026-07-01)
 
 ## Real-time library monitoring (disabled)
 
-**Status:** Disabled on all 14 NFS-backed libraries. Enabled only on Collections (local disk).
+**Status:** Disabled on all 17 NFS-backed libraries. Enabled only on Collections (local disk).
+(Drift note: the 5 libraries added 2026-07-01 + Create were created with monitoring ON — Jellyfin's
+default for new libraries — and were switched off 2026-07-04. Check for drift after adding any
+library.)
 
 **Why:** Jellyfin 10.11.x has a regression where `FileSystemWatcher` on NFS causes ~11% idle
 CPU. inotify doesn't work on NFS anyway — the watchers just poll uselessly. This is a known
@@ -62,15 +76,16 @@ new/changed media. Note the schedule is currently **7×/day** (09/11/13/15/17/19
 **Config location:** `<EnableRealtimeMonitor>false</EnableRealtimeMonitor>` in each library's
 `options.xml` at `/srv/apps/jellyfin/appdata/root/default/<library>/options.xml`.
 
-**To re-enable** (e.g. if a future Jellyfin version fixes the regression):
+**To toggle for all libraries except Collections** (works regardless of which libraries exist;
+flip true/false as needed — run with the container stopped so Jellyfin doesn't rewrite the files):
 ```bash
 ssh jelly
-for lib in Create Gym Humanity 'Kids Movies' 'Kids Shows' 'Kids Youtube' \
-  'Math + Engineering' Movies Music 'Our Movies' Shows Sport Travel YouTube; do
-  sed -i 's|<EnableRealtimeMonitor>false|<EnableRealtimeMonitor>true|' \
-    "/srv/apps/jellyfin/appdata/root/default/$lib/options.xml"
+cd /srv/apps && docker compose stop jellyfin
+for f in /srv/apps/jellyfin/appdata/root/default/*/options.xml; do
+  case "$f" in */Collections/*) continue ;; esac
+  sed -i 's|<EnableRealtimeMonitor>true|<EnableRealtimeMonitor>false|' "$f"
 done
-docker restart jellyfin
+docker compose start jellyfin
 ```
 
 **To verify current state:**
@@ -78,7 +93,64 @@ docker restart jellyfin
 ssh jelly "grep EnableRealtimeMonitor /srv/apps/jellyfin/appdata/root/default/*/options.xml"
 ```
 
-## Scheduled scan I/O brownout (2026-07-01)
+## Recurring 10–20 min brownouts: ffprobe OOM loop (ROOT CAUSE, found 2026-07-04)
+
+**This was the actual cause of the daily brownouts from ~2026-06-28 through 2026-07-04.** The
+scan-concurrency work below (2026-07-01/02) was real but secondary — the outages continued because
+of this loop, which ran underneath the whole time.
+
+**Mechanism:** `Abominable (2019) WEBDL-1080p.mkv` (Kids Movies, 6.4 GB) had a corrupt Matroska
+seek index (SeekHead/Cues) — linear playback/demux was fine, but Jellyfin 10.11's media-info probe
+(`ffprobe ... -show_frames -only_first_vframe`) follows the cues, lands on garbage EBML elements
+("unknown-length element", "invalid as first byte of an EBML number"), and **balloons to ~5.5 GB
+anon RSS**. That exhausted the 6 GB LXC cgroup → the whole box entered reclaim thrash (D-state
+pileup, `node_load1` up to 102 while CPU stays <50%, Kestrel thread-pool starvation, docker.sock
+and node_exporter statfs all hang) → after 0.5–20 min the kernel memcg OOM killer killed ffprobe →
+scan completed → instant recovery. Because ffprobe never finished, Jellyfin never saved probe data
+for the item and **re-probed it on every scheduled scan** — one OOM kill per scan, every scan
+(verify: `ssh pve "journalctl -k | grep 'Memory cgroup out of memory'"` — the kernel is shared, so
+guest OOMs appear in the pve journal).
+
+**Why the outage length varied (22 s → 24 min):** it's the time the box thrashes before the OOM
+killer fires — short when RAM is mostly free at scan start, long when page cache is full. Raising
+LXC RAM 4 GB → 6 GB (~Jun 28) made episodes *longer*, not better.
+
+**Trigger for the item re-probe:** new `.srt` subtitle files added 2026-06-26 invalidated the item's
+media info; the file itself had been in the library (corrupt) since 2025-10.
+
+**Fix applied 2026-07-04:**
+
+1. **Container memory cap fixed** (the fix that actually ended the outages) in
+   `roles/jellyfin_lxc/files/docker-compose.yml`: `mem_limit` was **8g on a 6 GB LXC** (could never
+   trigger — the LXC wall was always hit first). Now `mem_limit: 4g`, `mem_reservation: 1g`,
+   transcode tmpfs 4g → 2g (tmpfs pages count against the container's limit). A runaway ffprobe is
+   now killed inside the container cgroup in ~10 s; the LXC keeps ~2 GB headroom. Verified on the
+   15:00 scan 2026-07-04: scan completed in 32 s, load ~4, UI up, ffprobe killed at 3.8 GB inside
+   the docker cgroup with zero box-wide impact.
+2. **The bad title was deleted entirely** (John's call — movie not worth keeping). Note: a
+   lossless remux (`-c copy`) had been tried first and did **not** stop the balloon — the bug is
+   keyed to the title's stream data, not (only) its corrupt cues. If Radarr still monitors
+   Abominable (2019) it may re-grab it; a different encode is unlikely to trigger the bug, and
+   the ffprobe wrapper (below) makes it harmless if it does.
+3. **ffprobe wrapped with `ulimit -v 3G`** in the custom Dockerfile
+   (`roles/jellyfin_lxc/files/dockerfile`): key discovery — when the oversized allocation FAILS,
+   ffprobe falls back to a sane path and completes with full valid JSON in seconds (verified on
+   the bad file and 486 swept files; a 4K remux probes fine through it). The wrapper converts any
+   future balloon into a graceful completion **with metadata saved**, so no retry loop can form.
+   `ffmpeg` itself is not wrapped (transcodes legitimately need memory). Rebuild after changing:
+   `make jelly TAGS=docker`, then `ssh jelly "cd /srv/apps && docker compose build jellyfin && docker compose up -d jellyfin"`
+   (the Ansible handler recreates containers but does not rebuild images).
+
+**Diagnosis recipe for "Jellyfin down N minutes, self-recovered":** check pve journal for memcg OOM
+kills first. To catch a runaway live:
+`nohup sh -c 'for i in $(seq 1 1200); do date +%H:%M:%S; ps -eo rss=,args= | grep [f]fprobe; sleep 2; done' > /tmp/ffprobe-watch.log &`
+then read the biggest RSS lines — the culprit file path is in the ffprobe command line.
+
+## Scheduled scan I/O brownout (2026-07-01) — contributing factors, superseded
+
+**Note (2026-07-04):** the analysis below identified real amplifiers (12-way metadata fan-out,
+blocking trickplay) and the applied settings are kept, but the recurring outages were caused by the
+ffprobe OOM loop above, not by scan concurrency alone.
 
 **Symptom:** Jellyfin web UI becomes unresponsive / "down" for ~20 min at a stretch, several times a
 day, while the container stays *running* and even reports healthy. During the episode: `node_load1`
@@ -105,18 +177,37 @@ extraction + YouTube Metadata yt-dlp network fetches) fans out across all 12 vCP
 and CPU. The YouTube-metadata `DirectoryNotFoundException` errors are noise, not the cause — the cache
 is healthy (see below).
 
-**Proposed remediation (not yet applied — decide + apply via container-stopped file edits or the UI):**
+**What actually triggered the recurrence (2026-07-02):** ~220 new videos were imported into
+`/movies/youtube` ~1 week prior (all files dated 8–14 days ago, none since). Every scan since has
+been running metadata refresh + chapter-image extraction + **trickplay generation** on that backlog.
+Two settings turned that into a box-wide brownout: `LibraryMetadataRefreshConcurrency=0` (fans across
+all 12 vCPUs) **and** trickplay `ScanBehavior=Blocking` (trickplay ffmpeg runs *inside* the scan
+instead of as a background task). Jellyfin is 10.11.7 (unchanged since the 2026-04-01 image build), so
+this is a workload/config interaction, not a version regression.
 
-1. Cut scan frequency. The intent was ~2×/day; 7×/day is excessive. Edit the trigger file
-   `/srv/apps/jellyfin/appdata/config/ScheduledTasks/7738148f-fcd0-7979-c7ce-b148e06b3aed.js` down to
-   two daily triggers, e.g. 09:00 and 21:00 (ticks = hour × 3.6e10):
-   ```json
-   [{"Type":"DailyTrigger","TimeOfDayTicks":324000000000},{"Type":"DailyTrigger","TimeOfDayTicks":756000000000}]
-   ```
-   (Ticks reference: 09:00=324e9, 11:00=396e9, 13:00=468e9, 15:00=540e9, 17:00=612e9, 19:00=684e9,
-   21:00=756e9.) Or set the trigger to an `IntervalTrigger` of 12 h in the UI.
-2. Cap metadata-refresh concurrency so a scan can't monopolise the box. In `system.xml` set
-   `LibraryMetadataRefreshConcurrency` to `2` (from `0`). This is the single biggest lever.
+**Remediation (APPLIED 2026-07-02 — final state, keeps chapter images + trickplay):**
+
+1. **`LibraryMetadataRefreshConcurrency` `0` → `4`** in `system.xml`. The master throttle: max items
+   metadata-refreshed in parallel. `0` = auto = 12-way = the herd. `4` processes a large import
+   steadily without saturating CPU or the NFS link (chapter extraction is NFS-IO-bound — do not exceed
+   4 here even with spare cores). This is the single biggest lever.
+2. **Trickplay `ScanBehavior` `Blocking` → `NonBlocking`** in `system.xml` (`<TrickplayOptions>` block).
+   Moves trickplay generation out of the scan into a background task (already `BelowNormal` priority),
+   so the scan finishes fast while trickplay grinds gently afterward. Chapter images and trickplay are
+   both retained.
+3. Scan frequency left at **7×/day** (my interim 2×/day cut was reverted — the two changes above make
+   frequent scans cheap, so the cut is unnecessary). `LibraryScanFanoutConcurrency` (4) and
+   `ParallelImageEncodingLimit` (4) left as-is.
+
+Backups on host: `config/system.xml.bak-20260702-151439` (pre-change),
+`config/system.xml.bak-20260702-155424` (interim), and the original trigger file
+`...7738148f-...js.bak-20260702-151439`. Verified all values persisted across restart. Next levers if a
+brownout ever recurs: `EnableKeyFrameOnlyExtraction` `false`→`true` (cheaper trickplay ffmpeg), then
+`LibraryScanFanoutConcurrency` `4`→`2`.
+
+_Superseded interim fix (kept for reference): initially cut scans to 2×/day and set
+`LibraryMetadataRefreshConcurrency=2`; both were revised above once the trickplay `Blocking` root cause
+was found._
 
 **How to apply safely:** Jellyfin rewrites `system.xml` and the `ScheduledTasks/*.js` trigger files on
 shutdown, so **stop the container before hand-editing them**, or they'll be overwritten:
@@ -150,7 +241,8 @@ To map any task id → name: `cat data/ScheduledTasks/<id>.js` and read its `"Na
 - **`.ignore` directory churn** ([#16021](https://github.com/jellyfin/jellyfin/issues/16021)) — partially fixed in 10.11.6
 - **API/scanning performance degradation** ([#15352](https://github.com/jellyfin/jellyfin/issues/15352))
 
-Consider upgrading to 10.11.6 for incremental fixes, but the core NFS monitoring issue persists.
+Running 10.11.7 (has the 10.11.5/10.11.6 fixes above); the core NFS monitoring issue (#15815)
+persists, which is why real-time monitoring stays disabled.
 
 ## Trickplay
 
@@ -168,10 +260,11 @@ ssh jelly "docker logs jellyfin --since 5m 2>&1 | grep 'Watching directory'"
 If you see "Watching directory" lines for NFS paths, monitoring has been re-enabled.
 
 ### YouTubeMetadata errors in logs
-The YouTube Metadata plugin throws `DirectoryNotFoundException: .../ytvideo.info.json` for a handful
-of video IDs. **The cache is not broken** — `/srv/apps/jellyfin/cache/youtubemetadata` is populated
-(e.g. 224/225 dirs had a valid `ytvideo.info.json` on 2026-07-01). The errors are per-video: yt-dlp
-couldn't fetch metadata for those IDs (deleted / private / geoblocked), so no dir was written, and
-every scan re-tries them. They're log noise, **not** an outage cause — nothing to repair in the cache.
-The only real cleanup is removing the source media entries for genuinely dead videos so the plugin
-stops retrying. Note these fetches *do* add load during scans; see "Scheduled scan I/O brownout".
+The YouTube Metadata plugin throws `DirectoryNotFoundException: .../ytvideo.info.json` for video IDs
+that yt-dlp can't fetch (deleted / private / geoblocked): no cache dir gets written, and every scan
+re-tries them. **The cache itself is not broken** — `/srv/apps/jellyfin/cache/youtubemetadata` is
+populated. They're log noise, **not** an outage cause. The only real cleanup is deleting the source
+media files for genuinely dead videos so the plugin stops retrying — done 2026-07-04 for the three
+known dead IDs (`foYNUVFoZe0`, `NJTdu309d3E`, `VZcPKF2FOm0`). If new ones appear, find them with:
+`grep -h "DirectoryNotFoundException.*youtubemetadata" /srv/apps/jellyfin/appdata/log/log_*.log | grep -oE "youtubemetadata/[^/]+" | sort -u`
+then `find /mnt/nfs/movies/youtube -name "*<id>*" -delete` on jelly.

@@ -10,8 +10,12 @@ services:
     container_name: jellyfin
     restart: always
     init: true
-    mem_limit: 8g
-    mem_reservation: 4g
+    # LXC has 6g total. mem_limit MUST stay below that (minus ~1g for the other
+    # containers + system), or a runaway ffprobe/ffmpeg exhausts the whole LXC and
+    # the box thrashes for 10-20 min before the OOM killer fires (2026-07 brownouts).
+    # With a 4g cap the kernel kills the offender inside this cgroup within seconds.
+    mem_limit: 4g
+    mem_reservation: 1g
     ports:
       - 8096:8096/tcp
       - 7359:7359/udp
@@ -30,10 +34,12 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
+      # tmpfs pages are charged against this container's mem_limit (4g) —
+      # keep transcode tmpfs well below it so heavy transcodes can't OOM the container
       - type: tmpfs
         target: /transcode
         tmpfs:
-          size: 4g
+          size: 2g
       - /srv/apps/jellyfin/appdata:/config
       - /srv/apps/jellyfin/cache:/cache
       - /mnt/nfs/library:/library # kids shows, family movies, etc
@@ -60,6 +66,7 @@ services:
     image: grafana/alloy:v1.5.1
     container_name: alloy
     restart: unless-stopped
+    mem_limit: 512m  # ~50 MiB typical; cap so no sidecar can starve the 6 GB LXC
     environment:
       LOKI_WRITE_ENDPOINT: "http://192.168.2.106:3100/loki/api/v1/push"
       NODE_HOSTNAME: "jellyfin"
@@ -92,6 +99,7 @@ services:
     image: gcr.io/cadvisor/cadvisor:v0.49.1
     container_name: cadvisor
     restart: always
+    mem_limit: 512m  # ~36 MiB typical
     ports:
       - "18080:8080"
     volumes:
@@ -112,6 +120,7 @@ services:
   node_exporter:
     image: quay.io/prometheus/node-exporter:v1.8.2
     container_name: node_exporter
+    mem_limit: 128m  # ~10 MiB typical
     command:
       - '--path.rootfs=/host'
       - '--collector.textfile.directory=/textfile'

@@ -1,3 +1,14 @@
 FROM jellyfin/jellyfin:latest
 ADD https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux /usr/local/bin/yt-dlp
 RUN chmod +x /usr/local/bin/yt-dlp
+
+# Wrap ffprobe with a 3 GB virtual-memory ulimit. ffprobe has an allocation-greedy
+# path (hit by at least one real-world MKV, 2026-07) that balloons to 5+ GB and OOMs;
+# when the oversized allocation FAILS it falls back to a sane path and completes with
+# full, valid JSON. The cap converts "runaway -> OOM kill -> no metadata, retried every
+# scan" into "graceful completion". ffmpeg itself is NOT wrapped (transcodes legitimately
+# use lots of memory). See documentation/jellyfin_lxc.md (ffprobe OOM brownouts).
+RUN mv /usr/lib/jellyfin-ffmpeg/ffprobe /usr/lib/jellyfin-ffmpeg/ffprobe.real && \
+    printf '#!/bin/sh\nulimit -v 3145728\nexec /usr/lib/jellyfin-ffmpeg/ffprobe.real "$@"\n' \
+      > /usr/lib/jellyfin-ffmpeg/ffprobe && \
+    chmod +x /usr/lib/jellyfin-ffmpeg/ffprobe
