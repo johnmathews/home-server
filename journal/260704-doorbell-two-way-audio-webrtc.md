@@ -64,3 +64,45 @@ title: Front Door
   `https://home.johnmathews.is`); iOS has no permission, one tap required.
 - Added `ui: true` to the video card for a persistent control bar with a
   one-tap volume button (helps iOS especially).
+
+## Phase 5 (same day): the debugging saga → final single-button design
+
+The toggle/conditional-card designs kept failing in the field. Root causes, found
+by testing against the real card source in a Playwright harness and by watching
+go2rtc's session API live during user tests:
+
+- **Load-order race**: HA renders cards while Lovelace resources are still
+  loading, so prototype-patching alone missed already-rendered cards — sometimes
+  nothing was enhanced. Fix: also retrofit existing instances by walking shadow
+  DOMs, with retries.
+- **Chrome truth**: Site settings → Sound → Allow does NOT permit unmuted
+  autoplay (Google "Won't Fix"); only MEI, PWA install, or the managed
+  `AutoplayAllowlist` policy do. Firefox's per-site Autoplay permission works.
+- **iOS gesture rule**: WebKit rejects `getUserMedia` outside a user gesture.
+  The card acquires the mic at mount (async, outside gesture) and only
+  `console.warn`s the failure — so the iPhone silently created a session with no
+  audio channel at all (confirmed: no mic consumer ever reached go2rtc).
+- **Backchannel wedge**: talkback rode the permanent main RTSP session; senders
+  accumulated (16 observed) and never cleaned up, plus the PTT design streamed
+  continuous silence, plus two devices armed at once — the camera's single
+  talkback session wedged and survived browser refreshes ("worked once, never
+  again"). Fix: `#backchannel=0` on the main stream so talkback uses the
+  dedicated on-demand sub-session (fresh dial per use, self-clearing). Verified
+  server→speaker independently by injecting a tone via
+  `POST /api/streams?dst=doorbell&src=ffmpeg:<url>#audio=pcmu` (32 kB = 4 s
+  delivered; user confirmed audible).
+- **UX**: the two-level arm-toggle + hold-card design confused; conditional-card
+  mount/unmount re-rendered the video card, resetting it to muted.
+
+Final design: **one card** (`media: video,audio,microphone`, `ui: true`) plus one
+injected module that adds a "🎤 Hold to talk" button — fresh `getUserMedia` per
+hold (in-gesture, iOS-safe), `sender.replaceTrack()` attach/detach (verified via
+real-WebRTC loopback: bytes stop on null, resume on restore), mic fully released
+on release, half-duplex incoming mute while held, on-card diagnostics
+(`getStats` byte counter) and visible error banners. Deleted the input_boolean +
+auto-off automation. Script source preserved at `documentation/doorbell-ptt.js`;
+deployed as a `data:` URL Lovelace resource (id `6eebc249…`) since HAOS offers
+no filesystem access without SSH.
+
+Working end-to-end on desktop; user access domain is `https://home.itsa-pizza.com`
+(HA's configured external_url says home.johnmathews.is — unreconciled).
