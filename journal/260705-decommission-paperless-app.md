@@ -53,16 +53,29 @@ the Makefile target uses a hyphen — `make document-library` — matching `open
   `hostname="paperless"` targets still resolve to the library host.
 - Shared vars `puid`/`guid` in `group_vars/all/main.yml`.
 
-## Left as follow-ups (out of this brief's scope — flagged, not changed)
+## Follow-ups
 
-These still reference paperless but point at resources that are intentionally still alive, or belong to
-other roles:
+Done in a second commit (same day, at the user's request):
 
-- `roles/cloudflared_lxc/defaults/main.yml` + `scripts/cf-create-dns-records.sh`: `paperless.*` and
-  `documents.*` still route/resolve to the dead app port `:8000`. Removing or repointing them to library
-  is a routing decision, not part of "decommission the app".
+- `roles/cloudflared_lxc/defaults/main.yml`: repointed the `paperless` and `documents` tunnel ingress
+  prefixes from the dead `:8000` to the library app `:8010` (so all three of paperless/documents/library
+  route to library). Deployed via `make cloudflared TAGS=cloudflared`; verified on the edge —
+  `paperless.itsa-pizza.com`, `documents.itsa-pizza.com`, `library.itsa-pizza.com` all → `:8010`.
+- `roles/open_webui_lxc/defaults/main.yml`: removed the paperless `smb_shares` entry (it was dead
+  copy-paste config — nothing in the open_webui role consumes `smb_shares`, and that playbook doesn't
+  run `sleep_hours`).
+
+Still left alone (intentionally):
+
+- `scripts/cf-create-dns-records.sh` keeps the `paperless`/`documents` subdomains — the DNS records
+  should still exist (they now point at the library tunnel).
 - `roles/nas/defaults/main.yml` `refresh_shares_nfs_path: tank/paperless` — still a valid share.
-- `roles/open_webui_lxc` `smb_shares` paperless entry + a stale header comment.
+- A stale `# roles/paperless_lxc/tasks/main.yml` header comment in `roles/open_webui_lxc/tasks/main.yml`.
+
+**Note:** `make cloudflared` (full playbook) fails at the end on the `tailscale` role — the Tailscale
+auth key on that host is expired (pre-existing, unrelated to this work). The cloudflared config sync
+runs and completes before it; use `TAGS=cloudflared` to deploy cloudflared config without the tailscale
+role. The expired key should be rotated separately.
 
 ## Verification (all green)
 

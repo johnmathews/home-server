@@ -153,11 +153,11 @@ cloudflared_ingress:
   - prefix: prowlarr
     service: "http://192.168.2.105:9696"
 
-  # Documents
+  # Documents (paperless decommissioned; all three point at the library app)
   - prefix: paperless
-    service: "http://192.168.2.117:8000"
+    service: "http://192.168.2.117:8010"
   - prefix: documents
-    service: "http://192.168.2.117:8000"
+    service: "http://192.168.2.117:8010"
   - prefix: library
     service: "http://192.168.2.117:8010"
 
