@@ -122,3 +122,5 @@ Working end-to-end on desktop; user access domain is `https://home.itsa-pizza.co
   of truth, no minified fork).
 - User-side fix: set the companion app's internal URL to https (or disable
   internal URL) so it always connects via `https://home.itsa-pizza.com`.
+- **Confirmed working on all devices** (laptop browsers + iPhone app) after the
+  internal-URL change. Project complete.
