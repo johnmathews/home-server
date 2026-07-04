@@ -105,7 +105,10 @@ deployed as a `data:` URL Lovelace resource (id `6eebc249…`) since HAOS offers
 no filesystem access without SSH.
 
 Working end-to-end on desktop; user access domain is `https://home.itsa-pizza.com`
-(HA's configured external_url says home.johnmathews.is — unreconciled).
+(HA's configured external_url said home.johnmathews.is — reconciled at session end:
+external_url set to https://home.itsa-pizza.com via `config/core/update`;
+internal_url left at http://homeassistant.local:8123 for LAN integration
+callbacks, with the companion app overriding it per-device).
 
 ## Phase 6 (same day): iPhone — companion app connects over http
 
