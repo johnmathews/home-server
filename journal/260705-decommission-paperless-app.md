@@ -72,10 +72,13 @@ Still left alone (intentionally):
 - `roles/nas/defaults/main.yml` `refresh_shares_nfs_path: tank/paperless` — still a valid share.
 - A stale `# roles/paperless_lxc/tasks/main.yml` header comment in `roles/open_webui_lxc/tasks/main.yml`.
 
-**Note:** `make cloudflared` (full playbook) fails at the end on the `tailscale` role — the Tailscale
-auth key on that host is expired (pre-existing, unrelated to this work). The cloudflared config sync
-runs and completes before it; use `TAGS=cloudflared` to deploy cloudflared config without the tailscale
-role. The expired key should be rotated separately.
+**Note (resolved):** `make cloudflared` initially failed at the end on the `tailscale` role — the
+cloudflared node was `Logged out` (its node key had expired; pre-existing, unrelated to this work).
+Fixed by disabling key expiry for the cloudflared node in the Tailscale admin console, then running
+`tailscale up --accept-dns=true` on the node, which re-established the session using the existing
+(now non-expiring) node key — no auth key or interactive login needed. Full `make cloudflared` now
+passes (`failed=0`). The vault `vault_tailscale_auth_key` is still expired, which only matters for
+onboarding *new* nodes or re-authing a fully-logged-out node; rotate it before doing either.
 
 ## Verification (all green)
 
