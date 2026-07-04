@@ -70,6 +70,11 @@ LXC-wide cgroup wall and took every service on the box down with it.
 
 ## Follow-up hardening (same day)
 
+- Added a `Rebuild jellyfin image` handler (`build: always`, jellyfin service only) notified by
+  the "Copy dockerfile" task — closes the gap where a dockerfile change deployed the file but
+  never rebuilt the image (the manual `docker compose build` mentioned below is no longer
+  needed). `pull: never` keeps rebuilds from silently upgrading Jellyfin.
+
 - Deleted the 3 dead-YouTube-video source files (`foYNUVFoZe0`, `NJTdu309d3E`, `VZcPKF2FOm0`)
   that the YouTube Metadata plugin re-fetched (and error-logged) on every scan.
 - Added memory caps to the sidecar containers (alloy/cadvisor 512m, node_exporter 128m — ~10×
