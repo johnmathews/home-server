@@ -1,3 +1,10 @@
+**Status (2026-07-04): intentionally DISABLED on all hosts** (`share_drive_probe_enabled: false`,
+the role default, everywhere). NFS has been stable and the probing isn't needed; no
+`share_drive_probe_*` metrics are expected in Prometheus. If you see such metrics (or the older
+`mount_touch_probe_*` names), it's a stale `.prom` file — see the cleanup note below. On jellyfin
+a fossil `mount_touch_probe.prom` from 2025-10 served frozen metrics for 9 months before being
+removed on 2026-07-04.
+
 ## Ansible
 
 There is a task called `share_drive_probe`. It's added to all the playbooks.
