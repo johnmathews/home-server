@@ -148,6 +148,17 @@ siren.front_door_siren                    doorbell siren
 - **iOS app shows stale dashboard/behavior** — companion app Settings → Debugging → Reset frontend cache.
 - **Card badge shows MSE instead of RTC** — WebRTC failed to negotiate; check TCP 8555 reachability and `webrtc.candidates`.
 
+### Upstream contribution (pending)
+
+The PTT feature was reimplemented as a native `ptt: true` option for the
+AlexxIT/WebRTC card and offered upstream in
+[issue #685](https://github.com/AlexxIT/WebRTC/issues/685#issuecomment-4884009785)
+(2026-07-05). Patch + next-steps runbook:
+`~/projects/webrtc-ptt-contribution/` and
+[journal/260705-webrtc-ptt-oss-contribution.md](../journal/260705-webrtc-ptt-oss-contribution.md).
+If the PR is eventually merged, the injected `doorbell-ptt.js` resource can be
+retired in favor of the card's built-in option (see the runbook, step 4).
+
 ### Headless HA administration
 
 REST + WebSocket API (`ws://192.168.2.102:8123/api/websocket`) with a long-lived access token (Profile → Security). Notes: dashboard `url_path` needs a hyphen; strategy dashboards (like Overview) can't take cards without converting to manual; automations via `POST /api/config/automation/config/<id>`; helpers, dashboards, and frontend resources via WebSocket commands (`input_boolean/create|delete`, `lovelace/config/save`, `lovelace/resources/create|update`). go2rtc on `:1984` is unauthenticated on the LAN: `GET/POST /api/config`, `POST /api/restart`, `GET /api/streams`. The doorbell RTSP password lives in the go2rtc config inside HA — not in this repo or Ansible Vault.
