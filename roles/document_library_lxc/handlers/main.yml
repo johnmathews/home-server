@@ -5,19 +5,9 @@
     recreate: always
     pull: never
     dependencies: true
-  become: false
-
-- name: Restart paperless
-  community.docker.docker_compose_v2:
-    project_src: "{{ docker_compose_dir }}"
-    services:
-      - paperless-db
-      - paperless-webserver
-      - paperless-broker
-    state: present
-    recreate: always
-    pull: never
-    dependencies: true
+    # Drop the decommissioned paperless-* containers that are no longer in the
+    # compose file (they linger as orphans otherwise).
+    remove_orphans: true
   become: false
 
 - name: Restart alloy

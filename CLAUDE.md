@@ -44,10 +44,10 @@ make site          # Execute full provisioning
 
 **Everything is deployed by Ansible. Never hand-edit config on a host — it gets overwritten on the next run.**
 
-The naming convention ties the whole repo together. For a host like `paperless_lxc`:
+The naming convention ties the whole repo together. For a host like `immich_lxc`:
 
 ```
-make paperless  ->  playbooks/paperless_lxc.yml  ->  roles/paperless_lxc/  ->  host paperless_lxc
+make immich  ->  playbooks/immich_lxc.yml  ->  roles/immich_lxc/  ->  host immich_lxc
 ```
 
 `make <target>` runs one playbook, which imports one (sometimes more) role. Target names are
@@ -64,7 +64,9 @@ change. So:
   vars, then `make <host>` — do **not** `ssh` in and edit the compose file directly.
 - Vars come from `group_vars/all/`, `host_vars/<host>/`, and Ansible Vault (secrets — see
   `documentation/vault.md`).
-- `roles/paperless_lxc` is a good reference for the template-then-restart shape.
+- `roles/document_library_lxc` is a good reference for the template-then-restart shape.
+  (Note: its `make` target is hyphenated — `make document-library` — matching the
+  `open-webui → open_webui_lxc` precedent where the abbreviated target uses a hyphen.)
 
 **VMs vs LXCs.** Hosts ending in `_vm` (`nas_vm`, `media-vm`, `infra-vm`, `mailcow-vm`) are full VMs;
 `*_lxc` are LXC containers; `pve` is the Proxmox host itself and `pbs` the backup server. LXCs are
@@ -101,27 +103,27 @@ systemd unit — use `systemctl --user` on the agent host (see `documentation/ag
 Host IPs are assigned statically on the MikroTik router. Source of truth: `inventory.ini`.
 
 ```
-+-------------------+----------------+------------------+--------------------------------------+
-| Host              | Local IP       | Tailscale IP     | Key Services                         |
-+-------------------+----------------+------------------+--------------------------------------+
-| pve               | 192.168.2.214  |                  | Proxmox UI :8006                     |
-| pbs               | 192.168.2.200  |                  | Proxmox Backup Server                |
-| cloudflared_lxc   | 192.168.2.101  |                  | Cloudflare Tunnel                    |
-| mailcow-vm        | 192.168.2.103  |                  | Mailcow (retired)                    |
-| nas_vm            | 192.168.2.104  |                  | TrueNAS (NFS/SMB shares)            |
-| media-vm          | 192.168.2.105  |                  | Sonarr, Radarr, qBittorrent, etc.   |
-| infra-vm          | 192.168.2.106  |                  | Grafana, Prometheus, Loki, etc.      |
-| agent_lxc         | 192.168.2.107  | 100.125.185.47   | NanoClaw Gateway :18790              |
-| traefik_lxc       | 192.168.2.108  |                  | Reverse proxy (Traefik)              |
-| jellyfin_lxc      | 192.168.2.110  |                  | Jellyfin media server                |
-| immich_lxc        | 192.168.2.113  |                  | Immich photo management              |
-| music_lxc         | 192.168.2.109  |                  | Navidrome music streaming :4533      |
-| prometheus_lxc    | 192.168.2.115  |                  | Prometheus metrics                   |
-| tubearchivist_lxc | 192.168.2.116  |                  | TubeArchivist                        |
-| paperless_lxc     | 192.168.2.117  |                  | Paperless-ngx document store         |
-| open_webui_lxc    | 192.168.2.119  |                  | Open WebUI                           |
-| key_server        | 192.168.2.201  |                  | TrueNAS encryption key server        |
-+-------------------+----------------+------------------+--------------------------------------+
++----------------------+----------------+------------------+--------------------------------------+
+| Host                 | Local IP       | Tailscale IP     | Key Services                         |
++----------------------+----------------+------------------+--------------------------------------+
+| pve                  | 192.168.2.214  |                  | Proxmox UI :8006                     |
+| pbs                  | 192.168.2.200  |                  | Proxmox Backup Server                |
+| cloudflared_lxc      | 192.168.2.101  |                  | Cloudflare Tunnel                    |
+| mailcow-vm           | 192.168.2.103  |                  | Mailcow (retired)                    |
+| nas_vm               | 192.168.2.104  |                  | TrueNAS (NFS/SMB shares)             |
+| media-vm             | 192.168.2.105  |                  | Sonarr, Radarr, qBittorrent, etc.    |
+| infra-vm             | 192.168.2.106  |                  | Grafana, Prometheus, Loki, etc.      |
+| agent_lxc            | 192.168.2.107  | 100.125.185.47   | NanoClaw Gateway :18790              |
+| traefik_lxc          | 192.168.2.108  |                  | Reverse proxy (Traefik)              |
+| jellyfin_lxc         | 192.168.2.110  |                  | Jellyfin media server                |
+| immich_lxc           | 192.168.2.113  |                  | Immich photo management              |
+| music_lxc            | 192.168.2.109  |                  | Navidrome music streaming :4533      |
+| prometheus_lxc       | 192.168.2.115  |                  | Prometheus metrics                   |
+| tubearchivist_lxc    | 192.168.2.116  |                  | TubeArchivist                        |
+| document_library_lxc | 192.168.2.117  |                  | Library doc store (host: paperless)  |
+| open_webui_lxc       | 192.168.2.119  |                  | Open WebUI                           |
+| key_server           | 192.168.2.201  |                  | TrueNAS encryption key server        |
++----------------------+----------------+------------------+--------------------------------------+
 ```
 
 ## SSH Aliases
@@ -154,7 +156,7 @@ Service-specific guides in `/documentation/`. Read the relevant doc before worki
 - `navidrome.md` — Navidrome music streaming, NFS mount, Subsonic API clients
 - `agent.md` — NanoClaw architecture, LXC setup, macOS app, Tailscale, known issues
 - `open_webui_lxc.md` — Open WebUI LLM chat interface, OpenAI backend, Docker setup
-- `paperless.md` — Paperless-ngx document store, Docker stack, NFS/SMB, training schedule
+- `archive/paperless.md` — Paperless-ngx document store (decommissioned 2026-07-04, superseded by the `library` app on the same LXC)
 - `pbs.md` — Proxmox Backup Server: datastore, schedule, retention, restore procedure
 - `prometheus_lxc.md` — Prometheus metrics collection, scrape targets, retention, adding hosts
 - `quiet_hours.md` — Night-time container pausing for HDD spindown

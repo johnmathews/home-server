@@ -1,7 +1,7 @@
-# playbooks/paperless_lxc.yml
+# playbooks/document_library_lxc.yml
 
-- name: Paperless LXC
-  hosts: paperless_lxc
+- name: Document Library LXC
+  hosts: document_library_lxc
   gather_facts: true
   become: true
 
@@ -10,8 +10,8 @@
       tags: nfs
     - role: share_drive_probe
       tags: shares
-    - role: paperless_lxc
-      tags: paperless
+    - role: document_library_lxc
+      tags: document_library
     - role: sleep_hours
       tags: sleep
     - role: shell_environment

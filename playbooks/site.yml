@@ -10,7 +10,7 @@
 - import_playbook: nfs.yml  # noqa: name[play]
 - import_playbook: open_webui_lxc.yml  # noqa: name[play]
 - import_playbook: agent_lxc.yml  # noqa: name[play]
-- import_playbook: paperless_lxc.yml  # noqa: name[play]
+- import_playbook: document_library_lxc.yml  # noqa: name[play]
 - import_playbook: prometheus_lxc.yml  # noqa: name[play]
 - import_playbook: pve.yml  # noqa: name[play]
 - import_playbook: share_drive_probe.yml  # noqa: name[play]

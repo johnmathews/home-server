@@ -1,0 +1,11 @@
+pgid: 1001
+
+# Docker image versions
+# These track "latest" to match the images actually deployed on the host. Pin
+# to explicit versions again only after pulling and verifying them on the host.
+node_exporter_version: "latest"
+alloy_version: "latest"
+cadvisor_version: "latest"
+
+# Library (ghcr image tag = git commit sha of release)
+library_version: "latest"

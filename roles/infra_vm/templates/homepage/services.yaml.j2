@@ -247,16 +247,11 @@
         siteMonitor: http://192.168.2.105:6060
         description: Books
         icon: sh-booklore
-    - Paperless:
-        href: https://paperless.{{ primary_domain_name }}
-        siteMonitor: http://192.168.2.117:8000
-        description: Document management system
-        icon: paperless
-        showStats: true
-        widget:
-          type: paperlessngx
-          url: http://192.168.2.117:8000
-          key: "{{ vault_paperless_key }}"
+    - Library:
+        href: https://library.{{ primary_domain_name }}
+        siteMonitor: http://192.168.2.117:8010
+        description: Document library
+        icon: mdi-file-document-multiple
     - Tubearchivist:
         href: https://tube.{{ primary_domain_name }}
         siteMonitor: https://tube.{{ primary_domain_name }}

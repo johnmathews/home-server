@@ -1,74 +1,9 @@
 # vim: ft=yaml
-# paperless_lxc/files/docker-compose.yml
+# document_library_lxc/files/docker-compose.yml
 services:
 
-  paperless-db:
-    container_name: paperless-db
-    image: docker.io/library/postgres:17
-    restart: always
-    volumes:
-      - "{{ docker_compose_dir }}/paperless/pgdata:/var/lib/postgresql/data"
-    environment:
-      POSTGRES_DB: paperless
-      POSTGRES_USER: paperless
-      POSTGRES_PASSWORD: paperless
-      PUID: ${PUID}
-      PGID: ${PGID}
-      TZ: ${TZ}
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U paperless -d paperless"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  paperless-webserver:
-    container_name: paperless-webserver
-    image: ghcr.io/paperless-ngx/paperless-ngx:{{ paperless_version }}
-    restart: always
-    depends_on:
-      paperless-db:
-        condition: service_healthy
-      paperless-broker:
-        condition: service_healthy
-    ports:
-      - "8000:8000"
-    volumes:
-      - "{{ docker_compose_dir }}/paperless/data:/usr/src/paperless/data"
-      - "/mnt/nfs/paperless/media:/usr/src/paperless/media"
-      - "/mnt/nfs/paperless/export:/usr/src/paperless/export"
-      - "/mnt/nfs/paperless/consume:/usr/src/paperless/consume"
-    env_file: .env
-    environment:
-      PAPERLESS_REDIS: redis://paperless-broker:6379
-      PAPERLESS_DBHOST: paperless-db
-      PAPERLESS_TRAIN_TASK_CRON: "*/20 10-20 * * *"
-      PAPERLESS_INDEX_TASK_CRON: "*/20 10-20 * * *"
-      PAPERLESS_SANITY_TASK_CRON: "0 11 * * 1"
-      PUID: ${PUID}
-      PGID: ${PGID}
-      USERMAP_UID: ${PUID}
-      USERMAP_GID: ${PGID}
-      TZ: ${TZ}
-
-  paperless-broker:
-    container_name: paperless-broker
-    image: docker.io/library/redis:8
-    restart: always
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-    volumes:
-      - "{{ docker_compose_dir }}//paperless/redisdata:/data"
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  # Library (github.com/johnmathews/library) — paperless-ngx replacement,
-  # sharing this LXC during the transition. Own Postgres: paperless-db is
-  # stopped nightly by sleep_hours, and Library's web app must stay up.
+  # Library (github.com/johnmathews/library) — the document library app.
+  # Own Postgres (library-db); pgdata is local at /srv/apps/library/pgdata.
   library-db:
     container_name: library-db
     image: pgvector/pgvector:pg17

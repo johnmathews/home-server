@@ -42,7 +42,7 @@ get_tailscale_ip "root" "192.168.2.110" "jellyfin_lxc"
 get_tailscale_ip "root" "192.168.2.113" "immich_lxc"
 get_tailscale_ip "root" "192.168.2.115" "prometheus_lxc"
 get_tailscale_ip "root" "192.168.2.116" "tubearchivist_lxc"
-get_tailscale_ip "root" "192.168.2.117" "paperless_lxc"
+get_tailscale_ip "root" "192.168.2.117" "document_library_lxc"
 get_tailscale_ip "root" "192.168.2.119" "open_webui_lxc"
 get_tailscale_ip "root" "192.168.2.201" "key_server"
 

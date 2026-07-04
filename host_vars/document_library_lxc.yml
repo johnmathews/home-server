@@ -1,16 +1,11 @@
 nfs_shares:
-  - name: paperless
-    mountpoint: /mnt/nfs/paperless
-    target: /mnt/tank/paperless
   - name: document-store
     mountpoint: /mnt/nfs/document-store
     target: /mnt/tank/document-store
 
-# even though the paperless lxc doesnt need the smb share itself, we can still toggle 
+# even though this lxc doesnt need the smb share itself, we can still toggle
 # it off during quiet hours to avoid other clients waking up truenas HDDs.
 smb_shares:
-  - name: paperless
-    target: /mnt/paperless
   - name: document-store
     target: /mnt/document-store
 
@@ -24,22 +19,17 @@ sleep_hours_unpause_hour: 7
 
 # Containers to stop (not pause)
 sleep_hours_stop_containers:
-  - paperless-webserver
-  - paperless-broker
-  - paperless-db
   # library-worker polls the NFS consume dir (would keep TrueNAS HDDs awake);
   # its startup sweep ingests anything dropped overnight. library-api and
   # library-db stay up so the web app keeps working at night.
   - library-worker
 
 # Monitor integration (pause/resume monitoring during sleep hours)
-sleep_hours_kuma_map:
-  paperless-webserver: 36
+sleep_hours_kuma_map: {}
 
 # Graceful shutdown plugins
 sleep_hours_plugins:
   - default.sh
-  - paperless-graceful.sh
 
 # sleep docker containers during quiet hours and pause uptime-kuma monitors
 uptime_kuma_url: "http://192.168.2.106:3001"
