@@ -141,7 +141,7 @@ customElements.whenDefined('webrtc-camera').then(() => {
             }
             cap();
             stats();
-            dbg.textContent = 'PTT v9 | pc:' + (el.pc ? 'yes' : 'NO')
+            dbg.textContent = 'PTT v10 | pc:' + (el.pc ? 'yes' : 'NO')
                 + ' | sender:' + (M.s ? 'yes' : 'NO')
                 + ' | holding:' + tx
                 + ' | sent:' + (sent / 1024).toFixed(1) + 'kB';
@@ -167,6 +167,15 @@ customElements.whenDefined('webrtc-camera').then(() => {
             btn.style.background = '#b71c1c';
             rx(true);
             msg('');
+            // http (non-localhost) pages have no navigator.mediaDevices at all —
+            // e.g. the companion app connecting via an internal http:// URL
+            if (!navigator.mediaDevices || !window.isSecureContext) {
+                msg('Microphone blocked: insecure connection (http). '
+                    + 'Open HA via its https address — in the companion app, set the '
+                    + 'internal URL to https or disable it.');
+                stopTalk();
+                return;
+            }
             // getUserMedia INSIDE the gesture — required by iOS WebKit
             navigator.mediaDevices.getUserMedia({audio: true}).then(st => {
                 if (!tx) { st.getTracks().forEach(t => t.stop()); return; }

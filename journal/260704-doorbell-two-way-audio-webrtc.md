@@ -106,3 +106,19 @@ no filesystem access without SSH.
 
 Working end-to-end on desktop; user access domain is `https://home.itsa-pizza.com`
 (HA's configured external_url says home.johnmathews.is — unreconciled).
+
+## Phase 6 (same day): iPhone — companion app connects over http
+
+- iPhone screenshot showed `sender:NO | holding:true | sent:0.0kB` with NO error
+  banner and the button stuck red: `navigator.mediaDevices` is **undefined in
+  insecure contexts**, so the mic call threw synchronously before reaching the
+  error handler. The companion app connects via HA's *internal URL*
+  (`http://homeassistant.local:8123`) while on home WiFi — plain http, so iOS
+  exposes no microphone API at all. Desktop worked because it uses the https
+  address.
+- v10: guard for `!navigator.mediaDevices || !window.isSecureContext` with a
+  clear on-card message; the deploy pipeline now encodes
+  `documentation/doorbell-ptt.js` **verbatim** into the data: URL (single source
+  of truth, no minified fork).
+- User-side fix: set the companion app's internal URL to https (or disable
+  internal URL) so it always connects via `https://home.itsa-pizza.com`.

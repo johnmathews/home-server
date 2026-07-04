@@ -37,7 +37,8 @@ Open Home Assistant → **Doorbell** in the left sidebar (the 🔔 icon). Live v
 
 - The **chime and button always work**, even if Home Assistant, the network, or the internet is down — the doorbell and chime are RF-paired directly to each other.
 - **One talker at a time**: the doorbell hardware supports a single talkback session, like the Reolink app. If two people hold their buttons at once, the camera gets confused.
-- The grey `PTT v9 | …` line under the button is diagnostics: `sent:` should climb while you hold and speak. Errors show as a red banner on the card.
+- The grey `PTT v10 | …` line under the button is diagnostics: `sent:` should climb while you hold and speak. Errors show as a red banner on the card.
+- **The phone app must connect over https for talking to work.** If the companion app's *internal URL* is `http://homeassistant.local:8123` (the default), iOS blocks microphone access entirely while on home WiFi — the card shows `sender:NO` and a "Microphone blocked: insecure connection" banner on hold. Fix: app → Settings → Companion App → your server → set the **Internal URL** to the https address (or disable "connect via internal URL") so the app always uses `https://home.itsa-pizza.com`.
 
 ---
 
@@ -111,9 +112,10 @@ All talk/unmute behavior comes from a **Lovelace resource**: a JS module (regist
 - **Half-duplex**: all viewer videos mute while transmitting, restore on release.
 - **iOS first-use path**: mount-time `getUserMedia` fails outside a gesture (silently — the card only `console.warn`s), so the card negotiates no audio sender; the first hold acquires permission in-gesture and reconnects the card ("hold again to talk").
 - **Race-proofing**: HA renders cards while resources are still loading, so the module both patches the class *and* retrofits existing instances by walking shadow DOMs (retries at 0/0.8/2.5/8 s).
-- **Diagnostics bar** (`PTT v9 | pc | sender | holding | sent`) driven by `getStats()`.
+- **Diagnostics bar** (`PTT v10 | pc | sender | holding | sent`) driven by `getStats()`.
+- **Insecure-context guard**: on plain http, `navigator.mediaDevices` does not exist (the mount-time failure is silent and a naive call throws synchronously); the button surfaces "Microphone blocked: insecure connection" instead of hanging red.
 
-To modify: edit `doorbell-ptt.js` logic, minify/inline into a `data:` URL (percent-encode, e.g. `urllib.parse.quote(js, safe="(){}=>;.,'&:_$![]|=")`), then update the resource via the WebSocket API (`lovelace/resources/update`, resource id `6eebc249f29c4b22a92b3658d51f4da9`). Clients pick it up on hard refresh.
+To modify: edit `doorbell-ptt.js`, encode the file **verbatim** into a `data:` URL (`"data:text/javascript," + urllib.parse.quote(js, safe="(){}=>;.,'&:_$![]|=")`), then update the resource via the WebSocket API (`lovelace/resources/update`, resource id `6eebc249f29c4b22a92b3658d51f4da9`). Clients pick it up on hard refresh (companion app: close fully and reopen, or Settings → Debugging → Reset frontend cache). Bump the `PTT vN` version string when editing so the diagnostics bar confirms which version a client is running.
 
 ### Notifications
 
@@ -142,6 +144,7 @@ siren.front_door_siren                    doorbell siren
 - **Video starts muted** — browser autoplay policy; see "Hearing sound" above. One tap anywhere is the universal fallback.
 - **Talk worked, then stopped working across refreshes** — historically the wedged main-session backchannel; ensure `#backchannel=0` is still on the main stream (see above).
 - **Distorted/robotic talkback audio** — change the ffmpeg line to a single codec: `ffmpeg:doorbell#audio=pcma`.
+- **Phone: `sender:NO` and 0 kB sent while holding** — the app is connected over plain http (internal URL). Set the companion app's internal URL to https or disable it (see "Good to know").
 - **iOS app shows stale dashboard/behavior** — companion app Settings → Debugging → Reset frontend cache.
 - **Card badge shows MSE instead of RTC** — WebRTC failed to negotiate; check TCP 8555 reachability and `webrtc.candidates`.
 
