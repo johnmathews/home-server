@@ -121,6 +121,12 @@ views:
       name: Talk mode (microphone)
       icon: mdi:microphone
       color: red
+      tap_action:
+       action: toggle # single press toggles, no modal
+      icon_tap_action:
+       action: toggle
+      hold_action:
+       action: more-info # long-press still opens details
 ```
 
 The conditional-card pattern (not a mute button) is deliberate: with talk mode off, the mic-requesting player is unmounted entirely and the browser releases the microphone.
