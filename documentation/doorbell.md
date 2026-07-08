@@ -37,7 +37,8 @@ Open Home Assistant → **Doorbell** in the left sidebar (the 🔔 icon). Live v
 
 - The **chime and button always work**, even if Home Assistant, the network, or the internet is down — the doorbell and chime are RF-paired directly to each other.
 - **One talker at a time**: the doorbell hardware supports a single talkback session, like the Reolink app. If two people hold their buttons at once, the camera gets confused.
-- The grey `PTT v10 | …` line under the button is diagnostics: `sent:` should climb while you hold and speak. Errors show as a red banner on the card.
+- The grey `PTT v11 | …` line under the button is diagnostics: `sent:` should climb while you hold and speak. Errors show as a red banner on the card.
+- **You can see who is answering.** While one person holds the talk button, everyone else's screens show an amber banner — *"🎙 Ritsya is talking to the visitor"* — live for exactly as long as the button is held, and the other person's phone gets a push ("Ritsya is talking to the visitor", throttled to once per 2 minutes). Best practice remains one talker at a time.
 - **The phone app must connect over https for talking to work.** If the companion app's *internal URL* is `http://homeassistant.local:8123` (the default), iOS blocks microphone access entirely while on home WiFi — the card shows `sender:NO` and a "Microphone blocked: insecure connection" banner on hold. Fix: app → Settings → Companion App → your server → set the **Internal URL** to the https address (or disable "connect via internal URL") so the app always uses `https://home.itsa-pizza.com`.
 
 ---
@@ -114,6 +115,7 @@ All talk/unmute behavior comes from a **Lovelace resource**: a JS module (regist
 - **Race-proofing**: HA renders cards while resources are still loading, so the module both patches the class *and* retrofits existing instances by walking shadow DOMs (retries at 0/0.8/2.5/8 s).
 - **Diagnostics bar** (`PTT v10 | pc | sender | holding | sent`) driven by `getStats()`.
 - **Insecure-context guard**: on plain http, `navigator.mediaDevices` does not exist (the mount-time failure is silent and a naive call throws synchronously); the button surfaces "Microphone blocked: insecure connection" instead of hanging red.
+- **Who-is-talking**: on press the script writes the logged-in user's name (`hass.user.name`, via the frontend's `home-assistant` element — an internal but long-stable API) into `input_text.doorbell_talker`, and clears it on release / `pagehide`. Every card polls that entity in its 400 ms tick and shows the amber banner when someone *else* is talking. Fallback name is "someone" if the hass object is unavailable.
 
 To modify: edit `doorbell-ptt.js`, encode the file **verbatim** into a `data:` URL (`"data:text/javascript," + urllib.parse.quote(js, safe="(){}=>;.,'&:_$![]|=")`), then update the resource via the WebSocket API (`lovelace/resources/update`, resource id `6eebc249f29c4b22a92b3658d51f4da9`). Clients pick it up on hard refresh (companion app: close fully and reopen, or Settings → Debugging → Reset frontend cache). Bump the `PTT vN` version string when editing so the diagnostics bar confirms which version a client is running.
 
@@ -121,12 +123,15 @@ To modify: edit `doorbell-ptt.js`, encode the file **verbatim** into a `data:` U
 
 Automation `automation.doorbell_pressed_notify_phones`: on `binary_sensor.front_door_visitor` off→on, parallel notify to `mobile_app_john_s_phone` and `mobile_app_r_e_a_s_iphone` with snapshot (`/api/camera_proxy/camera.front_door_fluent`), time-sensitive, tap opens `/front-door`.
 
+Automation `automation.doorbell_someone_is_answering` (config id `doorbell_talker_notify`): when `input_text.doorbell_talker` becomes non-empty for 1 s, notify the *other* person's phone (John talks → Ritsya's iPhone, and vice versa; unknown names fall back to John's phone). Throttled via `last_triggered` > 120 s. Automation `automation.doorbell_talker_stale_clear`: talker name non-empty for 3 minutes → reset to empty (browser died mid-press).
+
 (An earlier `doorbell_talk_mode` input_boolean + auto-off automation existed for a toggle-based design; both were deleted when the single-button design replaced it.)
 
 ### Useful entities (Reolink integration)
 
 ```
 binary_sensor.front_door_visitor          doorbell button press
+input_text.doorbell_talker                name of whoever is holding talk (else empty)
 binary_sensor.front_door_motion/_person/_vehicle/_pet
 camera.front_door_fluent                  snapshot source for notifications
 number.front_door_doorbell_volume         doorbell speaker volume (currently 93)

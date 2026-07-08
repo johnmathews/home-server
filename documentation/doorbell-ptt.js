@@ -99,6 +99,37 @@ customElements.whenDefined('webrtc-camera').then(() => {
             + 'padding:3px 8px;margin-top:4px;border-radius:8px;position:relative;z-index:9';
         root.appendChild(dbg);
 
+        // who-is-talking: mirror PTT state into input_text.doorbell_talker so
+        // other household members see (and get notified) who answered
+        const TALKER = 'input_text.doorbell_talker';
+        const hassObj = () => {
+            const ha = document.querySelector('home-assistant');
+            return ha && ha.hass;
+        };
+        const setTalker = value => {
+            const h = hassObj();
+            if (h) h.callService('input_text', 'set_value',
+                {entity_id: TALKER, value: value}).catch(() => {});
+        };
+        const talkerBanner = document.createElement('div');
+        talkerBanner.style.cssText = 'display:none;align-items:center;justify-content:center;'
+            + 'color:#fff;background:#e65100;font:600 15px sans-serif;padding:8px;'
+            + 'margin-top:4px;border-radius:8px;position:relative;z-index:9';
+        root.appendChild(talkerBanner);
+        const updateTalkerBanner = () => {
+            const h = hassObj();
+            const st = h && h.states && h.states[TALKER];
+            const name = st ? st.state : '';
+            // hide while WE are the one talking (button already shows it)
+            if (name && name !== 'unknown' && !tx) {
+                talkerBanner.textContent = '🎙 ' + name + ' is talking to the visitor';
+                talkerBanner.style.display = 'flex';
+            } else {
+                talkerBanner.style.display = 'none';
+            }
+        };
+        window.addEventListener('pagehide', () => { if (tx) setTalker(''); });
+
         // half-duplex: mute/unmute every registered viewer video
         const rx = m => {
             window.__dbTx = m;
@@ -141,7 +172,8 @@ customElements.whenDefined('webrtc-camera').then(() => {
             }
             cap();
             stats();
-            dbg.textContent = 'PTT v10 | pc:' + (el.pc ? 'yes' : 'NO')
+            updateTalkerBanner();
+            dbg.textContent = 'PTT v11 | pc:' + (el.pc ? 'yes' : 'NO')
                 + ' | sender:' + (M.s ? 'yes' : 'NO')
                 + ' | holding:' + tx
                 + ' | sent:' + (sent / 1024).toFixed(1) + 'kB';
@@ -155,6 +187,7 @@ customElements.whenDefined('webrtc-camera').then(() => {
             if (M.t) { M.t.stop(); M.t = null; }        // release the mic
             if (M.s) M.s.replaceTrack(null).catch(() => {});
             rx(false);
+            setTalker('');
         };
 
         btn.addEventListener('contextmenu', e => e.preventDefault());
@@ -167,6 +200,8 @@ customElements.whenDefined('webrtc-camera').then(() => {
             btn.style.background = '#b71c1c';
             rx(true);
             msg('');
+            const h = hassObj();
+            setTalker((h && h.user && h.user.name) || 'someone');
             // http (non-localhost) pages have no navigator.mediaDevices at all —
             // e.g. the companion app connecting via an internal http:// URL
             if (!navigator.mediaDevices || !window.isSecureContext) {
