@@ -145,7 +145,45 @@ To modify: edit `doorbell-ptt.js`, encode the file **verbatim** into a `data:` U
 
 ### Notifications
 
-Automation `automation.doorbell_pressed_notify_phones`: on `binary_sensor.front_door_visitor` off→on, parallel notify to `mobile_app_john_s_phone` and `mobile_app_r_e_a_s_iphone` with snapshot (`/api/camera_proxy/camera.front_door_fluent`), time-sensitive, tap opens `/front-door`.
+Automation `automation.doorbell_pressed_notify_phones`: on `binary_sensor.front_door_visitor` off→on, parallel notify to `mobile_app_john_s_phone` and `mobile_app_r_e_a_s_iphone` with a **static snapshot** (`data.image: /api/camera_proxy/camera.front_door_fluent`), time-sensitive, tap opens `/front-door`. On iOS the snapshot shows as a small banner thumbnail; **long-press to expand** the full photo.
+
+Notification snapshots **depend on the Cloudflare Access bypass rules** (next section). Two attachment methods were tried: `data.entity_id` (live stream attachment) renders a **black screen** through the Cloudflare tunnel (buffered MJPEG/HLS), so the static `data.image` snapshot is the deliberate choice.
+
+### Cloudflare Access and the companion app
+
+`home.itsa-pizza.com` sits behind Cloudflare Zero Trust Access. The **main app works** (its session carries the Access cookie), but the app's **background processes run in separate iOS processes without that cookie** — notification attachments, token refresh, background webhooks. Access intercepts their requests and returns its login page, producing misleading client-side errors:
+
+```
++--------------------------------------------------+--------------------------------------+
+| Error shown on the phone                         | What actually happened               |
++--------------------------------------------------+--------------------------------------+
+| "Failed to load attachment - Request adaption    | Token refresh POST /auth/token got   |
+|  failed ... ObjectMapper failed to serialize"    | the Access login page instead of JSON|
+| "HLS stream unavailable"                         | Stream URL fetch blocked by Access   |
+| "... MJPEGStreamer.MJPEGError error 0"           | MJPEG fallback blocked by Access     |
+| Attachment loads but BLACK screen                | Live stream buffered by the CF       |
+|                                                  | tunnel (not an Access problem)       |
++--------------------------------------------------+--------------------------------------+
+```
+
+**Fix (applied 2026-07-08): Access *bypass* policies** on `home.itsa-pizza.com` for the paths token-based clients need — each remains protected by HA's own auth:
+
+```
+/api/camera_proxy/*         notification snapshot fetch   (HA bearer auth)
+/api/camera_proxy_stream/*  camera stream fetch           (HA bearer auth)
+/api/webhook/*              app location/sensor telemetry (secret webhook ids)
+/auth/token                 OAuth token refresh           (valid refresh token required)
+```
+
+Verify from any external network — a response **from HA** (not a 302 to `cloudflareaccess.com`) means the bypass works:
+
+```sh
+curl -i https://home.itsa-pizza.com/api/camera_proxy/camera.front_door_fluent   # 403 from HA = OK
+curl -i -X POST https://home.itsa-pizza.com/auth/token -d grant_type=refresh_token  # {"error":"invalid_request"} = OK
+curl -i https://home.itsa-pizza.com/api/                                        # 302 to Access = still protected, correct
+```
+
+Side effect worth knowing: `/api/webhook/*` being blocked also silently broke the app's **background location/sensor updates when away from home** — fixed by the same bypass.
 
 Automation `automation.doorbell_someone_is_answering` (config id `doorbell_talker_notify`): when `input_text.doorbell_talker` becomes non-empty for 1 s, notify the *other* person's phone (John talks → Ritsya's iPhone, and vice versa; unknown names fall back to John's phone). Throttled via `last_triggered` > 120 s. Automation `automation.doorbell_talker_stale_clear`: talker name non-empty for 3 minutes → reset to empty (browser died mid-press).
 
@@ -206,6 +244,7 @@ Known-good reference (2026-07-08): scenarios 1, 2, 4 all pass with badge RTC; sc
 - **Video starts muted** — browser autoplay policy; see "Hearing sound" above. One tap anywhere is the universal fallback.
 - **Talk worked, then stopped working across refreshes** — historically the wedged main-session backchannel; ensure `#backchannel=0` is still on the main stream (see above).
 - **Distorted/robotic talkback audio** — change the ffmpeg line to a single codec: `ffmpeg:doorbell#audio=pcma`.
+- **Notification shows "Failed to load attachment / Request adaption failed", "HLS stream unavailable", or a black image** — Cloudflare Access is blocking the app's background fetches, or the live-stream attachment is being used; see "Cloudflare Access and the companion app" above.
 - **Phone: `sender:NO` and 0 kB sent while holding** — the app is connected over plain http (internal URL). Set the companion app's internal URL to https or disable it (see "Good to know").
 - **iOS app shows stale dashboard/behavior** — companion app Settings → Debugging → Reset frontend cache.
 - **Card badge shows MSE instead of RTC** — WebRTC failed to negotiate; check TCP 8555 reachability and `webrtc.candidates`.
