@@ -130,6 +130,18 @@ customElements.whenDefined('webrtc-camera').then(() => {
         };
         window.addEventListener('pagehide', () => { if (tx) setTalker(''); });
 
+        // ask the browser to keep the receive jitter buffer small (shaves
+        // 100-300ms off doorbell->viewer latency; harmless where unsupported)
+        const lowLatency = () => {
+            if (!el.pc) return;
+            el.pc.getReceivers().forEach(r => {
+                try {
+                    if ('jitterBufferTarget' in r) r.jitterBufferTarget = 75;
+                    else if ('playoutDelayHint' in r) r.playoutDelayHint = 0.075;
+                } catch (e) {}
+            });
+        };
+
         // half-duplex: mute/unmute every registered viewer video
         const rx = m => {
             window.__dbTx = m;
@@ -173,7 +185,8 @@ customElements.whenDefined('webrtc-camera').then(() => {
             cap();
             stats();
             updateTalkerBanner();
-            dbg.textContent = 'PTT v11 | pc:' + (el.pc ? 'yes' : 'NO')
+            lowLatency();
+            dbg.textContent = 'PTT v12 | pc:' + (el.pc ? 'yes' : 'NO')
                 + ' | sender:' + (M.s ? 'yes' : 'NO')
                 + ' | holding:' + tx
                 + ' | sent:' + (sent / 1024).toFixed(1) + 'kB';

@@ -37,8 +37,9 @@ Open Home Assistant → **Doorbell** in the left sidebar (the 🔔 icon). Live v
 
 - The **chime and button always work**, even if Home Assistant, the network, or the internet is down — the doorbell and chime are RF-paired directly to each other.
 - **One talker at a time**: the doorbell hardware supports a single talkback session, like the Reolink app. If two people hold their buttons at once, the camera gets confused.
-- The grey `PTT v11 | …` line under the button is diagnostics: `sent:` should climb while you hold and speak. Errors show as a red banner on the card.
+- The grey `PTT v12 | …` line under the button is diagnostics: `sent:` should climb while you hold and speak. Errors show as a red banner on the card.
 - **You can see who is answering.** While one person holds the talk button, everyone else's screens show an amber banner — *"🎙 Ritsya is talking to the visitor"* — live for exactly as long as the button is held, and the other person's phone gets a push ("Ritsya is talking to the visitor", throttled to once per 2 minutes). Best practice remains one talker at a time.
+- **Away from home, expect degraded behavior (pending confirmation — see Testing checklist).** Outside the house, connections go through the Cloudflare tunnel, which cannot carry WebRTC media: observed remote sessions fall back to MSE (video +1–3 s lag, one-way only), and **hold-to-talk is expected NOT to work remotely** because talkback requires WebRTC. Watch the badge in the video corner: **RTC** = full function, **MSE** = view-only. Fix options if remote talkback is wanted: forward port 8555 (TCP+UDP) on the MikroTik to 192.168.2.102 (go2rtc already advertises its public address via STUN), or use Tailscale on the phones so the LAN address is reachable.
 - **The phone app must connect over https for talking to work.** If the companion app's *internal URL* is `http://homeassistant.local:8123` (the default), iOS blocks microphone access entirely while on home WiFi — the card shows `sender:NO` and a "Microphone blocked: insecure connection" banner on hold. Fix: app → Settings → Companion App → your server → set the **Internal URL** to the https address (or disable "connect via internal URL") so the app always uses `https://home.itsa-pizza.com`.
 
 ---
@@ -77,6 +78,28 @@ Talkback requires **WebRTC** (MSE/HLS are one-way by design — HA's built-in ca
 
 The talkback round trip is ~1.4 s (dominated by the doorbell firmware's ~0.5–0.8 s audio buffer — not tunable); the visitor hears you after roughly half that. Echo (your voice returning via the doorbell's mic) is avoided by muting incoming audio while transmitting (half-duplex), like every commercial intercom.
 
+Latency budget (what is and isn't tunable):
+
+```
++--------------------------------------+-----------+---------------------------+
+| Component                            | Approx.   | Tunable?                  |
++--------------------------------------+-----------+---------------------------+
+| DOORBELL -> APP                      |           |                           |
+|  camera encoder buffer               | 200-400ms | no (firmware)             |
+|  audio transcode (AAC->Opus, ffmpeg) | ~100ms    | no (WebRTC can't do AAC)  |
+|  network (LAN, WebRTC)               | <10ms     | already minimal           |
+|  browser jitter buffer               | 100-300ms | YES - v12 hints it to 75ms|
+|  MSE fallback (remote via tunnel)    | +1-3s     | avoidable (see below)     |
++--------------------------------------+-----------+---------------------------+
+| APP -> DOORBELL                      |           |                           |
+|  browser mic + WebRTC send           | 20-60ms   | already minimal           |
+|  go2rtc -> camera (PCMU passthrough) | ~10ms     | no transcode, minimal     |
+|  doorbell firmware playback buffer   | 500-800ms | NO - this is the floor    |
++--------------------------------------+-----------+---------------------------+
+```
+
+**Remote access transports:** WebRTC needs a reachable media path (port 8555). At home, LAN candidates work directly. Through the Cloudflare tunnel only HTTP flows, so the card falls back to MSE (view-only, +1–3 s). To get full-function remote access: MikroTik port-forward 8555 TCP+UDP → 192.168.2.102 (the `stun:8555` candidate then resolves and advertises the public address), or Tailscale on the client devices.
+
 ### go2rtc stream (go2rtc config inside HA)
 
 ```yaml
@@ -113,7 +136,8 @@ All talk/unmute behavior comes from a **Lovelace resource**: a JS module (regist
 - **Half-duplex**: all viewer videos mute while transmitting, restore on release.
 - **iOS first-use path**: mount-time `getUserMedia` fails outside a gesture (silently — the card only `console.warn`s), so the card negotiates no audio sender; the first hold acquires permission in-gesture and reconnects the card ("hold again to talk").
 - **Race-proofing**: HA renders cards while resources are still loading, so the module both patches the class *and* retrofits existing instances by walking shadow DOMs (retries at 0/0.8/2.5/8 s).
-- **Diagnostics bar** (`PTT v10 | pc | sender | holding | sent`) driven by `getStats()`.
+- **Diagnostics bar** (`PTT v12 | pc | sender | holding | sent`) driven by `getStats()`.
+- **Latency hint**: sets `jitterBufferTarget` (fallback `playoutDelayHint`) to ~75 ms on all WebRTC receivers each tick — shaves 100–300 ms off doorbell→viewer playout where the browser supports it.
 - **Insecure-context guard**: on plain http, `navigator.mediaDevices` does not exist (the mount-time failure is silent and a naive call throws synchronously); the button surfaces "Microphone blocked: insecure connection" instead of hanging red.
 - **Who-is-talking**: on press the script writes the logged-in user's name (`hass.user.name`, via the frontend's `home-assistant` element — an internal but long-stable API) into `input_text.doorbell_talker`, and clears it on release / `pagehide`. Every card polls that entity in its 400 ms tick and shows the amber banner when someone *else* is talking. Fallback name is "someone" if the hass object is unavailable.
 
@@ -139,6 +163,39 @@ select.reolink_chime_visitor_ringtone     chime ringtone
 switch.front_door_doorbell_button_sound   the doorbell's own press beep
 siren.front_door_siren                    doorbell siren
 ```
+
+### Testing checklist
+
+Run after any change (script version, go2rtc config, HA upgrade) or to answer
+"does it work away from home?". Hard-refresh the browser / fully restart the app
+first, and confirm the grey bar shows the expected `PTT vNN` before judging.
+
+Scenarios (test each row top-to-bottom; note results):
+
+```
++----+---------------------------+--------------------------------------------------+
+| #  | Scenario                  | Steps                                            |
++----+---------------------------+--------------------------------------------------+
+| 1  | Laptop, home WiFi         | full check (below)                               |
+| 2  | iPhone app, home WiFi     | full check                                       |
+| 3  | iPhone app, WiFi OFF (4G) | full check <- the open question: remote talkback |
+| 4  | Second person present     | banner + notification check (below)              |
++----+---------------------------+--------------------------------------------------+
+```
+
+Full check, per scenario:
+
+1. **Badge**: corner of the video — record `RTC` or `MSE`. (`MSE` = view-only mode; talk cannot work.)
+2. **Video**: live, and reacts within ~1 s when you wave at the camera.
+3. **Sound**: audible after at most one tap anywhere on the page.
+4. **Diagnostics line**: `pc:yes | sender:yes` (on iPhone, `sender:NO` before the very first hold is normal).
+5. **Talk**: hold the button ~5 s and speak. Expect: button red, `sent:` climbing by a few kB/s, voice at the door after ~1 s. Note any red banner text verbatim.
+6. **Release**: audio returns; `sent:` stops climbing.
+
+Second-person check (scenario 4): while one person holds talk, the other's screen shows the amber "🎙 <name> is talking" banner within ~1 s, and their phone gets one push (throttled: max one per 2 min).
+
+Record results as: scenario / badge / talk worked? / delay felt / any banner text.
+Known-good reference (2026-07-08): scenarios 1, 2, 4 all pass with badge RTC; scenario 3 untested — expected MSE + no talk until the port-forward or Tailscale fix is applied.
 
 ### Troubleshooting
 
