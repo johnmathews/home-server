@@ -181,7 +181,8 @@ services:
     restart: always
 
   booklore:
-    image: booklore/booklore:{{ booklore_version }}
+    # BookLore moved off Docker Hub (booklore/booklore is dead); official registry is ghcr
+    image: ghcr.io/booklore-app/booklore:{{ booklore_version }}
     container_name: booklore
     environment:
       - USER_ID=1001

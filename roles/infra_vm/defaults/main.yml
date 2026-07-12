@@ -21,6 +21,14 @@ portainer_ce_version: "latest"
 mktxp_version: "latest"
 container_status_exporter_version: "latest"
 atuin_version: "v18.4.0"
+diun_version: "latest"
+
+# Diun (Docker image update notifier -> Pushover)
+diun_schedule: "0 9 * * 1" # weekly check, Monday 09:00
+# Reuses the pve Pushover application token. For a dedicated "Diun" app label in
+# Pushover, create the app at pushover.net, add its token to vault, and swap here.
+diun_pushover_token: "{{ vault_pushover_pve_application_token }}"
+diun_pushover_user_key: "{{ vault_pushover_user_key }}"
 
 smb_infra_vm_username: infra_vm
 

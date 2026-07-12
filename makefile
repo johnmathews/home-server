@@ -46,6 +46,7 @@ ANSIBLE_OPTS := $(TAGS_ARG) $(SKIP_ARG) $(LIMIT_ARG) $(EXTRA)
 .PHONY: all site pve nas mail media infra key traefik immich tube prometheus \
         document-library music jelly open-webui cloudflared agent \
         shell nfs share_drive_probe tailscale requirements \
+        jelly-upgrade immich-upgrade \
         check lint clean ci help
 
 
@@ -78,6 +79,13 @@ traefik:
 immich:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/immich_lxc.yml $(VAULT) $(ANSIBLE_OPTS)
 
+# Pull the newest immich release images, redeploy the stack, health-check
+immich-upgrade:
+	ssh immich 'docker pull ghcr.io/immich-app/immich-server:release && docker pull ghcr.io/immich-app/immich-machine-learning:release && docker pull alangrainger/immich-public-proxy:latest'
+	$(MAKE) immich
+	@echo "waiting for immich to come up..."; sleep 40
+	@curl -sf -o /dev/null http://192.168.2.113:2283/api/server/ping && curl -s http://192.168.2.113:2283/api/server/version | python3 -c 'import json,sys; d=json.load(sys.stdin); print("immich healthy, version: v%s.%s.%s" % (d["major"], d["minor"], d["patch"]))' 
+
 tube:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/tubearchivist_lxc.yml $(VAULT) $(ANSIBLE_OPTS)
 
@@ -92,6 +100,12 @@ music:
 
 jelly:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/jellyfin_lxc.yml $(VAULT) $(ANSIBLE_OPTS)
+
+# Pull the newest jellyfin base, rebuild the local yt-dlp image, recreate, health-check
+jelly-upgrade:
+	ssh jelly 'docker pull jellyfin/jellyfin:latest && cd /srv/apps && docker compose build jellyfin && docker compose up -d jellyfin'
+	@echo "waiting for jellyfin to come up..."; sleep 25
+	@curl -sf -o /dev/null http://192.168.2.110:8096/health && curl -s http://192.168.2.110:8096/System/Info/Public | python3 -c 'import json,sys; print("jellyfin healthy, version:", json.load(sys.stdin)["Version"])'
 
 open-webui:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/open_webui_lxc.yml $(VAULT) $(ANSIBLE_OPTS)

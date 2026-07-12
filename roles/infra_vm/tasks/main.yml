@@ -146,7 +146,7 @@
     group: docker
     mode: '0644'
   notify: Update docker compose stack
-  tags: docker, mikrotik_exporter, docserver, homepage, documentation
+  tags: docker, mikrotik_exporter, docserver, homepage, documentation, diun
 
 - name: Upload .env file from template
   ansible.builtin.template:
@@ -155,7 +155,7 @@
     owner: "{{ docker_user }}"
     group: docker
     mode: '0600'
-  tags: atuin, docker, sre
+  tags: atuin, docker, sre, diun
 
 - name: Upload grafana config.ini
   ansible.builtin.template:
@@ -203,6 +203,10 @@
   ansible.builtin.import_tasks: mikrotik_exporter.yml
   tags: mikrotik_exporter
 
+- name: Include diun tasks
+  ansible.builtin.import_tasks: diun.yml
+  tags: diun, docker
+
 - name: Launch containers
   community.docker.docker_compose_v2:
     project_src: "{{ docker_compose_dir }}"
@@ -212,4 +216,4 @@
     dependencies: true
     remove_orphans: true
   become: false
-  tags: docker, mikrotik_exporter
+  tags: docker, mikrotik_exporter, diun

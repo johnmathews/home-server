@@ -174,7 +174,7 @@ Service-specific guides in `/documentation/`. Read the relevant doc before worki
 - `journal_agent.md` — Journal agent and ChromaDB on media VM (MCP journaling, vector search)
 - `proxmox_host_tuning.md` — ZFS ARC, KSM, VM ballooning, memory management
 - `truenas.md` — TrueNAS scripts: share refresh, disk spindown, exporter
-- `upgrade-procedures.md` — How to upgrade Docker images, Proxmox, TrueNAS, and dependencies
+- `upgrade-procedures.md` — How to upgrade Docker images, Proxmox, TrueNAS, and dependencies; Diun update notifications
 - `ups.md` — UPS monitoring via Network UPS Tools (NUT)
 - `vault.md` — Ansible Vault: layout, conventions, edit/rotate, recovery considerations
 

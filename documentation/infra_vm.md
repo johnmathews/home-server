@@ -44,6 +44,7 @@ services pin `:latest` directly. Container names are stable.
 | sre-agent                  | ghcr.io/johnmathews/sre-agent                       | 8001  | -                           |
 | sre-ingest                 | ghcr.io/johnmathews/sre-agent                       | -     | -                           |
 | mikrotik_exporter          | ghcr.io/akpw/mktxp                                  | 49090 | -                           |
+| diun                       | crazymax/diun                                       | -     | Image-update notifier       |
 | container-status-exporter  | ghcr.io/johnmathews/container-status-exporter       | 8081  | -                           |
 | atuin                      | ghcr.io/atuinsh/atuin                               | 8888  | atuin.itsa-pizza.com        |
 | atuin_database             | postgres:14                                         | -     | -                           |
@@ -144,6 +145,7 @@ The role splits tasks across multiple files:
 - `tasks/file-browser.yml` — File browser setup (orphaned: not imported by `main.yml` and no
   filebrowser service in the compose file)
 - `tasks/mikrotik_exporter.yml` — MKTXP configuration
+- `tasks/diun.yml` — Diun watched-images list (`templates/diun-images.yml.j2` → `/srv/infra/diun/images.yml`)
 - `tasks/mkdocs.yml` — MkDocs documentation site
 
 ### Ansible Tags

@@ -20,6 +20,29 @@ Most services run as Docker containers with pinned image versions in role defaul
 You must pull new images manually (step 4) before deploying. This prevents unexpected
 image changes during config-only deploys.
 
+### Update notifications (Diun)
+
+Diun runs on the infra VM (`roles/infra_vm`, `make infra t=diun`) and checks ~29
+watched rolling-tag images **weekly (Monday 09:00)**, sending a **Pushover**
+notification per updated image. The watch list is
+`roles/infra_vm/templates/diun-images.yml.j2` (self-built `ghcr.io/johnmathews/*`
+images, databases, and pinned images are deliberately excluded — comments in the
+file explain). linuxserver.io images rebuild weekly, so the media-stack entries
+notify most weeks; trim that block if it gets noisy.
+
+When a notification arrives:
+
+- **Jellyfin** → `make jelly-upgrade` (pull base, rebuild local image, recreate,
+  health-check)
+- **Immich** → read the release notes, then `make immich-upgrade`
+- **Anything else** → `ssh <host> 'docker pull <image>'` then `make <host>`
+  (handlers use `pull: never`, so pulling first is required)
+
+Diun reuses the pve Pushover app token (`diun_pushover_token` in
+`roles/infra_vm/defaults/main.yml`); create a dedicated "Diun" app in Pushover and
+swap the vault var there if you want distinctly-labelled notifications. Test the
+wiring with `ssh infra 'docker exec diun diun notif test'`.
+
 ### Monitoring sidecar upgrades
 
 Monitoring sidecars (node-exporter, cadvisor, alloy) run on every service host. Since
