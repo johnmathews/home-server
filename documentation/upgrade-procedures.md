@@ -30,6 +30,12 @@ images, databases, and pinned images are deliberately excluded — comments in t
 file explain). linuxserver.io images rebuild weekly, so the media-stack entries
 notify most weeks; trim that block if it gets noisy.
 
+The **Image Freshness dashboard** (`charts.itsa-pizza.com/d/image-freshness`) shows the
+complementary view: which *running* containers are behind, by how many days, with
+current/available versions — powered by `container_image_*` metrics from the
+container-status-exporter (registry digest comparison, 6h cycle). Diun says "something
+new exists"; the dashboard says "this is what you're behind on".
+
 When a notification arrives:
 
 - **Jellyfin** → `make jelly-upgrade` (pull base, rebuild local image, recreate,

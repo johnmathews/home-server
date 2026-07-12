@@ -27,6 +27,8 @@ rules become read-only in the UI.
 | UPS runtime low            | battery_runtime < 25 min AND on mains (OL flag)               | 10m  | 4     |
 | UPS load high              | ups_load > 30%                                                | 5m   |       |
 | UPS monitoring down        | up{job="nut"} == 0 (NoData also alerts)                       | 10m  | 5     |
+| Container image stale      | running image >30 days older than registry (weekly repeat)   | 6h   | 6     |
+| Image freshness data missing| freshness last-check older than 24h (NoData also alerts)    | 1h   | 6     |
 +----------------------------+---------------------------------------------------------------+------+-------+
 ```
 
@@ -57,6 +59,12 @@ Notes:
 5. **UPS monitoring down** has `noDataState: Alerting` and `execErrState: Alerting`,
    so losing the NUT exporter (or its scrape target) alerts instead of silently
    blinding the other four UPS rules.
+6. **Image freshness rules** (folder "Containers") ride on the container-status-exporter's
+   `container_image_*` metrics (see the Image Freshness dashboard, uid
+   `image-freshness`, reference JSON in `roles/infra_vm/files/grafana/dashboards/`).
+   The stale rule uses build-date distance (restart-proof, unlike a 30-day pending
+   period) and repeats its grouped Pushover digest weekly (`repeat_interval: 168h`).
+   Note: Prometheus renames the exporter's `hostname` label to `exported_hostname`.
 
 Known gaps: `nas_vm` (TrueNAS has its own alerting) and `home-assistant` (no
 node_exporter) are not covered by the VM/host disk rule.

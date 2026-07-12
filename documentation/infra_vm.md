@@ -45,7 +45,7 @@ services pin `:latest` directly. Container names are stable.
 | sre-ingest                 | ghcr.io/johnmathews/sre-agent                       | -     | -                           |
 | mikrotik_exporter          | ghcr.io/akpw/mktxp                                  | 49090 | -                           |
 | diun                       | crazymax/diun                                       | -     | Image-update notifier       |
-| container-status-exporter  | ghcr.io/johnmathews/container-status-exporter       | 8081  | -                           |
+| container-status-exporter  | ghcr.io/johnmathews/container-status-exporter       | 8081  | + image freshness metrics   |
 | atuin                      | ghcr.io/atuinsh/atuin                               | 8888  | atuin.itsa-pizza.com        |
 | atuin_database             | postgres:14                                         | -     | -                           |
 | node-exporter              | prom/node-exporter                                  | 9100  | -                           |
