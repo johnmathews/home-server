@@ -46,10 +46,14 @@ Copy the config.alloy file in `tubearchivist_lxc` to replace all other instances
   become: true
 
   roles:
-   - role: nfs_client
-     tags: [nfs]
-   - role: share_drive_probe
-     tags: [shares]
-   - role: jellyfin_lxc
-     tags: [jelly]
+    - role: nfs_client
+      tags: nfs
+    - role: share_drive_probe
+      tags: shares
+    - role: jellyfin_lxc
+      tags: jelly
+    - role: shell_environment
+      tags: shell
+    - role: tailscale
+      tags: tailscale
 ```

@@ -44,15 +44,15 @@ Internet -> Cloudflare Edge (TLS) -> Tunnel -> cloudflared LXC -> Traefik (192.1
 | homepage        | itsa-pizza.com                 | 192.168.2.106:3002    | None (public)     |
 | uptime          | uptime.itsa-pizza.com          | 192.168.2.106:3001    | None (public)     |
 | speed           | speed.itsa-pizza.com           | 192.168.2.100:8080    | None (public)     |
-| sre             | sre.itsa-pizza.com             | 192.168.2.106:8501    | BasicAuth         |
+| sre             | sre.itsa-pizza.com             | 192.168.2.106:8501    | Zero Access (edge)|
 | stats           | stats.itsa-pizza.com           | 192.168.2.106:3000    | Path-restricted   |
 +-----------------+-------------------------------+-----------------------+-------------------+
 ```
 
 These domains bypass Cloudflare Zero Access — either because native apps/APIs can't handle auth redirects (jellyfin,
 immich, navidrome, music), because they are intentionally public for portfolio demos (homepage, timer, docs, uptime,
-speed), or because they use alternative authentication (sre uses BasicAuth, stats uses path restriction to only expose
-Grafana public dashboards). Traefik applies rate limiting as a compensating security control on all routes.
+speed), or because they use alternative authentication (sre has a Cloudflare Zero Access policy applied at the edge,
+stats uses path restriction to only expose Grafana public dashboards). Traefik applies rate limiting as a compensating security control on all routes.
 
 ## Configuration Files
 
@@ -88,7 +88,7 @@ multiple domains (for domain migration compatibility). Priority values ensure sp
 | force-https-proto   | Sets X-Forwarded-Proto: https for backends          |
 | security-headers    | Referrer policy, XSS filter, frame deny, nosniff   |
 | immich-login-rl     | Rate limit: 200/s avg, 300 burst on auth routes    |
-| jelly-login-rl      | Rate limit: 60/s avg, 30 burst on general routes   |
+| jelly-login-rl      | Rate limit: 240/s avg, 120 burst on general routes |
 | jelly-auth-rl       | Rate limit: 5/min, 3 burst on login endpoint       |
 | music-rl            | Rate limit: 200/s avg, 300 burst (navidrome)       |
 | navidrome-auth-rl   | Rate limit: 5/min, 3 burst on auth endpoint        |

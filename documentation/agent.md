@@ -147,6 +147,7 @@ NanoClaw itself was installed manually and is managed as a systemd user service 
 +-----------------+--------+--------------------------------------------------+
 | Container       | Port   | Purpose                                          |
 +-----------------+--------+--------------------------------------------------+
+| relay           | 7800   | Relay orchestrator (public: relay.itsa-pizza.com) |
 | mkdocs-journal  | 8000   | NanoClaw dev journal (MkDocs Material)            |
 | mkdocs-docs     | 8001   | NanoClaw documentation (MkDocs Material)          |
 | syncthing       | 8384   | File sync with MacBook (dev folders)             |
@@ -175,6 +176,16 @@ NanoClaw itself was installed manually and is managed as a systemd user service 
 | NanoClaw Gateway| 18790  | Bound to 0.0.0.0, systemd user service           |
 +-----------------+--------+--------------------------------------------------+
 ```
+
+### Relay
+
+The `relay` container (image `ghcr.io/johnmathews/relay`, version pinned by `relay_version` in
+`roles/agent_lxc/defaults/main.yml`) runs the relay orchestrator on port 7800. It is exposed publicly at
+`relay.itsa-pizza.com` via the Cloudflare Tunnel (`roles/cloudflared_lxc/defaults/main.yml`, prefix `relay` ->
+`192.168.2.107:7800`) — an SSH-free ingress into the agent LXC. It bind-mounts its SQLite event store
+(`/srv/apps/relay/data`), a Pi OAuth credential (`/srv/apps/relay/.pi`), and the Syncthing project tree
+(`/srv/apps/syncthing`, identity-mounted so in-container paths match host paths). See the comments in
+`roles/agent_lxc/templates/docker-compose.yml.j2` for setup details.
 
 ### Syncthing
 
@@ -389,7 +400,9 @@ transport. The app allows `ws://` for localhost because the tunnel makes it appe
 #### Authentication token
 
 The gateway requires an auth token. The macOS app's setup flow does **not** provide a UI field for this. The token must
-be added manually to the macOS-side config file at `~/.nanobot/config.json`:
+be added manually to the macOS-side config file at `~/.nanobot/config.json`. Abbreviated example — note the token field
+itself is **not shown** below (copy the auth key name/value from the gateway config on the LXC into the `gateway`
+block):
 
 ```json
 {

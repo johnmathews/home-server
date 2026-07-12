@@ -225,7 +225,7 @@ Should show `Server: 192.168.2.111` (at home) or `Server: 100.108.0.112` (via Ta
 1. Check Unbound logs for SSL errors: `journalctl -u unbound | grep -i error`
 2. Verify certificate bundle exists: `ls -la /etc/ssl/certs/ca-certificates.crt`
 3. Restart Unbound: `systemctl restart unbound`
-4. Test again: dig @127.0.0.1 -p 5335 google.com`
+4. Test again: `dig @127.0.0.1 -p 5335 google.com`
 
 ### Problem: Slow DNS resolution
 

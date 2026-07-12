@@ -138,10 +138,12 @@ Service-specific guides in `/documentation/`. Read the relevant doc before worki
 - `adding-a-new-service.md` — Step-by-step guide for adding a new service to the infrastructure
 - `adguard-unbound.md` — DNS privacy and ad blocking (MikroTik → AdGuard → Unbound → Quad9)
 - `ansible_build_commands.md` — Make commands and tags quick reference
-- `cloudflare-api.md` — Cloudflare API reference for DNS, Tunnel, Access, and Redirect automation
+- `archive/cloudflare-api.md` — Cloudflare API research notes from the domain migration (superseded by `cloudflared.md`, which documents the live API sync)
 - `cloudflared.md` — Cloudflare Tunnel setup, proxied services, DNS routes, architecture
+- `archive/documentation-improvement-plan.md` — Doc overhaul plan, Tiers 1–3 completed 2026-03 (archived 2026-07-12)
+- `archive/traefik-log-resilience-plan.md` — Traefik log rotation plan; Option B implemented (archived 2026-07-12)
 - `disaster-recovery.md` — Backup architecture, recovery scenarios, and rebuild procedures
-- `domain-migration.md` — Migration plan from itsa.pizza to itsa-pizza.com (multi-session project)
+- `archive/domain-migration.md` — Completed migration from itsa.pizza to itsa-pizza.com (archived 2026-07-12)
 - `docserver.md` — Documentation MCP server on infra VM (indexing, search, MCP)
 - `disks.md` — Proxmox host disk management and backup storage
 - `doorbell.md` — Reolink video doorbell: usage guide (non-technical), notifications, two-way audio, HA/go2rtc setup

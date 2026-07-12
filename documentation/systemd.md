@@ -88,13 +88,13 @@ systemctl list-timers --all | grep Docker
 ### Start a service 
 
 ```sh
-systemctl start mount-touch-probe.service
+systemctl start share-drive-probe.service
 ```
 
 ### Check the logs for a service 
 
 ```sh
-journalctl -u mount-touch-probe.service -n 50 -e
+journalctl -u share-drive-probe.service -n 50 -e
 ```
 
 ## Service Lifecycle

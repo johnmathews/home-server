@@ -1,4 +1,4 @@
-`iperf3` is a network testing utility. It runs on the Proxmox server and also on a client, like your laptop.
+`iperf3` is a network testing utility. It runs on the Infra VM and also on a client, like your laptop.
 
 Make a connection between the server and the client and you can test the speed of the connection between them.
 

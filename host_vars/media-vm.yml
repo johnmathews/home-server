@@ -50,9 +50,7 @@ sleep_hours_stop_containers:
   - sabnzbd
   - qbittorrent
   - booklore-mariadb
-  - lidarr
   - slskd
-  - soularr
 
 sleep_hours_kuma_map:
   sabnzbd: 28

@@ -22,25 +22,30 @@ by the OpenAI API (or compatible endpoints).
 ## Docker Containers
 
 ```
-+-----------------+-------------------------------------------+-------+------------------------------+
-| Container       | Image                                     | Port  | Purpose                      |
-+-----------------+-------------------------------------------+-------+------------------------------+
-| open-webui      | ghcr.io/open-webui/open-webui:main        | 3000  | LLM chat interface           |
-| node_exporter   | node-exporter:latest                      | 9100  | Host metrics for Prometheus  |
-| cadvisor        | cadvisor:latest                           | 18080 | Container metrics            |
-| alloy           | grafana/alloy:latest                      | 12345 | Log shipping to Loki         |
-+-----------------+-------------------------------------------+-------+------------------------------+
++-----------------+---------------------------------------------------------------+-------+------------------------------+
+| Container       | Image                                                         | Port  | Purpose                      |
++-----------------+---------------------------------------------------------------+-------+------------------------------+
+| open-webui      | ghcr.io/open-webui/open-webui:main                            | 3000  | LLM chat interface           |
+| node_exporter   | quay.io/prometheus/node-exporter:{{ node_exporter_version }}  | 9100  | Host metrics for Prometheus  |
+| cadvisor        | gcr.io/cadvisor/cadvisor:{{ cadvisor_version }}               | 18080 | Container metrics            |
+| alloy           | grafana/alloy:{{ alloy_version }}                             | 12345 | Log shipping to Loki         |
++-----------------+---------------------------------------------------------------+-------+------------------------------+
 ```
+
+Sidecar version pins live in `roles/open_webui_lxc/defaults/main.yml` (currently:
+cadvisor `v0.49.1`, alloy `v1.5.1`, node_exporter `v1.8.2`).
 
 ## Configuration
 
 ### LLM Backend
 
 Open WebUI connects to the OpenAI API using the `OPENAI_API_KEY` environment variable.
-The API key is stored in the `.env` file deployed by Ansible (sourced from vault).
+The key is stored in the Ansible-deployed `.env` file as `OPENAI_KEY` (from `vault_openai_key`),
+which the compose template maps to `OPENAI_API_KEY` in the container environment.
 
 Settings:
-- `OPENAI_API_KEY` — From vault via `.env` file
+- `OPENAI_API_KEY` — set from `${OPENAI_KEY}` in `docker-compose.yml.j2` (`.env` deployed from
+  `roles/open_webui_lxc/templates/.env.j2`)
 - No custom `OPENAI_API_BASE` configured — uses default `https://api.openai.com/v1`
 - Supports switching to Azure OpenAI or local LLM proxies by setting `OPENAI_API_BASE`
 
@@ -66,15 +71,13 @@ Accessible via Cloudflare Tunnel with Zero Access protection:
 Signup is enabled in Open WebUI itself, but Cloudflare Access provides the authentication
 layer. Users must pass Zero Access before reaching the signup/login page.
 
-## SMB Configuration
-
-The role defaults include an SMB share configuration for Paperless (`smb_shares: paperless`
-mounted at `/mnt/paperless`). This appears to allow the Open WebUI LXC to access the Paperless
-document store, potentially for document-based chat or RAG workflows.
-
 ## Vault Variables Used
 
-- `vault_openai_api_key` (or equivalent) — OpenAI API key in `.env` template
+- `vault_openai_key` — OpenAI API key in `.env` template
+
+Note: the role defaults still carry vestigial `smb_username` / `smb_server` variables from a
+removed Paperless SMB share config (Paperless was decommissioned 2026-07-04; the `smb_shares`
+entry was deleted from the defaults at that time).
 
 ## Troubleshooting
 

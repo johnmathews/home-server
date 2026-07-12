@@ -99,7 +99,7 @@ Version variables added to each role's defaults for easy updates. Static file
 - **Prometheus config refactoring**: 255+ hardcoded IPs in `roles/prometheus_lxc/templates/prometheus/prometheus.yml.j2`.
   Should be generated from variables with Jinja2 loops. Large change needing its own session.
 - **GitHub Actions CI**: No automated `make ci` on push. Requires vault secrets in GitHub.
-- **Documentation**: See `documentation/documentation-improvement-plan.md` for incremental plan.
+- **Documentation**: See `documentation/archive/documentation-improvement-plan.md` for incremental plan (completed, archived 2026-07-12).
 - **vault_gluetun_api_key**: Needs to be created in vault and the old key rotated.
 
 ### Cleanup

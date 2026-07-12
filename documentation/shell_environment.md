@@ -185,7 +185,7 @@ The infra VM runs the Atuin **server** as a Docker container (port 8888), backed
 VMs and LXCs run the Atuin **client** — the `shell_environment` role installs the CLI binary and configures it to sync
 against the server.
 
-- **Server**: `ghcr.io/atuinsh/atuin:latest` on the infra VM (Docker Compose)
+- **Server**: `ghcr.io/atuinsh/atuin:{{ atuin_version }}` on the infra VM (Docker Compose)
 - **Client**: version-pinned binary installed to `/usr/local/bin/atuin`, controlled by `atuin_version` in
   `group_vars/all/main.yml`
 - **Database**: Postgres 14 container (`atuin-db` service), data persisted at `/srv/infra/atuin/database`
@@ -195,8 +195,8 @@ against the server.
 **Client binary** — bump `atuin_version` in `group_vars/all/main.yml`, then run `make <target> t=atuin` for each host.
 The task compares the installed version against the target and re-installs if they differ.
 
-**Server** — uses `latest` tag (Atuin stopped publishing semver Docker tags after v18.2.0). To pull a newer image,
-run `make infra t=docker` which triggers a `docker compose up --force-recreate`.
+**Server** — pinned to the same `atuin_version` in the infra VM compose template. Bump the var, then run
+`make infra t=docker` which triggers a `docker compose up --force-recreate`.
 
 ### Key bindings
 

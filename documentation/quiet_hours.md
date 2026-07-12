@@ -1,13 +1,17 @@
 ## Deployment
 
 - The service is updated and deployed using Ansible.
-- The tasks live in `tasks/sleep_docker_containers.yml`
+- The tasks live in `roles/sleep_hours/tasks/` (`main.yml`, `directories.yml`,
+  `install_configuration.yml`, `install_plugins.yml`, `install_python_venv.yml`,
+  `install_scripts.yml`, `install_systemd.yml`, `nfs_smb_deploy.yml`)
+
+**Note:** the feature is currently **disabled fleet-wide** — see "Currently Enabled Hosts" below.
 
 `make site tags=sleep`
 
 `make media tags=sleep`
 
-`make paperless tags=sleep`
+`make document-library tags=sleep`
 
 `make tube tags=sleep`
 
@@ -41,7 +45,9 @@ cd tests
 - **20 integration tests** across 5 test files
 - Mock TrueNAS API server (no real TrueNAS required)
 - Mock Uptime Kuma server
-- Automated in CI/CD via GitHub Actions
+- Automated in CI/CD via GitHub Actions (`.github/workflows/test.yml`) — but the workflow
+  **skips the suite entirely** unless some `host_vars/` file sets `sleep_hours_enabled: true`,
+  which none currently does
 
 ### Documentation
 
@@ -81,13 +87,13 @@ file/socket state is unchanged.
 
 The following template variables are used.
 
-They can be edited in `media_vm/defaults/main.yml`.
+They can be edited in `group_vars/all/main.yml`.
 
 ```yaml
 uptime_kuma_url: "http://192.168.2.106:3001"
 uptime_kuma_user: "john"
-docker_quiet_hours_start: "23:55"
-docker_quiet_hours_end: "08:45"
+docker_quiet_hours_start: "00:00"
+docker_quiet_hours_end: "08:00"
 ```
 
 Ansible vault:
@@ -96,18 +102,24 @@ Ansible vault:
 
 ## Template files
 
-The Ansible role uses the following files and templates, located in
-`roles/sleep_hours/templates/`:
+Templates, located in `roles/sleep_hours/templates/`:
 
 - `docker-sleep@.service` - Unified service unit template for all operations
 - `docker-sleep@pause.timer.j2`
 - `docker-sleep@unpause.timer.j2`
 - `docker-sleep@stop.timer.j2`
 - `docker-sleep@start.timer.j2`
-- `docker-sleep.sh` - Main script that performs all operations
-- `uptimekumactl.py` - Uptime Kuma integration
 - `containers.list.j2` - Container list template
 - `kuma.map.j2` - Monitor mapping template
+- `truenas.conf.j2` - TrueNAS API config (NFS/SMB share control)
+- `truenas-nfs-shares.list.j2` - NFS share list (NFS/SMB share control)
+
+Static scripts, located in `roles/sleep_hours/files/` and deployed via `copy`:
+
+- `docker-sleep.sh` - Main script that performs all operations
+- `truenas-shares.sh` - TrueNAS NFS/SMB share toggling
+- `uptimekumactl.py` - Uptime Kuma integration
+- `plugins/` - per-service graceful-shutdown/busy-detection plugins
 
 ## Method
 
@@ -312,6 +324,12 @@ journalctl -u docker-sleep@stop.service -n 100
 ## TrueNAS NFS/SMB Share Control
 
 The quiet hours system can automatically disable and re-enable TrueNAS NFS and SMB shares to prevent HDD wakeup during quiet hours.
+
+> **Note (2026-07-12):** the worked examples below use **paperless** paths and containers.
+> Paperless-ngx was decommissioned 2026-07-04 — that LXC now runs the `library` app, its shares
+> are named `document-store`, and its only sleep-managed container is `library-worker`
+> (see `host_vars/document_library_lxc.yml`). The API mechanics shown remain correct; treat the
+> paperless names as illustrative only.
 
 ### How It Works
 
@@ -725,7 +743,7 @@ ls -l /etc/sleep-hours/truenas.conf
 cat /etc/sleep-hours/truenas.conf
 
 # Redeploy if missing:
-make paperless  # Or whatever host is affected
+make document-library  # Or whatever host is affected
 ```
 
 ---
@@ -822,17 +840,22 @@ jq --version
 
 ### Currently Enabled Hosts
 
-Check `host_vars/<hostname>.yml` for the current status:
+**As of 2026-07-12 the feature is DISABLED fleet-wide.** Every host that defines it sets
+`sleep_hours_enabled: false`, so the systemd timers/scripts are not deployed anywhere, and
+NFS/SMB share control is off everywhere:
 
-- ✅ paperless_lxc (`sleep_hours_nfs_smb_enabled: true`)
-- ✅ tubearchivist_lxc (`sleep_hours_nfs_smb_enabled: true`)
-- ✅ media-vm (`sleep_hours_nfs_smb_enabled: true`)
+- ❌ document_library_lxc (`sleep_hours_enabled: false`, `sleep_hours_nfs_smb_enabled: false`) —
+  successor to paperless_lxc, whose host_vars file no longer exists
+- ❌ tubearchivist_lxc (`sleep_hours_enabled: false`, `sleep_hours_nfs_smb_enabled: false`)
+- ❌ media-vm (`sleep_hours_enabled: false`, `sleep_hours_nfs_smb_enabled: false`)
 
-To enable on a new host:
+The container lists, kuma maps, and plugins remain configured in `host_vars/`, so the feature
+can be re-enabled per host. Check `host_vars/<hostname>.yml` for current status. To enable:
 
 ```yaml
 # host_vars/<hostname>.yml
-sleep_hours_nfs_smb_enabled: true
+sleep_hours_enabled: true
+sleep_hours_nfs_smb_enabled: true  # optional: also toggle TrueNAS shares
 ```
 
 ## Version History

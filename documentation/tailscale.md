@@ -132,19 +132,15 @@ lxc.mount.entry: /dev/net/tun dev/net/tun none bind,create=file
 
 This only needs to be run once and is idempotent (safe to run multiple times).
 
-### 3. Deploy Tailscale to AdGuard LXC
+### 3. Tailscale on the AdGuard LXC (manual — not Ansible-managed)
 
-**Critical:** The AdGuard LXC must have its own Tailscale instance for DNS to work remotely:
+**Critical:** The AdGuard LXC must have its own Tailscale instance for DNS to work remotely.
 
-```bash
-# Deploy to AdGuard specifically
-make tailscale LIMIT=adguard
+The AdGuard LXC (192.168.2.111) is **not managed by Ansible** — it appears in neither `inventory.ini` nor
+`inventory-tailscale.ini`, so `make tailscale` never touches it. Its Tailscale instance was installed and
+authenticated manually on the LXC (`curl -fsSL https://tailscale.com/install.sh | sh` then `tailscale up`).
 
-# Or use Ansible directly
-ansible-playbook -i inventory.ini playbooks/tailscale.yml --vault-password-file=.vault_pass.txt --limit adguard
-```
-
-After deployment, get the AdGuard Tailscale IP:
+To check or retrieve the AdGuard Tailscale IP:
 
 ```bash
 ssh root@192.168.2.111 "tailscale ip -4"
@@ -159,8 +155,9 @@ Deploy to remaining VMs and LXCs:
 # Deploy to all hosts
 make tailscale
 
-# Or deploy to specific host
-make tailscale LIMIT=media_vm
+# Or deploy to specific host (inventory.ini uses hyphens, e.g. media-vm;
+# inventory-tailscale.ini uses underscores, e.g. media_vm)
+make tailscale LIMIT=media-vm
 
 # Or use Ansible directly
 ansible-playbook -i inventory.ini playbooks/tailscale.yml --vault-password-file=.vault_pass.txt
@@ -200,7 +197,7 @@ After deployment, get the Tailscale IP for each host:
 ```bash
 # From your local machine
 ssh john@192.168.2.105 "tailscale ip -4"
-# Output: 100.64.0.5
+# Output: 100.88.114.14
 
 # Or SSH to each host and run:
 tailscale status
@@ -229,18 +226,22 @@ Enable Tailscale DNS in the app:
 
 ### 7. Update Tailscale Inventory
 
-Edit `inventory-tailscale.ini` and replace the placeholder IPs (100.x.x.x) with actual Tailscale IPs:
+Edit `inventory-tailscale.ini` and keep the `ansible_host` values in sync with the actual Tailscale IPs
+(`scripts/collect-tailscale-ips.sh` can gather them). The file is the source of truth; current entries look like:
 
 ```ini
-[adguard]
-adguard_lxc ansible_host=100.108.0.112 ansible_user=root ansible_ssh_private_key_file=~/.ssh/id_rsa
+[proxmox]
+proxmox_host ansible_host=100.99.115.121 ansible_user=root ansible_ssh_private_key_file=~/.ssh/john_macbook
 
 [media]
-media_vm ansible_host=100.64.0.5 ansible_user=john ansible_ssh_private_key_file=~/.ssh/john_macbook
+media_vm ansible_host=100.88.114.14 ansible_user=john ansible_ssh_private_key_file=~/.ssh/john_macbook
 
 [infra]
-infra_vm ansible_host=100.64.0.8 ansible_user=john ansible_ssh_private_key_file=~/.ssh/john_macbook
+infra_vm ansible_host=100.64.76.3 ansible_user=john ansible_ssh_private_key_file=~/.ssh/john_macbook
 ```
+
+Note: the AdGuard LXC is not in this inventory (not Ansible-managed), and host names here use underscores
+(`media_vm`) whereas `inventory.ini` uses hyphens (`media-vm`).
 
 ### 8. Install Tailscale on Your Laptop
 
@@ -268,13 +269,13 @@ Test SSH access using Tailscale IPs:
 
 ```bash
 # Test SSH to Proxmox
-ssh root@100.64.0.1
+ssh root@100.99.115.121
 
 # Test SSH to AdGuard
 ssh root@100.108.0.112
 
 # Test SSH to Media VM
-ssh john@100.64.0.5
+ssh john@100.88.114.14
 
 # Test Ansible
 ansible all -i inventory-tailscale.ini -m ping
@@ -362,14 +363,14 @@ You can also access web services directly via Tailscale IPs:
 # AdGuard Home
 open http://100.108.0.112
 
-# Prometheus (not exposed via Cloudflare)
-open http://100.64.0.7:9090
+# Prometheus
+open http://100.108.161.119:9090
 
-# Grafana
-open http://100.64.0.8:3000
+# Grafana (infra VM)
+open http://100.64.76.3:3000
 
 # Proxmox UI
-open https://100.64.0.1:8006
+open https://100.99.115.121:8006
 ```
 
 ### MagicDNS (Optional)
@@ -587,7 +588,7 @@ tailscale down
 
 To access the entire local network (192.168.2.x) through Tailscale, configure Proxmox as a subnet router:
 
-Edit `host_vars/proxmox_host.yml`:
+Edit `host_vars/pve.yml`:
 
 ```yaml
 tailscale_advertise_routes: "192.168.2.0/24"
@@ -596,7 +597,7 @@ tailscale_advertise_routes: "192.168.2.0/24"
 Redeploy:
 
 ```bash
-make tailscale LIMIT=proxmox_host
+make tailscale LIMIT=pve
 ```
 
 Approve routes in admin console: https://login.tailscale.com/admin/machines
@@ -620,7 +621,7 @@ However, the Tailscale IP approach is more explicit and doesn't require subnet r
 
 Route all your laptop traffic through your homelab (useful for privacy on untrusted networks):
 
-Configure Proxmox as exit node in `host_vars/proxmox_host.yml`:
+Configure Proxmox as exit node in `host_vars/pve.yml`:
 
 ```yaml
 tailscale_exit_node: true
@@ -705,10 +706,10 @@ Add custom metrics (optional):
 - job_name: "tailscale"
   static_configs:
    - targets:
-      - "100.64.0.1:9100" # Proxmox
+      - "100.99.115.121:9100" # Proxmox
       - "100.108.0.112:9100" # AdGuard
-      - "100.64.0.5:9100" # Media
-      - "100.64.0.8:9100" # Infra
+      - "100.88.114.14:9100" # Media
+      - "100.64.76.3:9100" # Infra
 ```
 
 ## Security Considerations

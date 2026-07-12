@@ -27,7 +27,7 @@ uptime_kuma_user: "john"
 
 ansible_python_interpreter: /usr/bin/python3
 
-# Atuin client version (server uses latest Docker image; no semver tags after v18.2.0)
+# Atuin version — pins both the client binary and the server Docker image (infra VM compose)
 atuin_version: "v18.13.3"
 
 # MikroTik router monitoring (MKTXP)

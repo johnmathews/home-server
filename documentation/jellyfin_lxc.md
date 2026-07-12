@@ -14,7 +14,6 @@
 | alloy         | 12345 | grafana/alloy:v1.5.1                     |
 | cadvisor      | 18080 | gcr.io/cadvisor/cadvisor:v0.49.1         |
 | node_exporter | 9100  | quay.io/prometheus/node-exporter:v1.8.2  |
-| portainer_agent|      | portainer/agent:latest                   |
 
 The jellyfin container runs with `mem_limit: 4g` / `mem_reservation: 1g` — **the limit must stay
 below the LXC's 6 GB** (see the ffprobe OOM brownout section for why). The sidecars are capped

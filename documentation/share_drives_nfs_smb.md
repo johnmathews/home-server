@@ -10,8 +10,6 @@
 5. Check the status of the systemd unit: `systemctl status mnt-nfs--books.automount`
 6. `ls` the share drive to trigger it and check it reads correctly - you should see the drive contents.
 
-## Setup monitoring for a new NFS share
-
 ## TrueNAS
 
 TrueNAS can be a bit buggy. Toggle the individual share to refresh the
@@ -36,7 +34,7 @@ connection or update settings. Or toggle the entire service.
   use `-f` to force the unmount, but if files are being written this could cause
   trouble.
 
-`sudo mount -t nfs4 192.168.2.104:/mnt/tank/paperless /mnt/nfs/paperless`
+`sudo mount -t nfs4 192.168.2.104:/mnt/tank/library /mnt/nfs/library`
 
 `du -h -d 3`
 
@@ -75,7 +73,6 @@ file location.
 - `sudo mount -t nfs 192.168.2.104:/mnt/tank/library /mnt/nfs/library`
 - `sudo mount -t nfs 192.168.2.104:/mnt/tank/media /mnt/nfs/media`
 - `sudo mount -t nfs 192.168.2.104:/mnt/tank/movies /mnt/nfs/movies`
-- `sudo mount -t nfs 192.168.2.104:/mnt/tank/paperless /mnt/nfs/paperless`
 - `sudo mount -t nfs 192.168.2.104:/mnt/tank/photos /mnt/nfs/photos`
 - `sudo mount -t nfs 192.168.2.104:/mnt/tank/youtube-kids /mnt/nfs/youtube-kids`
 

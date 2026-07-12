@@ -1,5 +1,7 @@
 # Documentation Improvement Plan
 
+**Status:** completed — Tiers 1–3 done 2026-03-26; Tier 4 folded into normal doc upkeep. Archived 2026-07-12.
+
 Incremental plan for bringing all roles up to documentation parity. Work on a role's docs whenever
 that role is touched in a session, or pick items from this list when there's time.
 

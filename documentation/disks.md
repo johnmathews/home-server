@@ -22,14 +22,16 @@ Its configured and deployed using Ansible: `/roles/pve/tasks/hd-idle.yml`
 TrueNAS HDDs are spun down using a custom script, no other method seems to work.
 Perhaps `hd-idle` could be dockerized and deployed as a custom app.
 
-A script measures disk utilisation and, if conditions are met, spins down the HDDs using an hdparm command.
+A script counts I/O sectors transferred per disk and, if conditions are met, spins down the HDDs using an hdparm command.
 
 The script is deployed using `make nas t=hdds`.
 
-The script contains a list of disk ids to monitor. All disks are sampled **in parallel** using a single `iostat` call, which allows for longer sample durations without proportional runtime increase. Parameters:
+The script contains a list of disk ids to monitor. All disks are sampled **in parallel** using per-disk sector counts from `/sys/block/*/stat`, which allows for longer sample durations without proportional runtime increase. Parameters:
 - `SAMPLE_DURATION=900` (15 minutes) - catches periodic activity patterns
-- `COOLDOWN_SECS=1800` (30 minutes) - prevents spindown thrash
-- `UTIL_THRESHOLD=0.03` (0.03% utilisation threshold)
+- `COOLDOWN_SECS=3600` (60 minutes) - prevents spindown thrash
+- `IO_THRESHOLD=100` (sectors, ~50KB) - a disk transferring fewer sectors than this during the sample is considered idle
+
+See `documentation/truenas.md` (Disk Spindown section) for the full mechanism, decision workflow, and example logs.
 
 The script is deployed to `/mnt/swift/scripts/spindown_hdds.sh` using Ansible.
 

@@ -18,8 +18,8 @@ The media files are stored on disks attached to the NAS not on the media VM. The
 shares. For this to work the permissions on the media VM have to match the permissions on TrueNAS for the relevant
 datasets.
 
-`PUID` and `GUID` are set as variables in `roles/media_vm/defaults/main.yml` and must match the user id in TrueNAS of a
-user that has access to the relevant datasets.
+`puid` and `guid` are set as variables in `group_vars/all/main.yml` (both `1001`) and must match the user id in TrueNAS
+of a user that has access to the relevant datasets.
 
 ## Music Acquisition — slskd (Standalone)
 
@@ -31,8 +31,8 @@ where Navidrome picks them up as a dedicated library.
 
 **History**: Previously used an automated Lidarr + Soularr + slskd pipeline. Lidarr and Soularr were
 disabled (2026-03-27) because Lidarr's metadata matching was rejecting valid downloads, causing repeated
-downloads and wasted bandwidth. Both services are commented out in `docker-compose.yml.j2` and can be
-re-enabled if needed.
+downloads and wasted bandwidth. Both services have since been removed from `docker-compose.yml.j2`
+entirely (their version vars and the Soularr config template remain — see "Disabled services" below).
 
 ### Architecture
 
@@ -162,10 +162,13 @@ Optionally clear old downloads: `rm -rf /mnt/nfs/downloads/slskd/*`
 
 ### Disabled services (Lidarr + Soularr)
 
-Lidarr and Soularr are commented out in `docker-compose.yml.j2`. Their config templates and vault
-variables remain in place for easy re-enablement. To re-enable:
+Lidarr and Soularr were removed from `roles/media_vm/templates/docker-compose.yml.j2` — there are
+no commented-out blocks left to uncomment. What remains for re-enablement: `lidarr_version` /
+`soularr_version` in `roles/media_vm/defaults/main.yml`, the Soularr config template
+(`roles/media_vm/templates/soularr/config.ini.j2`), and their vault variables. To re-enable:
 
-1. Uncomment the `lidarr` and `soularr` services in `roles/media_vm/templates/docker-compose.yml.j2`
+1. Re-add `lidarr` and `soularr` service blocks to `roles/media_vm/templates/docker-compose.yml.j2`
+   (recover the old blocks from git history)
 2. Add `lidarr` and `soularr` back to `sleep_hours_stop_containers` in `host_vars/media-vm.yml`
 3. Run `make media`
 

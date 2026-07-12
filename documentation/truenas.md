@@ -16,8 +16,8 @@ make nas t=refresh-shares
 Variables in `roles/nas/defaults/main.yml`:
 - `refresh_shares_enabled: true`
 - `refresh_shares_nfs_path: "tank/paperless"`
-- `refresh_shares_smb_path: "tank/paperless"`
-- `refresh_shares_wait_seconds: 10`
+- `refresh_shares_smb_path: "tank/time-machine-backups/johns-laptop"`
+- `refresh_shares_wait_seconds: 5`
 
 ### UI
 
@@ -36,7 +36,7 @@ Variables in `roles/nas/defaults/main.yml`:
 1. Verifies TrueNAS API is accessible
 2. Looks up NFS and SMB share IDs via API
 3. Disables both shares
-4. Waits 10 seconds
+4. Waits 5 seconds (`refresh_shares_wait_seconds`)
 5. Re-enables both shares
 6. Logs everything to `/mnt/swift/logs/refresh_shares.log`
 
@@ -61,7 +61,7 @@ Refresh script started at 2025-12-14 23:30:45
   [OK] Disabled NFS share (ID: 3)
   [OK] Disabled SMB share (ID: 5)
 
-[INFO] Waiting 10 seconds...
+[INFO] Waiting 5 seconds...
 
 [INFO] Enabling shares...
   [OK] Enabled NFS share (ID: 3)
@@ -81,8 +81,9 @@ rather than TrueNAS. I've taken the following measures to make spindown possible
   - a "metadata" VDEV
   - a "log" VDEV
 
-Therefore a script runs on a cronjob to try to spindown the disks at night. The script measures utilisation over a sample
-period and only if utilisation is below 0.1% is a spindown using `hdparm` implemented. See below for details.
+Therefore a script runs on a cronjob to try to spindown the disks at night. The script counts I/O sectors transferred
+over a sample period (via `/sys/block/*/stat`) and only if a disk transfers fewer than `IO_THRESHOLD` sectors is a
+spindown using `hdparm` implemented. See below for details.
 
 ### Spindown Script Deployment
 
@@ -110,7 +111,7 @@ Cron runs a script at hours `0`, `2`, `6`, `23` to see if any HDDs can be spun d
 
 **Parameters:**
 - `SAMPLE_DURATION=900` (15 minutes) - catches periodic activity patterns
-- `COOLDOWN_SECS=1800` (30 minutes) - prevents spindown thrash after recent spindown
+- `COOLDOWN_SECS=3600` (60 minutes) - prevents spindown thrash after recent spindown
 - `IO_THRESHOLD=100` (sectors) - disk must transfer fewer than ~50KB to be considered idle
 
 **Why sector counts instead of iostat %util:**

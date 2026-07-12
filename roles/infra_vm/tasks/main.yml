@@ -197,7 +197,7 @@
 
 - name: Include mkdocs tasks
   ansible.builtin.import_tasks: mkdocs.yml
-  tags: docs, docker, documentaton
+  tags: docs, docker, documentation, mkdocs
 
 - name: Include mikrotik_exporter tasks
   ansible.builtin.import_tasks: mikrotik_exporter.yml

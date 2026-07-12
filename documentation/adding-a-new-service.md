@@ -30,7 +30,7 @@ Use centralized variables from `group_vars/all/main.yml` where possible:
 # Role-specific variables only — don't redefine puid, guid, TZ, etc.
 <service>_version: "1.0.0"         # Pin the Docker image version
 <service>_port: 8080
-<service>_docker_compose_dir: "{{ docker_compose_base_dir }}/<service>"
+<service>_docker_compose_dir: "{{ docker_compose_dir }}/<service>"
 ```
 
 ### tasks/main.yml
@@ -90,9 +90,9 @@ services:
     ports:
       - "{{ <service>_port }}:8080"
     environment:
-      TZ: "{{ default_tz }}"
-      PUID: "{{ default_puid }}"
-      PGID: "{{ default_guid }}"
+      TZ: "{{ TZ }}"
+      PUID: "{{ puid }}"
+      PGID: "{{ guid }}"
 
   # --- Monitoring sidecars ---
   node-exporter:
@@ -116,7 +116,7 @@ services:
     container_name: cadvisor
     restart: unless-stopped
     ports:
-      - "8080:8080"
+      - "18080:8080"   # host port 18080 by convention (8080 is often taken by the app)
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:ro
@@ -165,19 +165,31 @@ Add to relevant groups:
 
 ## Step 3: Create the Playbook
 
-Create `playbooks/<service>.yml`:
+Create `playbooks/<service>.yml`. Existing playbooks include the standard role stack
+(NFS mounts, mount monitoring, shell environment, tailscale) alongside the service role,
+each with its tag:
 
 ```yaml
 - name: Configure <service> LXC
   hosts: <service>
+  gather_facts: true
   become: true
   roles:
+    - role: nfs_client          # if the service needs NFS mounts
+      tags: nfs
+    - role: share_drive_probe   # if mount health monitoring is needed
+      tags: shares
     - role: <service>_lxc
+      tags: <service>
+    - role: shell_environment
+      tags: shell
+    - role: tailscale
+      tags: tailscale
 ```
 
 ## Step 4: Add to site.yml
 
-Add the import to `playbooks/site.yml` (alphabetical order):
+Add the import to `playbooks/site.yml` (roughly alphabetical — match the existing order):
 
 ```yaml
 - import_playbook: <service>.yml
@@ -216,15 +228,14 @@ Reference them in `roles/<service>/defaults/main.yml`:
 ## Step 7: Add NFS Mounts (if needed)
 
 If the service needs access to TrueNAS shares, add it to the `nfs_clients` group
-in `inventory.ini` and configure mounts in `host_vars/<service>_lxc.yml`:
+in `inventory.ini` and configure mounts in `host_vars/<service>_lxc.yml`. The
+`nfs_client` role iterates the `nfs_shares` list:
 
 ```yaml
-nfs_mounts:
+nfs_shares:
   - name: media
-    src: "192.168.2.104:/mnt/tank/media"
-    path: /mnt/media
-    fstype: nfs
-    opts: "rw,soft,intr,timeo=30,retrans=3"
+    target: /mnt/tank/media
+    mountpoint: /mnt/nfs/media
 ```
 
 ## Step 8: Wire Up External Access
@@ -250,16 +261,22 @@ and Navidrome that need WebSocket support or custom middleware.
 
 ## Step 9: Add Prometheus Monitoring
 
-Add scrape targets to `roles/prometheus_lxc/templates/prometheus/prometheus.yml.j2`:
+Scrape jobs are consolidated — there is one `node_exporter` job and one `cadvisor` job,
+each with a target per host. Add the new host as a target (with a `hostname` label) to
+both existing jobs in `roles/prometheus_lxc/templates/prometheus/prometheus.yml.j2`:
 
 ```yaml
-  - job_name: '<service>-node'
+  - job_name: 'cadvisor'
     static_configs:
-      - targets: ['192.168.2.XXX:9100']
+      # ... existing targets ...
+      - targets: ['192.168.2.XXX:18080']
+        labels: {hostname: '<service>'}
 
-  - job_name: '<service>-cadvisor'
+  - job_name: 'node_exporter'
     static_configs:
-      - targets: ['192.168.2.XXX:8080']
+      # ... existing targets ...
+      - targets: ['192.168.2.XXX:9100']
+        labels: {hostname: '<service>'}
 ```
 
 ## Step 10: Deploy and Verify

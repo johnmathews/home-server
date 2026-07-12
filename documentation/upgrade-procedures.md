@@ -10,7 +10,7 @@ Most services run as Docker containers with pinned image versions in role defaul
 
 1. Check the current version in `roles/<service>/defaults/main.yml`
 2. Check the upstream release notes for breaking changes
-3. Update the version variable (e.g., `jellyfin_version: "10.10.6"`)
+3. Update the version variable (e.g., `tubearchivist_version: "v0.5.10"`)
 4. Pull the new image on the host: `ssh <host> "cd /srv/<stack> && docker compose pull <service>"`
 5. Deploy: `make <service>`
 6. Verify the service starts and works correctly
@@ -22,17 +22,17 @@ image changes during config-only deploys.
 
 ### Monitoring sidecar upgrades
 
-Monitoring sidecars (node-exporter, cadvisor, alloy) are shared across all services.
-Their versions are centralized in `group_vars/all/main.yml`:
+Monitoring sidecars (node-exporter, cadvisor, alloy) run on every service host, but their
+versions are **not** centralized — each role pins its own in
+`roles/<role>/defaults/main.yml` (`node_exporter_version`, `cadvisor_version`,
+`alloy_version`), and the values differ per role (some pin e.g. `v1.8.2`/`v0.49.1`/`v1.5.1`,
+others use `latest`). The exception is `jellyfin_lxc`, which uses static files rather than
+templates, so its sidecar versions are hardcoded in the role's compose file. Only
+`atuin_version` is global in `group_vars/all/main.yml`.
 
-```yaml
-node_exporter_version: "v1.9.0"
-cadvisor_version: "v0.51.0"
-alloy_version: "v1.6.1"
-```
-
-To upgrade all sidecars at once, update the version in `group_vars/all/main.yml` and
-run `make site`. To upgrade one host at a time, use `make <service>` for each.
+To upgrade sidecars, update the version in each role's `defaults/main.yml` (and the
+jellyfin_lxc static compose file) and run `make <service>` per host, or `make site` after
+updating all roles.
 
 ## Ansible and Python Dependencies
 
@@ -122,10 +122,13 @@ versions are documented in `documentation/jellyfin_lxc.md`.
 Immich releases frequently with breaking changes. Always read the release notes.
 The machine learning model may need to re-index after upgrades.
 
-### Paperless-ngx
+### Library (document store)
 
-Database migrations run automatically on container startup. Ensure the PostgreSQL
-container is healthy before upgrading the Paperless container.
+The `library` app (`ghcr.io/johnmathews/library`, replaced Paperless-ngx in July 2026) is
+pinned via `library_version` in `roles/document_library_lxc/defaults/main.yml`. Deploy with
+`make document-library`. Never let the deployed version pin drop below the running image —
+a downgrade can corrupt the database (see the Paperless LXC recreate landmine notes).
+Ensure the PostgreSQL container is healthy before upgrading.
 
 ### Grafana / Prometheus / Loki
 

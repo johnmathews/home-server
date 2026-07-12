@@ -18,4 +18,4 @@ match the last part of the MAC address. See `~/.ssh/known_hosts` and
 ## Domain
 
 External access uses `itsa-pizza.com` via Cloudflare (DNS, Tunnel, Zero Access).
-The migration from `itsa.pizza` to `itsa-pizza.com` is complete — see `documentation/domain-migration.md`.
+The migration from `itsa.pizza` to `itsa-pizza.com` is complete — see `documentation/archive/domain-migration.md`.

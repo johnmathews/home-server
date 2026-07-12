@@ -8,7 +8,7 @@ You can connect to the server using the command `ssh key` using user: `john`
 
 ## TrueNAS script to retrieve keys
 
-Local Location: `truenas_vm/templates/get_keys.sh.j2`.
+Local Location: `roles/nas/templates/get_keys.sh.j2`.
 Update and deploy: `make nas tags=key`
 
 Location on TrueNAS: `/mnt/swift/scripts/get_keys.sh`
@@ -22,7 +22,10 @@ role.
 The IP address of the key server is `192.168.2.201`.
 
 The key server is defined in a FastAPI script
-`key_server/templates/key-server-main.py`.
+`roles/key_server/templates/key-server-main.py.j2`.
+
+The listen port comes from `vault_key_server_port` (Ansible Vault) — the `8001` in the URLs
+below assumes that value.
 
 ## Updating keys
 

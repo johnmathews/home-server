@@ -12,7 +12,6 @@ full-text search via Elasticsearch. Used primarily for archiving kids' content.
 | Host                  | tubearchivist_lxc (192.168.2.116)                |
 | SSH                   | ssh tubearchivist (user: root)                   |
 | Web UI                | tube.itsa-pizza.com                              |
-| Alt URL               | kids-tube.itsa-pizza.com                         |
 | Port                  | 8000                                             |
 | Docker compose dir    | /srv/apps                                        |
 | Ansible               | make tube                                        |
@@ -23,19 +22,22 @@ full-text search via Elasticsearch. Used primarily for archiving kids' content.
 ## Docker Containers
 
 ```
-+-------------------+-----------------------------------+-------+-------------------------------+
-| Container         | Image                             | Port  | Purpose                       |
-+-------------------+-----------------------------------+-------+-------------------------------+
-| tubearchivist     | bbilly1/tubearchivist:latest      | 8000  | Main web app + downloader     |
-| archivist-es      | elasticsearch:8.18.0              | 9200* | Full-text search + indexing   |
-| archivist-redis   | redis:latest                      | 6379* | Task queue + caching          |
-| alloy             | grafana/alloy:latest              | 12345 | Log shipping to Loki          |
-| node_exporter     | node-exporter:latest              | 9100  | Host metrics for Prometheus   |
-| cadvisor          | cadvisor:latest                   | 18080 | Container metrics             |
-+-------------------+-----------------------------------+-------+-------------------------------+
++-------------------+----------------------------------------------------------+-------+-------------------------------+
+| Container         | Image                                                    | Port  | Purpose                       |
++-------------------+----------------------------------------------------------+-------+-------------------------------+
+| tubearchivist     | bbilly1/tubearchivist:{{ tubearchivist_version }}         | 8000  | Main web app + downloader     |
+| archivist-es      | elasticsearch:8.18.0                                     | 9200* | Full-text search + indexing   |
+| archivist-redis   | redis/redis-stack-server:7.4.0-v3                        | 6379* | Task queue + caching          |
+| alloy             | grafana/alloy:{{ alloy_version }}                         | 12345 | Log shipping to Loki          |
+| node_exporter     | quay.io/prometheus/node-exporter:{{ node_exporter_version }} | 9100 | Host metrics for Prometheus |
+| cadvisor          | gcr.io/cadvisor/cadvisor:{{ cadvisor_version }}           | 18080 | Container metrics             |
++-------------------+----------------------------------------------------------+-------+-------------------------------+
 ```
 
 *Ports marked with `*` are internal only (exposed within Docker network, not on host).
+
+Version pins live in `roles/tubearchivist_lxc/defaults/main.yml` (currently: tubearchivist
+`v0.5.10`, alloy `v1.5.1`, node_exporter `v1.8.2`, cadvisor `v0.49.1`).
 
 ### Container Details
 
@@ -44,7 +46,8 @@ full-text search via Elasticsearch. Used primarily for archiving kids' content.
 - **archivist-es**: Elasticsearch 8.18.0 with security enabled (`xpack.security.enabled=true`).
   Java heap: 1GB min/max (`-Xms1g -Xmx1g`). Single-node discovery. Memory lock disabled
   (ulimits set for unlimited memlock).
-- **archivist-redis**: Standard Redis for task queue. Depends on Elasticsearch being up first.
+- **archivist-redis**: Redis Stack Server (`redis/redis-stack-server:7.4.0-v3`) for task queue.
+  Depends on Elasticsearch being up first.
 
 ## Storage
 
@@ -66,6 +69,7 @@ mounted read-only into the Jellyfin LXC at `/youtube-kids` for playback.
 - `cache` — TubeArchivist download cache and thumbnails
 - `redis` — Redis persistence
 - `es` — Elasticsearch data and snapshots
+- `media` — declared in the compose template (currently unused; the media path is the NFS bind mount)
 
 ## Configuration
 
@@ -91,7 +95,6 @@ mounted read-only into the Jellyfin LXC at `/youtube-kids` for playback.
 Accessible via Cloudflare Tunnel with Zero Access protection:
 
 - `tube.itsa-pizza.com` → `192.168.2.116:8000`
-- `kids-tube.itsa-pizza.com` → `192.168.2.116:8000`
 
 ## Quiet Hours Integration
 
@@ -119,7 +122,7 @@ Jellyfin from modifying the archive.
 
 ## Upgrading
 
-1. TubeArchivist uses `:latest` tag — restart pulls the newest image
+1. TubeArchivist is pinned — bump `tubearchivist_version` in `roles/tubearchivist_lxc/defaults/main.yml`
 2. Elasticsearch is pinned to `8.18.0` — update in the docker-compose template
 3. Run `make tube`
 4. After Elasticsearch upgrades, the index may need rebuilding via the TubeArchivist web UI

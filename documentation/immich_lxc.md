@@ -23,20 +23,23 @@ object detection, smart search). Replaces Google Photos.
 ## Docker Containers
 
 ```
-+-------------------------+----------------------------------------------------+-------+
-| Container               | Image                                              | Port  |
-+-------------------------+----------------------------------------------------+-------+
-| immich_server           | ghcr.io/immich-app/immich-server:release            | 2283  |
-| immich_machine_learning | ghcr.io/immich-app/immich-machine-learning:release  | -     |
-| immich_postgres         | immich-app/postgres:14-vectorchord                 | -     |
-| immich-redis            | valkey/valkey:8-bookworm (pinned by SHA)            | -     |
-| immich_public_proxy     | alangrainger/immich-public-proxy:latest             | 3000  |
-| image_borders           | ghcr.io/johnmathews/image-borders:latest           | -     |
-| cadvisor                | cadvisor:latest                                    | 18080 |
-| node_exporter           | node-exporter:latest                               | 9100  |
-| alloy                   | grafana/alloy:latest                               | 12345 |
-+-------------------------+----------------------------------------------------+-------+
++-------------------------+------------------------------------------------------------------+-------+
+| Container               | Image                                                            | Port  |
++-------------------------+------------------------------------------------------------------+-------+
+| immich_server           | ghcr.io/immich-app/immich-server:release                          | 2283  |
+| immich_machine_learning | ghcr.io/immich-app/immich-machine-learning:release                | -     |
+| immich_postgres         | ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0    | -     |
+| immich-redis            | valkey/valkey:8-bookworm (pinned by SHA)                          | -     |
+| immich_public_proxy     | alangrainger/immich-public-proxy:{{ immich_public_proxy_version }}| 3000  |
+| image_borders           | ghcr.io/johnmathews/image-borders:{{ image_borders_version }}     | -     |
+| cadvisor                | gcr.io/cadvisor/cadvisor:{{ cadvisor_version }}                   | 18080 |
+| node_exporter           | quay.io/prometheus/node-exporter:{{ node_exporter_version }}      | 9100  |
+| alloy                   | grafana/alloy:{{ alloy_version }}                                 | 12345 |
++-------------------------+------------------------------------------------------------------+-------+
 ```
+
+Version pins live in `roles/immich_lxc/defaults/main.yml` (currently: public proxy `1.6.1`,
+cadvisor `v0.49.1`, node_exporter `v1.8.2`, alloy `v1.5.1`, image_borders `latest`).
 
 ### Container Details
 
@@ -44,9 +47,9 @@ object detection, smart search). Replaces Google Photos.
 - **immich_machine_learning**: Handles face recognition, object detection, and smart search. Stores
   models in a Docker volume (`model-cache`). Runs as user 1001:1001. No hardware acceleration configured
   (CPU inference).
-- **immich_postgres**: PostgreSQL 14 with pgvecto.rs extension for vector similarity search (used by
-  smart search/CLIP). Configured with `--data-checksums` and `DB_STORAGE_TYPE: HDD` optimization.
-  128MB shared memory (`shm_size`).
+- **immich_postgres**: PostgreSQL 14 with VectorChord 0.4.3 (plus pgvecto.rs 0.2.0 for migration
+  compatibility) for vector similarity search (used by smart search/CLIP). Configured with
+  `--data-checksums` and `DB_STORAGE_TYPE: HDD` optimization. 128MB shared memory (`shm_size`).
 - **immich-redis**: Valkey (Redis-compatible) for caching and job queues. Pinned by SHA digest.
 - **immich_public_proxy**: Public-facing proxy for shared albums. Accessible at `share.itsa-pizza.com`.
   Points to Immich server at `http://192.168.2.113:2283`.
@@ -60,12 +63,14 @@ object detection, smart search). Replaces Google Photos.
 Photos are stored on TrueNAS via NFS:
 
 - `/mnt/nfs/photos` — Main photo library (mounted into immich_server)
+- `/mnt/nfs/photos/immich` — Immich upload directory (`UPLOAD_LOCATION` in `.env.j2`)
 
 ### Docker Volumes
 
 - `model-cache` — ML model cache (named Docker volume)
-- `/srv/apps/immich/postgres` — PostgreSQL data directory (local disk)
-- `/srv/apps/immich/` — Immich upload directory (`UPLOAD_LOCATION`)
+- `/srv/apps/immich/postgres` — PostgreSQL data directory (local disk; `DB_DATA_LOCATION`)
+- `/srv/apps/immich/` — local dir holding only the postgres data dir and the API key file
+  (uploads are NOT here — they live on the NFS share, see above)
 
 ## Environment Variables
 

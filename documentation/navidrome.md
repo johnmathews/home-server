@@ -27,10 +27,10 @@ navidrome.itsa-pizza.com  music.itsa-pizza.com     │
 │  │  SQLite: /data   │  /mnt/tank/music     │ │
 │  └─────────────┘   └──────────────────────┘ │
 │         ▲                                   │
-│  ┌──────┴──────┐                            │
-│  │   Feishin    │                            │
-│  │   :9180      │                            │
-│  └─────────────┘                            │
+│  ┌──────┴──────┐  ┌─────────────┐           │
+│  │   Feishin    │  │   Picard     │           │
+│  │   :9180      │  │   :5800      │           │
+│  └─────────────┘  └─────────────┘           │
 │                                             │
 │  ┌─────────┐  ┌──────────────┐  ┌────────┐ │
 │  │  Alloy   │  │ Node Exporter│  │cAdvisor│ │
@@ -63,13 +63,14 @@ cloudflared on the LAN.
 
 ## Ports
 
-| Port  | Service       | Purpose                |
-| ----- | ------------- | ---------------------- |
-| 4533  | Navidrome     | Web UI + Subsonic API  |
-| 9180  | Feishin       | Web player UI          |
-| 9100  | Node Exporter | Host metrics           |
-| 12345 | Alloy         | Log shipping dashboard |
-| 18080 | cAdvisor      | Container metrics      |
+| Port  | Service            | Purpose                                        |
+| ----- | ------------------ | ---------------------------------------------- |
+| 4533  | Navidrome          | Web UI + Subsonic API                          |
+| 9180  | Feishin            | Web player UI                                  |
+| 5800  | MusicBrainz Picard | Tagging UI (also at picard.itsa-pizza.com)     |
+| 9100  | Node Exporter      | Host metrics                                   |
+| 12345 | Alloy              | Log shipping dashboard                         |
+| 18080 | cAdvisor           | Container metrics                              |
 
 ## NFS Mount
 
@@ -103,7 +104,7 @@ make music t=shell        # Only shell environment
 2. Open http://192.168.2.109:4533 in a browser
 3. Navidrome presents an admin account creation form on first visit
 4. Create the admin user
-5. Music library scan starts automatically (hourly schedule via `ND_SCANSCHEDULE=1h`)
+5. Music library scan starts automatically (hourly schedule via `ND_SCANSCHEDULE=@every 1h`)
 6. Trigger a manual scan from Settings > Scan if needed
 
 ## Subsonic API Clients
@@ -147,7 +148,7 @@ Navidrome has multiple libraries. Music files arrive from different sources:
   downloading, approved albums are moved from `/mnt/nfs/downloads/slskd/` to `/mnt/nfs/music/slskd/Artist/Album/`. See
   `documentation/media_vm.md` for details.
 
-Navidrome scans hourly (`ND_SCANSCHEDULE=1h`) and picks up files from all libraries automatically.
+Navidrome scans hourly (`ND_SCANSCHEDULE=@every 1h`) and picks up files from all libraries automatically.
 
 **History**: The slskd library replaced an automated Lidarr + Soularr + slskd pipeline (disabled 2026-03-27) due to
 Lidarr's metadata matching rejecting valid downloads.

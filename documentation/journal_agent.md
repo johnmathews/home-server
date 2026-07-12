@@ -19,7 +19,7 @@ and vector search over journal entries.
 `http://localhost:8000/api/v2/heartbeat` (interval 30s, retries 3, start_period 10s with start_interval 2s).
 
 Image versions for journal-server and journal-chromadb come from `journal_agent_version` and
-`journal_chromadb_version` in `group_vars/all/main.yml`. The webapp pins `:latest`.
+`journal_chromadb_version` in `roles/media_vm/defaults/main.yml` (both `"latest"`). The webapp pins `:latest`.
 
 ## Data Storage
 
@@ -52,6 +52,9 @@ secrets beyond `TZ`):
 | `APP_BASE_URL`                            | public URL the webapp is served at                   |
 | `REGISTRATION_ENABLED`                    | `true` / `false`                                     |
 | `JOURNAL_ENABLE_MOOD_SCORING=true`        | hardcoded                                            |
+| `STRAVA_CLIENT_ID`, `STRAVA_REDIRECT_URI`, `STRAVA_CLIENT_SECRET`, `STRAVA_REFRESH_TOKEN` | from vault — Strava integration |
+| `STRAVE_ACCESS_TOKEN`                     | from vault — Strava access token (typo `STRAVE` is in the compose/env templates, kept as-is) |
+| `GARMIN_USERNAME`, `GARMIN_PASSWORD`      | from vault — Garmin integration                      |
 
 The shadow gemini transcription is a measured-rollout pattern: primary OCR remains whatever
 `JOURNAL_INSIGHTS_APP_OCR_PROVIDER` selects, and gemini runs in parallel for comparison data without affecting

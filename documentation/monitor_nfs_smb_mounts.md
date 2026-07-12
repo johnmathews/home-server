@@ -7,7 +7,8 @@ removed on 2026-07-04.
 
 ## Ansible
 
-There is a task called `share_drive_probe`. It's added to all the playbooks.
+There is a role called `share_drive_probe`. It's added to the playbooks of hosts
+that mount NFS/SMB shares (plus `infra-vm`).
 
 ## Enabling / Disabling
 
@@ -27,7 +28,8 @@ rm /var/lib/node_exporter/textfile_collector/share_drive_probe.prom
 ```
 
 Hosts that run the probe are listed under `[share_drive_clients]` in
-`inventory.ini`, plus `pve`.
+`inventory.ini`, plus `infra-vm` (which includes the role directly in
+`playbooks/infra_vm.yml`). `pve` does not run the probe.
 
 ## Setup and Deployment (Ansible)
 
@@ -39,8 +41,8 @@ Deploy it to an individual host using `make <host> tags=shares` or to all hosts
 by `make site tags=shares`.
 
 Ensure that `node-exporter` is also running (usually as a docker container)
-because it collects the .prom file created by the `share_drive_probe` service
-and placed at `/var/lib/nodeExporter/textfile_creator`.
+because it collects the .prom file created by the `share-drive-probe` service
+and placed at `/var/lib/node_exporter/textfile_collector`.
 
 In `inventory.ini` there is a `share_drive_clients` section.
 
@@ -53,8 +55,8 @@ This is implemented by running `share_drive_probe` - a systemd service (not a
 container!) on each VM or LXC that writes Prometheus metrics to the
 node_exporter text_file location.
 
-A systemd timer `share_drive_probe.timer` calls a one-shot service
-`share_drive_probe.service`. The service calls a shell script
+A systemd timer `share-drive-probe.timer` calls a one-shot service
+`share-drive-probe.service`. The service calls a shell script
 `share_drive_probe.sh` that writes Prometheus metrics to
 `/var/lib/node_exporter/textfile_collector/share_drive_probe.prom`.
 

@@ -44,8 +44,8 @@ ANSIBLE_OPTS := $(TAGS_ARG) $(SKIP_ARG) $(LIMIT_ARG) $(EXTRA)
 
 # Declare all available commands as .PHONY (always run)
 .PHONY: all site pve nas mail media infra key traefik immich tube prometheus \
-        document-library media-dl music jelly open-webui cloudflared agent atuin \
-        shell nfs share_drive_probe tailscale lint-paths requirements \
+        document-library music jelly open-webui cloudflared agent \
+        shell nfs share_drive_probe tailscale requirements \
         check lint clean ci help
 
 
@@ -87,9 +87,6 @@ prometheus:
 document-library:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/document_library_lxc.yml $(VAULT) $(ANSIBLE_OPTS)
 
-media-dl:
-	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/media_dl_lxc.yml $(VAULT) $(ANSIBLE_OPTS)
-
 music:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/music_lxc.yml $(VAULT) $(ANSIBLE_OPTS)
 
@@ -105,9 +102,6 @@ cloudflared:
 agent:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/agent_lxc.yml $(VAULT) $(ANSIBLE_OPTS)
 
-atuin:
-	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/atuin.yml $(VAULT) $(ANSIBLE_OPTS)
-
 shell:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/shell_environment.yml $(VAULT) $(ANSIBLE_OPTS)
 
@@ -119,9 +113,6 @@ tailscale:
 
 nfs:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/nfs.yml $(VAULT) $(ANSIBLE_OPTS)
-
-lint-paths:
-	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/validate-paths.yml $(VAULT) $(ANSIBLE_OPTS)
 
 requirements:
 	.venv/bin/ansible-galaxy role install -r requirements.yml -p ~/.ansible/roles && .venv/bin/ansible-galaxy collection install -r requirements.yml && uv pip install -r requirements.txt

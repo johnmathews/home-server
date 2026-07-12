@@ -95,7 +95,7 @@ Internet -> Cloudflare Edge (TLS) -> Tunnel -> cloudflared LXC
                           (+ Zero Access)                    (bypass Zero Access,
                                                               + rate limiting)
                           e.g. grafana, sonarr,              e.g. jellyfin, immich,
-                          radarr, paperless, etc.            homepage, uptime, sre
+                          radarr, library, etc.              homepage, uptime, sre
 ```
 
 ## Proxied Services
@@ -124,7 +124,7 @@ All services listed in `/etc/cloudflared/config.yml`. Key subdomains:
 - `agent-docs.itsa-pizza.com` -> MkDocs Docs (192.168.2.107:8001)
 - `charts.itsa-pizza.com` / `grafana.itsa-pizza.com` -> Grafana (192.168.2.106:3000)
 - `sonarr.itsa-pizza.com`, `radarr.itsa-pizza.com`, etc. -> Media VM services
-- `paperless.itsa-pizza.com` / `documents.itsa-pizza.com` -> Paperless-ngx
+- `paperless.itsa-pizza.com` / `documents.itsa-pizza.com` / `library.itsa-pizza.com` -> Library app (192.168.2.117:8010; Paperless-ngx decommissioned 2026-07-04)
 - `proxmox.itsa-pizza.com` / `pve.itsa-pizza.com` -> Proxmox UI
 - ... (see full list in config.yml)
 
@@ -143,4 +143,4 @@ config file, DNS records, shell environment, and Tailscale.
 
 ## Domain Migration
 
-Migration from `itsa.pizza` to `itsa-pizza.com` is complete. See `documentation/domain-migration.md` for history.
+Migration from `itsa.pizza` to `itsa-pizza.com` is complete. See `documentation/archive/domain-migration.md` for history.

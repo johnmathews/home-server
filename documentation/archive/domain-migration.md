@@ -1,9 +1,11 @@
+**Status:** completed — Stages 0–4 done; `itsa.pizza` is being allowed to expire. Archived 2026-07-12.
+
 # Domain Migration: itsa.pizza -> itsa-pizza.com
 
 ## Context
 
-The home server is accessible externally via the domain `itsa.pizza`, managed through Cloudflare. The domain price has
-increased, so all services are being migrated to `itsa-pizza.com`.
+The home server was accessible externally via the domain `itsa.pizza`, managed through Cloudflare. The domain price
+increased, so all services were migrated to `itsa-pizza.com`.
 
 ## Current Architecture
 
@@ -168,10 +170,10 @@ crossover period.
 - [x] Remove old `itsa.pizza` hostnames from cloudflared config (removed `migration_additional_domains`)
 - [x] Remove old Traefik router rules for `itsa.pizza` (removed `migration_additional_domains`)
 - [x] Update services with internal domain references (SABnzbd host_whitelist, Immich external URL)
-- [ ] Update any external references (app configs on phones/devices, bookmarks, etc.)
+- [x] Update any external references (app configs on phones/devices, bookmarks, etc.) — moot; old URLs fail once the domain expires
 - [x] `itsa.pizza` will be allowed to expire (not renewing)
-- [ ] Remove old `itsa.pizza` Zero Access policies from Cloudflare dashboard
-- [ ] Remove old `itsa.pizza` CNAME records from Cloudflare DNS (or let them expire with the domain)
+- [x] Remove old `itsa.pizza` Zero Access policies from Cloudflare dashboard — moot; domain expiring
+- [x] Remove old `itsa.pizza` CNAME records from Cloudflare DNS — moot; expiring with the domain
 - [x] Remove `mailcow` from Tailscale admin console (offline, service retired)
 
 ## Open Questions

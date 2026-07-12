@@ -21,7 +21,7 @@ manager, an offline drive, or a sealed envelope. Do not rely on this laptop's di
 ```
 .vault_pass.txt          mode 0600, gitignored — the decryption password
 group_vars/all/vault.yml encrypted YAML, committed to git (the encrypted form is safe to commit)
-group_vars/all/main.yml  plaintext defaults; references vault values via {{ vault_* }} vars
+roles/*/defaults/main.yml plaintext aliases that reference vault values via {{ vault_* }} vars
 ansible.cfg              no vault config; password is passed via --vault-password-file
 makefile                 every Ansible call has $(VAULT) = --vault-password-file=.vault_pass.txt
 ```
@@ -69,8 +69,8 @@ This decrypts the file into a temp location, opens `$EDITOR`, and re-encrypts on
 ### Add a new secret
 
 1. Edit the vault and add `vault_my_new_secret: "value"` under the appropriate section.
-2. Reference it from a template, default, or `.env.j2` as `{{ vault_my_new_secret }}` (or via an alias in
-   `group_vars/all/main.yml`).
+2. Reference it from a template, default, or `.env.j2` as `{{ vault_my_new_secret }}` (or via an alias in the
+   role's `defaults/main.yml`).
 3. Run the relevant `make <target>` to deploy.
 
 ### Rotate the vault password
@@ -88,9 +88,12 @@ Update the off-site backup of `.vault_pass.txt` immediately afterward.
 
 1. **Vault names are prefixed `vault_`.** This makes it grep-able and obvious in templates that a value comes from the
    vault.
-2. **Don't reference vault vars directly in templates.** Add a plaintext alias in `group_vars/all/main.yml` (e.g.
-   `grafana_password: "{{ vault_grafana_password }}"`) and reference the alias. This keeps the vault list curated and
-   makes refactoring easier.
+2. **Prefer aliases over referencing vault vars directly in templates.** Add a plaintext alias in the role's
+   `defaults/main.yml` (e.g. `cloudflared_api_token: "{{ vault_cloudflared_api_token }}"`) and reference the alias.
+   This keeps the vault list curated and makes refactoring easier. In practice this is not applied uniformly —
+   several templates (e.g. `roles/media_vm/templates/.env.j2`, `roles/immich_lxc/templates/.env.j2`,
+   `roles/infra_vm/templates/homepage/services.yaml.j2`) reference `vault_*` vars directly; follow the alias
+   convention for new work.
 3. **Encrypted file commits are safe.** Git diffs of `vault.yml` show ciphertext; merging conflicts on it requires manual
    resolution after `ansible-vault decrypt` / re-encrypt.
 

@@ -8,7 +8,7 @@ How to recover the home server infrastructure from various failure scenarios.
 
 - **Host:** 192.168.2.200 (`ssh pbs`)
 - **Purpose:** Automated backups of all VMs and LXCs
-- **Storage:** Dedicated backup disk on the Proxmox host
+- **Storage:** Dedicated disk on the PBS host (192.168.2.200)
 - **Schedule:** Configured in Proxmox UI under Datacenter > Backup
 
 PBS stores full and incremental backups of each VM/LXC. Each backup includes the
@@ -18,7 +18,7 @@ complete disk image and configuration.
 
 | Component       | Backup Method          | Location              |
 |-----------------|------------------------|-----------------------|
-| VMs (media, infra, nas) | PBS automated backup | Proxmox Backup Server |
+| VMs (media, infra, nas; mailcow retired) | PBS automated backup | Proxmox Backup Server |
 | LXCs (all)      | PBS automated backup   | Proxmox Backup Server |
 | Ansible config  | Git (this repository)  | GitHub                |
 | Vault secrets   | Git (encrypted)        | GitHub (vault.yml)    |
