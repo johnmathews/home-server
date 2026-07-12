@@ -23,8 +23,26 @@ literal pin — sync it by hand when bumping.
 Before 2026-07-12 the agents were hand-run containers (~a year stale); they were
 removed and replaced by the compose-managed ones on: jellyfin, immich,
 tubearchivist, paperless, music, open-webui, prometheus, traefik, agent.
-`media-vm` and `pve` already managed theirs (pve still deploys 2.24.1 until the
-next full `make pve`; the 2.39.1 image is pre-pulled there).
+`media-vm` and `pve` already managed theirs; pve converged the same evening via
+`make pve t=portainer` (its docker tasks carry the `portainer` tag).
+
+## Security: AGENT_SECRET (added 2026-07-12)
+
+A Portainer agent is full Docker control (it mounts `docker.sock`) listening on
+`0.0.0.0:9001`. Without a shared secret, anything on the LAN that speaks the agent
+protocol gets root-equivalent on the host. All agents and the server therefore
+carry `AGENT_SECRET` from `vault_portainer_agent_secret`:
+
+- server: `AGENT_SECRET=${PORTAINER_AGENT_SECRET}` via the infra `.env`
+- templated roles: rendered inline in each compose's `portainer-agent` service
+- jellyfin (static compose): interpolated from `/srv/apps/.env` (mode 0600,
+  deployed by the role)
+
+An agent without the matching secret is rejected by the server — so when rotating
+the secret, redeploy the server first, then every host. The
+`/var/lib/docker/volumes` bind-mount was also dropped from all agents (only the
+UI's volume-browse feature used it). Port 9001 remains LAN-bound: there is no
+management VLAN, and the secret is the effective control.
 
 ## Registering a new endpoint
 

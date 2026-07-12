@@ -100,3 +100,13 @@
     mode: '0644'
   notify: Restart docker
   tags: docker,alloy
+
+- name: Upload .env for docker compose interpolation
+  ansible.builtin.template:
+    src: env.j2
+    dest: /srv/apps/.env
+    owner: root
+    group: root
+    mode: '0600'
+  notify: Restart docker
+  tags: docker

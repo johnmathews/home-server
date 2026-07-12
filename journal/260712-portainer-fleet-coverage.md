@@ -28,8 +28,24 @@ endpoints** in Portainer.
    change-triggered handlers, so on a rerun (compose already rendered) the new
    agent service was never created — started it with a one-off
    `docker compose up -d portainer-agent` from the rendered file.
-5. pve deferred: its docker block has no tag and a full `make pve` (host tuning)
-   wasn't worth one agent bump — image pre-pulled, next `make pve` upgrades it.
+5. pve initially deferred, then converged the same evening via
+   `make pve t=portainer` (the docker tasks turn out to carry a `portainer` tag).
+
+## Security hardening (same evening)
+
+The automated commit review flagged the codified agents as a HIGH: unauthenticated
+docker.sock control on 0.0.0.0:9001, LAN-wide. True for the past year of hand-run
+agents, but codifying it deserved fixing: generated `vault_portainer_agent_secret`,
+set `AGENT_SECRET` on the server and every agent (jellyfin's static compose gets it
+via a role-deployed `/srv/apps/.env`), dropped the unneeded
+`/var/lib/docker/volumes` bind-mount, redeployed server-first then the fleet.
+Deliberately skipped: binding 9001 to a management interface (no mgmt VLAN exists;
+the shared secret is the effective control).
+
+Bonus finding: `make pve t=portainer` initially failed — pve's live sidecars ran
+`latest` while the role pins versions; the pinned images were never pulled
+(`pull: never`) because pve hadn't been deployed in months. Pre-pulled and
+converged; pve agent now 2.39.1 + secret, sidecars on pins.
 
 ## Notes
 

@@ -6,11 +6,13 @@ services:
     image: portainer/agent:{{ portainer_agent_version }}
     container_name: portainer_agent
     restart: always
+    environment:
+      # Shared secret: only the Portainer server (same secret) can control this agent
+      AGENT_SECRET: "{{ vault_portainer_agent_secret }}"
     ports:
       - "9001:9001"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /var/lib/docker/volumes:/var/lib/docker/volumes
     logging:
       driver: "json-file"
       options:

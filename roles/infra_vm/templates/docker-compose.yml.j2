@@ -330,6 +330,9 @@ services:
   portainer:
     image: portainer/portainer-ce
     container_name: portainer
+    environment:
+      # Must match AGENT_SECRET on every portainer-agent (vault_portainer_agent_secret)
+      - AGENT_SECRET=${PORTAINER_AGENT_SECRET}
     ports:
       - "9000:9000"
     volumes:
