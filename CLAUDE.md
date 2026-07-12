@@ -145,6 +145,7 @@ Service-specific guides in `/documentation/`. Read the relevant doc before worki
 - `docserver.md` — Documentation MCP server on infra VM (indexing, search, MCP)
 - `disks.md` — Proxmox host disk management and backup storage
 - `doorbell.md` — Reolink video doorbell: usage guide (non-technical), notifications, two-way audio, HA/go2rtc setup
+- `grafana-alerting.md` — Grafana alert rules, concise Pushover notification templates, API access
 - `immich_lxc.md` — Immich photo management, Docker stack, NFS mounts, ML, mobile app
 - `index.md` — Top-level project overview and conventions
 - `infra_vm.md` — Infrastructure VM services (Grafana, Loki, Homepage, Portainer, Atuin, etc.)

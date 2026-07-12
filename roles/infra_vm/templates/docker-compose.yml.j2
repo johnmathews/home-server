@@ -253,6 +253,8 @@ services:
     container_name: grafana
     mem_limit: 256m # ADDED: currently ~183MB, biggest consumer
     oom_score_adj: -500 # Observability backstop, see loki above.
+    environment:
+      TZ: Europe/Amsterdam # alert notification templates render .StartsAt.Local
     ports:
       - "3000:3000"
     volumes:
