@@ -54,8 +54,21 @@ applied.
 
 ## Left alone (needs owner decision)
 
-- `roles/nas/defaults/main.yml` `refresh_shares_nfs_path: "tank/paperless"` —
-  points at the decommissioned dataset; intended replacement unknown.
-- `playbooks/media_vm.yml` has `vm_id: 105` but the live media VM is qemu/114
-  (pve_exporter) — playbook is the stale side; changing it needs investigation.
 - Sidecar version pins duplicated across 5+ roles — refactor candidate.
+
+## Same-day follow-up: the two holds resolved
+
+- `refresh_shares_nfs_path` → `tank/document-store` (owner-confirmed), deployed
+  via `make nas t=refresh-shares` and test-run to completion — script finds the
+  share (ID 19) and toggles it cleanly. Note: interrupting this script mid-run
+  (e.g. piping through `head`) leaves shares DISABLED; its trap re-enables on
+  SIGINT but not SIGPIPE. Always let it finish.
+- `vm_id` in `playbooks/media_vm.yml`: investigated — **no role consumes
+  `vm_id`** (or `vm_name`/`vm_cloud_init_*`); they're leftovers from a
+  VM-provisioning role no longer in the playbook. The live media VM is
+  VMID 114 (recreated ~2025-04 via the community-scripts helper, keeping MAC
+  `02:00:00:00:01:05` and hence IP .105). Updated the value to 114 with an
+  "unused" comment. `infra_vm.yml`'s 106 happens to still match live.
+- Claw ingress fix deployed via `make cloudflared`: edge now routes
+  `claw.itsa-pizza.com` → 18790 (verified in /etc/cloudflared/config.yml).
+  Endpoint stays down until the NanoClaw gateway itself is listening again.

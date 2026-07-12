@@ -28,7 +28,7 @@
     ansible_ssh_private_key_file: ~/.ssh/john_macbook
 
     vm_name: media
-    vm_id: 105
+    vm_id: 114 # unused by any role; VM was recreated via community-scripts helper (was 105)
     vm_cloud_init_user: john
     vm_cloud_init_mac: 02:00:00:00:01:05
     vm_ip_address: 192.168.2.105

@@ -15,7 +15,7 @@ make nas t=refresh-shares
 
 Variables in `roles/nas/defaults/main.yml`:
 - `refresh_shares_enabled: true`
-- `refresh_shares_nfs_path: "tank/paperless"`
+- `refresh_shares_nfs_path: "tank/document-store"`
 - `refresh_shares_smb_path: "tank/time-machine-backups/johns-laptop"`
 - `refresh_shares_wait_seconds: 5`
 
@@ -54,8 +54,8 @@ Refresh script started at 2025-12-14 23:30:45
   [OK] TrueNAS API accessible
 
 [INFO] Looking up share IDs...
-  [OK] NFS share tank/paperless → ID: 3
-  [OK] SMB share tank/paperless → ID: 5
+  [OK] NFS share tank/document-store → ID: 3
+  [OK] SMB share tank/time-machine-backups/johns-laptop → ID: 5
 
 [INFO] Disabling shares...
   [OK] Disabled NFS share (ID: 3)
