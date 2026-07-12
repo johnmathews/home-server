@@ -29,7 +29,10 @@ deployment, configuration, and updates using a Makefile-driven workflow.
 ```sh
 make requirements   # Install Ansible + Python deps
 make lint          # Run ansible-lint (warnings only, non-blocking)
-make check         # Dry-run of full site.yml (no changes)
+make check         # Dry-run of full site.yml (no changes) — KNOWN LIMITATION: several
+                   # roles' probe->install chains are not check-mode-safe (e.g. tailscale
+                   # status parse), so expect false failures; validate per-host instead:
+                   # ansible-playbook playbooks/<host>.yml --check
 make ci            # lint + check (pre-commit validation)
 make site          # Execute full provisioning
 ```

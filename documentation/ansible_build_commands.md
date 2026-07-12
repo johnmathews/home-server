@@ -57,3 +57,20 @@ Copy the config.alloy file in `tubearchivist_lxc` to replace all other instances
     - role: tailscale
       tags: tailscale
 ```
+
+## App upgrade shortcuts
+
+```sh
+make jelly-upgrade    # pull newest jellyfin base, rebuild local image, recreate, health-check
+make immich-upgrade   # pull newest immich release images, make immich, health-check
+```
+
+Needed because compose handlers use `pull: never` — see `upgrade-procedures.md`.
+
+## Known limitation: `make check`
+
+Several roles' probe→install chains are not check-mode-safe (a `command` probe is
+skipped in check mode, then a later task consumes its empty output — e.g. the
+tailscale status parse). `make check` therefore produces false failures. The
+shell_environment nodejs/lazygit chains were fixed 2026-07-12; the tailscale role
+still fails. Prefer per-playbook checks: `ansible-playbook playbooks/<host>.yml --check`.

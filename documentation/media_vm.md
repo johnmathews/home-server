@@ -196,3 +196,11 @@ no commented-out blocks left to uncomment. What remains for re-enablement: `lida
 ssh media "docker exec gluetun wget -qO- https://ifconfig.me"
 ```
 Should show a Mullvad IP, not your home IP.
+
+## BookLore
+
+Book library server (`ghcr.io/booklore-app/booklore` — the project left Docker Hub in
+2026, so the old `booklore/booklore` path is dead) with a `booklore-mariadb` sidecar
+(`lscr.io/linuxserver/mariadb`, pinned). Both are in the media-vm compose template;
+port 6060, data under `/srv/media/config/booklore/` plus the `/mnt/nfs/books` share.
+Part of `sleep_hours_stop_containers`.

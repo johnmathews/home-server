@@ -79,4 +79,5 @@
       - nodejs_version.stdout | regex_replace('^v', '') is version('20.0.0', '>=', version_type='semver')
     fail_msg: "Node.js version {{ nodejs_version.stdout | default('unknown') }} is below required v20.0.0"
     success_msg: "Node.js {{ nodejs_version.stdout }} installed successfully"
-  when: nodejs_needs_install
+  # The verify command above is skipped in check mode, so there is nothing to assert on
+  when: nodejs_needs_install and not ansible_check_mode
