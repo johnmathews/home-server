@@ -35,6 +35,10 @@ atuin_version: "v18.13.3"
 # so roles that deliberately track :latest (agent, music, prometheus, traefik,
 # document_library) are unaffected. jellyfin_lxc hardcodes the same pins in its
 # static files/docker-compose.yml — keep it in sync by hand.
+# Portainer agent — pin to the Portainer server version (infra VM). Agents are
+# deployed by every docker role's compose; register new endpoints in Portainer.
+portainer_agent_version: "2.39.1"
+
 sidecar_alloy_version: "v1.5.1"
 sidecar_node_exporter_version: "v1.8.2"
 sidecar_cadvisor_version: "v0.49.1"

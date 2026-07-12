@@ -164,6 +164,7 @@ Service-specific guides in `/documentation/`. Read the relevant doc before worki
 - `open_webui_lxc.md` — Open WebUI LLM chat interface, OpenAI backend, Docker setup
 - `archive/paperless.md` — Paperless-ngx document store (decommissioned 2026-07-04, superseded by the `library` app on the same LXC)
 - `pbs.md` — Proxmox Backup Server: datastore, schedule, retention, restore procedure
+- `portainer.md` — Portainer server + fleet-wide Ansible-managed agents, endpoint registration, upgrades
 - `prometheus_lxc.md` — Prometheus metrics collection, scrape targets, retention, adding hosts
 - `quiet_hours.md` — Night-time container pausing for HDD spindown
 - `river.md` — Grafana Alloy (River config language) log shipping to Loki

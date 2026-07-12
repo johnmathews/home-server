@@ -62,7 +62,6 @@ alloy_version: "{{ sidecar_alloy_version }}"
 disk_status_exporter_version: "latest"
 node_exporter_version: "{{ sidecar_node_exporter_version }}"
 cadvisor_version: "{{ sidecar_cadvisor_version }}"
-portainer_agent_version: "2.24.1"
 
 # alloy container
 puid: 1001

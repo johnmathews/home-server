@@ -16,7 +16,6 @@ jellyseerr_version: "latest"
 alloy_version: "{{ sidecar_alloy_version }}"
 node_exporter_version: "{{ sidecar_node_exporter_version }}"
 cadvisor_version: "{{ sidecar_cadvisor_version }}"
-portainer_agent_version: "2.24.1"
 
 # defaults/main.yml has the lowest priority. host_vars/media-vm.yml has highest priority.
 # Changing this will require you to `cd /src/media && docker compose logs qbittorrent`

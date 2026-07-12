@@ -3,6 +3,21 @@
 
 services:
 
+  portainer-agent:
+    image: portainer/agent:{{ portainer_agent_version }}
+    container_name: portainer_agent
+    restart: always
+    ports:
+      - "9001:9001"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/volumes:/var/lib/docker/volumes
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
   musicbrainz-picard:
     image: jlesage/musicbrainz-picard
     container_name: picard
