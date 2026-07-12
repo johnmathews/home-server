@@ -38,7 +38,7 @@ object detection, smart search). Replaces Google Photos.
 +-------------------------+------------------------------------------------------------------+-------+
 ```
 
-Version pins live in `roles/immich_lxc/defaults/main.yml` (currently: public proxy `1.6.1`,
+Version pins live in `roles/immich_lxc/defaults/main.yml` (currently: public proxy `latest`,
 cadvisor `v0.49.1`, node_exporter `v1.8.2`, alloy `v1.5.1`, image_borders `latest`).
 
 ### Container Details

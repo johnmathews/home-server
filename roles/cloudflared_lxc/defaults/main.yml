@@ -53,9 +53,6 @@ cloudflared_ingress:
   # Apps (direct — behind Zero Access)
   - prefix: sre-mcp
     service: "http://192.168.2.106:8001"
-  - prefix: claw
-    service: "http://192.168.2.107:18790"
-
   # Traefik / media ingress
   - prefix: traefik
     service: "http://192.168.2.108"

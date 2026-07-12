@@ -30,6 +30,15 @@ ansible_python_interpreter: /usr/bin/python3
 # Atuin version — pins both the client binary and the server Docker image (infra VM compose)
 atuin_version: "v18.13.3"
 
+# Monitoring sidecar pins — single source for the roles that pin these images.
+# Roles reference them via their own defaults (alloy_version: "{{ sidecar_alloy_version }}"),
+# so roles that deliberately track :latest (agent, music, prometheus, traefik,
+# document_library) are unaffected. jellyfin_lxc hardcodes the same pins in its
+# static files/docker-compose.yml — keep it in sync by hand.
+sidecar_alloy_version: "v1.5.1"
+sidecar_node_exporter_version: "v1.8.2"
+sidecar_cadvisor_version: "v0.49.1"
+
 # MikroTik router monitoring (MKTXP)
 mikrotik_router_ip: 192.168.2.1
 

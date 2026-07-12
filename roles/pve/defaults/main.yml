@@ -58,10 +58,10 @@ nut_mon_pass: "{{ vault_nut_mon_pass }}"
 
 
 # Docker image versions
-alloy_version: "v1.5.1"
+alloy_version: "{{ sidecar_alloy_version }}"
 disk_status_exporter_version: "latest"
-node_exporter_version: "v1.8.2"
-cadvisor_version: "v0.49.1"
+node_exporter_version: "{{ sidecar_node_exporter_version }}"
+cadvisor_version: "{{ sidecar_cadvisor_version }}"
 portainer_agent_version: "2.24.1"
 
 # alloy container

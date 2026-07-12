@@ -63,6 +63,7 @@ services:
         hard: 65536
 
   alloy:
+    # static file: keep this pin in sync with sidecar_alloy_version (group_vars/all/main.yml)
     image: grafana/alloy:v1.5.1
     container_name: alloy
     restart: unless-stopped

@@ -22,17 +22,24 @@ image changes during config-only deploys.
 
 ### Monitoring sidecar upgrades
 
-Monitoring sidecars (node-exporter, cadvisor, alloy) run on every service host, but their
-versions are **not** centralized — each role pins its own in
-`roles/<role>/defaults/main.yml` (`node_exporter_version`, `cadvisor_version`,
-`alloy_version`), and the values differ per role (some pin e.g. `v1.8.2`/`v0.49.1`/`v1.5.1`,
-others use `latest`). The exception is `jellyfin_lxc`, which uses static files rather than
-templates, so its sidecar versions are hardcoded in the role's compose file. Only
-`atuin_version` is global in `group_vars/all/main.yml`.
+Monitoring sidecars (node-exporter, cadvisor, alloy) run on every service host. Since
+2026-07-12 the pinned versions are single-sourced in `group_vars/all/main.yml`:
+`sidecar_alloy_version`, `sidecar_node_exporter_version`, `sidecar_cadvisor_version`.
+The roles that pin (immich, infra_vm, pve, media_vm, open_webui, tubearchivist)
+reference these in their own defaults (`alloy_version: "{{ sidecar_alloy_version }}"`).
 
-To upgrade sidecars, update the version in each role's `defaults/main.yml` (and the
-jellyfin_lxc static compose file) and run `make <service>` per host, or `make site` after
-updating all roles.
+Two exceptions:
+
+- Roles that deliberately track `latest` keep their own literal defaults and are
+  unaffected by the `sidecar_*` values: agent, music, prometheus, traefik,
+  document_library.
+- `jellyfin_lxc` deploys a static `files/docker-compose.yml` (not a template), so its
+  sidecar pins are literal in that file — update it by hand when bumping `sidecar_*`.
+
+To upgrade sidecars: bump the `sidecar_*` versions in `group_vars/all/main.yml`, edit
+the jellyfin static compose to match, then `make <service>` per host (or `make site`).
+Note the compose handlers use `pull: never` — pre-pull new images on each host (or
+temporarily allow pulling) before recreating.
 
 ## Ansible and Python Dependencies
 
@@ -113,14 +120,37 @@ TrueNAS updates are applied through the TrueNAS web UI:
 
 ### Jellyfin
 
-Jellyfin major version upgrades (e.g., 10.9.x to 10.10.x) can introduce breaking
-changes. Check the Jellyfin release notes carefully. Known issues with specific
-versions are documented in `documentation/jellyfin_lxc.md`.
+Jellyfin tracks `latest` — but only at image-pull time. The app image is a local build
+(`jellyfin-with-yt-dlp:latest`, `FROM jellyfin/jellyfin:latest` + yt-dlp + the ffprobe
+ulimit wrapper), and the handlers use `pull: never`, so the base stays frozen until you
+pull. To upgrade:
+
+```sh
+ssh jelly
+docker pull jellyfin/jellyfin:latest
+cd /srv/apps && docker compose build jellyfin && docker compose up -d jellyfin
+```
+
+Major version upgrades (e.g., 10.10.x to 10.11.x) can introduce breaking changes —
+check the release notes. Known issues per version are in `documentation/jellyfin_lxc.md`.
 
 ### Immich
 
-Immich releases frequently with breaking changes. Always read the release notes.
-The machine learning model may need to re-index after upgrades.
+Immich server + machine-learning track the official rolling `release` tag
+(`IMMICH_VERSION=release` in the .env). Same pull-time caveat: `make immich` recreates
+onto whatever `release` image is cached locally. To upgrade:
+
+```sh
+ssh immich
+docker pull ghcr.io/immich-app/immich-server:release
+docker pull ghcr.io/immich-app/immich-machine-learning:release
+```
+
+then `make immich` from the repo. Read the release notes first — Immich still ships
+breaking changes, and the mobile app generally wants a matching server version. The
+ML model may re-index after upgrades. Do NOT move `immich_postgres` (pinned
+`14-vectorchord`) or valkey to newer tags casually — database major upgrades need a
+migration plan.
 
 ### Library (document store)
 

@@ -119,7 +119,6 @@ All services listed in `/etc/cloudflared/config.yml`. Key subdomains:
 
 **Direct (with Zero Access):**
 
-- `claw.itsa-pizza.com` -> NanoClaw (192.168.2.107:18790)
 - `agent-journal.itsa-pizza.com` -> MkDocs Journal (192.168.2.107:8000)
 - `agent-docs.itsa-pizza.com` -> MkDocs Docs (192.168.2.107:8001)
 - `charts.itsa-pizza.com` / `grafana.itsa-pizza.com` -> Grafana (192.168.2.106:3000)

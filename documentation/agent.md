@@ -11,6 +11,16 @@ finally renamed to "NanoClaw" in early 2026.
 - GitHub (fork): https://github.com/johnmathews/nanoclaw
 - Official site: https://nanoclaw.dev
 
+> **v2 note (2026-07-12):** NanoClaw was migrated v1 → v2 in May 2026. The v1 TCP
+> WebSocket gateway on port 18790 (and its Control UI / WebChat) **no longer exists**
+> — verified: no `18790` listener or code in `/srv/apps/nanoclaw/src|dist`. v2's
+> surfaces are: the `ncl` CLI over a Unix socket (`data/ncl.sock`), a localhost-only
+> health endpoint, and a Slack webhook server exposed via Tailscale Funnel. The
+> systemd user unit is now **`nanoclaw-583cc1c4.service`** (suffixed with the install
+> id from `data/install-id`), not `nanoclaw.service`. Sections below describing the
+> gateway/Control UI are v1-historical. The former `claw.itsa-pizza.com` tunnel route
+> was removed 2026-07-12.
+
 ## Architecture
 
 NanoClaw uses a gateway-centric architecture where the gateway process manages all messaging channels and spawns
@@ -35,9 +45,9 @@ isolated Docker containers for each agent session.
      +---------------+  +-------+ +------------+ ...
 ```
 
-### Gateway (port 18790)
+### Gateway (v1 — removed in v2)
 
-The central process -- a long-running Node.js daemon that:
+The v1 central process -- a long-running Node.js daemon that:
 
 - Owns all messaging channel connections (adapters for WhatsApp, Telegram, Slack, Discord, etc.)
 - Manages sessions, routing, and access control
@@ -52,7 +62,7 @@ Additional internal ports:
 +--------------------+--------+---------------------------------------------+
 | Service            | Port   | Notes                                       |
 +--------------------+--------+---------------------------------------------+
-| Gateway (WS)       | 18790  | Bound to 0.0.0.0                            |
+| Gateway (WS)       | 18790  | v1 only — removed in v2                     |
 | Credential proxy   | 3001   | On Docker bridge (172.17.0.1), for containers|
 | Health endpoint    | 3002   | On localhost only                            |
 +--------------------+--------+---------------------------------------------+
@@ -173,7 +183,8 @@ NanoClaw itself was installed manually and is managed as a systemd user service 
 +-----------------+--------+--------------------------------------------------+
 | Service         | Port   | Notes                                            |
 +-----------------+--------+--------------------------------------------------+
-| NanoClaw Gateway| 18790  | Bound to 0.0.0.0, systemd user service           |
+| NanoClaw host   | —      | nanoclaw-583cc1c4.service (systemd user unit);   |
+|                 |        | ncl.sock + localhost health; no TCP gateway (v2) |
 +-----------------+--------+--------------------------------------------------+
 ```
 
@@ -274,15 +285,11 @@ are mounted into the containers (rw to allow Docker overlay mounts for `.pages` 
 ssh agent
 ```
 
-### Web UI (Control UI / WebChat)
+### Web UI (Control UI / WebChat) — v1 only
 
-The Gateway binds to `0.0.0.0:18790`, so it is reachable on the LAN. You can also use an SSH tunnel:
-
-```sh
-ssh -N -L 18790:127.0.0.1:18790 agent
-```
-
-Then open http://localhost:18790 in your browser.
+v1's gateway served a Control UI on `0.0.0.0:18790` (LAN or via
+`ssh -N -L 18790:127.0.0.1:18790 agent`). v2 has no web UI; operate it via the
+`ncl` CLI on the host (Unix socket) or the chat channels themselves.
 
 ### Remote access (off-network via Tailscale)
 
@@ -308,10 +315,13 @@ ssh agent
 tailscale status    # Shows node state and connected peers
 ```
 
-### Public access (Cloudflare Tunnel)
+### Public access (Cloudflare Tunnel) — removed 2026-07-12
 
-NanoClaw is proxied behind cloudflared (NOT Traefik) at `claw.itsa-pizza.com` -> `192.168.2.107:18790`. The tunnel is
-configured on the cloudflared LXC (192.168.2.101) in `/etc/cloudflared/config.yml`.
+v1 was proxied behind cloudflared at `claw.itsa-pizza.com` -> `192.168.2.107:18790`. Since
+v2 has no TCP gateway, that ingress entry was removed from `roles/cloudflared_lxc` on
+2026-07-12 (the `claw` CNAME and its Cloudflare Access app may still exist at the edge as
+harmless orphans — delete via the Cloudflare dashboard if desired). Slack inbound now
+arrives via a Tailscale Funnel webhook (`https://agent.flicker-enigmatic.ts.net/webhook/slack`).
 
 **Important**: `claw.itsa-pizza.com` is behind **Cloudflare Access** (zero-trust), which redirects unauthenticated requests
 to `itsapizza.cloudflareaccess.com` for login. This means the Cloudflare Tunnel URL **cannot be used** for WebSocket

@@ -3,7 +3,6 @@ smb_server: 192.168.2.104
 
 truenas_ip: "192.168.2.104"
 
-# Docker image versions (jellyfin_lxc uses static files, not templates - versions are literal)
-alloy_version: "v1.5.1"
-cadvisor_version: "v0.49.1"
-node_exporter_version: "v1.8.2"
+# No sidecar version vars here: jellyfin_lxc deploys a static files/docker-compose.yml,
+# so its alloy/cadvisor/node-exporter pins are literal in that file. Keep them in sync
+# with sidecar_*_version in group_vars/all/main.yml.
