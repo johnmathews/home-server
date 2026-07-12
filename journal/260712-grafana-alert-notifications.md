@@ -45,8 +45,25 @@ Details in `documentation/grafana-alerting.md`.
 
 ## Follow-ups
 
-- infra-vm root disk 94% full: `/var/lib/docker` is 16G, of which **6.3GB is
-  reclaimable unused images** (`docker image prune -a`).
-- Consider unpausing the Share Drive / UPS rules now that notifications are readable.
+- ~~infra-vm root disk 94% full~~ — resolved same day: `docker image prune -af`
+  reclaimed 6.7GB, disk now at 75%.
+- ~~Consider unpausing the Share Drive / UPS rules~~ — resolved same day, see below.
 - `vault_grafana_*` creds double as the Grafana UI admin login; SRE_agent SA is
   deliberately read-only.
+
+## Same-day follow-up: UPS rules rebuilt, share drive rule deleted
+
+- **Share Drive State** deleted (probe no longer needed).
+- All four paused UPS rules deleted. "Days since on battery (OB)" was broken anyway:
+  it referenced `ups_days_since_last_ob`, which was renamed to
+  `ups_days_since_last_ob_lower_bound`, so with `noDataState: Alerting` it fired
+  permanently — likely why everything got paused.
+- Replaced with five active rules driven by NUT status flags rather than derived
+  metrics: **UPS on battery** (OB flag, immediate), **UPS battery critical** (LB/FSD
+  flags, immediate), **UPS runtime low** (<25 min, gated on the OL flag so it is
+  quiet during outages), **UPS load high** (>30% for 5m), **UPS monitoring down**
+  (up{job="nut"} == 0 or NoData for 10m — so the exporter dying can't silently blind
+  the rest).
+- Summaries carry live values (battery %, runtime min, load %) via `$values.X.Value`.
+- NUT's own upssched Pushover notifications kept as an independent failsafe; a real
+  outage sends one notification from each path.

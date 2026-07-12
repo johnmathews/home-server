@@ -63,6 +63,12 @@ Pushover notifications are set up in `upsched-cmd.sh.j2`. A pushover notificatio
 - COMMBAD
 - COMMOK
 
+Grafana also has five UPS alert rules (on battery, battery critical, runtime low,
+load high, monitoring down) that notify via the same Pushover app with battery %,
+runtime and load detail — see `grafana-alerting.md`. The NUT path above is kept as a
+failsafe since it works even if the monitoring stack is down, so a mains-loss event
+produces one notification from each path.
+
 If power is lost and you have a terminal session connected to Proxmox, you will
 see a notification like below:
 

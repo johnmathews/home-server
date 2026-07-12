@@ -17,18 +17,24 @@ rules become read-only in the UI.
 ## Alert rules
 
 ```
-+------------------------------+--------+-------------------------------------------------------------+-----------+-------+
-| Rule                         | State  | Condition                                                   | For       | Notes |
-+------------------------------+--------+-------------------------------------------------------------+-----------+-------+
-| Disk Utilization (LXC)       | active | pve_disk_usage/pve_disk_size > 0.9, joined to pve_guest_info| 2m        | 1     |
-| Disk Utilization (VM/host)   | active | 1 - node_filesystem_avail/size on "/" > 0.9                 | 2m        | 2     |
-| Share Drive State            | PAUSED | share_drive_probe_state_enriched in [Fail, Error]           | 20m       |       |
-| Days since on battery (OB)   | PAUSED | ups_days_since_last_ob == 0                                 | 0s        |       |
-| UPS Load                     | PAUSED | network_ups_tools_ups_load > 30                             | 1m        |       |
-| UPS Battery Charge           | PAUSED | network_ups_tools_battery_charge < 75                       | 1m        |       |
-| UPS Battery Runtime          | PAUSED | avg battery runtime < 25 min                                | 5m        |       |
-+------------------------------+--------+-------------------------------------------------------------+-----------+-------+
++----------------------------+---------------------------------------------------------------+------+-------+
+| Rule                       | Condition                                                     | For  | Notes |
++----------------------------+---------------------------------------------------------------+------+-------+
+| Disk Utilization (LXC)     | pve_disk_usage/pve_disk_size > 0.9, joined to pve_guest_info  | 2m   | 1     |
+| Disk Utilization (VM/host) | 1 - node_filesystem_avail/size on "/" > 0.9                   | 2m   | 2     |
+| UPS on battery             | ups_status{flag="OB"} == 1                                    | 0s   | 3     |
+| UPS battery critical       | ups_status{flag=~"LB|FSD"} == 1                               | 0s   | 3     |
+| UPS runtime low            | battery_runtime < 25 min AND on mains (OL flag)               | 10m  | 4     |
+| UPS load high              | ups_load > 30%                                                | 5m   |       |
+| UPS monitoring down        | up{job="nut"} == 0 (NoData also alerts)                       | 10m  | 5     |
++----------------------------+---------------------------------------------------------------+------+-------+
 ```
+
+All rules are active (none paused). The old rules "Share Drive State" (probe no longer
+needed), "Days since on battery (OB)" (referenced the since-renamed
+`ups_days_since_last_ob` metric, so it was permanently NoData), "UPS Load", "UPS
+Battery Charge" and "UPS Battery Runtime" were deleted on 2026-07-12 and replaced by
+the set above.
 
 Notes:
 
@@ -40,6 +46,17 @@ Notes:
    `type="qemu"`** guests (Proxmox cannot see inside VM disks), so VMs need this
    separate rule. LXCs also run node_exporter and would be double-counted; they are
    excluded by `device!~"rpool/data/subvol-.*"` (LXC rootfs datasets are ZFS subvols).
+
+3. **UPS event alerts** fire immediately (`for: 0s`) on the NUT status flags. NUT's
+   own `upssched-cmd.sh` also sends Pushover for ONBATT/ONLINE/LOWBATT etc. (see
+   `ups.md`) — that path is independent of the monitoring stack and stays as a
+   failsafe; the Grafana alerts add battery %, runtime and load detail plus resolved
+   messages. Expect two notifications for a mains-loss event, one from each path.
+4. **UPS runtime low** is gated on the `OL` (online) flag so it stays quiet during an
+   actual outage — it exists to catch battery ageing / creeping load while on mains.
+5. **UPS monitoring down** has `noDataState: Alerting` and `execErrState: Alerting`,
+   so losing the NUT exporter (or its scrape target) alerts instead of silently
+   blinding the other four UPS rules.
 
 Known gaps: `nas_vm` (TrueNAS has its own alerting) and `home-assistant` (no
 node_exporter) are not covered by the VM/host disk rule.
