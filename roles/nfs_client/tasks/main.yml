@@ -37,6 +37,8 @@
   register: existing_uid
   changed_when: false
   failed_when: false
+  # Read-only probe: must run in check mode or the guard below passes vacuously
+  check_mode: false
 
 - name: Ensure NFS user exists (only if UID not already defined)
   ansible.builtin.user:
@@ -122,6 +124,8 @@
     if mountpoint -q {{ item.mountpoint }}; then echo "mounted"; else echo "not mounted (automount armed)"; fi
   register: _mount_status
   changed_when: false
+  # Read-only probe: skipped-loop results have no stdout for the debug task below
+  check_mode: false
 
 - name: Debug mount status
   ansible.builtin.debug:

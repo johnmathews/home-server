@@ -21,12 +21,13 @@ mode, because commands are skipped there and the register is empty.
 2. **Fixed:** `shell_environment` lazygit chain — extract/install gated with
    `not ansible_check_mode` (get_url reports "changed" in check mode without
    downloading anything, so unarchive hit a nonexistent file).
-3. **Not fixed (follow-up):** `roles/tailscale/tasks/main.yml:33` "Parse Tailscale
-   status" does `from_json` on the skipped status command's empty stdout — fails
-   on every host in check mode. Downstream conditionals consume the parsed var,
-   so the fix needs more care than a one-line guard. Until then `make check`
-   still false-fails; per-playbook `--check` runs work for roles other than
-   tailscale. CLAUDE.md and ansible_build_commands.md now carry the caveat.
+3. **Fixed the next day (2026-07-13):** tailscale role (status probe + auth-result
+   check + display probe) and nfs_client (getent + mountpoint probes) — read-only
+   probes now carry `check_mode: false`, the auth-result check gates on
+   `not ansible_check_mode`. Full `make check` then passed fleet-wide: 16 hosts,
+   failed=0 everywhere (only pre-existing ignore_errors fatals). The caveats added
+   to CLAUDE.md / ansible_build_commands.md were retracted and replaced with a
+   check-mode rule for new roles.
 
 ## Security scan
 

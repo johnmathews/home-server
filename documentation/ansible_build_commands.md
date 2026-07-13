@@ -67,10 +67,12 @@ make immich-upgrade   # pull newest immich release images, make immich, health-c
 
 Needed because compose handlers use `pull: never` — see `upgrade-procedures.md`.
 
-## Known limitation: `make check`
+## Check-mode rule for new roles
 
-Several roles' probe→install chains are not check-mode-safe (a `command` probe is
-skipped in check mode, then a later task consumes its empty output — e.g. the
-tailscale status parse). `make check` therefore produces false failures. The
-shell_environment nodejs/lazygit chains were fixed 2026-07-12; the tailscale role
-still fails. Prefer per-playbook checks: `ansible-playbook playbooks/<host>.yml --check`.
+`make check` passes fleet-wide (fixed 2026-07-13). Keep it that way: a `command`/
+`shell` probe is **skipped in check mode**, so any task consuming its register will
+see empty/undefined output. When writing a probe→register→consume chain, mark
+read-only probes with `check_mode: false` (they then run in dry runs and the facts
+stay accurate), and gate consumers of write-command results with
+`not ansible_check_mode`. Fixed instances to copy from: tailscale status parse,
+nfs_client getent/mountpoint probes, shell_environment nodejs/lazygit.

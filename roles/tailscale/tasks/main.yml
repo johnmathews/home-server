@@ -29,6 +29,8 @@
   register: tailscale_status
   changed_when: false
   failed_when: false
+  # Read-only probe: must run even in check mode, or the parse below gets empty output
+  check_mode: false
 
 - name: Parse Tailscale status
   ansible.builtin.set_fact:
@@ -104,7 +106,8 @@
           - Check logs: journalctl -u tailscaled -n 50
 
           Error code: {{ tailscale_auth_result.rc }}
-      when: tailscale_auth_result.rc != 0
+      # In check mode the auth command above is skipped, so there is no result to check
+      when: not ansible_check_mode and tailscale_auth_result.rc != 0
 
 - name: Ensure Tailscale service is enabled and started
   ansible.builtin.systemd:
@@ -121,6 +124,9 @@
   ansible.builtin.command: tailscale status
   register: tailscale_status_output
   changed_when: false
+  # Read-only probe: a skipped register is still "defined", so the display task
+  # below would render .stdout_lines of nothing in check mode
+  check_mode: false
   when: tailscale_enabled
 
 - name: Display Tailscale IP
