@@ -1,7 +1,6 @@
 # nas_vm: TrueNAS appliance — package installs get reverted on updates.
-# mailcow: retired, VM is disabled.
 - name: Install and configure Tailscale on all hosts
-  hosts: all:!nas:!mailcow
+  hosts: all:!nas
   become: true
   roles:
     - role: tailscale

@@ -180,7 +180,10 @@ docker pull ghcr.io/immich-app/immich-server:release
 docker pull ghcr.io/immich-app/immich-machine-learning:release
 ```
 
-then `make immich` from the repo. Read the release notes first — Immich still ships
+then `docker compose up -d` in `/srv/apps` on the host — `make immich` alone will NOT
+recreate on an image-only change (the compose definition is unchanged, so
+`recreate: auto` sees nothing to do); `make immich-upgrade` does all of this.
+Read the release notes first — Immich still ships
 breaking changes, and the mobile app generally wants a matching server version. The
 ML model may re-index after upgrades. Do NOT move `immich_postgres` (pinned
 `14-vectorchord`) or valkey to newer tags casually — database major upgrades need a

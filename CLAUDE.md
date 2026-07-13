@@ -68,7 +68,7 @@ change. So:
   (Note: its `make` target is hyphenated — `make document-library` — matching the
   `open-webui → open_webui_lxc` precedent where the abbreviated target uses a hyphen.)
 
-**VMs vs LXCs.** Hosts ending in `_vm` (`nas_vm`, `media-vm`, `infra-vm`, `mailcow-vm`) are full VMs;
+**VMs vs LXCs.** Hosts ending in `_vm` (`nas_vm`, `media-vm`, `infra-vm`) are full VMs;
 `*_lxc` are LXC containers; `pve` is the Proxmox host itself and `pbs` the backup server. LXCs are
 defined/managed on `pve`. The distinction matters when investigating: you SSH to the guest for its
 services, but to `pve` for guest lifecycle (start/stop/config).
@@ -109,7 +109,6 @@ Host IPs are assigned statically on the MikroTik router. Source of truth: `inven
 | pve                  | 192.168.2.214  |                  | Proxmox UI :8006                     |
 | pbs                  | 192.168.2.200  |                  | Proxmox Backup Server                |
 | cloudflared_lxc      | 192.168.2.101  |                  | Cloudflare Tunnel                    |
-| mailcow-vm           | 192.168.2.103  |                  | Mailcow (retired)                    |
 | nas_vm               | 192.168.2.104  |                  | TrueNAS (NFS/SMB shares)             |
 | media-vm             | 192.168.2.105  |                  | Sonarr, Radarr, qBittorrent, etc.    |
 | infra-vm             | 192.168.2.106  |                  | Grafana, Prometheus, Loki, etc.      |

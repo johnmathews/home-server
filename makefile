@@ -43,7 +43,7 @@ LIMIT_ARG := $(if $(strip $(LIMIT)),--limit $(LIMIT),)
 ANSIBLE_OPTS := $(TAGS_ARG) $(SKIP_ARG) $(LIMIT_ARG) $(EXTRA)
 
 # Declare all available commands as .PHONY (always run)
-.PHONY: all site pve nas mail media infra key traefik immich tube prometheus \
+.PHONY: all site pve nas media infra key traefik immich tube prometheus \
         document-library music jelly open-webui cloudflared agent \
         shell nfs share_drive_probe tailscale requirements \
         jelly-upgrade immich-upgrade \
@@ -61,9 +61,6 @@ pve:
 nas:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/nas.yml $(VAULT) $(ANSIBLE_OPTS)
 
-mail:
-	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/mail_vm.yml $(VAULT) $(ANSIBLE_OPTS)
-
 media:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/media_vm.yml $(VAULT) $(ANSIBLE_OPTS)
 
@@ -79,10 +76,12 @@ traefik:
 immich:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/immich_lxc.yml $(VAULT) $(ANSIBLE_OPTS)
 
-# Pull the newest immich release images, redeploy the stack, health-check
+# Pull the newest immich release images, recreate onto them, health-check.
+# docker compose up (not ansible) is what recreates on image-only changes:
+# the compose definition is unchanged, so recreate:auto sees nothing to do.
 immich-upgrade:
 	ssh immich 'docker pull ghcr.io/immich-app/immich-server:release && docker pull ghcr.io/immich-app/immich-machine-learning:release && docker pull alangrainger/immich-public-proxy:latest'
-	$(MAKE) immich
+	ssh immich 'cd /srv/apps && docker compose up -d'
 	@echo "waiting for immich to come up..."; sleep 40
 	@curl -sf -o /dev/null http://192.168.2.113:2283/api/server/ping && curl -s http://192.168.2.113:2283/api/server/version | python3 -c 'import json,sys; d=json.load(sys.stdin); print("immich healthy, version: v%s.%s.%s" % (d["major"], d["minor"], d["patch"]))' 
 

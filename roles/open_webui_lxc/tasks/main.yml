@@ -80,3 +80,13 @@
   tags: docker
   notify:
     - Restart all containers
+
+- name: Launch containers
+  community.docker.docker_compose_v2:
+    project_src: "{{ docker_compose_dir }}"
+    state: present
+    recreate: auto
+    pull: never
+    remove_orphans: true
+  become: false
+  tags: docker
