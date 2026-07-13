@@ -38,11 +38,13 @@ surfaces, all fed by the same data:
 (Diun was retired 2026-07-13 — it duplicated this with a hand-maintained watch
 list and no knowledge of running state.)
 
-**Known blind spot:** jellyfin runs a locally-built image
-(`jellyfin-with-yt-dlp`), so the exporter reports it as `local` and can never mark
-it outdated — no automatic signal exists for new Jellyfin releases. Run
-`make jelly-upgrade` periodically, or add base-image freshness for local builds to
-the exporter (tracked as a follow-up).
+**Local builds** (jellyfin's `jellyfin-with-yt-dlp`) are tracked via the OCI
+base-image annotation: the Dockerfile carries
+`LABEL org.opencontainers.image.base.name="docker.io/jellyfin/jellyfin:latest"`, and
+the exporter compares the locally-pulled base against the registry — so new Jellyfin
+releases trigger the fast-lane alert like everything else (since 2026-07-13). Caveat:
+the check assumes pull+rebuild happen together, which `make jelly-upgrade` guarantees.
+Any future local build gets the same tracking by adding the LABEL.
 
 When a notification arrives:
 

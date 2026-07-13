@@ -1,4 +1,6 @@
 FROM jellyfin/jellyfin:latest
+# Lets the container-status-exporter track base-image freshness for this local build
+LABEL org.opencontainers.image.base.name="docker.io/jellyfin/jellyfin:latest"
 ADD https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux /usr/local/bin/yt-dlp
 RUN chmod +x /usr/local/bin/yt-dlp
 
