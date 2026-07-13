@@ -259,11 +259,12 @@ Add router and service entries to the Traefik dynamic configuration templates in
 `roles/traefik_lxc/templates/`. This is used for services like Jellyfin, Immich,
 and Navidrome that need WebSocket support or custom middleware.
 
-### Watch the image for updates (Diun)
+### Update visibility (automatic)
 
-If the service uses a rolling tag (`latest`, `release`, `main`), add it to the Diun
-watch list in `roles/infra_vm/templates/diun-images.yml.j2` and run `make infra t=diun`
-— you'll get a Pushover notification when the registry publishes a new image.
+Nothing to configure: once the service runs on a Portainer-covered host, the
+container-status-exporter discovers it and the Image Freshness dashboard / staleness
+alerts track it. Optionally add its container name to the "App update available"
+Grafana rule for fast (1-day) update notifications.
 
 ## Step 9: Add Prometheus Monitoring
 

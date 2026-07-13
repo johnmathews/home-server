@@ -20,21 +20,29 @@ Most services run as Docker containers with pinned image versions in role defaul
 You must pull new images manually (step 4) before deploying. This prevents unexpected
 image changes during config-only deploys.
 
-### Update notifications (Diun)
+### Update notifications
 
-Diun runs on the infra VM (`roles/infra_vm`, `make infra t=diun`) and checks ~29
-watched rolling-tag images **weekly (Monday 09:00)**, sending a **Pushover**
-notification per updated image. The watch list is
-`roles/infra_vm/templates/diun-images.yml.j2` (self-built `ghcr.io/johnmathews/*`
-images, databases, and pinned images are deliberately excluded — comments in the
-file explain). linuxserver.io images rebuild weekly, so the media-stack entries
-notify most weeks; trim that block if it gets noisy.
+Update visibility comes from the **container-status-exporter** (infra VM): every 6h
+it compares each running container's image digest against its registry. Three
+surfaces, all fed by the same data:
 
-The **Image Freshness dashboard** (`charts.itsa-pizza.com/d/image-freshness`) shows the
-complementary view: which *running* containers are behind, by how many days, with
-current/available versions — powered by `container_image_*` metrics from the
-container-status-exporter (registry digest comparison, 6h cycle). Diun says "something
-new exists"; the dashboard says "this is what you're behind on".
+1. **Image Freshness dashboard** — `charts.itsa-pizza.com/d/image-freshness`:
+   current vs available for all ~108 containers on 12 hosts, auto-discovered (no
+   watch list to maintain).
+2. **"App update available" alert** — Pushover within a day when a *tracked app's
+   running* image falls behind: immich_server, jellyfin, navidrome, open-webui
+   (edit the `container_name` regex in the Grafana rule to change the set).
+3. **"Container image stale" alert** — weekly Pushover digest of anything >30 days
+   behind, as the safety net for the long tail.
+
+(Diun was retired 2026-07-13 — it duplicated this with a hand-maintained watch
+list and no knowledge of running state.)
+
+**Known blind spot:** jellyfin runs a locally-built image
+(`jellyfin-with-yt-dlp`), so the exporter reports it as `local` and can never mark
+it outdated — no automatic signal exists for new Jellyfin releases. Run
+`make jelly-upgrade` periodically, or add base-image freshness for local builds to
+the exporter (tracked as a follow-up).
 
 When a notification arrives:
 
@@ -43,11 +51,6 @@ When a notification arrives:
 - **Immich** → read the release notes, then `make immich-upgrade`
 - **Anything else** → `ssh <host> 'docker pull <image>'` then `make <host>`
   (handlers use `pull: never`, so pulling first is required)
-
-Diun reuses the pve Pushover app token (`diun_pushover_token` in
-`roles/infra_vm/defaults/main.yml`); create a dedicated "Diun" app in Pushover and
-swap the vault var there if you want distinctly-labelled notifications. Test the
-wiring with `ssh infra 'docker exec diun diun notif test'`.
 
 ### Monitoring sidecar upgrades
 

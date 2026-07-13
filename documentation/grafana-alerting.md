@@ -28,6 +28,7 @@ rules become read-only in the UI.
 | UPS load high              | ups_load > 30%                                                | 5m   |       |
 | UPS monitoring down        | up{job="nut"} == 0 (NoData also alerts)                       | 10m  | 5     |
 | Container image stale      | running image >30 days older than registry (weekly repeat)   | 6h   | 6     |
+| App update available       | tracked app containers outdated (fast lane, weekly repeat)   | 24h  | 6     |
 | Image freshness data missing| freshness last-check older than 24h (NoData also alerts)    | 1h   | 6     |
 +----------------------------+---------------------------------------------------------------+------+-------+
 ```

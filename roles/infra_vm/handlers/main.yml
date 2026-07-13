@@ -116,15 +116,3 @@
     dependencies: true
     remove_orphans: true
   become: false
-
-- name: Restart diun
-  community.docker.docker_compose_v2:
-    project_src: "{{ docker_compose_dir }}"
-    services:
-      - diun
-    state: present
-    recreate: always
-    pull: never
-    dependencies: true
-    remove_orphans: true
-  become: false
