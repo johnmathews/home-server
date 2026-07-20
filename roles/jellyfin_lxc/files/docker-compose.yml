@@ -2,7 +2,7 @@
 services:
 
   portainer-agent:
-    image: portainer/agent:2.39.1 # static file: keep in sync with portainer_agent_version
+    image: portainer/agent:2.43.0 # static file: keep in sync with portainer_agent_version
     container_name: portainer_agent
     restart: always
     environment:
@@ -81,7 +81,7 @@ services:
 
   alloy:
     # static file: keep this pin in sync with sidecar_alloy_version (group_vars/all/main.yml)
-    image: grafana/alloy:v1.5.1
+    image: grafana/alloy:v1.18.0
     container_name: alloy
     restart: unless-stopped
     mem_limit: 512m  # ~50 MiB typical; cap so no sidecar can starve the 6 GB LXC
@@ -114,7 +114,7 @@ services:
         max-file: "5"
 
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    image: gcr.io/cadvisor/cadvisor:v0.55.1
     container_name: cadvisor
     restart: always
     mem_limit: 512m  # ~36 MiB typical
@@ -136,7 +136,7 @@ services:
         max-file: "5"
 
   node_exporter:
-    image: quay.io/prometheus/node-exporter:v1.8.2
+    image: quay.io/prometheus/node-exporter:v1.12.1
     container_name: node_exporter
     mem_limit: 128m  # ~10 MiB typical
     command:
