@@ -75,6 +75,26 @@ the jellyfin static compose to match, then `make <service>` per host (or `make s
 Note the compose handlers use `pull: never` — pre-pull new images on each host (or
 temporarily allow pulling) before recreating.
 
+#### Bulk refresh across hosts — `make refresh-sidecars`
+
+The `latest`-tracking roles (agent, music, prometheus, traefik, document_library) drift
+as upstream pushes new `:latest` builds, since `pull: never` means `make <host>` never
+pulls them. Rather than pull + recreate on each host by hand, run:
+
+```sh
+make refresh-sidecars                       # all sidecar hosts, all three services
+make refresh-sidecars LIMIT=agent_lxc       # one host (inventory hostname)
+make refresh-sidecars EXTRA='-e {"sidecars":["alloy"]}'   # just alloy, all hosts
+```
+
+This pulls the newest images and recreates alloy / node-exporter / cadvisor across the
+`observability_sidecars` inventory group (`playbooks/refresh_sidecars.yml`). It is the
+manual "apply" companion to the Image Freshness dashboard's "visibility": run it when the
+dashboard shows sidecars behind. It is safe on pinned hosts — `docker compose pull` fetches
+the pinned tag they already run, so nothing is recreated there. The playbook discovers each
+host's actual compose service names, so the `node_exporter` (underscore) vs `node-exporter`
+(hyphen, infra_vm only) split is handled automatically, and app containers are never touched.
+
 ## Ansible and Python Dependencies
 
 ### Ansible collections and roles

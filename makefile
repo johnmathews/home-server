@@ -46,7 +46,7 @@ ANSIBLE_OPTS := $(TAGS_ARG) $(SKIP_ARG) $(LIMIT_ARG) $(EXTRA)
 .PHONY: all site pve nas media infra key traefik immich tube prometheus \
         document-library music jelly open-webui cloudflared agent \
         shell nfs share_drive_probe tailscale requirements \
-        jelly-upgrade immich-upgrade \
+        jelly-upgrade immich-upgrade refresh-sidecars \
         check lint clean ci help
 
 
@@ -115,6 +115,14 @@ cloudflared:
 agent:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/agent_lxc.yml $(VAULT) $(ANSIBLE_OPTS)
 
+# Pull newest images for the observability sidecars (alloy, node-exporter,
+# cadvisor) across every host that runs them, then recreate. Handlers use
+# pull:never, so this is the bulk "apply" for sidecar :latest drift shown on
+# the Image Freshness dashboard. Scope with LIMIT=host; pick services with
+# EXTRA='-e {"sidecars":["alloy"]}'.
+refresh-sidecars:
+	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/refresh_sidecars.yml $(VAULT) $(ANSIBLE_OPTS)
+
 shell:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/shell_environment.yml $(VAULT) $(ANSIBLE_OPTS)
 
@@ -165,6 +173,7 @@ help:
 	@echo ""
 	@echo "  make jelly-upgrade    → Pull newest Jellyfin base, rebuild, recreate, health-check"
 	@echo "  make immich-upgrade   → Pull newest Immich release images, redeploy, health-check"
+	@echo "  make refresh-sidecars → Pull+recreate alloy/node-exporter/cadvisor on all sidecar hosts"
 	@echo ""
 	@echo "  make check            → Dry run (no changes applied)"
 	@echo "  make lint             → Lint playbooks and roles"

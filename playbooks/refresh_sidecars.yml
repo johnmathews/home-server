@@ -1,0 +1,80 @@
+---
+# Refresh the observability sidecar containers across every host that runs them.
+#
+# Why this exists
+# ---------------
+# Alloy, node-exporter and cadvisor run as sidecars in every service's compose
+# stack. The roles that deliberately track `:latest` (agent, music, prometheus,
+# traefik, document_library) drift as upstream pushes new `:latest` builds,
+# because the compose handlers use `pull: never` and `make <host>` recreates but
+# never pulls. Refreshing them one host at a time is tedious. This playbook pulls
+# the newest images and recreates the sidecars in bulk, on demand — the manual
+# "apply" companion to the container-status-exporter freshness dashboard.
+#
+# It is idempotent for pinned hosts: `docker compose pull` fetches the pinned tag
+# they already run, so nothing is recreated there.
+#
+# Usage
+# -----
+#   make refresh-sidecars                       # all sidecar hosts, all three services
+#   make refresh-sidecars LIMIT=agent_lxc       # one host (inventory hostname)
+#   make refresh-sidecars EXTRA='-e {"sidecars":["alloy"]}'   # just alloy, all hosts
+#
+- name: Refresh observability sidecar containers
+  hosts: observability_sidecars
+  gather_facts: false
+  become: true
+
+  vars:
+    # Compose service names to refresh. Both node-exporter spellings are listed
+    # because infra_vm names the service `node-exporter` while every other role
+    # uses `node_exporter`; intersecting with each host's actual services (below)
+    # keeps the extra name harmless. Override to target a different set, e.g.
+    #   -e '{"sidecars":["alloy"]}'
+    sidecars:
+      - alloy
+      - node_exporter
+      - node-exporter
+      - cadvisor
+
+  tasks:
+    - name: Discover the services defined in this host's compose stack
+      ansible.builtin.command:
+        cmd: docker compose config --services
+        chdir: "{{ docker_compose_dir }}"
+      register: stack_services
+      changed_when: false
+
+    - name: Select the sidecars that actually exist on this host
+      ansible.builtin.set_fact:
+        sidecars_present: "{{ sidecars | intersect(stack_services.stdout_lines) }}"
+
+    - name: Note hosts with no matching sidecars
+      ansible.builtin.debug:
+        msg: >-
+          No matching sidecars ({{ sidecars | join(', ') }}) in
+          {{ docker_compose_dir }}/docker-compose.yml — nothing to do.
+      when: sidecars_present | length == 0
+
+    # Pulling is a cache fill, not a state change — and `docker compose pull`
+    # prints "Pulled" even when the local digest is already current, so its
+    # output can't distinguish a real download. The observable state change is
+    # the recreate below, which reports `changed` accurately. Hence pull never
+    # reports changed; the play is `changed` iff a container was recreated.
+    - name: Pull the newest images for the sidecars present
+      ansible.builtin.command:
+        cmd: "docker compose pull {{ sidecars_present | join(' ') }}"
+        chdir: "{{ docker_compose_dir }}"
+      register: pull_result
+      changed_when: false
+      when: sidecars_present | length > 0
+
+    - name: Recreate the sidecar containers onto the pulled images
+      ansible.builtin.command:
+        cmd: "docker compose up -d {{ sidecars_present | join(' ') }}"
+        chdir: "{{ docker_compose_dir }}"
+      register: up_result
+      changed_when: >-
+        ('Recreate' in up_result.stderr) or ('Recreated' in up_result.stderr)
+        or ('Started' in up_result.stderr) or ('Created' in up_result.stderr)
+      when: sidecars_present | length > 0
