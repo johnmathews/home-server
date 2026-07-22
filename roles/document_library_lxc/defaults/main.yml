@@ -1,11 +1,12 @@
 pgid: 1001
 
 # Docker image versions
-# These track "latest" to match the images actually deployed on the host. Pin
-# to explicit versions again only after pulling and verifying them on the host.
-node_exporter_version: "latest"
-alloy_version: "latest"
-cadvisor_version: "latest"
+# Monitoring sidecars — pinned to the versions deployed on this host (2026-07),
+# pulled and verified on the host first. Bump deliberately: pull the new tag on
+# the host first (handlers use pull:never), or run `make refresh-sidecars`.
+node_exporter_version: "v1.12.1"
+alloy_version: "v1.18.0"
+cadvisor_version: "v0.55.1"
 
 # Library (ghcr image tag = git commit sha of release)
 library_version: "latest"

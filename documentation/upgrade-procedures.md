@@ -64,22 +64,23 @@ reference these in their own defaults (`alloy_version: "{{ sidecar_alloy_version
 
 Two exceptions:
 
-- Roles that deliberately track `latest` keep their own literal defaults and are
-  unaffected by the `sidecar_*` values: agent, music, prometheus, traefik,
-  document_library.
+- agent, music, prometheus, traefik, document_library pin explicit versions in their
+  **own** `defaults/main.yml` (not via `sidecar_*`) — they used to track `:latest` and
+  drifted, so they were pinned to the versions then deployed (2026-07: alloy v1.18.0,
+  cadvisor v0.55.1, node-exporter v1.12.1). These are ahead of the `sidecar_*` values;
+  bump each role's literal defaults independently, or unify onto `sidecar_*` later.
 - `jellyfin_lxc` deploys a static `files/docker-compose.yml` (not a template), so its
   sidecar pins are literal in that file — update it by hand when bumping `sidecar_*`.
 
-To upgrade sidecars: bump the `sidecar_*` versions in `group_vars/all/main.yml`, edit
-the jellyfin static compose to match, then `make <service>` per host (or `make site`).
-Note the compose handlers use `pull: never` — pre-pull new images on each host (or
-temporarily allow pulling) before recreating.
+To upgrade sidecars: bump the `sidecar_*` versions in `group_vars/all/main.yml` (or the
+literal defaults on the five roles above), edit the jellyfin static compose to match, then
+`make <service>` per host (or `make site`). Note the compose handlers use `pull: never` —
+pre-pull new images on each host (or temporarily allow pulling) before recreating.
 
 #### Bulk refresh across hosts — `make refresh-sidecars`
 
-The `latest`-tracking roles (agent, music, prometheus, traefik, document_library) drift
-as upstream pushes new `:latest` builds, since `pull: never` means `make <host>` never
-pulls them. Rather than pull + recreate on each host by hand, run:
+All sidecars are now pinned, so `make <host>` will not pull a newer image (`pull: never`).
+To move to a newer build across hosts — pull the images and recreate in one step — run:
 
 ```sh
 make refresh-sidecars                       # all sidecar hosts, all three services

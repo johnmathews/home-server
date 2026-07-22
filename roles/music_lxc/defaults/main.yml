@@ -1,6 +1,9 @@
 # Docker image versions
 navidrome_version: "latest"
 feishin_version: "latest"
-alloy_version: "latest"
-node_exporter_version: "latest"
-cadvisor_version: "latest"
+# Monitoring sidecars — pinned to the versions deployed on this host (2026-07).
+# Bump deliberately: pull the new tag on the host first (handlers use pull:never),
+# or run `make refresh-sidecars`.
+alloy_version: "v1.18.0"
+node_exporter_version: "v1.12.1"
+cadvisor_version: "v0.55.1"
