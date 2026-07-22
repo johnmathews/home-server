@@ -27,9 +27,9 @@ infra VM queries Prometheus for dashboards.
 | Container      | Image                              | Port  | Purpose                    |
 +----------------+------------------------------------+-------+----------------------------+
 | prometheus     | prom/prometheus:latest              | 9090  | Metrics collection + query |
-| node_exporter  | node-exporter:latest               | 9100  | Host metrics               |
-| cadvisor       | cadvisor:latest                    | 18080 | Container metrics          |
-| alloy          | grafana/alloy:latest               | 12345 | Log shipping to Loki       |
+| node_exporter  | node-exporter:v1.12.1              | 9100  | Host metrics               |
+| cadvisor       | cadvisor:v0.55.1                   | 18080 | Container metrics          |
+| alloy          | grafana/alloy:v1.18.0              | 12345 | Log shipping to Loki       |
 +----------------+------------------------------------+-------+----------------------------+
 ```
 

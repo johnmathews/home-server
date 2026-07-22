@@ -101,13 +101,13 @@ Rate limits use `CF-Connecting-IP` header for source identification (real client
 ## Docker Containers
 
 ```
-+-------------+---------------------+-------+--------------------------------------------+
-| Container   | Image               | Port  | Purpose                                    |
-+-------------+---------------------+-------+--------------------------------------------+
-| traefik     | traefik:v3.1        | 80    | Reverse proxy                              |
-| cadvisor    | cadvisor:latest     | 18080 | Container metrics for Prometheus           |
-| alloy       | grafana/alloy:latest| 12345 | Log shipping to Loki                       |
-+-------------+---------------------+-------+--------------------------------------------+
++-------------+----------------------+-------+--------------------------------------------+
+| Container   | Image                | Port  | Purpose                                    |
++-------------+----------------------+-------+--------------------------------------------+
+| traefik     | traefik:v3.1         | 80    | Reverse proxy                              |
+| cadvisor    | cadvisor:v0.55.1     | 18080 | Container metrics for Prometheus           |
+| alloy       | grafana/alloy:v1.18.0| 12345 | Log shipping to Loki                       |
++-------------+----------------------+-------+--------------------------------------------+
 ```
 
 No node-exporter on this host (not present in docker-compose).
