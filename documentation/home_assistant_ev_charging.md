@@ -25,10 +25,13 @@ MAC `d8:fc:92:93:f5:7d`, LAN IP `192.168.2.29`.
 +---------------------------------------------+----------------------------------------+
 | Entity                                      | Notes                                  |
 +---------------------------------------------+----------------------------------------+
-| sensor.voldt_2_4_5g_total_energy            | lifetime kWh (total_increasing) ->     |
-|                                             |   Energy dashboard "EV Charger(Enyaq)" |
-| sensor.voldt_2_4_5g_daily_total_energy      | convenience counters (daily/monthly/   |
-|   /_monthly_ /_yearly_                      |   yearly)                              |
+| sensor.ev_charger_energy                    | THE energy sensor: Riemann-integrated  |
+|                                             |   from total_power (see "Known issue") |
+|                                             |   -> Energy dashboard "EV Charger      |
+|                                             |   (Enyaq)" + all dashboard cards       |
+| sensor.voldt_2_4_5g_total_energy            | DEAD - device firmware never updates   |
+|   /_daily_ /_monthly_ /_yearly_ /_balance_  |   its energy counters via cloud (all   |
+|                                             |   stuck at 0; do not use)              |
 | sensor.voldt_2_4_5g_total_power             | live draw, kW; member of the powercalc |
 |                                             |   Rest Of Home subtract group          |
 | sensor.voldt_2_4_5g_single_phase_power      | per-phase power, kW                    |
@@ -81,14 +84,23 @@ charger_wait, charger_charging, charger_pause, charger_end, charger_fault
 (charger_free_fault). "How long was the car plugged in but NOT charging" could be a
 future history_stats on charger_insert/charger_wait/charger_end if wanted.
 
+## Known issue: the device's own energy counters are dead
+
+Verified on the first real charge (2026-08-12, ~3.05 h at ~2.86 kW ≈ 8.7 kWh, confirmed
+against the P1 meter): `work_state` and `total_power` report correctly, but
+`forward_energy_total` (and daily/monthly/yearly/balance) **never left 0** — the firmware
+doesn't maintain or push them. Fix: `sensor.ev_charger_energy` (Riemann `integration:` in
+configuration.yaml, method left, `max_sub_interval` 5 min) integrates the power sensor,
+and everything (Energy dashboard entry, dashboard cards) points at it. The first charge
+(8.7 kWh) predates the sensor and is missing from the dashboard history — injectable via
+Developer tools → Statistics → adjust if it ever matters.
+
 ## Caveats
 
 - **Cloud-dependent**: sensor updates flow through Tuya's cloud (MQTT push, updates are
-  near-real-time). Internet outage = no data (charging itself is unaffected).
-- **First-charge check**: the power sensor reports **kW** while other Rest Of Home
-  members report W; powercalc normalises units, but verify during the first real charge
-  that `sensor.rest_of_home_power` doesn't go strongly negative (if it does, the
-  conversion assumption failed — remove the charger from `subtract_entities` and file it).
+  near-real-time). Internet outage = no data (charging itself is unaffected). Energy is
+  integrated from sparse power updates, so treat kWh as ~±5% (good enough for cost
+  tracking; the grid-truth is always the P1 meter).
 - Re-pairing the device into a different app/account changes its device ID and breaks the
   entity history.
 
