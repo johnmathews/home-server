@@ -51,8 +51,10 @@ Grid prices: tariff 1 €0.24111/kWh, tariff 2 €0.27693/kWh, gas €1.3073/m³
 |                           |                                          |   self-usage only)  |
 | Plug 4 Lamp               | sensor.plug_4_lamp_energy                | fixed 15.4 W        |
 | Plug 5 / 6 Filament Lamp  | sensor.plug_{5,6}_filament_lamp_energy   | fixed ~6.4 W (EST.) |
-| EV Charger (Enyaq)        | sensor.voldt_2_4_5g_total_energy         | Tuya cloud (real,   |
-|                           |                                          |   xtend_tuya)       |
+| EV Charger (Enyaq)        | sensor.ev_charger_energy                 | Riemann integral of |
+|                           |                                          |   estimated power - |
+|                           |                                          |   the Voldt's own   |
+|                           |                                          |   counters are dead |
 | Rest of home (untracked)  | sensor.rest_of_home_energy               | subtract group      |
 +---------------------------+------------------------------------------+---------------------+
 ```
@@ -160,6 +162,10 @@ the correct amount. No YAML involved.
 |    |   (kW/W conversion); OPTIONAL local-key upgrade to tuya-local    |                |
 |    |   if Tuya platform linking ever works — home_assistant_ev_       |                |
 |    |   charging.md                                                    |                |
+| 8  | EV car side: DONE via MySkoda (HACS) 2026-08-13. Once ~5 kWh     | EV charging    |
+|    |   has been charged, sanity-check sensor.ev_charging_efficiency   | efficiency     |
+|    |   against the expected mid-80s%; a wildly-off figure means the   |                |
+|    |   58 kWh pack constant or the work_state gating needs revisiting |                |
 +----+------------------------------------------------------------------+----------------+
 ```
 
