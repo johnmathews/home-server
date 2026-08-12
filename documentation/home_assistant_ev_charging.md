@@ -26,15 +26,20 @@ MAC `d8:fc:92:93:f5:7d`, LAN IP `192.168.2.29`.
 | Entity                                      | Notes                                  |
 +---------------------------------------------+----------------------------------------+
 | sensor.ev_charger_energy                    | THE energy sensor: Riemann-integrated  |
-|                                             |   from total_power (see "Known issue") |
-|                                             |   -> Energy dashboard "EV Charger      |
-|                                             |   (Enyaq)" + all dashboard cards       |
+|                                             |   from ev_charger_power_estimated (see |
+|                                             |   "Known issue") -> Energy dashboard   |
+|                                             |   "EV Charger (Enyaq)" + all cards     |
 | sensor.voldt_2_4_5g_total_energy            | DEAD - device firmware never updates   |
 |   /_daily_ /_monthly_ /_yearly_ /_balance_  |   its energy counters via cloud (all   |
 |                                             |   stuck at 0; do not use)              |
-| sensor.voldt_2_4_5g_total_power             | live draw, kW; member of the powercalc |
-|                                             |   Rest Of Home subtract group          |
-| sensor.voldt_2_4_5g_single_phase_power      | per-phase power, kW                    |
+| sensor.ev_charger_power_estimated           | THE power sensor (template): cloud     |
+|                                             |   value when fresh; set-current x 230V |
+|                                             |   while charging with a stale 0. Feeds |
+|                                             |   energy integration, Rest Of Home,    |
+|                                             |   dashboard gauges.                    |
+| sensor.voldt_2_4_5g_total_power             | raw cloud power: correct but pushed    |
+|                                             |   only HOURLY (~hh:58) + on session end|
+| sensor.voldt_2_4_5g_single_phase_power      | per-phase power, kW (same cadence)     |
 | sensor.voldt_2_4_5g_work_state              | charger_free / charging / fault ...    |
 | number.voldt_2_4_5g_charging_current        | 8-13 A charge rate control             |
 | select.voldt_2_4_5g_work_mode               | charge_now / schedule / ... - LEAVE ON |
@@ -89,9 +94,15 @@ future history_stats on charger_insert/charger_wait/charger_end if wanted.
 Verified on the first real charge (2026-08-12, ~3.05 h at ~2.86 kW ≈ 8.7 kWh, confirmed
 against the P1 meter): `work_state` and `total_power` report correctly, but
 `forward_energy_total` (and daily/monthly/yearly/balance) **never left 0** — the firmware
-doesn't maintain or push them. Fix: `sensor.ev_charger_energy` (Riemann `integration:` in
-configuration.yaml, method left, `max_sub_interval` 5 min) integrates the power sensor,
-and everything (Energy dashboard entry, dashboard cards) points at it. The first charge
+doesn't maintain or push them. Also, the raw power DP is pushed only **hourly** (at
+~hh:58) plus instantly on session end — so each session's first up-to-60 min would read
+0 kW. Fix, two layers: `sensor.ev_charger_power_estimated` (template in templates.yaml)
+uses the cloud value when fresh and falls back to set-current × 230 V while
+`work_state = charger_charging` with a stale 0; `sensor.ev_charger_energy` (Riemann
+`integration:`, method left, `max_sub_interval` 5 min) integrates that, and everything
+(Energy dashboard entry, Rest Of Home, dashboard cards) points at the estimated pair.
+Accuracy: the estimator ran ~4% high vs the observed 2.86 kW during the fallback hour
+(car pulls slightly under the 13 A pilot) — self-corrects when real values arrive. The first charge
 (8.7 kWh) predates the sensor and is missing from the dashboard history — injectable via
 Developer tools → Statistics → adjust if it ever matters.
 
