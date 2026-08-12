@@ -1,0 +1,58 @@
+# roles/family_finances_lxc/handlers/main.yml
+#
+# `state: present` + `recreate: always`, never `state: restarted` — the latter
+# is `docker compose restart`, which will not pick up a changed image tag, env
+# var or mount, and a handler fires precisely because one of those changed
+# (documentation/adding-a-new-service.md).
+#
+# These handlers use `pull: missing` where the estate's older roles use
+# `pull: never`. Deliberate: this application's image tag is a git commit SHA
+# that changes on every deploy, so `never` would fail the first time a new SHA
+# is pinned unless somebody remembered to pull it on the host by hand. The
+# sidecars below keep `never`, because their versions are bumped on purpose.
+
+- name: Restart all containers
+  community.docker.docker_compose_v2:
+    project_src: "{{ family_finances_docker_compose_dir }}"
+    state: present
+    recreate: always
+    pull: missing
+    dependencies: true
+    remove_orphans: true
+  become: false
+
+# The application only. Every restart of these ends every logged-in session:
+# sessions hold the household encryption key in memory and are never persisted,
+# by design (family-finances docs/adr/0009). Nothing is readable again until a
+# member logs in, so prefer deploying when nobody is mid-upload.
+- name: Restart family finances
+  community.docker.docker_compose_v2:
+    project_src: "{{ family_finances_docker_compose_dir }}"
+    services:
+      - backend
+      - frontend
+    state: present
+    recreate: always
+    pull: missing
+    dependencies: true
+  become: false
+
+- name: Restart alloy
+  community.docker.docker_compose_v2:
+    project_src: "{{ family_finances_docker_compose_dir }}"
+    services:
+      - alloy
+    state: present
+    recreate: always
+    pull: never
+    dependencies: true
+  become: false
+
+- name: Restart sleep-hours timers
+  become: true
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: restarted
+  loop:
+    - docker-sleep@pause.timer
+    - docker-sleep@unpause.timer

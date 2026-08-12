@@ -1,0 +1,37 @@
+# roles/family_finances_lxc/defaults/main.yml
+#
+# The family finances app (github.com/johnmathews/family-finances).
+# Two containers: a FastAPI backend holding one encrypted SQLite file per
+# household, and nginx serving the built Vue app and proxying /api to it.
+
+pgid: 1001
+
+# Monitoring sidecars — pinned to the versions deployed elsewhere on the
+# estate. Bump deliberately: handlers use pull:never, so pull on the host first
+# or run `make refresh-sidecars`.
+node_exporter_version: "v1.12.1"
+alloy_version: "v1.18.0"
+cadvisor_version: "v0.55.1"
+
+family_finances_docker_compose_dir: "{{ docker_compose_dir }}"
+
+# ghcr image tag = the git commit SHA the images were built from. Pin it, do
+# not track `latest`: the app deliberately builds images only from a green
+# `main`, and pinning is what makes a rollback one line instead of an
+# investigation. See family-finances docs/deployment.md §3.
+family_finances_version: "latest"
+
+# Where the household databases and archived statements live on the host. This
+# directory IS the family's financial record — it is what the PBS guest backup
+# has to contain (family-finances docs/adr/0017-backup-posture.md).
+family_finances_data_dir: /srv/family-finances
+
+# Published for Traefik only. The backend is never published: nginx reaches it
+# over the compose network, and publishing it would put a route to the API on
+# the host that does not pass through the proxy.
+family_finances_port: 8080
+
+# The invitation code required to create a household. Unset closes
+# registration, which is the safe direction and the tested one
+# (family-finances docs/adr/0016-invite-only-registration.md).
+family_finances_signup_code: "{{ vault_family_finances_signup_code }}"

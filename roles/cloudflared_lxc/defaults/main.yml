@@ -28,6 +28,9 @@ cloudflared_ingress:
   - prefix: sre
     service: "http://192.168.2.108"
     set_host_header: true
+  - prefix: finances
+    service: "http://192.168.2.108"
+    set_host_header: true
   - prefix: stats
     service: "http://192.168.2.108"
     set_host_header: true

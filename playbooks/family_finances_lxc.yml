@@ -1,0 +1,21 @@
+# playbooks/family_finances_lxc.yml
+
+- name: Family Finances LXC
+  hosts: family_finances_lxc
+  gather_facts: true
+  become: true
+
+  roles:
+    # No nfs_client or share_drive_probe: the household databases live on the
+    # guest's own disk, deliberately. They are small (about 1 MB each), they are
+    # rewritten in full on every write, and putting them on an NFS mount would
+    # add a network filesystem to the path of an atomic rename that the
+    # encryption depends on.
+    - role: family_finances_lxc
+      tags: family_finances
+    - role: sleep_hours
+      tags: sleep
+    - role: shell_environment
+      tags: shell
+    - role: tailscale
+      tags: tailscale
