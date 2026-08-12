@@ -1,79 +1,81 @@
 # Home Assistant — EV Charging (Voldt granny cable)
 
-**Status:** integration installed, device located — waiting only on the **local key** — 2026-08-12.
+**Status:** LIVE since 2026-08-12 — cloud integration via official Tuya + xtend_tuya.
+Tracks charging of the **Skoda Enyaq** on the **Voldt Type 2 granny cable**
+(8–13 A, ~2.8 kW, WiFi). In the Energy dashboard as **"EV Charger (Enyaq)"**.
 
-Collected device facts:
+## How it works
 
-```
-Device ID : bf64f8935163d3d8a1z9qw   (from Voldt app)
-MAC       : d8:fc:92:93:f5:7d
-LAN IP    : 192.168.2.29             (found via port-6668 scan, MAC-verified;
-                                      needs a static lease on the MikroTik)
-Note      : the IP the Voldt app displays (188.x.x.x) is the home WAN address,
-            not the device — ignore it.
-```
+The cable is a white-label **Tuya** device (category `qccdz`, EV charger). Two cloud
+integrations cooperate:
 
-Tracks charging of the **Skoda Enyaq** via the **Voldt Type 2 granny cable** (8–13 A,
-~2.8 kW max, WiFi, Voldt app). The cable is a white-label **Tuya** device.
+1. **Official Tuya integration** — logged into the Smart Life account via user-code + QR
+   scan. Only maps a bare switch for this category.
+2. **xtend_tuya** (HACS, `azerty9971/xtend_tuya`) — same login, exposes ALL the device's
+   datapoints as entities, including the energy/power sensors the official integration
+   hides.
 
-## Integration approach
+The device lives in the **Smart Life** app (it was re-paired out of the Voldt app, which
+is now retired — same backend, same features). Device ID `bff9a892e0eb9fa22bwmyp`,
+MAC `d8:fc:92:93:f5:7d`, LAN IP `192.168.2.29`.
 
-**tuya-local** (HACS, `make-all/tuya-local`, installed 2026-08-12, v2026.8.0) with its
-built-in **`voldt_ev_charger`** device profile. Fully local: HA polls the cable directly
-on the LAN (TCP 6668) — no Tuya cloud dependency after setup, works during internet
-outages. The Voldt app keeps working alongside (one local connection at a time is used
-by HA; the app falls back to cloud).
-
-Entities the profile provides:
+## Entities
 
 ```
-+---------------------------+-------------------------------------------------------+
-| Entity                    | Notes                                                 |
-+---------------------------+-------------------------------------------------------+
-| Total energy (kWh)        | lifetime counter -> Energy dashboard device entry     |
-| Power (W)                 | live draw; also joins the Rest Of Home subtract list  |
-| Voltage / Current         | diagnostics                                           |
-| Set current (number)      | 8-13 A charge rate control from HA                    |
-| Switch                    | starts/stops the CURRENT charge session (it is NOT    |
-|                           | a device on/off switch)                               |
-| Charging mode (select)    | charge_now / charge_pct / charge_energy / schedule.   |
-|                           | "schedule" BLOCKS immediate charging even when        |
-|                           | plugged in - leave on charge_now unless scheduling    |
-| Status / fault / temp     | free / charging / fault states, safety monitoring     |
-+---------------------------+-------------------------------------------------------+
++---------------------------------------------+----------------------------------------+
+| Entity                                      | Notes                                  |
++---------------------------------------------+----------------------------------------+
+| sensor.voldt_2_4_5g_total_energy            | lifetime kWh (total_increasing) ->     |
+|                                             |   Energy dashboard "EV Charger(Enyaq)" |
+| sensor.voldt_2_4_5g_daily_total_energy      | convenience counters (daily/monthly/   |
+|   /_monthly_ /_yearly_                      |   yearly)                              |
+| sensor.voldt_2_4_5g_total_power             | live draw, kW; member of the powercalc |
+|                                             |   Rest Of Home subtract group          |
+| sensor.voldt_2_4_5g_single_phase_power      | per-phase power, kW                    |
+| sensor.voldt_2_4_5g_work_state              | charger_free / charging / fault ...    |
+| number.voldt_2_4_5g_charging_current        | 8-13 A charge rate control             |
+| select.voldt_2_4_5g_work_mode               | charge_now / schedule / ... - LEAVE ON |
+|                                             |   charge_now; "schedule" blocks        |
+|                                             |   immediate charging                   |
+| switch.voldt_2_4_5g_switch                  | starts/stops the CURRENT session (not  |
+|                                             |   a device power switch)               |
+| sensor.voldt_2_4_5g_temperature             | internal temp, safety                  |
+| button.voldt_2_4_5g_clear_energy            | RESETS the lifetime counter - do NOT   |
+|                                             |   press; it breaks dashboard history   |
++---------------------------------------------+----------------------------------------+
 ```
 
-## Setup steps — John (one-time, ~20 min)
+## Caveats
 
-1. **Tuya developer account**: free signup at <https://iot.tuya.com> → create a Cloud
-   project (data center: **Central Europe**) → subscribe to the trial of "IoT Core".
-2. **Link the app account**: project → Devices → "Link App Account" → scan the QR with
-   the **Voldt app** (Me → scan). If the Voldt app can't/won't scan it, re-pair the
-   cable into the **Smart Life** app instead (same Tuya platform, no feature loss) and
-   link that account.
-3. **Collect the local key** (device ID already known, see above): Cloud → API
-   Explorer → "Query Device Details" with the device ID (the key changes if the
-   device is ever re-paired — re-fetch then).
-4. **Static lease**: reserve `192.168.2.29` for MAC `d8:fc:92:93:f5:7d` on the
-   MikroTik (IP → DHCP Server → Leases → Make Static).
-5. Hand the local key to Claude (or add the integration yourself:
-   Settings → Devices → Add integration → Tuya Local).
+- **Cloud-dependent**: sensor updates flow through Tuya's cloud (MQTT push, updates are
+  near-real-time). Internet outage = no data (charging itself is unaffected).
+- **First-charge check**: the power sensor reports **kW** while other Rest Of Home
+  members report W; powercalc normalises units, but verify during the first real charge
+  that `sensor.rest_of_home_power` doesn't go strongly negative (if it does, the
+  conversion assumption failed — remove the charger from `subtract_entities` and file it).
+- Re-pairing the device into a different app/account changes its device ID and breaks the
+  entity history.
 
-## Remaining work — Claude (once credentials exist)
+## The developer-platform dead end (context)
 
-- Add the charger via the tuya-local config flow (IP + device ID + local key, select the
-  Voldt EV charger profile).
-- Energy dashboard: add the total-energy sensor as device entry "EV Charger (Enyaq)".
-- Add the power sensor to the `Rest Of Home` `subtract_entities` list in
-  `configuration.yaml` (powercalc block) and commit to the config repo.
-- Update this doc with the final entity ids; consider a cheap-tariff charging automation
-  (tariff sensor: `sensor.p1_meter_tariff`).
+The plan A was **tuya-local** (fully local, no cloud) — it is installed with its
+`voldt_ev_charger` profile ready, but it needs the device's **local key**, and Tuya's
+developer-platform "Link App Account" QR flow failed persistently: scanning the QR (both
+in the Voldt and Smart Life apps, correct data center, IoT Core authorized, Me→Scan
+scanner) made the app open a URL that returned an S3 `AccessDenied`. The same account
+authorized HA's QR login instantly, so the failure is on Tuya's platform side — community
+reports point at account/billing verification requirements for new developer accounts.
 
-## Notes
+**Optional future upgrade to local**: if the platform link ever works (retry after
+completing billing verification at iot.tuya.com, project "Voldt cable", Central Europe
+link DC), fetch the local key via API Explorer → "Query Device Details", then add the
+device in the Tuya Local integration (IP `192.168.2.29`, device ID + local key) and swap
+the dashboard/Rest-Of-Home sensors. Until then the cloud route is fully functional.
 
-- Granny-cable sessions are long (~2.3–2.8 kW → overnight for meaningful range); the
-  lifetime kWh counter makes per-session and per-month cost visible in the Energy
-  dashboard using the standard tariff prices.
-- tuya-local was not in this HACS install's default store cache — it is added as a
-  custom repository (`make-all/tuya-local`), which HACS remembers for updates.
-- Energy monitoring architecture: see `home_assistant_energy.md`.
+## Related
+
+- Reserve `192.168.2.29` for MAC `d8:fc:92:93:f5:7d` on the MikroTik (needed for the
+  local upgrade; harmless to do now — see JTBD in `home_assistant_energy.md`).
+- Cheap-tariff charging automation idea: trigger on `sensor.p1_meter_tariff`, act on
+  `switch.voldt_2_4_5g_switch` + `number.voldt_2_4_5g_charging_current`.
+- Energy monitoring architecture: `home_assistant_energy.md`.

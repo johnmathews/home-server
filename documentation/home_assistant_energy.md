@@ -51,6 +51,8 @@ Grid prices: tariff 1 €0.24111/kWh, tariff 2 €0.27693/kWh, gas €1.3073/m³
 |                           |                                          |   self-usage only)  |
 | Plug 4 Lamp               | sensor.plug_4_lamp_energy                | fixed 15.4 W        |
 | Plug 5 / 6 Filament Lamp  | sensor.plug_{5,6}_filament_lamp_energy   | fixed ~6.4 W (EST.) |
+| EV Charger (Enyaq)        | sensor.voldt_2_4_5g_total_energy         | Tuya cloud (real,   |
+|                           |                                          |   xtend_tuya)       |
 | Rest of home (untracked)  | sensor.rest_of_home_energy               | subtract group      |
 +---------------------------+------------------------------------------+---------------------+
 ```
@@ -149,10 +151,12 @@ the correct amount. No YAML involved.
 |    |   biggest single untracked load in Rest Of Home                  | untracked sink |
 | 6  | Remove electric-heater leftovers if the plug is truly retired    | tidiness       |
 |    |   (z2m device removal)                                           |                |
-| 7  | EV charger (Voldt granny cable): create Tuya IoT account, link   | EV charging    |
-|    |   Voldt app, collect device ID + local key, static DHCP lease    | tracking       |
-|    |   on MikroTik — full steps in home_assistant_ev_charging.md.     |                |
-|    |   (tuya-local + Voldt profile already installed 2026-08-12)      |                |
+| 7  | EV charger: DONE via cloud (xtend_tuya) 2026-08-12. Remaining:   | EV charging    |
+|    |   static lease for 192.168.2.29 (MAC d8:fc:92:93:f5:7d) on       | robustness     |
+|    |   MikroTik; verify Rest Of Home stays sane during first charge   |                |
+|    |   (kW/W conversion); OPTIONAL local-key upgrade to tuya-local    |                |
+|    |   if Tuya platform linking ever works — home_assistant_ev_       |                |
+|    |   charging.md                                                    |                |
 +----+------------------------------------------------------------------+----------------+
 ```
 
