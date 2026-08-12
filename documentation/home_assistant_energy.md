@@ -17,7 +17,7 @@ this repo is the household's operational source of truth.
 | HomeWizard P1 meter       | Whole-home grid import (2 tariffs) + gas. Ground truth.      |
 | Nous metering plugs (z2m) | Real measured power/energy for big appliances.               |
 | powercalc (HACS)          | Estimated power for lights + dumb plugs; "Rest Of Home".     |
-| Energy dashboard          | 2 grid tariffs, gas, 20 device consumption entries.          |
+| Energy dashboard          | 2 grid tariffs, gas, 21 device consumption entries.          |
 | Prometheus                | Scrapes HA at :8123/api/prometheus (vault_home_assistant_    |
 |                           | token) -> Grafana.                                           |
 +---------------------------+--------------------------------------------------------------+
@@ -64,7 +64,8 @@ KAJPLATS (measured separately via its light entity); plug 3 = 1× KAJPLATS only;
 off the bulbs. KAJPLATS spec: 9.5 W @ 1521 lm. The KAJPLATS bulbs sit behind plugs 2/3, so
 they read `unavailable` when the plug is off — powercalc counts that as off (0 W).
 
-**Rest Of Home** = `sensor.p1_meter_power` minus every tracked power sensor (20 members),
+**Rest Of Home** = `sensor.p1_meter_power` minus every tracked power sensor (21 members
+incl. the EV charger),
 integrated to `sensor.rest_of_home_energy`. It makes the untracked baseline (fridge, hob,
 network gear, …) a visible line in the dashboard. Before the overhaul ~59% of grid import
 was invisible. Value can flicker negative briefly when a big load switches (P1 updates lag
@@ -109,7 +110,9 @@ the correct amount. No YAML involved.
 ## powercalc specifics
 
 - Installed via HACS (v1.24.1), config is YAML-only: `powercalc:` block in
-  `configuration.yaml`. `enable_autodiscovery: false` — every sensor is explicit.
+  `configuration.yaml`. Autodiscovery is off (`discovery: enabled: false` — the older
+  `enable_autodiscovery` spelling was deprecated by powercalc mid-2026) — every sensor
+  is explicit.
 - Lights whose model has a measured profile in the powercalc library use LUT mode
   automatically (no strategy in YAML): STOFTMOLN `T2035`, TRADFRI `LED2103G5`,
   JETSTROM `L2207`.
