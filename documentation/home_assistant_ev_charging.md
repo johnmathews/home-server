@@ -102,9 +102,16 @@ uses the cloud value when fresh and falls back to set-current × 230 V while
 `integration:`, method left, `max_sub_interval` 5 min) integrates that, and everything
 (Energy dashboard entry, Rest Of Home, dashboard cards) points at the estimated pair.
 Accuracy: the estimator ran ~4% high vs the observed 2.86 kW during the fallback hour
-(car pulls slightly under the 13 A pilot) — self-corrects when real values arrive. The first charge
-(8.7 kWh) predates the sensor and is missing from the dashboard history — injectable via
-Developer tools → Statistics → adjust if it ever matters.
+(car pulls slightly under the 13 A pilot) — self-corrects when real values arrive. The first
+charge (8.7 kWh) predated the sensor; it was injected retroactively into the statistics
+(2026-08-13, at the 23:00 hour of 12 Aug — the earliest existing stats row). Deliberate
+side effect, decided acceptable: 12 Aug's HOURLY detail view shows a +9/−9 kWh pair
+(EV vs computed untracked) because the energy sits in a different hour than the grid
+import; all daily/weekly/monthly totals and costs are correct. Do not "fix" it.
+
+Also normal: when the car is left plugged in after finishing, it wakes every ~25–30 min
+for short top-up/balancing draws (10 s–4 min at ~2.2 kW). Each counts as a "session" in
+ev_charging_sessions_today, so the counter reads high on plugged-in evenings.
 
 ## Caveats
 
