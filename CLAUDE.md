@@ -148,6 +148,7 @@ Service-specific guides in `/documentation/`. Read the relevant doc before worki
 - `doorbell.md` — Reolink video doorbell: usage guide (non-technical), notifications, two-way audio, HA/go2rtc setup
 - `grafana-alerting.md` — Grafana alert rules, concise Pushover notification templates, API access
 - `home_assistant_energy.md` — HA energy monitoring: P1 meter, powercalc, Energy dashboard, config repo, backlog
+- `home_assistant_ev_charging.md` — Voldt granny cable via tuya-local: setup steps, entities, Enyaq charge tracking
 - `immich_lxc.md` — Immich photo management, Docker stack, NFS mounts, ML, mobile app
 - `index.md` — Top-level project overview and conventions
 - `infra_vm.md` — Infrastructure VM services (Grafana, Loki, Homepage, Portainer, Atuin, etc.)

@@ -149,6 +149,10 @@ the correct amount. No YAML involved.
 |    |   biggest single untracked load in Rest Of Home                  | untracked sink |
 | 6  | Remove electric-heater leftovers if the plug is truly retired    | tidiness       |
 |    |   (z2m device removal)                                           |                |
+| 7  | EV charger (Voldt granny cable): create Tuya IoT account, link   | EV charging    |
+|    |   Voldt app, collect device ID + local key, static DHCP lease    | tracking       |
+|    |   on MikroTik — full steps in home_assistant_ev_charging.md.     |                |
+|    |   (tuya-local + Voldt profile already installed 2026-08-12)      |                |
 +----+------------------------------------------------------------------+----------------+
 ```
 
