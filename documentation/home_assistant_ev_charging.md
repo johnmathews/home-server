@@ -45,6 +45,37 @@ MAC `d8:fc:92:93:f5:7d`, LAN IP `192.168.2.29`.
 +---------------------------------------------+----------------------------------------+
 ```
 
+## Answering the usual questions
+
+```
++--------------------------------------+------------------------------------------------+
+| Question                             | Where to look                                  |
++--------------------------------------+------------------------------------------------+
+| Energy + cost per day/week/month/    | Energy dashboard -> pick the period at the top |
+| quarter                              | -> "EV Charger (Enyaq)" row in the device      |
+|                                      | breakdown. Costs use the real tariff prices.   |
+|                                      | Data is long-term statistics: kept forever.    |
+| When do charges start and end?       | History page -> sensor.voldt_2_4_5g_work_state |
+|                                      | -> coloured timeline of charger_charging       |
+|                                      | blocks. Raw history kept ~10 days (recorder    |
+|                                      | default); older start/stop times are gone, but |
+|                                      | hourly energy statistics remain forever.       |
+| How long do we spend charging?       | sensor.ev_charging_time_today (hours, resets   |
+|                                      | daily; long-term stats enabled via customize   |
+|                                      | state_class). Statistics graph card with       |
+|                                      | stat_type max per day = charging h/day.        |
+| How many sessions?                   | sensor.ev_charging_sessions_today (count/day). |
+| Ad-hoc analysis / Grafana            | HA exports all sensors to Prometheus           |
+|                                      | (prometheus: block; scraped by prometheus_lxc) |
+|                                      | -> voldt sensors are queryable in Grafana too. |
++--------------------------------------+------------------------------------------------+
+```
+
+`charger_charging` is one of the work_state enum values: charger_free, charger_insert,
+charger_wait, charger_charging, charger_pause, charger_end, charger_fault
+(charger_free_fault). "How long was the car plugged in but NOT charging" could be a
+future history_stats on charger_insert/charger_wait/charger_end if wanted.
+
 ## Caveats
 
 - **Cloud-dependent**: sensor updates flow through Tuya's cloud (MQTT push, updates are
