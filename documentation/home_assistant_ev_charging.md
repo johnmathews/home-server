@@ -60,11 +60,16 @@ MAC `d8:fc:92:93:f5:7d`, LAN IP `192.168.2.29`.
 |                                      | blocks. Raw history kept ~10 days (recorder    |
 |                                      | default); older start/stop times are gone, but |
 |                                      | hourly energy statistics remain forever.       |
-| How long do we spend charging?       | sensor.ev_charging_time_today (hours, resets   |
-|                                      | daily; long-term stats enabled via customize   |
-|                                      | state_class). Statistics graph card with       |
-|                                      | stat_type max per day = charging h/day.        |
-| How many sessions?                   | sensor.ev_charging_sessions_today (count/day). |
+| How long do we spend charging?       | sensor.ev_charging_time_today (hours; the      |
+|                                      | "charging day" runs 09:00-09:00 so overnight   |
+|                                      | sessions count whole; long-term stats enabled  |
+|                                      | via customize state_class; max-per-day =       |
+|                                      | charging h/day).                               |
+| How many sessions?                   | sensor.ev_charging_sessions_today (count per   |
+|                                      | 09:00-09:00 day).                              |
+| Everything in one place              | "EV Charging" dashboard (sidebar, /ev-charging)|
+|                                      | - live gauge/controls, session timeline (72h), |
+|                                      | daily+monthly energy bars, charging h/day.     |
 | Ad-hoc analysis / Grafana            | HA exports all sensors to Prometheus           |
 |                                      | (prometheus: block; scraped by prometheus_lxc) |
 |                                      | -> voldt sensors are queryable in Grafana too. |
