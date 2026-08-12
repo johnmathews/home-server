@@ -1,6 +1,17 @@
 # Home Assistant — EV Charging (Voldt granny cable)
 
-**Status:** integration installed, waiting on Tuya credentials (John's steps below) — 2026-08-12.
+**Status:** integration installed, device located — waiting only on the **local key** — 2026-08-12.
+
+Collected device facts:
+
+```
+Device ID : bf64f8935163d3d8a1z9qw   (from Voldt app)
+MAC       : d8:fc:92:93:f5:7d
+LAN IP    : 192.168.2.29             (found via port-6668 scan, MAC-verified;
+                                      needs a static lease on the MikroTik)
+Note      : the IP the Voldt app displays (188.x.x.x) is the home WAN address,
+            not the device — ignore it.
+```
 
 Tracks charging of the **Skoda Enyaq** via the **Voldt Type 2 granny cable** (8–13 A,
 ~2.8 kW max, WiFi, Voldt app). The cable is a white-label **Tuya** device.
@@ -40,11 +51,12 @@ Entities the profile provides:
    the **Voldt app** (Me → scan). If the Voldt app can't/won't scan it, re-pair the
    cable into the **Smart Life** app instead (same Tuya platform, no feature loss) and
    link that account.
-3. **Collect credentials**: from the linked devices list note the charger's
-   **device ID**; get the **local key** via Cloud → API Explorer → "Query Device
-   Details" (it changes if the device is ever re-paired — re-fetch then).
-4. **Static IP**: give the cable a static DHCP lease on the MikroTik and note the IP.
-5. Hand device ID + local key + IP to Claude (or add the integration yourself:
+3. **Collect the local key** (device ID already known, see above): Cloud → API
+   Explorer → "Query Device Details" with the device ID (the key changes if the
+   device is ever re-paired — re-fetch then).
+4. **Static lease**: reserve `192.168.2.29` for MAC `d8:fc:92:93:f5:7d` on the
+   MikroTik (IP → DHCP Server → Leases → Make Static).
+5. Hand the local key to Claude (or add the integration yourself:
    Settings → Devices → Add integration → Tuya Local).
 
 ## Remaining work — Claude (once credentials exist)
