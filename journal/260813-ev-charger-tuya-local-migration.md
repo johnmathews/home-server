@@ -158,13 +158,39 @@ its end-of-charge value — an idle cable reads hot forever.
 
 Fixed rather than just documented, because the DP 27 press **does** work while idle:
 a manual press at 15:37 moved it 53 -> 50 C within 12 s. Added a second automation, **"EV
-cable refresh temperature while idle"**, on a /15 time pattern gated on status != charging.
+cable refresh temperature while idle"**, on a /5 time pattern gated on status != charging.
 Verified firing at 15:45:00 exactly, temperature 50 -> 48 C. Applied with
 `automation/reload` — no restart, so no repeat of the integral gap this time.
 
-An idle press gives one fresh sample, not a rolling window; idle temperature only drifts
-~1 C per 10 min so there is nothing more to report. 15 min keeps background writes to
-96/day. Voltage and current stay at 0 while idle regardless — DP 6 only reports during a
+An idle press gives one fresh sample, not a rolling window.
+
+**Interval chosen by measurement, after getting it wrong once.** I first set 15 min,
+justified by "idle temperature drifts ~1 C per 10 min". That figure was an artifact: I had
+compared 53 C at 15:05 (still charging) against 50 C at 15:37, and the 32-minute gap was
+simply the absence of sampling, not slow drift. John pushed back and was right. The real
+post-charge rate is ~1 C per 4 min, so 15 min was skipping ~4 C across exactly the phase
+where a fault would show.
+
+Re-measured properly by pressing every 60 s during the fastest cooling phase: **12 presses
+produced 2 distinct readings** (48->47 immediately, 47->46 four minutes later, then eight
+flat minutes). Cooling is asymptotic, so it only gets more redundant as the cable settles
+toward ~40 C. Combined with DP 24 being an integer, that puts two hard ceilings on the
+useful rate — 1 min would be >83% redundant at its best moment and buys latency, never
+resolution.
+
+Landed on **3 min** (480 presses/day), just below the fastest observed change rate. I had
+first argued for 5 min partly on device-wear grounds, which John challenged — rightly, as
+it turned out. A press is a Tuya LAN command setting DP 27; there is no physical actuation
+and no evidence it writes anything non-volatile. (DP 18, the session switch, *does* drive a
+contactor — that one must never go on a timer.) With an unsupported cost argument removed,
+nothing favoured 5 over 3.
+
+Charging needs no equivalent tuning: the /4 keep-alive holds a window open continuously
+and the device pushes on every degree crossing inside it, so temperature is already
+effectively 20 s sampled while charging — confirmed by a nine-minute flat stretch at
+52-53 C mid-charge with the window open throughout.
+
+Voltage and current stay at 0 while idle regardless — DP 6 only reports during a
 session, which is worth knowing before anyone tries to "fix" that too.
 
 ## Gotchas recorded

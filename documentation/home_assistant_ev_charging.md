@@ -41,8 +41,8 @@ report kWh drawn from the wall.
 | Dashboard cards "not available"    | Cable entity renamed. Visible, so easy.          |
 | Lifetime energy sensor reads 0     | Expected. DP 1 is dead in firmware. Not a bug,   |
 | (sensor.voldt_ev_cable_energy)     |   and it is not the sensor anything uses.        |
-| Cable temperature more than 15 min | Both refresh automations are off/broken. While   |
-| stale while idle                   |   idle, temperature is refreshed every 15 min    |
+| Cable temperature more than 3 min  | Both refresh automations are off/broken. While   |
+| stale while idle                   |   idle, temperature is refreshed every 3 min     |
 |                                    |   by "EV cable refresh temperature while idle".  |
 | Voltage / current read 0 while     | Expected, always. DP 6 only reports during a     |
 | idle                               |   session; refreshing does not change that.      |
@@ -65,6 +65,15 @@ The cable is a white-label **Tuya** device (category `qccdz`, EV charger). Since
 2026-08-13 it is read **locally over the LAN** by **tuya-local** (HACS,
 `make-all/tuya-local`), using its built-in `voldt_ev_charger` profile. No cloud is in the
 path for any sensor that matters.
+
+> **"DP" = datapoint.** Tuya models every device as a set of numbered, typed datapoints —
+> that is the entire protocol surface, over both the cloud API and the LAN. Each HA entity
+> is a mapping of one DP. On this device: DP 1 lifetime energy (integer, ÷100 = kWh, dead),
+> DP 3 work state (enum), DP 4 set current (integer A), DP 6 voltage/current/power packed
+> into a base64 blob, DP 9 power (integer, ÷1000 = kW), DP 10 fault bitmask, DP 14 work
+> mode (enum), DP 18 the session switch (boolean — this one drives a contactor), DP 24
+> temperature (integer °C), DP 25 last-session energy (integer, ÷100 = kWh), DP 27 the
+> metering refresh command. Numbers, not names, are what the protocol addresses.
 
 Device ID `bff9a892e0eb9fa22bwmyp`, MAC `d8:fc:92:93:f5:7d`, LAN IP `192.168.2.29`
 (static lease), protocol 3.5, firmware V4.1.6. The tuya-local config entry is named
@@ -114,13 +123,53 @@ charging — comfortably inside the ~5 minute window.
 **Temperature needs the same treatment when idle.** The refresh also updates the
 temperature register, and nothing else does — so between charges the reading would freeze
 at its end-of-charge value and a cooling cable would keep reading hot indefinitely. A
-second automation, **"EV cable refresh temperature while idle"**, presses every 15 minutes
-whenever the status is not `charging`. Verified 2026-08-13: presses at 15:37 and 15:45
-tracked the cable cooling 53 -> 50 -> 48 C.
+second automation, **"EV cable refresh temperature while idle"**, presses every 3 minutes
+whenever the status is not `charging`. Verified 2026-08-13: presses tracked the cable
+cooling 53 -> 50 -> 48 -> 47 -> 46 C.
 
-Idle presses yield a **single** fresh sample rather than a rolling window — idle
-temperature drifts only ~1 C per 10 min, so there is nothing further for the device to
-report. 15 min is therefore ample, and it keeps the background write rate to 96/day.
+Idle presses yield a **single** fresh sample rather than a rolling window.
+
+### Why 3 minutes
+
+A "press" here is just a Tuya LAN command setting DP 27 — no relay, no moving part, and
+nothing that appears to be written to non-volatile memory. (DP 18, the session switch,
+*does* drive a contactor. Never put that on a timer.) So the cost of polling is
+essentially nil, and the interval is set purely by what the data can support.
+
+Two hard ceilings cap the useful rate:
+
+1. **DP 24 is an integer.** Whole degrees only — 1 C is the finest resolution obtainable
+   at any sampling rate.
+2. **The value only moves on a degree crossing.** Post-charge cooling is asymptotic:
+   ~1 C per 4 min immediately after a charge, stretching past 8 min within half an hour,
+   then effectively flat near the ~40 C settled idle figure.
+
+3 min sits just below that fastest observed change rate, so every crossing is caught
+promptly. Going faster was measured, not guessed: pressing every 60 s during the fastest
+cooling phase gave **2 distinct readings from 12 presses**, and it only gets more redundant
+as the cable settles. Sampling below the change rate buys detection *latency*, never
+resolution — and a cable and plug have enough thermal mass that nothing develops in 60 s
+that is not equally visible minutes later.
+
+```
++----------+-----------+------------------------------------------------------+
+| Interval | Presses   | Verdict                                              |
+|          | /day      |                                                      |
++----------+-----------+------------------------------------------------------+
+|  15 min  |       96  | Too coarse - skips ~4 C during early cooldown.       |
+|   5 min  |      288  | Fine, but can lag a crossing by ~1 min.              |
+|   3 min  |      480  | CURRENT. Just below the fastest change rate.         |
+|   1 min  |     1440  | ~83% redundant at best, >95% once settled. No new    |
+|          |           |   information at any point.                          |
++----------+-----------+------------------------------------------------------+
+```
+
+**Charging needs no equivalent tuning.** The `/4` keep-alive holds a window open
+continuously, and inside a window the device pushes on every degree crossing — so
+temperature is already effectively 20 s sampled while charging. Confirmed by a nine-minute
+flat stretch at 52-53 C mid-charge with the window open throughout: not under-sampling,
+just no crossing to report.
+
 Voltage and current stay at 0 while idle no matter how often you refresh: DP 6 only
 reports during a session.
 
@@ -166,7 +215,7 @@ All `voldt_ev_cable_*` entities come from tuya-local over the LAN.
 | switch.voldt_ev_cable                       | starts/stops the CURRENT session (not  |
 |                                             |   a device power switch)               |
 | sensor.voldt_ev_cable_temperature           | internal temp. Refreshed every 4 min   |
-|                                             |   charging, 15 min idle. ~53 C at 13 A |
+|                                             |   charging, 3 min idle. ~53 C at 13 A  |
 |                                             |   is normal; ~40 C settled idle.       |
 | button.voldt_ev_cable_refresh               | DP 27. Opens the ~5 min live-metering  |
 |                                             |   window; driven by the keep-alive     |
@@ -477,7 +526,7 @@ never go looking in Settings → Devices & Services → Helpers for these entiti
 | "EV cable keep power live"           | /config/automations.yaml (id 1786623900000)    |
 |   (DP 27 keep-alive, /4 charging)    |                                                |
 | "EV cable refresh temperature        | /config/automations.yaml (id 1786626600000)    |
-|   while idle" (DP 27, /15 idle)      |                                                |
+|   while idle" (DP 27, /3 idle)       |                                                |
 | MySkoda + Tuya creds, tuya-local     | /config/.storage (never git-tracked) - the     |
 |   device id + LOCAL KEY              |   local key lives in core.config_entries       |
 | "EV Charging" dashboard              | storage mode - edit via the UI or the          |
