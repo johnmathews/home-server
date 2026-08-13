@@ -18,7 +18,8 @@ complete disk image and configuration.
 
 | Component       | Backup Method          | Location              |
 |-----------------|------------------------|-----------------------|
-| VMs (media, infra, nas; mailcow retired) | PBS automated backup | Proxmox Backup Server |
+| VMs (media, infra, nas, **home assistant**; mailcow retired) | PBS automated backup | Proxmox Backup Server |
+| HA config (`/config`) | Git, separate private repo | GitHub (`johnmathews/home-assistant-config`) |
 | LXCs (all)      | PBS automated backup   | Proxmox Backup Server |
 | Ansible config  | Git (this repository)  | GitHub                |
 | Vault secrets   | Git (encrypted)        | GitHub (vault.yml)    |
@@ -158,3 +159,21 @@ These files are essential for recovery and must not be lost:
 - `~/.ssh/john_macbook` — SSH private key for all hosts
 - This git repository — the complete infrastructure definition
 - PBS datastore — VM/LXC backups
+- `/config/.git-ssh/id_deploy` on the HA VM — write-scoped deploy key for the HA config repo.
+  Gitignored by design, so it exists **only** inside VM 102 and its PBS backups.
+
+### Home Assistant (VM 102) — a special case
+
+HA is **not** managed by this Ansible repo, so it has two independent recovery paths:
+
+1. **Restore VM 102 from PBS** (21 snapshots, daily — verified 2026-08-13). This is the normal
+   path and recovers everything, including `.storage`, which holds integration credentials and
+   Lovelace dashboards. Neither is in any git repo.
+2. **Rebuild from scratch.** Config YAML comes from the private `johnmathews/home-assistant-config`
+   repo, but `.storage` does not — so integration credentials must be re-entered. The Ansible
+   vault holds `vault_home_connect_client_id` / `_secret` specifically so the Bosch Home Connect
+   application does not have to be re-registered at developer.home-connect.com. Other
+   integrations' credentials are **not** vaulted and would need re-authenticating.
+
+Path 1 is strongly preferred. Path 2 exists because a corrupted-but-restorable `.storage` is a
+plausible failure that a whole-VM restore does not always fix.

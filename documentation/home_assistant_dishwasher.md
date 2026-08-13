@@ -1,7 +1,8 @@
 # Home Assistant — Dishwasher (Bosch / Home Connect)
 
 **Status:** complete as of 2026-08-13. Energy tracking live via the metering plug, Home
-Connect integration live for cycle/program data. Per-cycle attribution not yet built.
+Connect integration live for cycle/programme data, per-cycle attribution built and validated
+on a real cycle. Remaining work is time: 4–6 weeks of cycles to build a calibration table.
 
 Bosch **SMV6YCX00E** (Series 6, fully integrated, 60 cm, 14 place settings), installed
 ~May 2026, controlled day-to-day through the Bosch Home Connect phone app. This doc covers
@@ -73,19 +74,30 @@ temperature swings seasonally from ~8 °C to ~18 °C. Using this model's real la
 | Deep winter      |  8 deg C|  42 K   | 0.46 kWh         | +8.5%             |
 | Late summer      | 18 deg C|  32 K   | 0.35 kWh         | -8.5%             |
 +------------------+---------+---------+------------------+-------------------+
-| 9.5 L heated to 50 deg C; spread 0.111 kWh = 17.1% of a 0.65 kWh eco cycle  |
+| 9.5 L heated to 50 deg C -> seasonal spread 0.111 kWh                       |
 +-----------------------------------------------------------------------------+
 ```
 
-Upper bound, since the cold pre-rinse is not heated to full temperature — if only ~7 L
-reaches 50 °C the spread is 0.082 kWh, still **12.6%** of the cycle. Either way the seasonal
-term alone is two to three times the ±5% budget.
+That 0.111 kWh spread as a share of a cycle, against both available denominators:
 
-Note this is *worse* than a first estimate against a guessed ~0.92 kWh cycle suggested: the
-lower the real cycle energy, the larger the same absolute seasonal swing looms in relative
-terms.
+```
++---------------------------------------------+---------+------------------------+
+| vs. the 0.65 kWh EU label figure             | 17.1%   | test-bench conditions  |
+| vs. the 0.88 kWh first measured cycle        | 12.6%   | this kitchen, Aug 2026 |
++---------------------------------------------+---------+------------------------+
+```
 
-That alone exceeds the ±5% budget, and it is a **systematic seasonal bias, not noise** —
+Both are an upper bound, since the cold pre-rinse is not heated to full temperature. Whichever
+denominator you take, **the seasonal term alone is two to three times the ±5% budget**, which
+is what settles the question.
+
+An earlier version of this section claimed the case got *stronger* once the real label figure
+replaced a guessed ~0.92 kWh cycle. That reasoning is now retracted: the first measured cycle
+came in at **0.88 kWh**, within 5% of the original guess, so the 0.65 kWh label — not the
+guess — was the outlier. The conclusion survives unchanged; the argument for it does not, and
+is corrected here rather than left standing.
+
+The seasonal term is a **systematic bias, not noise** —
 winter always reads high, summer always low, so it does not average out over a month.
 On top of it: published figures are EU test-bench numbers (fixed 15 °C inlet, standard
 load/soil); Auto programs vary genuinely with the soil sensor; options like Extra Dry and
@@ -109,7 +121,7 @@ zigbee2mqtt throughout, so reconnecting was purely physical — no re-pairing ne
 | sensor.dishwasher_plug_energy      | kWh, total_increasing -> Energy dash   |
 | sensor.dishwasher_plug_power       | W, measurement -> Rest Of Home subtract|
 | switch.dishwasher_plug             | do NOT switch off - see below          |
-| select.dishwasher_plug_power_...   | set to restore-on-power-loss           |
+| select.dishwasher_plug_power_...   | leave at 'on'; NOT 'restore' - below   |
 +------------------------------------+----------------------------------------+
 ```
 
@@ -165,8 +177,8 @@ slate but destroys the old machine's history irreversibly.)
 than `purge_keep_days`, checking that the *state* is continuous is **not** sufficient. Check
 the statistics `sum` too — that is where the artifact lives.
 
-Still unverified: how Rest Of Home behaves while the dishwasher is actually drawing ~2 kW.
-Check after the first full cycle that the untracked line does not dip sharply negative.
+Rest Of Home under real load was verified later the same day — see "First measured cycle"
+below. Short version: transient dips to ~−1595 W during heating, reconciling to 99.4%.
 
 ### Operational cautions
 
@@ -215,32 +227,56 @@ Config entry `01KZXXREB7PXKJ5EWDD0B4XPRY`, state `loaded`. HA keeps the credenti
 only**, since nothing in this repo consumes them; without it, rebuilding HA from scratch would
 mean re-registering the application at developer.home-connect.com.
 
-**17 entities**, device "Dishwasher" (Bosch SMV6YCX00E):
+**20 registry entities — 16 enabled, 4 disabled by the integration.** Device "Dishwasher"
+(Bosch SMV6YCX00E). Verified against the entity registry 2026-08-13.
 
 ```
++-------------------------------------------------+---------------------------------+
+| ENABLED (16)                                    |                                 |
 +-------------------------------------------------+---------------------------------+
 | binary_sensor.dishwasher_connectivity           | on                              |
 | binary_sensor.dishwasher_remote_control         | remote control allowed          |
 | binary_sensor.dishwasher_remote_start           | remote start allowed            |
 | button.dishwasher_stop_programme                | stop the running programme      |
-| number.dishwasher_start_in_relative             | delayed start, seconds          |
+| number.dishwasher_start_in_relative             | CONFIGURED delay, not a live    |
+|                                                 |   countdown - see gotcha below  |
 | select.dishwasher_active_programme              | e.g. dishcare_dishwasher_       |
 | select.dishwasher_selected_programme            |   program_eco_50                |
-| sensor.dishwasher_door                          | open / closed                   |
-| sensor.dishwasher_operation_state               | run / delayedstart / finished   |
+| sensor.dishwasher_door                          | open / closed / locked          |
+| sensor.dishwasher_operation_state               | inactive/ready/delayedstart/    |
+|                                                 |   run/pause/actionrequired/     |
+|                                                 |   finished/error/aborting       |
 | sensor.dishwasher_programme_finish_time         | timestamp                       |
 | sensor.dishwasher_programme_progress            | percent                         |
-| sensor.dishwasher_program_aborted               | event                           |
-| sensor.dishwasher_programme_finished            | event                           |
-| sensor.dishwasher_rinse_aid_nearly_empty        | event                           |
-| sensor.dishwasher_salt_nearly_empty             | event                           |
 | switch.dishwasher_power                         | on                              |
 | switch.dishwasher_vario_speed                   | off                             |
+| switch.dishwasher_extra_dry                     | programme option                |
+| switch.dishwasher_half_load                     | programme option                |
+| switch.dishwasher_hygiene                       | programme option                |
++-------------------------------------------------+---------------------------------+
+| DISABLED by the integration (4) - present in    |                                 |
+| the registry, produce NO state and NO data      |                                 |
++-------------------------------------------------+---------------------------------+
+| sensor.dishwasher_program_aborted               | (note: "program", not           |
+| sensor.dishwasher_programme_finished            |   "programme" - the integration |
+| sensor.dishwasher_rinse_aid_nearly_empty        |   spells it both ways; the ids  |
+| sensor.dishwasher_salt_nearly_empty             |   really are inconsistent)      |
 +-------------------------------------------------+---------------------------------+
 ```
 
 **No energy sensor**, as predicted. `sensor.dishwasher_operation_state` and
 `select.dishwasher_active_programme` are the two that matter for per-cycle attribution.
+
+Two things worth knowing:
+
+- **Don't build anything on the four disabled sensors** without enabling them first — a
+  "programme finished" automation keyed on `sensor.dishwasher_programme_finished` would never
+  fire. Cycle-end detection uses `operation_state` reaching `finished` instead, which is why
+  the attribution automations work.
+- **The three option switches (`extra_dry`, `half_load`, `hygiene`) are observable**, which
+  matters for calibration: options shift a cycle's energy without changing the programme name,
+  and they are exactly the confound that would poison a naive per-programme lookup table. They
+  are not currently captured per cycle — see the calibration section.
 
 ## Per-cycle attribution (built 2026-08-13)
 
@@ -330,11 +366,52 @@ repo's whitelist `.gitignore` deliberately excludes.** So dashboard edits are *n
 controlled — they exist only in the running instance and in HA/PBS backups. Unlike the YAML
 changes, there is nothing to `git revert` if a card layout goes wrong.
 
+### First measured cycle — 2026-08-13, Eco 50
+
+The whole chain worked end to end on real Home Connect transitions, not simulated ones.
+
+```
++------------------------------------------+----------------------------------+
+| Measured cycle energy                    | 0.88 kWh                         |
+| EU label figure (eco, test conditions)   | 0.65 kWh                         |
+| Difference                               | +35%                             |
+| Programme recorded                       | eco_50 (captured automatically)  |
+| Arithmetic check                         | 497.24 - 496.36 = 0.88  correct  |
+| Peak draw                                | 1984 W                           |
++------------------------------------------+----------------------------------+
+```
+
+**+35% over the label on the very first cycle**, and this is a *late-summer* measurement —
+mains inlet is at its warmest, the most favourable end of the seasonal range. The same wash
+in February should cost more. One cycle is not a calibration, but the direction is exactly
+what the seasonal argument above predicted, and it is a far larger gap than the ±5% a static
+lookup would have needed.
+
+Peak draw of 1984 W confirms the gauge `max` of 2400 W is sensible (~21% headroom) and that
+the original 1800 W would indeed have pegged. No change needed — this closes the "revisit once
+a real cycle shows the true peak" note above, and confirms the rating-plate caution (a ~2.2 kW
+element was the expectation; 1984 W is the measurement).
+
+**Rest Of Home under real load** — the last unverified thing — behaved correctly. It dips to
+about **−1595 W** transiently during the heating phases, in 3 of the 4 cycle hours. That
+magnitude is roughly the appliance's own draw, which is the signature of *meter lag*: the
+plug reports the ~2 kW load before the P1 meter does, so `P1 − Σtracked` is briefly negative
+by about the appliance's consumption. It averages out as designed — reconciliation across
+the cycle window came to **99.4% accounted (gap 0.02 kWh)**.
+
 ### Calibration
 
 Collect 4–6 weeks, then compare measured per-programme energy against the 0.65 kWh label
 figure and, more importantly, look at the **spread**. That decides whether a fixed
-per-programme constant could ever replace the plug. Programme ids to expect:
+per-programme constant could ever replace the plug.
+
+**Known limitation of the current attribution**: only the programme name is captured, not the
+option switches (`extra_dry`, `half_load`, `hygiene`, `vario_speed`). Those change a cycle's
+energy without changing its programme name, so two cycles logged as `eco_50` are not
+necessarily comparable. If the measured spread turns out wide, capturing the option states at
+cycle start is the first thing to try before concluding the programme itself is variable.
+
+Programme ids to expect:
 
 ```
 dishcare_dishwasher_program_eco_50        auto_2        intensiv_70
