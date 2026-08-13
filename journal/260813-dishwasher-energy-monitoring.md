@@ -106,15 +106,43 @@ lookup approach look better than it is.
 - **Check Rest Of Home during the first real cycle.** Everything so far was verified with the
   dishwasher idle at 0 W; the interesting case is ~2 kW of heating element, where a unit or
   sign error would show as the untracked line dipping sharply negative.
-- **Per-cycle attribution**, deliberately not built — the design was never presented in
-  detail, so it needs John's sign-off first. `sensor.dishwasher_operation_state` and
-  `select.dishwasher_active_programme` are the inputs; combined with plug kWh they give
-  per-program measured constants over a 4–6 week calibration window.
-- **First calibration cycle is already queued**: at the moment the integration came up the
-  machine was sitting in `delayedstart` with `dishcare_dishwasher_program_eco_50` selected,
-  finishing 20:14 UTC. Even without attribution built, that cycle is reconstructable after
-  the fact from the plug's statistics over the run window — measured vs. the 0.65 kWh label
-  figure.
+- **The first real cycle has not happened yet.** A 5-hour delayed Eco 50 was queued, and I
+  inferred a ~16:27 UTC start from `programme_finish_time` (20:22) minus the spec-sheet 3:55
+  duration. `number.dishwasher_start_in_relative` read 16260 s, which did not reconcile with
+  that; I noticed and did not chase it. John then cancelled the delay, which explains the
+  discrepancy — that number was the configured delay, not a live countdown. Machine is back
+  at `ready` with Eco 50 still selected.
+- **Calibration**: 4–6 weeks of cycles, then compare measured per-programme energy and its
+  spread against the 0.65 kWh label figure.
+## Per-cycle attribution (built and smoke-tested the same session)
+
+Two automations subtract the plug's cumulative counter between Home Connect's `run` and
+`finished` states, into `sensor.dishwasher_last_cycle_energy`.
+
+The design constraint that shaped it: there is **no `recorder:` block**, so HA runs the
+default `purge_keep_days: 10`. State history — and therefore cycle boundaries — is gone
+after ten days, which kills the tempting "build nothing, reconstruct it from the recorder
+later" approach for a 4–6 week calibration. Long-term statistics survive indefinitely, so
+the template sensor carries `state_class: measurement` to get the per-cycle values (and
+their spread) into LTS. Deliberately no `device_class: energy`; HA rejects that pairing.
+
+Mid-build improvement: the start trigger began as an enumerated
+`from: [ready, inactive, delayedstart]` and was switched to `not_from: [pause, run]`. The
+enumeration silently misses `unknown -> run`, which is exactly what happens if HA restarts at
+the moment a cycle begins — and I had just restarted HA minutes before what I believed was an
+imminent cycle start.
+
+Smoke-tested by driving `operation_state` through the REST API while the machine sat idle:
+start snapshot (496.36 + eco_50), finish arithmetic (1.0 kWh, programme copied), and the
+pause -> run guard (sentinel 100.0 held, no re-snapshot). **The plug's own
+`total_increasing` counter was never overridden** — faking it would have injected a phantom
+kWh into the Energy dashboard, the precise artifact avoided earlier the same day.
+Consumption was simulated by lowering the start snapshot instead. Helpers reset afterwards
+and the test statistic wiped via `recorder/clear_statistics`.
+
+Committed as `6264055` in the HA config repo.
+
+## Still open
 
 ## Notes for next time
 

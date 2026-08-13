@@ -214,10 +214,76 @@ Config entry `01KZXXREB7PXKJ5EWDD0B4XPRY`, state `loaded`. Credentials are store
 **No energy sensor**, as predicted. `sensor.dishwasher_operation_state` and
 `select.dishwasher_active_programme` are the two that matter for per-cycle attribution.
 
-## Per-cycle attribution (planned, not built)
+## Per-cycle attribution (built 2026-08-13)
 
-Once Home Connect is live, its `operation_state` transitions give clean cycle boundaries,
-which combined with the plug's kWh yields "this eco cycle cost 0.83 kWh". Deliberately not
-built yet — the plug and the integration land first, then this. Its first job is
-calibration: 4–6 weeks of measured per-program energy, producing a real table of constants
-and a real variance figure, which is what makes any future lookup-only mode defensible.
+Home Connect gives the cycle boundaries, the plug gives the kWh. Two automations subtract
+the plug's cumulative counter across a cycle:
+
+```
+operation_state:  ready/delayedstart --> run --> [pause <-> run] --> finished
+                                          |                            |
+                                    snapshot start                 record delta
+```
+
+```
++--------------------------------------------------+--------------------------------+
+| input_number.dishwasher_cycle_start_energy       | counter value at cycle start   |
+| input_number.dishwasher_last_cycle_energy        | the computed delta             |
+| input_text.dishwasher_cycle_programme            | programme, in flight           |
+| input_text.dishwasher_last_cycle_programme       | programme, copied at finish    |
+| sensor.dishwasher_last_cycle_energy              | template sensor, kWh           |
+| automation.dishwasher_snapshot_plug_energy_...   | start                          |
+| automation.dishwasher_record_cycle_energy_...    | finish                         |
++--------------------------------------------------+--------------------------------+
+```
+
+Design points that matter if you ever debug this:
+
+- **`state_class: measurement` on the template sensor** is load-bearing. There is no
+  `recorder:` block, so HA is on the default `purge_keep_days: 10` and state history is gone
+  after ten days. Long-term statistics survive indefinitely, so this is what makes a 4–6 week
+  calibration possible at all. Deliberately **no** `device_class: energy` — HA rejects that
+  pairing with `measurement`.
+- **The start trigger uses `not_from: [pause, run]`**, not an enumerated `from:` list. That
+  covers `unknown -> run`, which is what happens if HA restarts at the exact moment a cycle
+  begins. Enumerating source states silently misses it.
+- **Two separate programme helpers.** The in-flight one is copied to the last-cycle one only
+  at finish, so starting a new cycle never leaves the reported last-cycle energy paired with
+  the new cycle's programme name.
+- **Aborted programmes record nothing** — they go `aborting -> ready` and never reach
+  `finished`.
+- **Standby draw between cycles is not attributed to any cycle.** It still lands in the plug
+  total and the Energy dashboard; it just does not inflate a per-cycle figure.
+- Shared failure mode with the retired "corrected energy" pattern: if an automation does not
+  fire, that cycle is lost quietly. The `not_from` trigger makes the next cycle re-baseline
+  cleanly rather than record a doubled value, so it fails safe rather than silently wrong.
+
+### Smoke test (2026-08-13)
+
+Verified by driving `sensor.dishwasher_operation_state` through the REST API while the
+machine sat idle at `ready`:
+
+```
++--------+---------------------------------------------+---------------------------+
+| Test A | -> run                                      | snapshot 496.36 + eco_50  |
+| Test B | start lowered to 495.36, then -> finished   | recorded 1.0 kWh, prog OK |
+| Test C | run -> pause -> run with sentinel 100.0     | stayed 100.0, no re-snap  |
++--------+---------------------------------------------+---------------------------+
+```
+
+The plug's own `total_increasing` counter was **deliberately never overridden** during
+testing — faking it would have injected a phantom kWh into the Energy dashboard, the exact
+artifact avoided when the plug was reconnected. Consumption was simulated by lowering the
+start snapshot instead. Helpers were reset afterwards and the test statistic wiped with
+`recorder/clear_statistics`, so the calibration dataset starts empty.
+
+### Calibration
+
+Collect 4–6 weeks, then compare measured per-programme energy against the 0.65 kWh label
+figure and, more importantly, look at the **spread**. That decides whether a fixed
+per-programme constant could ever replace the plug. Programme ids to expect:
+
+```
+dishcare_dishwasher_program_eco_50        auto_2        intensiv_70
+kurz_60        night_wash        machine_care        pre_rinse
+```
