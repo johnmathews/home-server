@@ -1,0 +1,126 @@
+# vim: ft=yaml
+# family_finances_lxc/templates/docker-compose.yml.j2
+#
+# Mirrors docker-compose.yml in the family-finances repository. Keep the two in
+# step: that file is what a reader consults, this one is what actually runs.
+services:
+
+  portainer-agent:
+    image: portainer/agent:{{ portainer_agent_version }}
+    container_name: portainer_agent
+    restart: always
+    environment:
+      AGENT_SECRET: "{{ vault_portainer_agent_secret }}"
+    ports:
+      - "9001:9001"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # The API. Owns ingestion, categorisation and every analytic; the web app and
+  # (later) the MCP server are both thin clients of it.
+  #
+  # No `ports:` on purpose. Only nginx reaches it, over the compose network.
+  # Publishing it would put a path to the API on the host that never passes
+  # through the proxy or its rate limiting.
+  backend:
+    container_name: ff-backend
+    image: ghcr.io/johnmathews/family-finances-backend:{{ family_finances_version }}
+    restart: unless-stopped
+    expose:
+      - "8000"
+    environment:
+      TZ: "{{ TZ }}"
+      FAMILY_FINANCES_DIRECTORY: /data/directory.sqlite3
+      FAMILY_FINANCES_HOUSEHOLDS: /data/households
+      FAMILY_FINANCES_SIGNUP_CODE: ${FAMILY_FINANCES_SIGNUP_CODE}
+    volumes:
+      # The family's financial record. This is the path the PBS guest backup
+      # has to contain (family-finances docs/adr/0017).
+      - "{{ family_finances_data_dir }}:/data"
+    healthcheck:
+      # curl is not in the slim image; the stdlib is.
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # The web app, and the reverse proxy that makes app and API one origin. That
+  # is why the backend has no CORS layer anywhere — there is no second origin
+  # for a browser to be told about (family-finances docs/adr/0010).
+  frontend:
+    container_name: ff-frontend
+    image: ghcr.io/johnmathews/family-finances-frontend:{{ family_finances_version }}
+    restart: unless-stopped
+    ports:
+      - "{{ family_finances_port }}:80"
+    environment:
+      TZ: "{{ TZ }}"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  node_exporter:
+    image: quay.io/prometheus/node-exporter:{{ node_exporter_version }}
+    container_name: node_exporter
+    command:
+      - '--path.rootfs=/host'
+      - '--collector.textfile'
+      - '--collector.textfile.directory=/textfile'
+    ports:
+      - "9100:9100"
+    restart: unless-stopped
+    volumes:
+      - '/:/host:ro,rslave'
+      - '/var/lib/node_exporter/textfile_collector:/textfile:ro'
+
+  alloy:
+    image: grafana/alloy:{{ alloy_version }}
+    container_name: alloy
+    restart: unless-stopped
+    environment:
+      LOKI_WRITE_ENDPOINT: "http://192.168.2.106:3100/loki/api/v1/push"
+      NODE_HOSTNAME: "family-finances"
+      LOG_LEVEL: "warn"
+    volumes:
+      - ./alloy:/etc/alloy:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/log/journal:/var/log/journal:ro
+      - /run/log/journal:/run/log/journal:ro
+      - /etc/machine-id:/etc/machine-id:ro
+    command: >
+      run --server.http.listen-addr=0.0.0.0:12345 --stability.level=experimental --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
+    ports:
+      - "12345:12345"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:{{ cadvisor_version }}
+    container_name: cadvisor
+    restart: always
+    ports:
+      - "18080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /sys:/sys:ro
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /var/run:/var/run:ro
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"

@@ -45,6 +45,7 @@ ANSIBLE_OPTS := $(TAGS_ARG) $(SKIP_ARG) $(LIMIT_ARG) $(EXTRA)
 # Declare all available commands as .PHONY (always run)
 .PHONY: all site pve nas media infra key traefik immich tube prometheus \
         document-library music jelly open-webui cloudflared agent \
+        finances \
         shell nfs share_drive_probe tailscale requirements \
         jelly-upgrade immich-upgrade refresh-sidecars \
         check lint clean ci help
@@ -96,6 +97,9 @@ document-library:
 
 music:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/music_lxc.yml $(VAULT) $(ANSIBLE_OPTS)
+
+finances:
+	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/family_finances_lxc.yml $(VAULT) $(ANSIBLE_OPTS)
 
 jelly:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/jellyfin_lxc.yml $(VAULT) $(ANSIBLE_OPTS)

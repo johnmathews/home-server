@@ -53,6 +53,8 @@ scrape_configs:
         labels: {hostname: 'open-webui'}
       - targets: ['192.168.2.109:18080']
         labels: {hostname: 'music'}
+      - targets: ['192.168.2.120:18080']
+        labels: {hostname: 'family-finances'}
     relabel_configs:
       - source_labels: [__address__]
         regex: '([^:]+)(?::\d+)?'
@@ -190,6 +192,8 @@ scrape_configs:
         labels: {hostname: 'paperless'}
       - targets: ['192.168.2.119:9100']
         labels: {hostname: 'open-webui'}
+      - targets: ['192.168.2.120:9100']
+        labels: {hostname: 'family-finances'}
       - targets: ['192.168.2.109:9100']
         labels: {hostname: 'music'}
     relabel_configs:

@@ -98,6 +98,33 @@ http:
         - security-headers
         - navidrome-auth-rl
 
+    # Family finances (github.com/johnmathews/family-finances).
+    # Bypasses Zero Access like the other app-authenticated services; the app
+    # has its own login and registration is invite-only.
+    finances:
+      rule: {{ host('finances') }}
+      entryPoints: [web]
+      service: finances-svc
+      priority: 100
+      middlewares:
+        - force-https-proto
+        - security-headers
+        - public-rl
+
+    # The credential endpoints only — deliberately NOT the whole /api/auth
+    # prefix, which would also throttle logout and the session check. A login
+    # attempt here is an attempt against an encryption key, so it is worth
+    # rate limiting; ordinary app traffic is not.
+    finances-auth:
+      rule: ({{ host('finances') }}) && (PathPrefix(`/api/auth/login`) || PathPrefix(`/api/auth/signup`) || PathPrefix(`/api/auth/recover`))
+      entryPoints: [web]
+      service: finances-svc
+      priority: 200
+      middlewares:
+        - force-https-proto
+        - security-headers
+        - finances-auth-rl
+
     music:
       rule: {{ host('music') }}
       entryPoints: [web]
@@ -204,6 +231,12 @@ http:
           - url: "http://192.168.2.109:4533"
         passHostHeader: true
 
+    finances-svc:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.2.120:8080"
+        passHostHeader: true
+
     music-svc:
       loadBalancer:
         servers:
@@ -278,6 +311,14 @@ http:
       rateLimit:
         average: 240
         burst: 120
+        sourceCriterion:
+          requestHeaderName: CF-Connecting-IP
+
+    finances-auth-rl:
+      rateLimit:
+        average: 5
+        period: 1m
+        burst: 3
         sourceCriterion:
           requestHeaderName: CF-Connecting-IP
 

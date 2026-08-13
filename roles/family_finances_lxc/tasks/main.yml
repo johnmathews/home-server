@@ -1,0 +1,80 @@
+# roles/family_finances_lxc/tasks/main.yml
+
+- name: Create container config directories (root-owned)
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+  loop:
+    - /srv/apps/alloy
+  tags: [docker, family_finances]
+
+# 10001 is the `finances` uid inside the backend image, which runs as a
+# non-root user. 0700 because this directory holds the encrypted household
+# databases and the archived statement files: no other account on the host has
+# any business reading them, encrypted or not.
+- name: Create the household data directory owned by the image's app uid
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: 10001
+    group: 10001
+    mode: '0700'
+  loop:
+    - "{{ family_finances_data_dir }}"
+    - "{{ family_finances_data_dir }}/households"
+  tags: [docker, family_finances]
+
+- name: Create environment file from template
+  ansible.builtin.template:
+    src: .env.j2
+    dest: "{{ family_finances_docker_compose_dir }}/.env"
+    mode: '0600'
+    owner: root
+    group: root
+  notify: Restart family finances
+  tags: docker
+
+- name: Upload config files
+  ansible.builtin.copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: '0644'
+  loop:
+    - {src: templates/config.alloy, dest: /srv/apps/alloy/config.alloy}
+  become: true
+  tags: alloy
+  notify: Restart alloy
+
+- name: Copy docker-compose.yml
+  ansible.builtin.template:
+    src: templates/docker-compose.yml.j2
+    dest: "{{ family_finances_docker_compose_dir }}/docker-compose.yml"
+    mode: '0644'
+    owner: root
+    group: root
+  tags: docker
+  notify: Restart all containers
+
+- name: Log in to ghcr so the private images can be pulled
+  community.docker.docker_login:
+    registry_url: ghcr.io
+    username: "{{ family_finances_ghcr_user }}"
+    password: "{{ family_finances_ghcr_token }}"
+    reauthorize: true
+  become: false
+  no_log: true
+  tags: docker
+
+- name: Converge the stack
+  community.docker.docker_compose_v2:
+    project_src: "{{ family_finances_docker_compose_dir }}"
+    state: present
+    recreate: auto
+    pull: missing
+  become: false
+  tags: docker

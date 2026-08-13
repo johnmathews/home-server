@@ -1,0 +1,36 @@
+# playbooks/family_finances_lxc.yml
+
+- name: Family Finances LXC
+  hosts: family_finances_lxc
+  gather_facts: true
+  become: true
+
+  roles:
+    # No nfs_client or share_drive_probe: the household databases live on the
+    # guest's own disk, deliberately. They are small (about 1 MB each), they are
+    # rewritten in full on every write, and putting them on an NFS mount would
+    # add a network filesystem to the path of an atomic rename that the
+    # encryption depends on.
+    - role: family_finances_lxc
+      tags: family_finances
+    - role: sleep_hours
+      tags: sleep
+    - role: shell_environment
+      tags: shell
+
+    # No tailscale role, for two reasons that both need fixing before it
+    # returns. The guest was cloned, so it arrived holding the document-library
+    # host's tailscale node key — same node ID, same 100.100.7.47, same
+    # paperless.*.ts.net name — and tailnet traffic for `paperless` landed on
+    # whichever machine had connected last. That state has been wiped here.
+    #
+    # Re-registering it as its own node needs a working auth key, and
+    # vault_tailscale_auth_key is expired ("API key does not exist"). The role
+    # calls fail() when authentication does not work, so including it would
+    # make `make finances` red every run. Existing hosts are unaffected: they
+    # are already authenticated, so the block is skipped for them — which is
+    # why a dead key has gone unnoticed.
+    #
+    # To restore: refresh vault_tailscale_auth_key, add the role back, run.
+    # The app itself does not need the tailnet — it is reached over the
+    # Cloudflare tunnel (docs/adr/0015 in the family-finances repository).
