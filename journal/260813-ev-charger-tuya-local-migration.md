@@ -150,6 +150,23 @@ restart should agree far more closely. Worth re-checking on the next clean sessi
 Useful consequence: DP 25 is now a standing post-hoc audit of the integral. A persistent
 multi-percent gap would indicate the keep-alive automation is missing windows.
 
+### Follow-up: idle temperature
+
+Noticed while verifying: the device still reported 53 C after the session ended, with the
+cable physically cooling. Temperature shares the refresh-window behaviour, so it froze at
+its end-of-charge value — an idle cable reads hot forever.
+
+Fixed rather than just documented, because the DP 27 press **does** work while idle:
+a manual press at 15:37 moved it 53 -> 50 C within 12 s. Added a second automation, **"EV
+cable refresh temperature while idle"**, on a /15 time pattern gated on status != charging.
+Verified firing at 15:45:00 exactly, temperature 50 -> 48 C. Applied with
+`automation/reload` — no restart, so no repeat of the integral gap this time.
+
+An idle press gives one fresh sample, not a rolling window; idle temperature only drifts
+~1 C per 10 min so there is nothing more to report. 15 min keeps background writes to
+96/day. Voltage and current stay at 0 while idle regardless — DP 6 only reports during a
+session, which is worth knowing before anyone tries to "fix" that too.
+
 ## Gotchas recorded
 
 - The keep-alive automation is **load-bearing and fails quietly**. If it stops, power

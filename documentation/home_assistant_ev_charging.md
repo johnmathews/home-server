@@ -41,11 +41,11 @@ report kWh drawn from the wall.
 | Dashboard cards "not available"    | Cable entity renamed. Visible, so easy.          |
 | Lifetime energy sensor reads 0     | Expected. DP 1 is dead in firmware. Not a bug,   |
 | (sensor.voldt_ev_cable_energy)     |   and it is not the sensor anything uses.        |
-| Cable temperature looks high while | Expected. Temperature, voltage and current only  |
-| the cable is idle and cool         |   refresh inside a refresh window, so between    |
-|                                    |   charges they FREEZE at their end-of-charge     |
-|                                    |   values. A cooling cable still reads hot. Only  |
-|                                    |   trust these DURING a charge.                   |
+| Cable temperature more than 15 min | Both refresh automations are off/broken. While   |
+| stale while idle                   |   idle, temperature is refreshed every 15 min    |
+|                                    |   by "EV cable refresh temperature while idle".  |
+| Voltage / current read 0 while     | Expected, always. DP 6 only reports during a     |
+| idle                               |   session; refreshing does not change that.      |
 | Want to check the energy figures   | Compare sensor.voldt_ev_cable_last_charge (the   |
 | are actually right                 |   device's own meter) against the rise in        |
 |                                    |   sensor.ev_charger_energy over that session.    |
@@ -111,6 +111,19 @@ The automation **"EV cable keep power live"** (`automations.yaml`) presses the b
 `sensor.voldt_ev_cable_status` becomes `charging` and every 4 minutes while it stays
 charging — comfortably inside the ~5 minute window.
 
+**Temperature needs the same treatment when idle.** The refresh also updates the
+temperature register, and nothing else does — so between charges the reading would freeze
+at its end-of-charge value and a cooling cable would keep reading hot indefinitely. A
+second automation, **"EV cable refresh temperature while idle"**, presses every 15 minutes
+whenever the status is not `charging`. Verified 2026-08-13: presses at 15:37 and 15:45
+tracked the cable cooling 53 -> 50 -> 48 C.
+
+Idle presses yield a **single** fresh sample rather than a rolling window — idle
+temperature drifts only ~1 C per 10 min, so there is nothing further for the device to
+report. 15 min is therefore ample, and it keeps the background write rate to 96/day.
+Voltage and current stay at 0 while idle no matter how often you refresh: DP 6 only
+reports during a session.
+
 ## Cable-side entities
 
 All `voldt_ev_cable_*` entities come from tuya-local over the LAN.
@@ -133,9 +146,9 @@ All `voldt_ev_cable_*` entities come from tuya-local over the LAN.
 | sensor.voldt_ev_cable_power                 | raw local power, kW. ~20 s while the   |
 |                                             |   refresh window is open, else frozen. |
 | sensor.voldt_ev_cable_voltage / _current    | V and A, same window. `unknown` until  |
-|                                             |   the first refresh after a restart.   |
-|                                             |   Frozen at end-of-charge values while |
-|                                             |   idle - only trust during a charge.   |
+|                                             |   the first refresh after a restart,   |
+|                                             |   and 0 whenever idle - DP 6 only      |
+|                                             |   reports during a session.            |
 | sensor.voldt_ev_cable_status                | available / plugged_in / waiting /     |
 |                                             |   charging / paused / charged / fault  |
 |                                             |   / fault_unplugged. NOTE the values   |
@@ -152,9 +165,9 @@ All `voldt_ev_cable_*` entities come from tuya-local over the LAN.
 |                                             |   immediate charging                   |
 | switch.voldt_ev_cable                       | starts/stops the CURRENT session (not  |
 |                                             |   a device power switch)               |
-| sensor.voldt_ev_cable_temperature           | internal temp. Same refresh-window     |
-|                                             |   staleness as voltage/current. Around |
-|                                             |   53 C at 13 A is normal (40 C idle).  |
+| sensor.voldt_ev_cable_temperature           | internal temp. Refreshed every 4 min   |
+|                                             |   charging, 15 min idle. ~53 C at 13 A |
+|                                             |   is normal; ~40 C settled idle.       |
 | button.voldt_ev_cable_refresh               | DP 27. Opens the ~5 min live-metering  |
 |                                             |   window; driven by the keep-alive     |
 |                                             |   automation. Safe to press manually.  |
@@ -462,7 +475,9 @@ never go looking in Settings → Devices & Services → Helpers for these entiti
 | ev_charging_time/sessions_today      |                                                |
 | the four utility_meters              | /config/configuration.yaml, utility_meter:     |
 | "EV cable keep power live"           | /config/automations.yaml (id 1786623900000)    |
-|   (the DP 27 keep-alive)             |                                                |
+|   (DP 27 keep-alive, /4 charging)    |                                                |
+| "EV cable refresh temperature        | /config/automations.yaml (id 1786626600000)    |
+|   while idle" (DP 27, /15 idle)      |                                                |
 | MySkoda + Tuya creds, tuya-local     | /config/.storage (never git-tracked) - the     |
 |   device id + LOCAL KEY              |   local key lives in core.config_entries       |
 | "EV Charging" dashboard              | storage mode - edit via the UI or the          |
