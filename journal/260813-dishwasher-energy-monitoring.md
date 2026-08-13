@@ -72,21 +72,32 @@ manufacturer nominals, with a known error instead of an assumed one.
    (dashboard table, JTBD #1 rewritten, dropped-devices note).
 6. **John reconnected the plug the same session**, and it verified clean: power 0 W (idle),
    energy 496.36 kWh, switch on, Rest Of Home 248 W against P1 386 W.
-   **No phantom spike** — the last statistic before the April outage was `state=496.36` and
-   it resumed at exactly 496.36, so the counter picked up where it left off and the
-   counter-reset runbook was not needed. `power_outage_memory` was already `on`, which is the
-   setting we want (relay closes unconditionally after a cut); `restore` would have been
-   wrong, since it reinstates the pre-cut state.
+   I recorded **"no phantom spike"** at this point — the last statistic before the April
+   outage was `state=496.36` and it resumed at exactly 496.36, so the counter appeared to pick
+   up where it left off. **⚠️ This conclusion was WRONG and is retracted later in this entry —
+   see "The -471.62 kWh phantom spike" below.** The state was continuous; the statistics `sum`
+   was not, and I had only checked the state. Left here as written, with this pointer, because
+   the sequence is the lesson.
+   `power_outage_memory` was already `on`, which is the setting we want (relay closes
+   unconditionally after a cut); `restore` would have been wrong, since it reinstates the
+   pre-cut state.
 
 7. **Home Connect integration went live the same session.** John registered the developer
    app; credentials added via `application_credentials/create` over WebSocket, then the
    config flow driven headlessly (`POST /api/config/config_entries/flow`, handler
    `home_connect`) — it returns an `external` step whose `url` John opened to approve.
-   Entry `01KZXXREB7PXKJ5EWDD0B4XPRY`, state `loaded`, **17 entities**. The Cloudflare Zero
-   Trust redirect worried me beforehand and turned out to be a non-issue.
+   Entry `01KZXXREB7PXKJ5EWDD0B4XPRY`, state `loaded`, **17 entities visible at that moment**.
+   The Cloudflare Zero Trust redirect worried me beforehand and turned out to be a non-issue.
 
    Appliance identified as a **Bosch SMV6YCX00E** (Series 6, 60 cm, 14 place settings).
-   Confirmed: **no energy entity** among the 17, exactly as predicted.
+   Confirmed: **no energy entity**, exactly as predicted.
+
+   *Later correction (same session, during wrap-up):* the registry actually holds **20**
+   entities — **16 enabled, 4 disabled by the integration**. Three option switches
+   (`extra_dry`, `half_load`, `hygiene`) appeared after that first look, and I had counted the
+   4 disabled ones as live. I reported "17" as a fact when it was a snapshot of a still-settling
+   integration. Corrected in `documentation/home_assistant_dishwasher.md`; the disabled four
+   produce no state, so anything built on them would never fire.
 
 ### The label figures sharpen the earlier argument
 
@@ -101,46 +112,15 @@ The general point is worth remembering: *the lower a cycle's total energy, the l
 same absolute seasonal swing looms in relative terms.* Guessing the cycle high made the
 lookup approach look better than it is.
 
-## First real cycle — everything verified
+**⚠️ Retracted later the same day.** The first measured cycle came in at **0.88 kWh** — within
+5% of the original ~0.92 kWh guess. So the guess was fine and the 0.65 kWh *label* was the
+outlier; the case did not get "stronger", I had just swapped a good denominator for a
+test-bench one. Against the measured cycle the spread is 12.6%, not 17.1%. **The conclusion
+(reject the static lookup) is unaffected — it clears the ±5% bar on any denominator — but the
+reasoning above is wrong and is corrected in `documentation/home_assistant_dishwasher.md`.**
+Worth noting how this happened: I "corrected" a sound estimate toward an authoritative-looking
+published figure, and the published figure was the one that didn't describe reality.
 
-An Eco 50 ran 17:05–21:20 UTC. The whole chain worked on genuine Home Connect transitions:
-
-```
-+------------------------------------------+----------------------------------+
-| Measured cycle energy                    | 0.88 kWh                         |
-| EU label figure                          | 0.65 kWh   -> +35%               |
-| Programme captured automatically         | eco_50                           |
-| Arithmetic check                         | 497.24 - 496.36 = 0.88  correct  |
-| Peak draw                                | 1984 W                           |
-| Reconciliation over the cycle window     | 99.4% accounted (0.02 kWh gap)   |
-+------------------------------------------+----------------------------------+
-```
-
-**+35% over the label on the first cycle, in late summer** — the most favourable point in the
-seasonal range, since mains inlet is at its warmest. n=1 is not a calibration, but the
-direction matches the seasonal argument that killed the static-lookup idea, and the gap is
-far larger than the ±5% that approach needed.
-
-Peak 1984 W confirms the 2400 W gauge max is right and that the original 1800 W would have
-pegged — the guess held up, now on evidence.
-
-**Rest Of Home under real load** (the last open verification) behaved as designed: transient
-dips to about **-1595 W** in 3 of 4 cycle hours, a magnitude roughly equal to the appliance's
-own draw. That is meter lag — the plug reports the ~2 kW load before P1 does — and it averages
-out, as the 99.4% reconciliation shows.
-
-## Still open
-
-- **Calibration**: 4–6 weeks of cycles, then compare measured per-programme energy and its
-  spread against the 0.65 kWh label figure.
-- **KAJPLATS bulbs** remain offline and contribute nothing (pre-existing backlog).
-
-### Footnote: a timing inference that was wrong
-
-Mid-session I predicted a ~16:27 UTC cycle start from `programme_finish_time` (20:22) minus
-the spec-sheet 3:55 duration. `number.dishwasher_start_in_relative` read 16260 s, which did
-not reconcile; I noticed the inconsistency and did not chase it. John had set a 5-hour delay
-and then cancelled it — that field holds the *configured* delay, not a live countdown.
 ## Per-cycle attribution (built and smoke-tested the same session)
 
 Two automations subtract the plug's cumulative counter between Home Connect's `run` and
@@ -197,7 +177,33 @@ chose continuity.
 Blast radius was narrow: the earlier 24 h energy audit was unaffected, because the
 dishwasher's accrual there computed as 0 - 0 = 0 rather than -471.62.
 
-## Still open
+## First real cycle — everything verified
+
+An Eco 50 ran 17:05–21:20 UTC. The whole chain worked on genuine Home Connect transitions:
+
+```
++------------------------------------------+----------------------------------+
+| Measured cycle energy                    | 0.88 kWh                         |
+| EU label figure                          | 0.65 kWh   -> +35%               |
+| Programme captured automatically         | eco_50                           |
+| Arithmetic check                         | 497.24 - 496.36 = 0.88  correct  |
+| Peak draw                                | 1984 W                           |
+| Reconciliation over the cycle window     | 99.4% accounted (0.02 kWh gap)   |
++------------------------------------------+----------------------------------+
+```
+
+**+35% over the label on the first cycle, in late summer** — the most favourable point in the
+seasonal range, since mains inlet is at its warmest. n=1 is not a calibration, but the
+direction matches the seasonal argument that killed the static-lookup idea, and the gap is
+far larger than the ±5% that approach needed.
+
+Peak 1984 W confirms the 2400 W gauge max is right and that the original 1800 W would have
+pegged — the guess held up, now on evidence.
+
+**Rest Of Home under real load** (the last open verification) behaved as designed: transient
+dips to about **-1595 W** in 3 of 4 cycle hours, a magnitude roughly equal to the appliance's
+own draw. That is meter lag — the plug reports the ~2 kW load before P1 does — and it averages
+out, as the 99.4% reconciliation shows.
 
 ## Notes for next time
 
@@ -208,3 +214,85 @@ dishwasher's accrual there computed as 0 - 0 = 0 rather than -471.62.
   login-flow changes.
 - The HA SSH password and the `sudo` + explicit `GIT_SSH_COMMAND` incantation for `/config`
   git were both needed again; already captured in memory, and both still correct.
+
+## Wrap-up (`/done`) — the doc audit earned its keep
+
+The wrap-up's adversarial documentation audit was dispatched to a subagent, and it found
+**four blocking errors in docs I had written hours earlier and believed were accurate**. That
+is the whole argument for not self-certifying this phase, so it is worth recording concretely:
+
+1. **`Status:` header said per-cycle attribution was "not yet built"** while the same file had
+   a section titled "built 2026-08-13" describing it in detail. I updated the body and never
+   revisited the header.
+2. **The energy doc's backlog still said Home Connect was "blocked on developer credentials"**
+   — hours after it went live. A reader consulting the backlog would have concluded the work
+   was pending.
+3. **The same backlog entry still claimed the counter "resumed with no spike"** — the exact
+   claim I had already retracted at length 100 lines earlier in the same file. I corrected the
+   narrative section and left the summary table asserting the original error.
+4. **"17 entities" was wrong in both directions**: the registry holds 20 — 16 enabled, 4
+   disabled by the integration. I had counted 4 dead entities as live and missed 3 option
+   switches that appeared later. Consequential, not cosmetic: anything built on
+   `sensor.dishwasher_programme_finished` would never fire, because it produces no state.
+
+The pattern in 1–3 is identical and worth naming: **I corrected the prose and left the summary
+standing.** Headers, status lines and backlog tables are exactly where stale claims survive a
+careful re-read, because re-reading pulls you to the detailed section that is already right.
+
+The audit also caught something I would not have thought to look for: `documentation/vault.md`
+now promises that the vaulted Home Connect credentials exist for disaster recovery, but
+`disaster-recovery.md` did not mention Home Assistant **at all** — VM 102 was absent from the
+backed-up list despite PBS holding 21 snapshots of it (verified, not assumed). One doc made a
+promise the receiving doc had never heard of.
+
+Other wrap-up findings:
+
+- **Lint**: `make lint` exits 2 with 16 failures / 240 warnings. Verified pre-existing by
+  stashing my changes and re-running — identical result, and no finding references any file
+  this session touched. Not fixed, deliberately: it is the repo's documented baseline
+  ("warnings only, non-blocking").
+- **Security**: clean. Explicitly grepped tracked files for the Home Connect client ID and
+  secret, the HA SSH password, and the HA JWT — none present. Vault encrypted at rest,
+  `.vault_pass.txt` untracked.
+- **`.venv` was tracked as a self-referential symlink** and broke `git pull --rebase`
+  mid-session. Fixed upstream by `056efba` ("Stop tracking .venv, and ignore it") — not by me;
+  it arrived with a pull.
+- **Tests**: no executable code changed, so the bats suite (which covers `roles/sleep_hours`)
+  has no bearing. The one machine-consumed change, the vault file, was verified with its real
+  consumer: `ansible-inventory` loads 17 hosts, exit 0, both new keys visible.
+
+## What is deliberately not done
+
+- **No per-cycle capture of the option switches** (`extra_dry`, `half_load`, `hygiene`,
+  `vario_speed`), even though they demonstrably change a cycle's energy without changing its
+  programme name. Two cycles logged as `eco_50` are therefore not strictly comparable. Deferred
+  because it is premature to add fields before knowing whether the measured spread is even wide
+  enough to need explaining — but it is the first thing to try if it is.
+- **hcpy / local Home Connect protocol not pursued.** The appliance speaks it (port 443,
+  PSK-only TLS, confirmed). Energy already arrives locally via the plug, so the cloud
+  integration only carries cycle labelling; a new Ansible-managed service was not worth it for
+  secondary telemetry.
+- **The `-471.62 kWh` artifact was repaired, not investigated further.** I know *what* happened
+  (statistics sum reset to 0 across a gap longer than `purge_keep_days`) and the fix holds, but
+  I did not read HA's recorder source to confirm the precise mechanism. Graded *strongly
+  supported*, not confirmed.
+- **`purge_keep_days` left at the default 10.** Raising it would make long-gap sum resets less
+  likely and allow retrospective cycle reconstruction, but it grows the recorder DB and is a
+  whole-instance change made on the strength of one incident. Flagged, not taken.
+- **The KAJPLATS bulbs were not repaired** — offline Matter devices, pre-existing backlog,
+  outside this session's scope.
+- **The four integration-disabled entities were left disabled.** Enabling them would give
+  event-based cycle-finished detection, but `operation_state` already works and is proven.
+
+## Still open
+
+- **Calibration**: 4–6 weeks of cycles, then compare measured per-programme energy and its
+  spread against the 0.65 kWh label figure.
+- **KAJPLATS bulbs** remain offline and contribute nothing (pre-existing backlog).
+
+### Footnote: a timing inference that was wrong
+
+Mid-session I predicted a ~16:27 UTC cycle start from `programme_finish_time` (20:22) minus
+the spec-sheet 3:55 duration. `number.dishwasher_start_in_relative` read 16260 s, which did
+not reconcile; I noticed the inconsistency and did not chase it. John had set a 5-hour delay
+and then cancelled it — that field holds the *configured* delay, not a live countdown.

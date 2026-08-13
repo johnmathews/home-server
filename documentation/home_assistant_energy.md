@@ -1,6 +1,7 @@
 # Home Assistant — Energy Monitoring
 
-**Status:** current as of 2026-08-12 (powercalc overhaul).
+**Status:** current as of 2026-08-13 (dishwasher added; reconciliation check and long-gap
+runbook documented). Built in the 2026-08-12 powercalc overhaul.
 
 Home Assistant runs as Proxmox **VM 102** (HAOS) at `192.168.2.102:8123`. It is **not
 managed by this Ansible repo** — its config lives in its own private repo,
@@ -17,7 +18,7 @@ this repo is the household's operational source of truth.
 | HomeWizard P1 meter       | Whole-home grid import (2 tariffs) + gas. Ground truth.      |
 | Nous metering plugs (z2m) | Real measured power/energy for big appliances.               |
 | powercalc (HACS)          | Estimated power for lights + dumb plugs; "Rest Of Home".     |
-| Energy dashboard          | 2 grid tariffs, gas, 21 device consumption entries.          |
+| Energy dashboard          | 2 grid tariffs, gas, 22 device consumption entries.          |
 | Prometheus                | Scrapes HA at :8123/api/prometheus (vault_home_assistant_    |
 |                           | token) -> Grafana.                                           |
 +---------------------------+--------------------------------------------------------------+
@@ -170,15 +171,40 @@ Small and stable is healthy. Growth means drift — a plug gone unavailable, a n
 power sensor misreporting. Note the two are not independent: Rest of home derives from the
 same P1 signal as the grid total, so `devices + rest ≈ grid` holds largely by construction.
 What it genuinely catches is disagreement between the two *signal paths* — instantaneous
-power integration versus the meter's cumulative counters. This figure is the same quantity
-as the gap in the reconciliation check below.
+power integration versus the meter's cumulative counters. It is the **same quantity** as the
+gap in the reconciliation check below, measured over a different window — 0.435 kWh across the
+whole of 13 Aug up to ~19:00 local, versus 0.14 kWh across the clean 16-hour window used
+there. Different numbers, same metric; always state the window when quoting either.
 
 ## Reconciliation health check
 
 The whole point of the Rest Of Home subtract group is that
 `grid ≈ Σ(tracked devices) + Rest Of Home`. Checking that identity is the fastest way to
-confirm the energy system is honest. Verified 2026-08-13: **98.5% accounted** over a clean
-16-hour window (gap 0.14 kWh), with 18 of 24 hours reconciling to within ±0.03 kWh.
+confirm the energy system is honest.
+
+Verified 2026-08-13 over two windows:
+
+```
++------------------------------+--------+-----------+-----------+----------------+
+| Window                       | grid   | dev+rest  | gap       | accounted      |
++------------------------------+--------+-----------+-----------+----------------+
+| 24 h to 16:00Z               | 29.32  |   31.51   | -2.19     | 107.5%         |
+|   18 of 24 hours within +/-0.03 kWh; the 6 bad hours are all the known EV      |
+|   backfill artifact below, which over-attributes one hour and under-attributes |
+|   the three before it.                                                          |
++------------------------------+--------+-----------+-----------+----------------+
+| 16 h to 16:00Z (excludes     |  9.45  |    9.31   | +0.14     | 98.5%          |
+|   the artifact window)       |        |           |           |                |
++------------------------------+--------+-----------+-----------+----------------+
+| 5 h spanning a real ~2 kW    |  3.72  |    3.70   | +0.02     | 99.4%          |
+|   dishwasher cycle           |        |           |           |                |
++------------------------------+--------+-----------+-----------+----------------+
+```
+
+Always quote the window with the number — the percentage is meaningless without it, and the
+24 h figure exceeding 100% is the artifact, not a fault. (kWh columns are rounded to 2 dp;
+the percentages are computed from unrounded values, so recomputing from the table can differ
+by ~0.1 pp.)
 
 **Use the statistics `change` field per hour — not first-to-last `sum` deltas.** A sum-delta
 over a window silently lies whenever a series has a discontinuity (a counter reset, a
@@ -227,13 +253,18 @@ positive gaps. Cosmetic, already accepted, ages out of any recent window.
 +----+------------------------------------------------------------------+----------------+
 | #  | Job                                                              | Unblocks       |
 +----+------------------------------------------------------------------+----------------+
-| 1  | Dishwasher: DONE 2026-08-13. Nous plug reconnected, energy       | DONE           |
-|    |   sensor on the dashboard, power sensor in the Rest Of Home      |                |
-|    |   subtract list, counter resumed at 496.36 kWh with no spike.    |                |
-|    |   The appliance itself reports NO energy (Home Connect has no    |                |
-|    |   kWh) - see home_assistant_dishwasher.md. Remaining: check      |                |
-|    |   Rest Of Home during the first ~2 kW cycle; Home Connect        |                |
-|    |   integration still blocked on developer credentials             |                |
+| 1  | Dishwasher: DONE 2026-08-13, end to end. Nous plug reconnected,  | DONE           |
+|    |   energy sensor on the dashboard, power sensor in the Rest Of    |                |
+|    |   Home subtract list, Home Connect integration live (16 enabled  |                |
+|    |   entities), per-cycle attribution built, first cycle measured   |                |
+|    |   at 0.88 kWh vs the 0.65 kWh label. Rest Of Home verified       |                |
+|    |   under ~2 kW load (99.4% reconciled). The counter did NOT       |                |
+|    |   resume cleanly - the statistics sum reset to 0, a -471.62      |                |
+|    |   kWh artifact, repaired with adjust_sum_statistics; see the     |                |
+|    |   long-gap runbook above. The appliance itself reports NO        |                |
+|    |   energy (Home Connect exposes no kWh) - full detail in          |                |
+|    |   home_assistant_dishwasher.md. Remaining: 4-6 weeks of          |                |
+|    |   cycles to build a per-programme calibration table              |                |
 | 2  | Re-pair office + bathroom JETSTROM panels (currently on the      | office/bath    |
 |    |   defunct ZHA network) to zigbee2mqtt, like the entrance panel   | light tracking |
 |    |   then: add powercalc entries for the new entities               |                |

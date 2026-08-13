@@ -123,6 +123,23 @@ Host IPs are assigned statically on the MikroTik router. Source of truth: `inven
 | open_webui_lxc       | 192.168.2.119  |                  | Open WebUI                           |
 | key_server           | 192.168.2.201  |                  | TrueNAS encryption key server        |
 +----------------------+----------------+------------------+--------------------------------------+
+
+Not in `inventory.ini` and **not Ansible-managed**, but part of the estate — you will need
+these and they are otherwise undiscoverable from this file:
+
+```
++----------------------+----------------+------------------+--------------------------------------+
+| Host                 | Local IP       | Managed by       | Key Services                         |
++----------------------+----------------+------------------+--------------------------------------+
+| home assistant (VM   | 192.168.2.102  | its own /config  | HA :8123, Mosquitto :1883,           |
+|   102, HAOS)         |                |   git repo       |   zigbee2mqtt, go2rtc :1984          |
+| bosch dishwasher     | 192.168.2.39   | Home Connect     | Home Connect local protocol :443     |
+|                      |                |   cloud + a Nous |   (PSK-only TLS)                     |
+|                      |                |   metering plug  |                                      |
+| voldt ev cable       | 192.168.2.29   | tuya-local via HA| EV charging (see ev_charging doc)    |
+| reolink doorbell     | 192.168.2.35   | HA + go2rtc      | Doorbell, two-way audio              |
++----------------------+----------------+------------------+--------------------------------------+
+```
 ```
 
 ## SSH Aliases
@@ -147,7 +164,7 @@ Service-specific guides in `/documentation/`. Read the relevant doc before worki
 - `disks.md` — Proxmox host disk management and backup storage
 - `doorbell.md` — Reolink video doorbell: usage guide (non-technical), notifications, two-way audio, HA/go2rtc setup
 - `grafana-alerting.md` — Grafana alert rules, concise Pushover notification templates, API access
-- `home_assistant_dishwasher.md` — Bosch dishwasher: LAN discovery, why Home Connect gives no kWh, metering plug, integration plan
+- `home_assistant_dishwasher.md` — Bosch dishwasher: LAN discovery, why Home Connect gives no kWh, metering plug, Home Connect integration, per-cycle energy attribution
 - `home_assistant_energy.md` — HA energy monitoring: P1 meter, powercalc, Energy dashboard, config repo, backlog
 - `home_assistant_ev_charging.md` — EV charging, both halves: Voldt granny cable (tuya-local over the LAN; the DP 27 refresh trick) + Skoda Enyaq (MySkoda), entities, charging-efficiency calc
 - `immich_lxc.md` — Immich photo management, Docker stack, NFS mounts, ML, mobile app

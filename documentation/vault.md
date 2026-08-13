@@ -29,7 +29,10 @@ makefile                 every Ansible call has $(VAULT) = --vault-password-file
 ## What's in the Vault
 
 145 `vault_*` secrets as of 2026-08-13, organised by service. Examples (names only — actual
-values are encrypted):
+values are encrypted).
+
+Note the reproduction command below reports **146** top-level keys, not 145: one key,
+`sshkeys`, predates the `vault_` prefix convention and is the sole exception to it.
 
 | Category        | Examples                                                             |
 | --------------- | -------------------------------------------------------------------- |
