@@ -52,8 +52,8 @@ Grid prices: tariff 1 €0.24111/kWh, tariff 2 €0.27693/kWh, gas €1.3073/m³
 | Plug 4 Lamp               | sensor.plug_4_lamp_energy                | fixed 15.4 W        |
 | Plug 5 / 6 Filament Lamp  | sensor.plug_{5,6}_filament_lamp_energy   | fixed ~6.4 W (EST.) |
 | EV Charger (Enyaq)        | sensor.ev_charger_energy                 | Riemann integral of |
-|                           |                                          |   estimated power - |
-|                           |                                          |   the Voldt's own   |
+|                           |                                          |   local power (~20s)|
+|                           |                                          |   - the Voldt's own |
 |                           |                                          |   counters are dead |
 | Rest of home (untracked)  | sensor.rest_of_home_energy               | subtract group      |
 +---------------------------+------------------------------------------+---------------------+
@@ -156,14 +156,16 @@ the correct amount. No YAML involved.
 |    |   biggest single untracked load in Rest Of Home                  | untracked sink |
 | 6  | Remove electric-heater leftovers if the plug is truly retired    | tidiness       |
 |    |   (z2m device removal)                                           |                |
-| 7  | EV charger (cable side): DONE. Cloud integration via             | DONE           |
-|    |   xtend_tuya 2026-08-12; static lease for 192.168.2.29           |                |
-|    |   (MAC d8:fc:92:93:f5:7d) set on the MikroTik 2026-08-13;        |                |
-|    |   Rest Of Home verified sane across a full charge (mean          |                |
-|    |   +223 W, 0.9% negative samples, all sub-minute switching        |                |
-|    |   transients - no kW/W unit error). The optional tuya-local      |                |
-|    |   local-key upgrade remains open, documented in                  |                |
-|    |   home_assistant_ev_charging.md rather than here.                |                |
+| 7  | EV charger (cable side): DONE, and since 2026-08-13 fully        | DONE           |
+|    |   LOCAL via tuya-local (was xtend_tuya cloud 2026-08-12).        |                |
+|    |   Static lease for 192.168.2.29 (MAC d8:fc:92:93:f5:7d) on       |                |
+|    |   the MikroTik. Rest Of Home verified sane across a full         |                |
+|    |   charge (mean +223 W, 0.9% negative samples, all sub-minute     |                |
+|    |   switching transients - no kW/W unit error). Power now          |                |
+|    |   samples every ~20 s instead of hourly, so the energy           |                |
+|    |   integral is a measurement not an estimate; this depends on     |                |
+|    |   automation.ev_cable_keep_power_live, which fails QUIETLY.      |                |
+|    |   See home_assistant_ev_charging.md.                             |                |
 | 8  | EV car side: DONE via MySkoda (HACS) 2026-08-13. Once ~5 kWh     | EV charging    |
 |    |   has been charged, sanity-check sensor.ev_charging_efficiency   | efficiency     |
 |    |   against the expected mid-80s%; a wildly-off figure means the   |                |

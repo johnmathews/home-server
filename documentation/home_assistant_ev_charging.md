@@ -1,9 +1,9 @@
 # Home Assistant — EV Charging (Voldt granny cable + Skoda Enyaq)
 
-**Status:** LIVE. Cable side since 2026-08-12 (official Tuya + xtend_tuya); car side
-since 2026-08-13 (MySkoda). Tracks charging of the **Skoda Enyaq** on the **Voldt Type 2
-granny cable** (8–13 A, ~2.8 kW, WiFi). In the Energy dashboard as **"EV Charger
-(Enyaq)"**.
+**Status:** LIVE. Cable side **fully local via tuya-local since 2026-08-13** (was Tuya
+cloud 2026-08-12 to 2026-08-13); car side since 2026-08-13 (MySkoda). Tracks charging of
+the **Skoda Enyaq** on the **Voldt Type 2 granny cable** (8–13 A, ~2.9 kW, WiFi). In the
+Energy dashboard as **"EV Charger (Enyaq)"**.
 
 There are two independent halves, and the distinction matters constantly:
 
@@ -11,8 +11,8 @@ There are two independent halves, and the distinction matters constantly:
 +-------------+---------------------------+---------------------------------------------+
 | Half        | Source                    | Measures                                    |
 +-------------+---------------------------+---------------------------------------------+
-| Cable side  | Voldt charger, Tuya cloud | Energy leaving the wall. Feeds the Energy    |
-|             |   (xtend_tuya)            |   dashboard and all cost figures.            |
+| Cable side  | Voldt charger, LAN        | Energy leaving the wall. Feeds the Energy    |
+|             |   (tuya-local)            |   dashboard and all cost figures.            |
 | Car side    | Skoda Enyaq, MySkoda      | State of charge, range, odometer, plug and   |
 |             |   cloud (HACS)            |   charging state. Feeds the efficiency calc. |
 +-------------+---------------------------+---------------------------------------------+
@@ -23,50 +23,105 @@ report kWh drawn from the wall.
 
 ## How the cable side works
 
-The cable is a white-label **Tuya** device (category `qccdz`, EV charger). Two cloud
-integrations cooperate:
+The cable is a white-label **Tuya** device (category `qccdz`, EV charger). Since
+2026-08-13 it is read **locally over the LAN** by **tuya-local** (HACS,
+`make-all/tuya-local`), using its built-in `voldt_ev_charger` profile. No cloud is in the
+path for any sensor that matters.
 
-1. **Official Tuya integration** — logged into the Smart Life account via user-code + QR
-   scan. Only maps a bare switch for this category.
-2. **xtend_tuya** (HACS, `azerty9971/xtend_tuya`) — same login, exposes ALL the device's
-   datapoints as entities, including the energy/power sensors the official integration
-   hides.
+Device ID `bff9a892e0eb9fa22bwmyp`, MAC `d8:fc:92:93:f5:7d`, LAN IP `192.168.2.29`
+(static lease), protocol 3.5, firmware V4.1.6. The tuya-local config entry is named
+**"Voldt EV Cable"**, so its entities are `*.voldt_ev_cable_*`.
 
-The device lives in the **Smart Life** app (it was re-paired out of the Voldt app, which
-is now retired — same backend, same features). Device ID `bff9a892e0eb9fa22bwmyp`,
-MAC `d8:fc:92:93:f5:7d`, LAN IP `192.168.2.29`.
+The two cloud integrations (**official Tuya** + **xtend_tuya**, both logged into the Smart
+Life account) are still installed but nothing depends on them. They are kept only as a
+fallback and as the easiest source of the local key. The Voldt is the **only** device on
+that Smart Life account, so removing them would cost nothing else.
+
+```
++------------------+------------------------------------------------------------+
+| Path             | Role                                                        |
++------------------+------------------------------------------------------------+
+| tuya-local (LAN) | LIVE. Every sensor the EV chain uses.                       |
+| Tuya + xtend     | Idle fallback. Same DPs, but hourly and without DP 27.       |
++------------------+------------------------------------------------------------+
+```
+
+### The refresh trick — the whole reason local is better
+
+The Voldt's firmware does **not** keep its power/voltage/current registers up to date. It
+refreshes them only on an internal ~3600 s timer, so `power_total` reads a stale value
+(usually `0`) for up to an hour into a charge. This is a firmware behaviour, not a cloud
+throttle: polling the device directly over the LAN returns the same stale `0`.
+
+The device has a hidden datapoint, **DP 27**, which forces a metering refresh. tuya-local
+exposes it as `button.voldt_ev_cable_refresh`. Pressing it makes the device report real
+power, voltage and current **every ~20 s for about 5 minutes**, then it falls silent again.
+
+```
++---------------------------+-------------------------------------------------+
+| Measured (2026-08-13)     | Two presses gave live windows of 295 s and 281 s |
+|                           |   with 20 s updates (occasional 40 s).          |
++---------------------------+-------------------------------------------------+
+```
+
+**DP 27 is reachable only locally.** It is absent from the device's Tuya cloud
+`status_range` entirely, so no cloud integration can ever press it. That is the real
+reason the cloud route was stuck at hourly power, and the single biggest gain from
+going local.
+
+The automation **"EV cable keep power live"** (`automations.yaml`) presses the button when
+`sensor.voldt_ev_cable_status` becomes `charging` and every 4 minutes while it stays
+charging — comfortably inside the ~5 minute window.
 
 ## Cable-side entities
+
+All `voldt_ev_cable_*` entities come from tuya-local over the LAN.
 
 ```
 +---------------------------------------------+----------------------------------------+
 | Entity                                      | Notes                                  |
 +---------------------------------------------+----------------------------------------+
-| sensor.ev_charger_energy                    | THE energy sensor: Riemann-integrated  |
-|                                             |   from ev_charger_power_estimated (see |
-|                                             |   "Known issue") -> Energy dashboard   |
-|                                             |   "EV Charger (Enyaq)" + all cards     |
-| sensor.voldt_2_4_5g_total_energy            | DEAD - device firmware never updates   |
-|   /_daily_ /_monthly_ /_yearly_ /_balance_  |   its energy counters via cloud (all   |
-|                                             |   stuck at 0; do not use)              |
-| sensor.ev_charger_power_estimated           | THE power sensor (template): cloud     |
-|                                             |   value when fresh; set-current x 230V |
-|                                             |   while charging with a stale 0. Feeds |
-|                                             |   energy integration, Rest Of Home,    |
-|                                             |   dashboard gauges.                    |
-| sensor.voldt_2_4_5g_total_power             | raw cloud power: correct but pushed    |
-|                                             |   only HOURLY (~hh:58) + on session end|
-| sensor.voldt_2_4_5g_single_phase_power      | per-phase power, kW (same cadence)     |
-| sensor.voldt_2_4_5g_work_state              | charger_free / charging / fault ...    |
-| number.voldt_2_4_5g_charging_current        | 8-13 A charge rate control             |
-| select.voldt_2_4_5g_work_mode               | charge_now / schedule / ... - LEAVE ON |
-|                                             |   charge_now; "schedule" blocks        |
+| sensor.ev_charger_energy                    | THE energy sensor: Riemann integral of |
+|                                             |   ev_charger_power_estimated -> Energy |
+|                                             |   dashboard "EV Charger (Enyaq)" + all |
+|                                             |   cards + the four utility_meters.     |
+| sensor.ev_charger_power_estimated           | THE power sensor (template): the local |
+|                                             |   power DP, with a set-current x 230 V |
+|                                             |   fallback for the seconds before the  |
+|                                             |   first refreshed reading. Feeds the   |
+|                                             |   integration, Rest Of Home, gauges.   |
+|                                             |   Name kept for continuity; it is no   |
+|                                             |   longer mostly an estimate.           |
+| sensor.voldt_ev_cable_power                 | raw local power, kW. ~20 s while the   |
+|                                             |   refresh window is open, else frozen. |
+| sensor.voldt_ev_cable_voltage / _current    | V and A, same window. `unknown` until  |
+|                                             |   the first refresh after a restart.   |
+| sensor.voldt_ev_cable_status                | available / plugged_in / waiting /     |
+|                                             |   charging / paused / charged / fault  |
+|                                             |   / fault_unplugged. NOTE the values   |
+|                                             |   differ from the old cloud enum       |
+|                                             |   (charger_charging -> charging).      |
+| sensor.voldt_ev_cable_last_charge           | DP 25: energy of the LAST completed    |
+|                                             |   session, kWh. Accurate (see below)   |
+|                                             |   but only finalised at session end.   |
+| sensor.voldt_ev_cable_energy                | DEAD - lifetime counter, always 0.     |
+| number.voldt_ev_cable_set_current           | 8-13 A charge rate control             |
+| select.voldt_ev_cable_charging_mode         | immediate / charge_to_percent /        |
+|                                             |   fixed_charge / scheduled_charge -    |
+|                                             |   LEAVE ON immediate; scheduled blocks |
 |                                             |   immediate charging                   |
-| switch.voldt_2_4_5g_switch                  | starts/stops the CURRENT session (not  |
+| switch.voldt_ev_cable                       | starts/stops the CURRENT session (not  |
 |                                             |   a device power switch)               |
-| sensor.voldt_2_4_5g_temperature             | internal temp, safety                  |
+| sensor.voldt_ev_cable_temperature           | internal temp, safety                  |
+| button.voldt_ev_cable_refresh               | DP 27. Opens the ~5 min live-metering  |
+|                                             |   window; driven by the keep-alive     |
+|                                             |   automation. Safe to press manually.  |
+| binary_sensor.voldt_ev_cable_problem        | fault bitmask (DP 10) - LOCAL ONLY,    |
+|                                             |   the cloud never exposed it           |
+| sensor.voldt_2_4_5g_*                       | the old cloud entities. Still present, |
+|                                             |   nothing depends on them.             |
 | button.voldt_2_4_5g_clear_energy            | RESETS the lifetime counter - do NOT   |
-|                                             |   press; it breaks dashboard history   |
+|                                             |   press                                |
 +---------------------------------------------+----------------------------------------+
 ```
 
@@ -144,9 +199,10 @@ is real loss — onboard-charger conversion, BMS and 12 V loads, and any precond
 Three design decisions worth knowing:
 
 1. **Gated on the cable, not the car.** The accumulator only counts SoC increases while
-   `sensor.voldt_2_4_5g_work_state` is `charger_charging`. Charging away from home (public
+   `sensor.voldt_ev_cable_status` is `charging`. Charging away from home (public
    AC, DC rapid) raises SoC with no cable energy behind it and would otherwise inflate
-   efficiency past 100%.
+   efficiency past 100%. This gate fails **silently** if that entity is renamed — battery
+   energy would simply stop accumulating. Check it after any integration change.
 2. **Only increases count.** SoC drops — preconditioning, vampire drain — are ignored, not
    subtracted. Energy spent heating the battery therefore shows up honestly as lost.
    Single steps above 10% are discarded as implausible: at ~2.9 kW that is over two hours,
@@ -171,11 +227,12 @@ baseline correction — but it needs a few real charges before it settles. Expec
 | quarter                              | -> "EV Charger (Enyaq)" row in the device      |
 |                                      | breakdown. Costs use the real tariff prices.   |
 |                                      | Data is long-term statistics: kept forever.    |
-| When do charges start and end?       | History page -> sensor.voldt_2_4_5g_work_state |
-|                                      | -> coloured timeline of charger_charging       |
-|                                      | blocks. Raw history kept ~10 days (recorder    |
-|                                      | default); older start/stop times are gone, but |
-|                                      | hourly energy statistics remain forever.       |
+| When do charges start and end?       | History page -> sensor.voldt_ev_cable_status   |
+|                                      | -> coloured timeline of "charging" blocks.     |
+|                                      | Raw history kept ~10 days (recorder default);  |
+|                                      | older start/stop times are gone, but hourly    |
+|                                      | energy statistics remain forever. This entity  |
+|                                      | only has history from 2026-08-13.              |
 | How long do we spend charging?       | sensor.ev_charging_time_today (hours; the      |
 |                                      | "charging day" runs 09:00-09:00 so overnight   |
 |                                      | sessions count whole; long-term stats enabled  |
@@ -200,30 +257,51 @@ baseline correction — but it needs a few real charges before it settles. Expec
 +--------------------------------------+------------------------------------------------+
 ```
 
-`charger_charging` is one of the work_state enum values: charger_free, charger_insert,
-charger_wait, charger_charging, charger_pause, charger_end, charger_fault
-(charger_free_fault). "How long was the car plugged in but NOT charging" could be a
-future history_stats on charger_insert/charger_wait/charger_end if wanted.
+`charging` is one of the `voldt_ev_cable_status` values: available, plugged_in, waiting,
+charging, paused, charged, fault, fault_unplugged. (The old cloud entity used the raw Tuya
+names — charger_free, charger_insert, charger_wait, charger_charging, charger_pause,
+charger_end, charger_fault, charger_free_fault. Anything written before 2026-08-13 that
+compares against those strings is stale.) "How long was the car plugged in but NOT
+charging" could be a future history_stats on plugged_in/waiting/charged if wanted.
 
-## Known issue: the device's own energy counters are dead
+## Known issue: the lifetime energy counter is dead
 
-Verified on the first real charge (2026-08-12, ~3.05 h at ~2.86 kW ≈ 8.7 kWh, confirmed
-against the P1 meter): `work_state` and `total_power` report correctly, but
-`forward_energy_total` (and daily/monthly/yearly/balance) **never left 0** — the firmware
-doesn't maintain or push them. Also, the raw power DP is pushed only **hourly** (at
-~hh:58) plus instantly on session end — so each session's first up-to-60 min would read
-0 kW. Fix, two layers: `sensor.ev_charger_power_estimated` (template in templates.yaml)
-uses the cloud value when fresh and falls back to set-current × 230 V while
-`work_state = charger_charging` with a stale 0; `sensor.ev_charger_energy` (Riemann
-`integration:`, method left, `max_sub_interval` 5 min) integrates that, and everything
-(Energy dashboard entry, Rest Of Home, dashboard cards) points at the estimated pair.
-Accuracy: the estimator ran ~4% high vs the observed 2.86 kW during the fallback hour
-(car pulls slightly under the 13 A pilot) — self-corrects when real values arrive. The first
-charge (8.7 kWh) predated the sensor; it was injected retroactively into the statistics
-(2026-08-13, at the 23:00 hour of 12 Aug — the earliest existing stats row). Deliberate
-side effect, decided acceptable: 12 Aug's HOURLY detail view shows a +9/−9 kWh pair
-(EV vs computed untracked) because the energy sits in a different hour than the grid
-import; all daily/weekly/monthly totals and costs are correct. Do not "fix" it.
+`forward_energy_total` (and daily/monthly/yearly/balance) **never left 0**, verified twice:
+first over the cloud on 2026-08-12 after 8.7 kWh, then again on 2026-08-13 by reading the
+DP directly over the LAN after ~19.8 kWh cumulative. It is dead **in firmware**, not a
+cloud problem, and going local did not fix it. Never press
+`button.voldt_2_4_5g_clear_energy` in the hope of resetting it into life.
+
+So lifetime energy is still integrated (`sensor.ev_charger_energy`, Riemann `integration:`,
+method left, `max_sub_interval` 5 min) from `sensor.ev_charger_power_estimated`. What
+changed is the quality of the input: that template now reads a real power measurement
+every ~20 s instead of an hourly one, so the integral is a measurement rather than the old
+±5% estimate.
+
+**The one energy DP that does work** is DP 25, `sensor.voldt_ev_cable_last_charge` — the
+energy of the last *completed* session. It is accurate, checked against duration × power:
+
+```
++---------------------+----------+----------+-------------+-----------+--------+
+| Session             | Duration | Power    | Expected    | DP 25     | Error  |
++---------------------+----------+----------+-------------+-----------+--------+
+| 20:44:57 - 22:21:34 | 96.6 min | 2.847 kW | 4.58 kWh    | 4.58 kWh  | 0.0 %  |
+| 23:55:42 - 02:12:18 | 136.6 min| 2.87 kW  | 6.53 kWh    | 6.54 kWh  | +0.2 % |
++---------------------+----------+----------+-------------+-----------+--------+
+```
+
+It is **not** used as the energy source, because it only finalises when a session ends —
+it reads `0.01` throughout a session, even locally, even inside a refresh window. Feeding
+the Energy dashboard from it would dump each session's whole kWh into its final hour.
+It is worth keeping as an independent cross-check of the integral.
+
+### The 12 Aug statistics artifact — leave it alone
+
+The first charge (8.7 kWh) predated the energy sensor and was injected retroactively into
+the statistics at the 23:00 hour of 12 Aug. Deliberate, and accepted: 12 Aug's HOURLY
+detail view shows a +9/−9 kWh pair (EV vs computed untracked) because the energy sits in a
+different hour than the grid import. All daily/weekly/monthly totals and costs are
+correct. Do not "fix" it.
 
 Also normal: when the car is left plugged in after finishing, it wakes every ~25–30 min
 for short top-up/balancing draws (10 s–4 min at ~2.2 kW). Each counts as a "session" in
@@ -235,12 +313,26 @@ the lifetime figure rather than a single day's.
 
 ## Caveats
 
-- **Cloud-dependent, both halves**: cable data flows through Tuya's cloud and car data
-  through Skoda's (MQTT push, near-real-time). Internet outage = no data (charging itself
-  is unaffected). Energy is integrated from sparse power updates, so treat kWh as ~±5%
-  (good enough for cost tracking; the grid-truth is always the P1 meter).
+- **The cable half is now local; the car half is still cloud.** An internet outage no
+  longer affects cable energy or cost data at all. Car data still flows through Skoda's
+  cloud (MQTT push). Charging itself is unaffected by either.
+- **The keep-alive automation is load-bearing.** If
+  `automation.ev_cable_keep_power_live` is disabled or broken, power silently reverts to
+  refreshing about once an hour and the energy integral degrades back to an estimate — it
+  will not error, it will just get worse. Check it first if kWh figures start drifting
+  from the P1 meter.
+- Energy is still an integral of sampled power, so it is not perfect — but at ~20 s
+  sampling of a near-constant 2.9 kW load the error is small. The grid-truth is always
+  the P1 meter.
+- **History splits at 2026-08-13.** The cable-side entity IDs changed
+  (`voldt_2_4_5g_work_state` -> `voldt_ev_cable_status`, etc.), so charger-state history,
+  the session timeline and charging-time/session counters start fresh from that date.
+  `sensor.ev_charger_energy` and its statistics were deliberately **not** renamed, so all
+  Energy-dashboard history and cost data is continuous across the cutover.
 - Re-pairing the Voldt into a different app/account changes its device ID and breaks the
-  entity history.
+  entity history; it would also change the local key.
+- If the local key ever stops working (factory reset, re-pair), see "Getting the local
+  key" below — do not go near the Tuya developer platform.
 - **MySkoda's long-term viability is not guaranteed.** It is an unofficial client of the
   phone app's API; there is no Skoda integration in HA core. VW Group is introducing a
   formal third-party access framework requiring app attestation
@@ -257,21 +349,34 @@ the lifetime figure rather than a single day's.
 - Changing the MySkoda account password breaks the integration — reconfigure the config
   entry, no reinstall needed.
 
-## The developer-platform dead end (context)
+## Getting the local key (for reference)
 
-The plan A was **tuya-local** (fully local, no cloud) — it is installed with its
-`voldt_ev_charger` profile ready, but it needs the device's **local key**, and Tuya's
-developer-platform "Link App Account" QR flow failed persistently: scanning the QR (both
-in the Voldt and Smart Life apps, correct data center, IoT Core authorized, Me→Scan
-scanner) made the app open a URL that returned an S3 `AccessDenied`. The same account
-authorized HA's QR login instantly, so the failure is on Tuya's platform side — community
-reports point at account/billing verification requirements for new developer accounts.
+The device's **local key** was never actually hard to obtain — the developer-platform
+route was simply the wrong route.
 
-**Optional future upgrade to local**: if the platform link ever works (retry after
-completing billing verification at iot.tuya.com, project "Voldt cable", Central Europe
-link DC), fetch the local key via API Explorer → "Query Device Details", then add the
-device in the Tuya Local integration (IP `192.168.2.29`, device ID + local key) and swap
-the dashboard/Rest-Of-Home sensors. Until then the cloud route is fully functional.
+Historically the plan was Tuya's developer platform ("Link App Account" QR at
+iot.tuya.com), which failed persistently: scanning the QR in either app, with the correct
+data center and IoT Core authorized, opened a URL returning an S3 `AccessDenied`.
+Community reports blame account/billing verification on new developer accounts. **Do not
+spend time on that route** — it is unnecessary.
+
+The key is already inside Home Assistant. `xtend_tuya` includes it, unredacted, in its
+diagnostics download (HA core's own Tuya integration *does* redact it, which is why this
+is easy to miss):
+
+```sh
+curl -H "Authorization: Bearer $HA_TOKEN" \
+  http://192.168.2.102:8123/api/diagnostics/config_entry/<xtend_tuya_entry_id> \
+  | python3 -c 'import json,sys; print(json.load(sys.stdin)["data"]["devices"][0]["local_key"])'
+```
+
+Other routes that need no developer account, if xtend_tuya is ever removed:
+`vineetchoudhary/tuya-local-key` (docker / CLI / HA add-on), which rides HA's own public
+app registration via the `tuya-device-sharing-sdk` and the same Smart Life QR login that
+already works on this account.
+
+Connection parameters that matter: protocol **3.5**, port 6668, IP `192.168.2.29`
+(static MikroTik lease), device ID `bff9a892e0eb9fa22bwmyp`.
 
 ## Where the config lives
 
@@ -288,10 +393,37 @@ never go looking in Settings → Devices & Services → Helpers for these entiti
 | ev_charger_energy (Riemann),         | /config/configuration.yaml, sensor: block      |
 | ev_charging_time/sessions_today      |                                                |
 | the four utility_meters              | /config/configuration.yaml, utility_meter:     |
-| MySkoda + Tuya credentials           | /config/.storage (never git-tracked)           |
+| "EV cable keep power live"           | /config/automations.yaml (id 1786623900000)    |
+|   (the DP 27 keep-alive)             |                                                |
+| MySkoda + Tuya creds, tuya-local     | /config/.storage (never git-tracked) - the     |
+|   device id + LOCAL KEY              |   local key lives in core.config_entries       |
 | "EV Charging" dashboard              | storage mode - edit via the UI or the          |
-|                                      |   lovelace/config/save websocket command       |
+|   (+ Power, All Devices)             |   lovelace/config/save websocket command       |
 +--------------------------------------+------------------------------------------------+
+```
+
+Consumers that reference the cable entities, and must all be checked together if the
+integration is ever changed again — `grep -rn 'voldt' /config/*.yaml` plus the three
+storage dashboards:
+
+```
++---------------------------------------+-------------------------------------------+
+| Consumer                              | Failure mode if left stale                |
++---------------------------------------+-------------------------------------------+
+| ev_charger_power_estimated (template) | Power reads 0 -> energy stops. Visible.   |
+| ev_battery_energy_gained (condition)  | SILENT. Battery energy just stops         |
+|                                       |   accumulating; efficiency drifts up.     |
+| ev_charging_time/sessions_today       | SILENT. Counters sit at 0.                |
+|   (history_stats, entity + state)     |                                           |
+| Rest Of Home subtract_entities        | Points at the template, not the raw DP -  |
+|                                       |   needs no change.                        |
+| Energy dashboard "EV Charger (Enyaq)" | Points at sensor.ev_charger_energy -      |
+|                                       |   needs no change.                        |
+| the four utility_meters               | Point at ev_charger_energy /              |
+|                                       |   ev_battery_energy_gained - no change.   |
+| dashboards: ev-charging, power,       | Cards show "Entity not available".        |
+|   all-devices                         |   Visible.                                |
++---------------------------------------+-------------------------------------------+
 ```
 
 Editing procedure: `ssh john@192.168.2.102`, edit under `sudo`, then **always**
@@ -308,11 +440,13 @@ sudo env GIT_SSH_COMMAND="ssh -i /config/.git-ssh/id_deploy \
 
 ## Related
 
-- `192.168.2.29` (MAC `d8:fc:92:93:f5:7d`) is a **static lease on the MikroTik** as of
-  2026-08-13, so the cable's address is now safe to hard-code — which is what the
-  tuya-local upgrade below needs.
+- `192.168.2.29` (MAC `d8:fc:92:93:f5:7d`) is a **static lease on the MikroTik**, which is
+  what makes the hard-coded tuya-local host safe.
 - Cheap-tariff charging automation idea: trigger on `sensor.p1_meter_tariff`, act on
-  `switch.voldt_2_4_5g_switch` + `number.voldt_2_4_5g_charging_current`. Now that the car
+  `switch.voldt_ev_cable` + `number.voldt_ev_cable_set_current`. Now that the car
   side exists, `number.skoda_enyaq_charge_limit` is the gentler lever — cap the target SoC
   instead of interrupting the session.
+- Possible cleanup: the official Tuya and xtend_tuya integrations now serve no purpose
+  (the Voldt is the only device on that account). Removing them would drop ~14 permanently
+  dead entities. Kept for now as a fallback path and as the simplest local-key source.
 - Energy monitoring architecture: `home_assistant_energy.md`.
