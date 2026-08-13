@@ -41,6 +41,11 @@ report kWh drawn from the wall.
 | Dashboard cards "not available"    | Cable entity renamed. Visible, so easy.          |
 | Lifetime energy sensor reads 0     | Expected. DP 1 is dead in firmware. Not a bug,   |
 | (sensor.voldt_ev_cable_energy)     |   and it is not the sensor anything uses.        |
+| Cable temperature looks high while | Expected. Temperature, voltage and current only  |
+| the cable is idle and cool         |   refresh inside a refresh window, so between    |
+|                                    |   charges they FREEZE at their end-of-charge     |
+|                                    |   values. A cooling cable still reads hot. Only  |
+|                                    |   trust these DURING a charge.                   |
 | Want to check the energy figures   | Compare sensor.voldt_ev_cable_last_charge (the   |
 | are actually right                 |   device's own meter) against the rise in        |
 |                                    |   sensor.ev_charger_energy over that session.    |
@@ -129,6 +134,8 @@ All `voldt_ev_cable_*` entities come from tuya-local over the LAN.
 |                                             |   refresh window is open, else frozen. |
 | sensor.voldt_ev_cable_voltage / _current    | V and A, same window. `unknown` until  |
 |                                             |   the first refresh after a restart.   |
+|                                             |   Frozen at end-of-charge values while |
+|                                             |   idle - only trust during a charge.   |
 | sensor.voldt_ev_cable_status                | available / plugged_in / waiting /     |
 |                                             |   charging / paused / charged / fault  |
 |                                             |   / fault_unplugged. NOTE the values   |
@@ -145,7 +152,9 @@ All `voldt_ev_cable_*` entities come from tuya-local over the LAN.
 |                                             |   immediate charging                   |
 | switch.voldt_ev_cable                       | starts/stops the CURRENT session (not  |
 |                                             |   a device power switch)               |
-| sensor.voldt_ev_cable_temperature           | internal temp, safety                  |
+| sensor.voldt_ev_cable_temperature           | internal temp. Same refresh-window     |
+|                                             |   staleness as voltage/current. Around |
+|                                             |   53 C at 13 A is normal (40 C idle).  |
 | button.voldt_ev_cable_refresh               | DP 27. Opens the ~5 min live-metering  |
 |                                             |   window; driven by the keep-alive     |
 |                                             |   automation. Safe to press manually.  |
