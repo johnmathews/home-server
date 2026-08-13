@@ -35,3 +35,11 @@ family_finances_port: 8080
 # registration, which is the safe direction and the tested one
 # (family-finances docs/adr/0016-invite-only-registration.md).
 family_finances_signup_code: "{{ vault_family_finances_signup_code }}"
+
+# ghcr credentials. The family-finances repository is private, so its packages
+# are private too — unlike library or sre-agent, whose repositories are public
+# and whose images therefore disclose nothing by being pullable. The image
+# carries the backend's Python source, so it stays private and the guest
+# authenticates instead.
+family_finances_ghcr_user: johnmathews
+family_finances_ghcr_token: "{{ vault_family_finances_ghcr_token }}"

@@ -60,6 +60,16 @@
   tags: docker
   notify: Restart all containers
 
+- name: Log in to ghcr so the private images can be pulled
+  community.docker.docker_login:
+    registry_url: ghcr.io
+    username: "{{ family_finances_ghcr_user }}"
+    password: "{{ family_finances_ghcr_token }}"
+    reauthorize: true
+  become: false
+  no_log: true
+  tags: docker
+
 - name: Converge the stack
   community.docker.docker_compose_v2:
     project_src: "{{ family_finances_docker_compose_dir }}"
