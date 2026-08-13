@@ -28,7 +28,8 @@ makefile                 every Ansible call has $(VAULT) = --vault-password-file
 
 ## What's in the Vault
 
-Roughly 50 secrets, organised by service. Examples (names only — actual values are encrypted):
+145 `vault_*` secrets as of 2026-08-13, organised by service. Examples (names only — actual
+values are encrypted):
 
 | Category        | Examples                                                             |
 | --------------- | -------------------------------------------------------------------- |
@@ -43,8 +44,17 @@ Roughly 50 secrets, organised by service. Examples (names only — actual values
 | Tailscale       | `vault_tailscale_auth_key`                                           |
 | Key server      | `vault_key_server_auth_token`                                        |
 | Immich          | `vault_immich_db_password`, `vault_immich_key`                       |
+| Home Assistant  | `vault_home_assistant_token`, `vault_home_connect_client_id/_secret` |
 
-The convention is `vault_<service>_<purpose>`. To see the full list:
+The convention is `vault_<service>_<purpose>`. Most entries are consumed directly as
+`{{ vault_* }}` in role templates — there is no indirection layer in `group_vars/all/main.yml`.
+
+**Not every entry is used by Ansible.** `vault_home_connect_client_id` / `_secret` are stored
+for **disaster recovery only**: Home Assistant is not managed by this repo, and it keeps those
+credentials in `.storage`, which is gitignored. Without a copy here, a from-scratch HA rebuild
+would mean re-registering the application at developer.home-connect.com.
+
+To see the full list:
 
 ```sh
 ansible-vault view group_vars/all/vault.yml --vault-password-file=.vault_pass.txt | grep -E '^\w+:'
