@@ -27,8 +27,12 @@ as a general trick for any Tuya device already paired to HA via xtend_tuya.
 Local access: protocol **3.5**, port 6668, 238/238 polls over 12 min with zero errors.
 The local connection coexists happily with the cloud one — both were live throughout.
 
-Three DPs exist locally that the Tuya cloud never exposes at all: **DP 10** (fault
-bitmask), **DP 23** (firmware, V4.1.6) and **DP 27**.
+**Four** DPs exist locally that the Tuya cloud never declares: **DP 6** (voltage +
+current + power in one base64 blob), **DP 10** (fault bitmask), **DP 23** (firmware,
+V4.1.6) and **DP 27**. Conversely the cloud declares three — 5, 16, 17 — that the device
+never returns. Most pointed of all: the cloud advertises DP 5 (`sigle_phase_power`,
+permanently 0) while hiding DP 6, which actually works. Full reconciliation table in
+`documentation/home_assistant_ev_charging.md`.
 
 Two firmware facts, both verified rather than assumed:
 

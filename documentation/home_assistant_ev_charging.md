@@ -68,12 +68,63 @@ path for any sensor that matters.
 
 > **"DP" = datapoint.** Tuya models every device as a set of numbered, typed datapoints —
 > that is the entire protocol surface, over both the cloud API and the LAN. Each HA entity
-> is a mapping of one DP. On this device: DP 1 lifetime energy (integer, ÷100 = kWh, dead),
-> DP 3 work state (enum), DP 4 set current (integer A), DP 6 voltage/current/power packed
-> into a base64 blob, DP 9 power (integer, ÷1000 = kW), DP 10 fault bitmask, DP 14 work
-> mode (enum), DP 18 the session switch (boolean — this one drives a contactor), DP 24
-> temperature (integer °C), DP 25 last-session energy (integer, ÷100 = kWh), DP 27 the
-> metering refresh command. Numbers, not names, are what the protocol addresses.
+> is a mapping of one DP. Numbers, not names, are what the protocol addresses.
+
+### The full datapoint map
+
+Enumerated 2026-08-13 by read-only local queries, reconciled against what the Tuya cloud
+declares (`local_strategy` in the xtend_tuya diagnostics) and what tuya-local's
+`voldt_ev_charger` profile maps.
+
+```
++-----+---------+--------+----------+--------------------------------------------------+
+| DP  | device  | cloud  | profile  | What it is                                       |
++-----+---------+--------+----------+--------------------------------------------------+
+|  1  |  yes    |  yes   |  yes     | forward_energy_total, /100 = kWh. DEAD - always  |
+|     |         |        |          |   0, in firmware, not just over the cloud.       |
+|  3  |  yes    |  yes   |  yes     | work_state (enum) -> sensor..._status            |
+|  4  |  yes    |  yes   |  yes     | charge_cur_set, A -> number..._set_current       |
+|  5  |   -     |  yes   |   -      | sigle_phase_power. Cloud declares it; the device |
+|     |         |        |          |   never returns it, and it read 0 via the cloud. |
+|  6  |   -     |   -    |  yes     | voltage + current + power packed into one base64 |
+|     |         |        |          |   blob. NOT declared by the cloud. Appears only  |
+|     |         |        |          |   during a session. The working power source.    |
+|  9  |  yes    |  yes   |  yes     | power_total, /1000 = kW -> sensor..._power       |
+| 10  |  yes    |   -    |  yes     | fault bitmask. NOT declared by the cloud.        |
+|     |         |        |          |   -> binary_sensor..._problem                    |
+| 14  |  yes    |  yes   |  yes     | work_mode (enum) - keep on immediate             |
+| 15  |  yes    |  yes   |   -      | balance_energy. Dead (always 0); the profile     |
+|     |         |        |          |   deliberately leaves it unmapped.               |
+| 16  |   -     |  yes   |   -      | clear_energy. Declared, never returned locally.  |
+| 17  |   -     |  yes   |   -      | energy_charge. Declared, never returned locally. |
+| 18  |  yes    |  yes   |  yes     | switch -> switch.voldt_ev_cable. DRIVES A        |
+|     |         |        |          |   CONTACTOR. Never put this on a timer.          |
+| 22  |   -     |   -    |  yes     | software_version. Profile maps it; absent here.  |
+| 23  |  yes    |   -    |  yes     | firmware version, "V4.1.6". NOT declared by the  |
+|     |         |        |          |   cloud.                                         |
+| 24  |  yes    |  yes   |  yes     | temp_current, integer C -> sensor..._temperature |
+| 25  |  yes    |  yes   |  yes     | charge_energy_once, /100 = kWh. Accurate         |
+|     |         |        |          |   per-session meter; finalises at session end.   |
+| 27  |  yes    |   -    |  yes     | metering refresh / link state. NOT declared by   |
+|     |         |        |          |   the cloud - the DP this whole migration is     |
+|     |         |        |          |   about. -> button..._refresh                    |
++-----+---------+--------+----------+--------------------------------------------------+
+```
+
+Three things worth drawing out:
+
+- **Four DPs (6, 10, 23, 27) are invisible to the Tuya cloud.** They are absent from the
+  device's declared `status_range`, so no cloud integration can read or write them at any
+  price. DP 27 is the one that matters; DP 6 and DP 10 are useful bonuses.
+- **The cloud advertises a broken power DP and hides the working one.** It declares DP 5
+  (`sigle_phase_power`, permanently 0) and never mentions DP 6, which carries real
+  voltage, current and power together.
+- **Three DPs (5, 16, 17) are declared but never returned.** Do not build on them.
+
+A press of `button..._refresh` writes the string `online` to DP 27. The value sticks — it
+reads back `online` afterwards — and re-writing the same value still triggers a refresh,
+so the automations do not need to toggle it. Caveat on completeness: the enumeration only
+sees DPs the device volunteers in a status query, so a write-only DP would not appear.
 
 Device ID `bff9a892e0eb9fa22bwmyp`, MAC `d8:fc:92:93:f5:7d`, LAN IP `192.168.2.29`
 (static lease), protocol 3.5, firmware V4.1.6. The tuya-local config entry is named
