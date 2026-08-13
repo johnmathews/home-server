@@ -123,6 +123,33 @@ sensor.ev_charger_energy  7.884 kWh @ 14:54:19 -> 8.577 kWh @ 15:08:42
 
 `automation.ev_cable_keep_power_live` confirmed firing on the /4 boundary.
 
+### Session end, observed (the last unverified link)
+
+John disconnected at 15:26:19. DP 25 finalised **in the same second** the status left
+`charging` — 0.01 → 3.18 kWh — so the "finalises at session end" behaviour holds locally,
+not just over the cloud. The automation stopped pressing immediately (13:24 UTC was the
+last press; the 13:28 tick was correctly blocked by the `charging` condition).
+
+That gave the first independent audit of the integral, device meter vs Riemann:
+
+```
++----------------------------------+-----------+------------+
+| Source                           | Session   | Mean power |
++----------------------------------+-----------+------------+
+| DP 25 (device meter)             | 3.18 kWh  | 2871 W     |
+| sensor.ev_charger_energy delta   | 3.120 kWh | 2816 W     |
++----------------------------------+-----------+------------+
+```
+
+1.9% low — and bucketing the integral into 5-minute windows puts the **entire** deficit in
+14:49–14:54, which is exactly when HA was restarted mid-session to load the new YAML.
+Every other window implies 2885–2889 W against a directly measured 2896 W (<0.5%). So the
+chain is sound and the gap was self-inflicted by the migration itself; a session without a
+restart should agree far more closely. Worth re-checking on the next clean session.
+
+Useful consequence: DP 25 is now a standing post-hoc audit of the integral. A persistent
+multi-percent gap would indicate the keep-alive automation is missing windows.
+
 ## Gotchas recorded
 
 - The keep-alive automation is **load-bearing and fails quietly**. If it stops, power

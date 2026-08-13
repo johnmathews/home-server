@@ -41,6 +41,10 @@ report kWh drawn from the wall.
 | Dashboard cards "not available"    | Cable entity renamed. Visible, so easy.          |
 | Lifetime energy sensor reads 0     | Expected. DP 1 is dead in firmware. Not a bug,   |
 | (sensor.voldt_ev_cable_energy)     |   and it is not the sensor anything uses.        |
+| Want to check the energy figures   | Compare sensor.voldt_ev_cable_last_charge (the   |
+| are actually right                 |   device's own meter) against the rise in        |
+|                                    |   sensor.ev_charger_energy over that session.    |
+|                                    |   See "Use DP 25 to audit the integral".         |
 | 12 Aug shows a +9/-9 kWh hourly    | Known, accepted, cosmetic. Do NOT "fix" it.      |
 | pair in the Energy dashboard       |                                                  |
 +------------------------------------+--------------------------------------------------+
@@ -318,6 +322,32 @@ energy of the last *completed* session. It is accurate, checked against duration
 | 23:55:42 - 02:12:18 | 136.6 min| 2.87 kW  | 6.53 kWh    | 6.54 kWh  | +0.2 % |
 +---------------------+----------+----------+-------------+-----------+--------+
 ```
+
+Under tuya-local it finalises **instantly** at session end — verified 2026-08-13 15:26:19,
+where it jumped 0.01 -> 3.18 kWh in the same second the status left `charging`.
+
+### Use DP 25 to audit the integral
+
+Because DP 25 is the device's own meter, it is an independent check on the Riemann
+integral. First comparison, for the 66.5 min session ending 15:26:19:
+
+```
++----------------------------------+-----------+------------------------------------+
+| Source                           | Session   | Mean power                         |
++----------------------------------+-----------+------------------------------------+
+| DP 25 (device meter)             | 3.18 kWh  | 2871 W                             |
+| sensor.ev_charger_energy delta   | 3.120 kWh | 2816 W                             |
++----------------------------------+-----------+------------------------------------+
+| Integral runs 1.9 % low                                                           |
++-----------------------------------------------------------------------------------+
+```
+
+The gap is **not** a design flaw: bucketing the integral into 5-minute windows puts the
+entire deficit in one window, 14:49-14:54, which is exactly when Home Assistant was
+restarted mid-session. Every other window implies 2885-2889 W against a directly measured
+2896 W — better than 0.5 %. Expect near-exact agreement on a session with no restart, and
+treat a persistent multi-percent gap as a signal that the keep-alive automation is
+missing windows.
 
 It is **not** used as the energy source, because it only finalises when a session ends —
 it reads `0.01` throughout a session, even locally, even inside a refresh window. Feeding
