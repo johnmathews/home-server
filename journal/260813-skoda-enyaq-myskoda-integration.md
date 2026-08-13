@@ -66,6 +66,9 @@ ratio.
 1. **Gated on the cable, not the car.** The accumulator only counts while
    `sensor.voldt_2_4_5g_work_state == charger_charging`. Without this, a public or DC
    charge would raise SoC with no cable energy behind it and push efficiency past 100%.
+   (Later the same day this became `sensor.voldt_ev_cable_status == 'charging'` — both the
+   entity and the enum value changed with the tuya-local migration. See
+   [260813-ev-charger-tuya-local-migration.md](260813-ev-charger-tuya-local-migration.md).)
 2. **Only increases count**, and single steps above 10% are discarded (at ~2.9 kW that is
    two hours — beyond any plausible polling gap). SoC drops from preconditioning are
    ignored rather than subtracted, so energy spent heating the battery correctly reads as

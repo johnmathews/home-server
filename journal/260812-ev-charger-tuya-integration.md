@@ -1,5 +1,11 @@
 # 2026-08-12 — EV charger (Voldt granny cable) into Home Assistant
 
+> **Superseded on 2026-08-13** by
+> [260813-ev-charger-tuya-local-migration.md](260813-ev-charger-tuya-local-migration.md).
+> The cable now runs on **tuya-local**, entities are `*.voldt_ev_cable_*`, and the
+> "developer-platform dead end" below was a false blocker — the local key was in
+> xtend_tuya's diagnostics all along. Kept as the record of the cloud route.
+
 Goal: track Skoda Enyaq charging (energy, cost, session times) from the Voldt Type 2
 granny cable (WiFi, Tuya white-label, category `qccdz`).
 

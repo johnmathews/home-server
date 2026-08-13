@@ -8,18 +8,47 @@ Energy dashboard as **"EV Charger (Enyaq)"**.
 There are two independent halves, and the distinction matters constantly:
 
 ```
-+-------------+---------------------------+---------------------------------------------+
-| Half        | Source                    | Measures                                    |
-+-------------+---------------------------+---------------------------------------------+
++-------------+---------------------------+----------------------------------------------+
+| Half        | Source                    | Measures                                     |
++-------------+---------------------------+----------------------------------------------+
 | Cable side  | Voldt charger, LAN        | Energy leaving the wall. Feeds the Energy    |
 |             |   (tuya-local)            |   dashboard and all cost figures.            |
 | Car side    | Skoda Enyaq, MySkoda      | State of charge, range, odometer, plug and   |
 |             |   cloud (HACS)            |   charging state. Feeds the efficiency calc. |
-+-------------+---------------------------+---------------------------------------------+
++-------------+---------------------------+----------------------------------------------+
 ```
 
 Neither can replace the other: the cable does not know the battery, and the car does not
 report kWh drawn from the wall.
+
+## If something looks wrong, start here
+
+```
++------------------------------------+--------------------------------------------------+
+| Symptom                            | Most likely cause                                |
++------------------------------------+--------------------------------------------------+
+| EV kWh drifting from the P1 meter, | automation.ev_cable_keep_power_live is off or    |
+| or power flat at one value for     |   broken. It presses DP 27 every 4 min while     |
+| ~an hour at a time                 |   charging; without it the firmware only         |
+|                                    |   refreshes power ~hourly. FAILS SILENTLY -      |
+|                                    |   check this FIRST. See "The refresh trick".     |
+| Battery-side energy stopped, or    | sensor.ev_battery_energy_gained is gated on      |
+| efficiency creeping upward         |   sensor.voldt_ev_cable_status == 'charging'.    |
+| toward 100%                        |   Renaming that entity, OR changing the enum     |
+|                                    |   value, breaks it SILENTLY.                     |
+| Charging time / session counters   | Same entity + same enum value, via the two       |
+| stuck at 0                         |   history_stats sensors. Also silent.            |
+| Dashboard cards "not available"    | Cable entity renamed. Visible, so easy.          |
+| Lifetime energy sensor reads 0     | Expected. DP 1 is dead in firmware. Not a bug,   |
+| (sensor.voldt_ev_cable_energy)     |   and it is not the sensor anything uses.        |
+| 12 Aug shows a +9/-9 kWh hourly    | Known, accepted, cosmetic. Do NOT "fix" it.      |
+| pair in the Energy dashboard       |                                                  |
++------------------------------------+--------------------------------------------------+
+```
+
+Two things never to do: press `button.voldt_2_4_5g_clear_energy` (resets the lifetime
+counter), and set the charging mode to anything but `immediate` (`scheduled_charge`
+blocks charging outright).
 
 ## How the cable side works
 
@@ -38,12 +67,12 @@ fallback and as the easiest source of the local key. The Voldt is the **only** d
 that Smart Life account, so removing them would cost nothing else.
 
 ```
-+------------------+------------------------------------------------------------+
-| Path             | Role                                                        |
-+------------------+------------------------------------------------------------+
-| tuya-local (LAN) | LIVE. Every sensor the EV chain uses.                       |
-| Tuya + xtend     | Idle fallback. Same DPs, but hourly and without DP 27.       |
-+------------------+------------------------------------------------------------+
++------------------+-------------------------------------------------------+
+| Path             | Role                                                  |
++------------------+-------------------------------------------------------+
+| tuya-local (LAN) | LIVE. Every sensor the EV chain uses.                 |
+| Tuya + xtend     | Idle fallback. Same DPs, hourly, and no DP 27.        |
++------------------+-------------------------------------------------------+
 ```
 
 ### The refresh trick — the whole reason local is better
@@ -58,10 +87,10 @@ exposes it as `button.voldt_ev_cable_refresh`. Pressing it makes the device repo
 power, voltage and current **every ~20 s for about 5 minutes**, then it falls silent again.
 
 ```
-+---------------------------+-------------------------------------------------+
++---------------------------+--------------------------------------------------+
 | Measured (2026-08-13)     | Two presses gave live windows of 295 s and 281 s |
-|                           |   with 20 s updates (occasional 40 s).          |
-+---------------------------+-------------------------------------------------+
+|                           |   with 20 s updates (occasional 40 s).           |
++---------------------------+--------------------------------------------------+
 ```
 
 **DP 27 is reachable only locally.** It is absent from the device's Tuya cloud
