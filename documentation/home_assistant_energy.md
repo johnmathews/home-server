@@ -260,6 +260,16 @@ positive gaps. Cosmetic, already accepted, ages out of any recent window.
 |    |   has been charged, sanity-check sensor.ev_charging_efficiency   | efficiency     |
 |    |   against the expected mid-80s%; a wildly-off figure means the   |                |
 |    |   58 kWh pack constant or the work_state gating needs revisiting |                |
+| 9  | OPEN: after the next charge that runs with NO Home Assistant     | confirm the    |
+|    |   restart mid-session, compare sensor.voldt_ev_cable_last_charge | energy figures |
+|    |   (the device's own meter, finalised at session end) against the |                |
+|    |   rise in sensor.ev_charger_energy over that same session.       |                |
+|    |   First attempt 2026-08-13 gave 3.18 vs 3.120 kWh = integral     |                |
+|    |   1.9% low, with the whole deficit in the 5-min window where HA  |                |
+|    |   was restarted to load new YAML - so "the restart caused it" is |                |
+|    |   STRONGLY SUPPORTED, not confirmed. Expect <0.5% on a clean     |                |
+|    |   run. A persistent multi-percent gap instead means              |                |
+|    |   automation.ev_cable_keep_power_live is missing refresh windows |                |
 +----+------------------------------------------------------------------+----------------+
 ```
 
