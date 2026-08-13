@@ -9,6 +9,8 @@ cloud-images/
 *.pem
 credentials.json
 *.retry
+# Claude Code worktrees live here. Never commit a worktree into the repo.
+.claude/worktrees/
 sabnzbd.ini.j2
 collections/
 *.secret
