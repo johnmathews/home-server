@@ -21,3 +21,9 @@ __pycache__/
 htmlcov/
 .pytest_cache/
 .playwright-mcp/
+
+# The ansible virtualenv is local build state, never repo content. It was once
+# committed as a symlink pointing at itself, which made every path under it
+# ELOOP and broke `make <host>` for anyone who checked the repo out.
+.venv/
+.venv
