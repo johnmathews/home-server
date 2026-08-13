@@ -209,8 +209,11 @@ the flow driven headlessly (`POST /api/config/config_entries/flow`, handler `hom
 which returns an `external` step whose `url` John opened to approve. The Cloudflare Zero
 Trust Access redirect was **not** a problem in practice.
 
-Config entry `01KZXXREB7PXKJ5EWDD0B4XPRY`, state `loaded`. Credentials are stored in HA's
-`.storage` (not tracked in git, not in the Ansible vault).
+Config entry `01KZXXREB7PXKJ5EWDD0B4XPRY`, state `loaded`. HA keeps the credentials in its
+`.storage` (gitignored). A copy also lives in the Ansible vault as
+`vault_home_connect_client_id` / `vault_home_connect_client_secret` — **for disaster recovery
+only**, since nothing in this repo consumes them; without it, rebuilding HA from scratch would
+mean re-registering the application at developer.home-connect.com.
 
 **17 entities**, device "Dishwasher" (Bosch SMV6YCX00E):
 
