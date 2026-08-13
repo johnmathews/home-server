@@ -78,19 +78,43 @@ manufacturer nominals, with a known error instead of an assumed one.
    setting we want (relay closes unconditionally after a cut); `restore` would have been
    wrong, since it reinstates the pre-cut state.
 
+7. **Home Connect integration went live the same session.** John registered the developer
+   app; credentials added via `application_credentials/create` over WebSocket, then the
+   config flow driven headlessly (`POST /api/config/config_entries/flow`, handler
+   `home_connect`) — it returns an `external` step whose `url` John opened to approve.
+   Entry `01KZXXREB7PXKJ5EWDD0B4XPRY`, state `loaded`, **17 entities**. The Cloudflare Zero
+   Trust redirect worried me beforehand and turned out to be a non-issue.
+
+   Appliance identified as a **Bosch SMV6YCX00E** (Series 6, 60 cm, 14 place settings).
+   Confirmed: **no energy entity** among the 17, exactly as predicted.
+
+### The label figures sharpen the earlier argument
+
+The model's EU label reads **65 kWh/100 cycles (0.65 kWh eco), 9.5 L, 3:55, class B**. My
+rejection of the static-lookup approach had been computed against a *guessed* ~0.92 kWh
+cycle and 9 L. Redone with the real figures the case is stronger, not weaker: 9.5 L across
+an 8→18 °C inlet swing is a 0.111 kWh spread, which is **17.1% of a 0.65 kWh cycle** (±8.5%
+about the mean) rather than 11.4%. Even assuming only ~7 L reaches full temperature it is
+12.6%.
+
+The general point is worth remembering: *the lower a cycle's total energy, the larger the
+same absolute seasonal swing looms in relative terms.* Guessing the cycle high made the
+lookup approach look better than it is.
+
 ## Still open
 
 - **Check Rest Of Home during the first real cycle.** Everything so far was verified with the
   dishwasher idle at 0 W; the interesting case is ~2 kW of heating element, where a unit or
   sign error would show as the untracked line dipping sharply negative.
-- **Home Connect integration**, blocked on John registering a developer app at
-  developer.home-connect.com (Single User Mode, Authorization Code Grant Flow, redirect
-  `https://my.home-assistant.io/redirect/oauth`, testing-account email **all lowercase**)
-  and handing over Client ID + Secret. Steps written up in the new doc. Likely snag: the
-  OAuth redirect passes through `home.itsa-pizza.com` behind Cloudflare Zero Trust Access.
-- **Per-cycle attribution**, deliberately not built. Once Home Connect lands, its
-  `operation_state` transitions give clean cycle boundaries; combined with plug kWh that
-  produces per-program measured constants. First job is calibration over 4–6 weeks.
+- **Per-cycle attribution**, deliberately not built — the design was never presented in
+  detail, so it needs John's sign-off first. `sensor.dishwasher_operation_state` and
+  `select.dishwasher_active_programme` are the inputs; combined with plug kWh they give
+  per-program measured constants over a 4–6 week calibration window.
+- **First calibration cycle is already queued**: at the moment the integration came up the
+  machine was sitting in `delayedstart` with `dishcare_dishwasher_program_eco_50` selected,
+  finishing 20:14 UTC. Even without attribution built, that cycle is reconstructable after
+  the fact from the plug's statistics over the run window — measured vs. the 0.65 kWh label
+  figure.
 
 ## Notes for next time
 

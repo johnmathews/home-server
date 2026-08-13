@@ -1,11 +1,27 @@
 # Home Assistant — Dishwasher (Bosch / Home Connect)
 
-**Status:** as of 2026-08-13, energy tracking is **live** (plug reconnected and verified).
-Home Connect integration still awaiting developer credentials.
+**Status:** complete as of 2026-08-13. Energy tracking live via the metering plug, Home
+Connect integration live for cycle/program data. Per-cycle attribution not yet built.
 
-Bosch dishwasher, replaced ~May 2026, controlled day-to-day through the Bosch Home Connect
-phone app. This doc covers how it is monitored from Home Assistant and — importantly — why
-energy tracking does **not** come from the appliance itself.
+Bosch **SMV6YCX00E** (Series 6, fully integrated, 60 cm, 14 place settings), installed
+~May 2026, controlled day-to-day through the Bosch Home Connect phone app. This doc covers
+how it is monitored from Home Assistant and — importantly — why energy tracking does **not**
+come from the appliance itself.
+
+Rated figures from the EU energy label, useful as the benchmark to measure against:
+
+```
++--------------------------------------+--------------------------------------+
+| Energy efficiency class              | B                                    |
+| Eco programme energy                 | 65 kWh / 100 cycles = 0.65 kWh/cycle |
+| Eco programme water                  | 9.5 L per cycle                      |
+| Eco programme duration               | 3:55                                 |
++--------------------------------------+--------------------------------------+
+```
+
+Remember these are EU test-bench conditions — 15 °C inlet, standard load and soil. Real
+consumption is expected to differ; quantifying that gap is the point of the calibration
+period below.
 
 See also: `home_assistant_energy.md` (the wider energy setup this feeds into).
 
@@ -47,18 +63,27 @@ The obvious workaround — hard-code "eco = 1.1 kWh, super quick = 2.0 kWh" from
 was evaluated on 2026-08-13 against a ±5% accuracy target and rejected.
 
 The dominant term in a cycle is heating water, `E = m·c·ΔT`, and Dutch mains inlet
-temperature swings seasonally from ~8 °C to ~18 °C:
+temperature swings seasonally from ~8 °C to ~18 °C. Using this model's real label figures
+(9.5 L, 0.65 kWh eco):
 
 ```
 +------------------+---------+---------+------------------+-------------------+
 | Condition        | Inlet   | Delta T | Heating energy   | vs. annual mean   |
 +------------------+---------+---------+------------------+-------------------+
-| Deep winter      |  8 deg C|  42 K   | 0.44 kWh         | +5.7%             |
-| Late summer      | 18 deg C|  32 K   | 0.34 kWh         | -5.7%             |
+| Deep winter      |  8 deg C|  42 K   | 0.46 kWh         | +8.5%             |
+| Late summer      | 18 deg C|  32 K   | 0.35 kWh         | -8.5%             |
 +------------------+---------+---------+------------------+-------------------+
-| ~9 L heated to 50 deg C; spread is 0.105 kWh = 11.4% of a 0.92 kWh cycle    |
+| 9.5 L heated to 50 deg C; spread 0.111 kWh = 17.1% of a 0.65 kWh eco cycle  |
 +-----------------------------------------------------------------------------+
 ```
+
+Upper bound, since the cold pre-rinse is not heated to full temperature — if only ~7 L
+reaches 50 °C the spread is 0.082 kWh, still **12.6%** of the cycle. Either way the seasonal
+term alone is two to three times the ±5% budget.
+
+Note this is *worse* than a first estimate against a guessed ~0.92 kWh cycle suggested: the
+lower the real cycle energy, the larger the same absolute seasonal swing looms in relative
+terms.
 
 That alone exceeds the ±5% budget, and it is a **systematic seasonal bias, not noise** —
 winter always reads high, summer always low, so it does not average out over a month.
@@ -128,7 +153,7 @@ Check after the first full cycle that the untracked line does not dip sharply ne
 - **Check the rating plate.** Nous plugs are rated 16 A / 3680 W; a dishwasher heating
   element is typically ~2.2 kW, so there is headroom, but confirm before relying on it.
 
-## Home Connect integration (pending)
+## Home Connect integration (live 2026-08-13)
 
 Chosen route: the **official cloud `home_connect` integration**. Rationale — energy already
 comes from the plug locally, so the cloud dependency only affects cycle labelling and
@@ -140,7 +165,7 @@ is the only route that could *possibly* surface richer local data points. It was
 more moving parts for secondary value; hcpy is unofficial and periodically breaks when
 Bosch changes their login flow.
 
-### Setup steps (blocked on John)
+### Setup steps (completed 2026-08-13)
 
 At <https://developer.home-connect.com>:
 
@@ -154,14 +179,40 @@ At <https://developer.home-connect.com>:
 4. Note the **Client ID** and **Client Secret**.
 5. **Log out** of the developer portal before continuing.
 
-Then the credentials go into HA's application credentials and the `home_connect` config
-flow runs. The OAuth redirect passes through `home.itsa-pizza.com`, which sits behind
-Cloudflare Zero Trust Access — approving from a browser already authenticated to Access
-should pass, but this is the most likely snag point.
+The credentials were registered via the `application_credentials/create` WebSocket call and
+the flow driven headlessly (`POST /api/config/config_entries/flow`, handler `home_connect`),
+which returns an `external` step whose `url` John opened to approve. The Cloudflare Zero
+Trust Access redirect was **not** a problem in practice.
 
-Expected entities for a dishwasher: operation state, door state, program progress, finish
-time, active/selected program, remote-control and remote-start binary sensors, power and
-child-lock switches. **No energy sensor** — see above.
+Config entry `01KZXXREB7PXKJ5EWDD0B4XPRY`, state `loaded`. Credentials are stored in HA's
+`.storage` (not tracked in git, not in the Ansible vault).
+
+**17 entities**, device "Dishwasher" (Bosch SMV6YCX00E):
+
+```
++-------------------------------------------------+---------------------------------+
+| binary_sensor.dishwasher_connectivity           | on                              |
+| binary_sensor.dishwasher_remote_control         | remote control allowed          |
+| binary_sensor.dishwasher_remote_start           | remote start allowed            |
+| button.dishwasher_stop_programme                | stop the running programme      |
+| number.dishwasher_start_in_relative             | delayed start, seconds          |
+| select.dishwasher_active_programme              | e.g. dishcare_dishwasher_       |
+| select.dishwasher_selected_programme            |   program_eco_50                |
+| sensor.dishwasher_door                          | open / closed                   |
+| sensor.dishwasher_operation_state               | run / delayedstart / finished   |
+| sensor.dishwasher_programme_finish_time         | timestamp                       |
+| sensor.dishwasher_programme_progress            | percent                         |
+| sensor.dishwasher_program_aborted               | event                           |
+| sensor.dishwasher_programme_finished            | event                           |
+| sensor.dishwasher_rinse_aid_nearly_empty        | event                           |
+| sensor.dishwasher_salt_nearly_empty             | event                           |
+| switch.dishwasher_power                         | on                              |
+| switch.dishwasher_vario_speed                   | off                             |
++-------------------------------------------------+---------------------------------+
+```
+
+**No energy sensor**, as predicted. `sensor.dishwasher_operation_state` and
+`select.dishwasher_active_programme` are the two that matter for per-cycle attribution.
 
 ## Per-cycle attribution (planned, not built)
 
