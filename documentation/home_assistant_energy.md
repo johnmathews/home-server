@@ -139,6 +139,28 @@ This adjusts that hour and all later rows, restoring the original baseline; reve
 adjusting by the negative. `recorder/clear_statistics` is the clean-slate alternative but is
 **irreversible**.
 
+## Reconciliation health check
+
+The whole point of the Rest Of Home subtract group is that
+`grid ≈ Σ(tracked devices) + Rest Of Home`. Checking that identity is the fastest way to
+confirm the energy system is honest. Verified 2026-08-13: **98.5% accounted** over a clean
+16-hour window (gap 0.14 kWh), with 18 of 24 hours reconciling to within ±0.03 kWh.
+
+**Use the statistics `change` field per hour — not first-to-last `sum` deltas.** A sum-delta
+over a window silently lies whenever a series has a discontinuity (a counter reset, a
+long-gap sum reset, an `adjust_sum_statistics` call) or when sensors in the comparison were
+created on different dates. An early attempt at this check using sum deltas produced a
+bogus "25% unaccounted" result and a false alarm about Rest Of Home under-reporting; the
+per-hour `change` method showed the system was fine all along.
+
+Method: `recorder/statistics_during_period` with `period: hour`, `types: ["change"]`, over
+`grid` + every `device_consumption` id from `energy/get_prefs`; then per hour compare
+`grid` against `Σtracked + rest`.
+
+Known benign anomaly: the 12 Aug EV backfill injected ~8.9 kWh into the 23:00 local bucket,
+so that hour shows a large negative gap and the preceding charging hours show matching
+positive gaps. Cosmetic, already accepted, ages out of any recent window.
+
 ## powercalc specifics
 
 - Installed via HACS (v1.24.1), config is YAML-only: `powercalc:` block in
