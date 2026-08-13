@@ -72,9 +72,11 @@ path for any sensor that matters.
 
 ### The full datapoint map
 
-Enumerated 2026-08-13 by read-only local queries, reconciled against what the Tuya cloud
-declares (`local_strategy` in the xtend_tuya diagnostics) and what tuya-local's
-`voldt_ev_charger` profile maps.
+Enumerated 2026-08-13 by read-only local queries **while the cable was idle**, reconciled
+against what the Tuya cloud declares (`local_strategy` in the xtend_tuya diagnostics) and
+what tuya-local's `voldt_ev_charger` profile maps. The "device" column therefore means
+"returned by an idle status query" — DP 6 is the one entry that is absent at idle but
+present during a session.
 
 ```
 +-----+---------+--------+----------+--------------------------------------------------+
