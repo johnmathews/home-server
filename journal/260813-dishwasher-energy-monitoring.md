@@ -142,6 +142,34 @@ and the test statistic wiped via `recorder/clear_statistics`.
 
 Committed as `6264055` in the HA config repo.
 
+## The -471.62 kWh phantom spike (and a verification mistake)
+
+John spotted a huge bar on the Energy dashboard shortly after the plug went back in, and
+guessed the three-month gap was behind it. He was right.
+
+The statistics **cumulative sum** for `sensor.dishwasher_plug_energy` was reset from 471.62
+to 0 when the plug returned, rendering as a -471.62 kWh Dishwasher bar. Cause: the plug was
+gone ~106 days, but with no `recorder:` block HA purges state history after 10 days, so on
+return there was no retained prior state to diff the counter against. HA treated the sensor
+as new and restarted the sum at zero.
+
+**The mistake worth recording**: earlier the same session I explicitly reported "no phantom
+spike", having verified that the sensor's *state* resumed at exactly 496.36 — matching its
+April value. That check was real but insufficient. For a `total_increasing` sensor the
+artifact lives in the statistics `sum`, not the state, and the state looking perfectly
+continuous is exactly what makes this failure sneaky. State continuity does not imply
+statistics continuity across a gap longer than `purge_keep_days`.
+
+Fixed non-destructively with WS `recorder/adjust_sum_statistics` at the reset hour,
+`adjustment: 471.62`, unit kWh — it adjusts that hour and every later row, restoring the
+original baseline. Verified: the 2026-08-13 daily row now reads sum=471.62, change=0.00.
+Reversible by adjusting -471.62. The alternative (`recorder/clear_statistics`) would give
+the new appliance a clean slate but destroys the old machine's history irreversibly; John
+chose continuity.
+
+Blast radius was narrow: the earlier 24 h energy audit was unaffected, because the
+dishwasher's accrual there computed as 0 - 0 = 0 rather than -471.62.
+
 ## Still open
 
 ## Notes for next time

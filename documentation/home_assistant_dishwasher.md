@@ -136,9 +136,34 @@ with the dishwasher member contributing 0.
 +------------------------------------------+-----------------------------------+
 ```
 
-**No phantom spike.** The last statistic recorded before the plug went offline in April was
-`state=496.36`, and it resumed at exactly 496.36 — so the counter picked up precisely where
-it left off and the delta from here is clean. The counter-reset runbook was not needed.
+**There WAS a phantom spike — a −471.62 kWh one — and the initial check missed it.** The
+sensor's *state* resumed at exactly 496.36, matching its April value, which looked like clean
+continuity. But the statistics **cumulative sum** was reset from 471.62 to 0, which the Energy
+dashboard rendered as a −471.62 kWh bar for the Dishwasher.
+
+```
++-------------+----------+-----------+----------------------------------------+
+| Date        | sum      | state     | change                                 |
++-------------+----------+-----------+----------------------------------------+
+| 2026-04-29  |  471.62  |  496.36   | +0.66   last data before unplugging    |
+| 2026-08-13  |    0.00  |  496.36   | -471.62 the artifact                   |
+| 2026-08-13  |  471.62  |  496.36   |  0.00   after the fix below            |
++-------------+----------+-----------+----------------------------------------+
+```
+
+**Cause**: the plug was gone ~106 days but there is no `recorder:` block, so state history
+purges after **10 days**. On return, HA had no retained prior state to diff the counter
+against, treated the sensor as new, and restarted `sum` at zero.
+
+**Fix applied**: WS `recorder/adjust_sum_statistics` on `sensor.dishwasher_plug_energy` at
+the reset hour, `adjustment: 471.62`, `adjustment_unit_of_measurement: kWh`. That adjusts
+the hour and every subsequent row, restoring the original baseline. Reversible by adjusting
+by −471.62. (The alternative, `recorder/clear_statistics`, gives the new appliance a clean
+slate but destroys the old machine's history irreversibly.)
+
+**The lesson worth carrying**: for a `total_increasing` sensor returning after a gap longer
+than `purge_keep_days`, checking that the *state* is continuous is **not** sufficient. Check
+the statistics `sum` too — that is where the artifact lives.
 
 Still unverified: how Rest Of Home behaves while the dishwasher is actually drawing ~2 kW.
 Check after the first full cycle that the untracked line does not dip sharply negative.

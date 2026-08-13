@@ -112,6 +112,33 @@ retained message) you can get a one-off phantom spike. Fix: **Developer tools �
 (sensor) → adjust statistic** — find the 5-minute slot with the spike and set its value to
 the correct amount. No YAML involved.
 
+### Long-gap sum reset (a different, sneakier failure)
+
+Seen 2026-08-13 with the dishwasher plug after ~106 days unplugged. There is **no
+`recorder:` block**, so state history purges after the default **10 days**. When a
+`total_increasing` sensor returns from a gap longer than that, HA has no retained prior
+state to diff against, treats the sensor as new, and **restarts the statistics `sum` at
+zero** — producing a large one-off *negative* bar on the Energy dashboard equal to the old
+sum.
+
+The trap: the entity's **state** looks perfectly continuous (it resumed at exactly its old
+496.36 kWh), so a state-level check passes while the artifact sits in the statistics layer.
+**Always check the `sum`, not just the state**, when a counter comes back from a long
+absence.
+
+Fix, non-destructively, via WS `recorder/adjust_sum_statistics`:
+
+```
+statistic_id: sensor.<x>_energy
+start_time:   <exact hour where sum dropped to 0, ISO8601>
+adjustment:   <the old sum, e.g. 471.62>
+adjustment_unit_of_measurement: kWh
+```
+
+This adjusts that hour and all later rows, restoring the original baseline; reverse it by
+adjusting by the negative. `recorder/clear_statistics` is the clean-slate alternative but is
+**irreversible**.
+
 ## powercalc specifics
 
 - Installed via HACS (v1.24.1), config is YAML-only: `powercalc:` block in
