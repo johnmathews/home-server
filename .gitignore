@@ -1,8 +1,14 @@
-I.DS_Store
+.DS_Store
 iso-images/
 cloud-images/
 .vault_pass.txt
 .env
+# Credentials that must never be committed. Secrets belong in Ansible Vault
+# (group_vars/all/vault*.yml) - see documentation/vault.md.
+*.key
+*.pem
+credentials.json
+*.retry
 sabnzbd.ini.j2
 collections/
 *.secret

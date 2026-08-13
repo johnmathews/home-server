@@ -213,3 +213,46 @@ session, which is worth knowing before anyone tries to "fix" that too.
 - HA's REST `/api/history/period` returned empty for these entities while the recorder DB
   plainly had the rows; querying a snapshot copy of `home-assistant_v2.db` directly was
   the reliable route.
+
+## Wrap-up findings (/done)
+
+Confidence grades: `confirmed` = directly observed, `strongly supported` = fits all
+evidence with nothing contradicting, `suspected` = hypothesis.
+
+- **Documentation audit — confirmed.** Cross-checked every claim in
+  `home_assistant_ev_charging.md` against live HA state and the deployed
+  `automations.yaml`, rather than re-reading the prose: 38 cited entity IDs all exist, both
+  automations present and `on`, the status enum matches the documented values exactly, and
+  the deployed `/4` + `/3` cadences match the doc in all four places they appear. Two
+  apparent failures were regex artifacts (a table cell wrapping
+  `sensor.skoda_enyaq_battery_` / `percentage`, and the deliberate `sensor.voldt_2_4_5g_*`
+  wildcard).
+- **Secrets — confirmed clean.** No secret patterns in any of this session's seven commits;
+  the Tuya local key in particular is absent from the repo. Vault files are AES256. The
+  only IPs added are the documented private-range LAN addresses.
+- **`.gitignore` hardened.** Added `*.key`, `*.pem`, `credentials.json`, `*.retry`, and
+  fixed a long-standing typo — line 1 was `I.DS_Store`, so `.DS_Store` was never actually
+  ignored. Verified no already-tracked file becomes ignored by the change.
+- **`make lint` is broken repo-wide — confirmed, not fixed.** `.venv` is tracked as a
+  symlink pointing at *itself*
+  (`/Users/john/projects/home-server/proxmox-setup/.venv` → the same path), so
+  `.venv/bin/ansible-lint` can never resolve — `ELOOP`, in the main checkout as well as in
+  worktrees. Added by `649d8b9` in PR #30 (the family-finances work) about an hour before
+  this wrap-up, so it belongs to another session. Left alone deliberately; see below.
+
+## What is deliberately not done
+
+- **Did not fix the `.venv` symlink.** The correct fix is `git rm --cached .venv` plus a
+  `.gitignore` entry, which rewrites part of another session's just-landed PR. Reported
+  rather than done — it is their call, and a virtualenv should not be tracked at all.
+- **Did not simplify the idle automation's two `condition: not` blocks** into a single
+  `state:` list condition. The semantics are identical and the current form is deployed and
+  verified working; churning verified config for cosmetics at the end of a session is a bad
+  trade. Noted for whenever that file is next edited.
+- **Did not remove the official Tuya and xtend_tuya integrations**, though nothing depends
+  on them now and the Voldt is the only device on that account. They remain the simplest
+  route to the local key and a fallback if tuya-local ever breaks.
+- **Did not re-run the DP 25 vs integral cross-check on a clean session.** Today's 1.9%
+  gap is fully explained by the mid-session HA restart, but that explanation is
+  *strongly supported*, not confirmed — it needs one charge with no restart to settle.
+- **Did not touch the 12 Aug statistics artifact**, per standing instruction.
