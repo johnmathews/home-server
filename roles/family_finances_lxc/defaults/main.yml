@@ -19,7 +19,7 @@ family_finances_docker_compose_dir: "{{ docker_compose_dir }}"
 # not track `latest`: the app deliberately builds images only from a green
 # `main`, and pinning is what makes a rollback one line instead of an
 # investigation. See family-finances docs/deployment.md §3.
-family_finances_version: "latest"
+family_finances_version: "b6ade8b1353178401e17a6ab3f5c14e50a75e5c6"
 
 # Where the household databases and archived statements live on the host. This
 # directory IS the family's financial record — it is what the PBS guest backup
