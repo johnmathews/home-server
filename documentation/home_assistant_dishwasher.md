@@ -277,6 +277,31 @@ artifact avoided when the plug was reconnected. Consumption was simulated by low
 start snapshot instead. Helpers were reset afterwards and the test statistic wiped with
 `recorder/clear_statistics`, so the calibration dataset starts empty.
 
+## Dashboards
+
+```
++---------------------+----------------------------------------------------------+
+| Energy dashboard    | sensor.dishwasher_plug_energy as "Dishwasher" (entry 22) |
+| Power > Kitchen     | pre-existing heading + gauge + history graph on           |
+|   (dashboard-power) |   sensor.dishwasher_plug_power, plus 6 tiles added        |
+|                     |   2026-08-13: status, programme, progress, finish time,   |
+|                     |   last-cycle energy, door                                 |
+| Everything          | Kitchen entities card: added plug energy and last-cycle   |
+|   (all-devices)     |   energy alongside the existing power sensor              |
++---------------------+----------------------------------------------------------+
+```
+
+The Kitchen view's dishwasher gauge and history graph already existed from the old
+dishwasher and needed no repair — the plug entity ids never changed, so they came back to
+life on their own when the plug was reconnected. The gauge's `max` was raised **1800 → 2400 W**
+because a ~2.2 kW heating element would have pegged it, with severity bands moved to
+0 / 800 / 1800. Revisit once a real cycle shows the true peak draw.
+
+**Caveat: Lovelace dashboards are storage-mode and live in `.storage/`, which the config
+repo's whitelist `.gitignore` deliberately excludes.** So dashboard edits are *not* version
+controlled — they exist only in the running instance and in HA/PBS backups. Unlike the YAML
+changes, there is nothing to `git revert` if a card layout goes wrong.
+
 ### Calibration
 
 Collect 4–6 weeks, then compare measured per-programme energy against the 0.65 kWh label
