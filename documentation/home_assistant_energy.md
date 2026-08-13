@@ -139,6 +139,40 @@ This adjusts that hour and all later rows, restoring the original baseline; reve
 adjusting by the negative. `recorder/clear_statistics` is the clean-slate alternative but is
 **irreversible**.
 
+## "Rest of home (untracked)" vs "Untracked consumption"
+
+Two similarly-named figures on the Electricity tab that mean different things:
+
+```
++------------------------------+----------------------------------------------+
+| "Rest of home (untracked)"   | OURS. sensor.rest_of_home_energy, the        |
+|                              | powercalc subtract group: P1 power minus     |
+|                              | every tracked power sensor, integrated.      |
+|                              | Not a device - an estimate of the untracked  |
+|                              | baseline, registered as a device entry so it |
+|                              | renders as a slice instead of being invisible|
++------------------------------+----------------------------------------------+
+| "Untracked consumption"      | HA's BUILT-IN residual, not configurable:    |
+|                              | grid total minus the sum of ALL device       |
+|                              | entries - which now includes Rest of home.   |
++------------------------------+----------------------------------------------+
+```
+
+Because Rest of home is itself a device entry, HA's built-in figure is no longer "the
+untracked load" — it is **the leftover after our estimate**, i.e. the error term of the
+Rest of home calculation. Read it as a health metric, not a consumption category.
+
+Reference values (2026-08-13): grid 17.329 kWh, real devices 12.914, Rest of home 3.980,
+all entries 16.894, so **Untracked consumption = 0.435 kWh (2.5%)**. Before the 08-12
+overhaul the built-in figure was the whole untracked baseline, ~59% of import.
+
+Small and stable is healthy. Growth means drift — a plug gone unavailable, a new load, or a
+power sensor misreporting. Note the two are not independent: Rest of home derives from the
+same P1 signal as the grid total, so `devices + rest ≈ grid` holds largely by construction.
+What it genuinely catches is disagreement between the two *signal paths* — instantaneous
+power integration versus the meter's cumulative counters. This figure is the same quantity
+as the gap in the reconciliation check below.
+
 ## Reconciliation health check
 
 The whole point of the Rest Of Home subtract group is that
