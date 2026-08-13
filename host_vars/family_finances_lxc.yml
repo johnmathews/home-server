@@ -1,0 +1,12 @@
+---
+# Host variables for the family-finances LXC (192.168.2.120).
+#
+# The sleep_hours role is in this host's playbook, and its defaults deliberately
+# do not define sleep_hours_enabled — the role's own defaults/main.yml says the
+# settings live in host_vars/<hostname>.yml. Without this file the role fails at
+# "A 'when' expression failed: 'sleep_hours_enabled' is undefined", which is
+# what it did on the first run that reached it.
+#
+# false, not true: this guest serves a public web application over a Cloudflare
+# tunnel, and it holds the household databases. A sleeping guest is an outage.
+sleep_hours_enabled: false
