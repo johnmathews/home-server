@@ -330,6 +330,37 @@ repo's whitelist `.gitignore` deliberately excludes.** So dashboard edits are *n
 controlled — they exist only in the running instance and in HA/PBS backups. Unlike the YAML
 changes, there is nothing to `git revert` if a card layout goes wrong.
 
+### First measured cycle — 2026-08-13, Eco 50
+
+The whole chain worked end to end on real Home Connect transitions, not simulated ones.
+
+```
++------------------------------------------+----------------------------------+
+| Measured cycle energy                    | 0.88 kWh                         |
+| EU label figure (eco, test conditions)   | 0.65 kWh                         |
+| Difference                               | +35%                             |
+| Programme recorded                       | eco_50 (captured automatically)  |
+| Arithmetic check                         | 497.24 - 496.36 = 0.88  correct  |
+| Peak draw                                | 1984 W                           |
++------------------------------------------+----------------------------------+
+```
+
+**+35% over the label on the very first cycle**, and this is a *late-summer* measurement —
+mains inlet is at its warmest, the most favourable end of the seasonal range. The same wash
+in February should cost more. One cycle is not a calibration, but the direction is exactly
+what the seasonal argument above predicted, and it is a far larger gap than the ±5% a static
+lookup would have needed.
+
+Peak draw of 1984 W confirms the gauge `max` of 2400 W is sensible (~20% headroom) and that
+the original 1800 W would indeed have pegged. No change needed.
+
+**Rest Of Home under real load** — the last unverified thing — behaved correctly. It dips to
+about **−1595 W** transiently during the heating phases, in 3 of the 4 cycle hours. That
+magnitude is roughly the appliance's own draw, which is the signature of *meter lag*: the
+plug reports the ~2 kW load before the P1 meter does, so `P1 − Σtracked` is briefly negative
+by about the appliance's consumption. It averages out as designed — reconciliation across
+the cycle window came to **99.4% accounted (gap 0.02 kWh)**.
+
 ### Calibration
 
 Collect 4–6 weeks, then compare measured per-programme energy against the 0.65 kWh label

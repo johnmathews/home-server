@@ -101,19 +101,46 @@ The general point is worth remembering: *the lower a cycle's total energy, the l
 same absolute seasonal swing looms in relative terms.* Guessing the cycle high made the
 lookup approach look better than it is.
 
+## First real cycle — everything verified
+
+An Eco 50 ran 17:05–21:20 UTC. The whole chain worked on genuine Home Connect transitions:
+
+```
++------------------------------------------+----------------------------------+
+| Measured cycle energy                    | 0.88 kWh                         |
+| EU label figure                          | 0.65 kWh   -> +35%               |
+| Programme captured automatically         | eco_50                           |
+| Arithmetic check                         | 497.24 - 496.36 = 0.88  correct  |
+| Peak draw                                | 1984 W                           |
+| Reconciliation over the cycle window     | 99.4% accounted (0.02 kWh gap)   |
++------------------------------------------+----------------------------------+
+```
+
+**+35% over the label on the first cycle, in late summer** — the most favourable point in the
+seasonal range, since mains inlet is at its warmest. n=1 is not a calibration, but the
+direction matches the seasonal argument that killed the static-lookup idea, and the gap is
+far larger than the ±5% that approach needed.
+
+Peak 1984 W confirms the 2400 W gauge max is right and that the original 1800 W would have
+pegged — the guess held up, now on evidence.
+
+**Rest Of Home under real load** (the last open verification) behaved as designed: transient
+dips to about **-1595 W** in 3 of 4 cycle hours, a magnitude roughly equal to the appliance's
+own draw. That is meter lag — the plug reports the ~2 kW load before P1 does — and it averages
+out, as the 99.4% reconciliation shows.
+
 ## Still open
 
-- **Check Rest Of Home during the first real cycle.** Everything so far was verified with the
-  dishwasher idle at 0 W; the interesting case is ~2 kW of heating element, where a unit or
-  sign error would show as the untracked line dipping sharply negative.
-- **The first real cycle has not happened yet.** A 5-hour delayed Eco 50 was queued, and I
-  inferred a ~16:27 UTC start from `programme_finish_time` (20:22) minus the spec-sheet 3:55
-  duration. `number.dishwasher_start_in_relative` read 16260 s, which did not reconcile with
-  that; I noticed and did not chase it. John then cancelled the delay, which explains the
-  discrepancy — that number was the configured delay, not a live countdown. Machine is back
-  at `ready` with Eco 50 still selected.
 - **Calibration**: 4–6 weeks of cycles, then compare measured per-programme energy and its
   spread against the 0.65 kWh label figure.
+- **KAJPLATS bulbs** remain offline and contribute nothing (pre-existing backlog).
+
+### Footnote: a timing inference that was wrong
+
+Mid-session I predicted a ~16:27 UTC cycle start from `programme_finish_time` (20:22) minus
+the spec-sheet 3:55 duration. `number.dishwasher_start_in_relative` read 16260 s, which did
+not reconcile; I noticed the inconsistency and did not chase it. John had set a 5-hour delay
+and then cancelled it — that field holds the *configured* delay, not a live countdown.
 ## Per-cycle attribution (built and smoke-tested the same session)
 
 Two automations subtract the plug's cumulative counter between Home Connect's `run` and
