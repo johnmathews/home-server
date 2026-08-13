@@ -32,6 +32,8 @@ Grid prices: tariff 1 €0.24111/kWh, tariff 2 €0.27693/kWh, gas €1.3073/m³
 | Entry                     | Sensor                                   | Source              |
 +---------------------------+------------------------------------------+---------------------+
 | Tech Shelf                | sensor.tech_shelf_energy                 | Nous plug (real)    |
+| Dishwasher                | sensor.dishwasher_plug_energy            | Nous plug (real) -  |
+|                           |                                          |   re-added 08-13    |
 | Washer Dryer              | sensor.washer_dryer_plug_energy          | Nous plug (real)    |
 | Office Desk               | sensor.desk_plug_energy                  | Nous plug (real)    |
 | Oven                      | sensor.oven_plug_energy                  | Nous plug (real)    |
@@ -97,7 +99,8 @@ Consequences to be aware of:
   history; the powercalc light sensors are new statistic ids). Grid and gas history is
   untouched. Orphaned old statistics remain in the recorder — Developer tools → Statistics
   will offer to delete them; harmless either way.
-- Dropped from the dashboard: TV (deliberate — small load), dishwasher (plug unplugged),
+- Dropped from the dashboard: TV (deliberate — small load), dishwasher (plug unplugged;
+  **re-added 2026-08-13**, see `home_assistant_dishwasher.md`),
   electric heater (plug retired), office/bathroom/living-room lights (devices offline, see
   backlog).
 
@@ -141,9 +144,13 @@ the correct amount. No YAML involved.
 +----+------------------------------------------------------------------+----------------+
 | #  | Job                                                              | Unblocks       |
 +----+------------------------------------------------------------------+----------------+
-| 1  | Reconnect dishwasher Nous plug                                   | dishwasher     |
-|    |   then: re-add sensor.dishwasher_plug_energy to dashboard and    | tracking       |
-|    |   sensor.dishwasher_plug_power to the Rest Of Home subtract list |                |
+| 1  | Dishwasher: DONE 2026-08-13. Nous plug reconnected, energy       | DONE           |
+|    |   sensor on the dashboard, power sensor in the Rest Of Home      |                |
+|    |   subtract list, counter resumed at 496.36 kWh with no spike.    |                |
+|    |   The appliance itself reports NO energy (Home Connect has no    |                |
+|    |   kWh) - see home_assistant_dishwasher.md. Remaining: check      |                |
+|    |   Rest Of Home during the first ~2 kW cycle; Home Connect        |                |
+|    |   integration still blocked on developer credentials             |                |
 | 2  | Re-pair office + bathroom JETSTROM panels (currently on the      | office/bath    |
 |    |   defunct ZHA network) to zigbee2mqtt, like the entrance panel   | light tracking |
 |    |   then: add powercalc entries for the new entities               |                |

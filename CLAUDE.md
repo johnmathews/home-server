@@ -147,6 +147,7 @@ Service-specific guides in `/documentation/`. Read the relevant doc before worki
 - `disks.md` — Proxmox host disk management and backup storage
 - `doorbell.md` — Reolink video doorbell: usage guide (non-technical), notifications, two-way audio, HA/go2rtc setup
 - `grafana-alerting.md` — Grafana alert rules, concise Pushover notification templates, API access
+- `home_assistant_dishwasher.md` — Bosch dishwasher: LAN discovery, why Home Connect gives no kWh, metering plug, integration plan
 - `home_assistant_energy.md` — HA energy monitoring: P1 meter, powercalc, Energy dashboard, config repo, backlog
 - `home_assistant_ev_charging.md` — EV charging, both halves: Voldt granny cable (tuya-local over the LAN; the DP 27 refresh trick) + Skoda Enyaq (MySkoda), entities, charging-efficiency calc
 - `immich_lxc.md` — Immich photo management, Docker stack, NFS mounts, ML, mobile app
