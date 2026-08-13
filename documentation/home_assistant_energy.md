@@ -135,7 +135,7 @@ the correct amount. No YAML involved.
   `/config`. Validate YAML before restart: `POST /api/config/core/check_config`.
 - API access: long-lived token in Ansible vault as `vault_home_assistant_token`.
 
-## Jobs to be done (backlog, 2026-08-12)
+## Jobs to be done (backlog, 2026-08-13)
 
 ```
 +----+------------------------------------------------------------------+----------------+
@@ -156,12 +156,14 @@ the correct amount. No YAML involved.
 |    |   biggest single untracked load in Rest Of Home                  | untracked sink |
 | 6  | Remove electric-heater leftovers if the plug is truly retired    | tidiness       |
 |    |   (z2m device removal)                                           |                |
-| 7  | EV charger: DONE via cloud (xtend_tuya) 2026-08-12. Remaining:   | EV charging    |
-|    |   static lease for 192.168.2.29 (MAC d8:fc:92:93:f5:7d) on       | robustness     |
-|    |   MikroTik; verify Rest Of Home stays sane during first charge   |                |
-|    |   (kW/W conversion); OPTIONAL local-key upgrade to tuya-local    |                |
-|    |   if Tuya platform linking ever works — home_assistant_ev_       |                |
-|    |   charging.md                                                    |                |
+| 7  | EV charger (cable side): DONE. Cloud integration via             | DONE           |
+|    |   xtend_tuya 2026-08-12; static lease for 192.168.2.29           |                |
+|    |   (MAC d8:fc:92:93:f5:7d) set on the MikroTik 2026-08-13;        |                |
+|    |   Rest Of Home verified sane across a full charge (mean          |                |
+|    |   +223 W, 0.9% negative samples, all sub-minute switching        |                |
+|    |   transients - no kW/W unit error). The optional tuya-local      |                |
+|    |   local-key upgrade remains open, documented in                  |                |
+|    |   home_assistant_ev_charging.md rather than here.                |                |
 | 8  | EV car side: DONE via MySkoda (HACS) 2026-08-13. Once ~5 kWh     | EV charging    |
 |    |   has been charged, sanity-check sensor.ev_charging_efficiency   | efficiency     |
 |    |   against the expected mid-80s%; a wildly-off figure means the   |                |

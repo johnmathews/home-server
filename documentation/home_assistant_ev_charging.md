@@ -308,8 +308,9 @@ sudo env GIT_SSH_COMMAND="ssh -i /config/.git-ssh/id_deploy \
 
 ## Related
 
-- Reserve `192.168.2.29` for MAC `d8:fc:92:93:f5:7d` on the MikroTik (needed for the
-  local upgrade; harmless to do now — see JTBD in `home_assistant_energy.md`).
+- `192.168.2.29` (MAC `d8:fc:92:93:f5:7d`) is a **static lease on the MikroTik** as of
+  2026-08-13, so the cable's address is now safe to hard-code — which is what the
+  tuya-local upgrade below needs.
 - Cheap-tariff charging automation idea: trigger on `sensor.p1_meter_tariff`, act on
   `switch.voldt_2_4_5g_switch` + `number.voldt_2_4_5g_charging_current`. Now that the car
   side exists, `number.skoda_enyaq_charge_limit` is the gentler lever — cap the target SoC
