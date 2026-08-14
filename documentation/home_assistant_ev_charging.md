@@ -30,8 +30,10 @@ report kWh drawn from the wall.
 | EV kWh drifting from the P1 meter, | automation.ev_cable_keep_power_live is off or    |
 | or power flat at one value for     |   broken. It presses DP 27 every 4 min while     |
 | ~an hour at a time                 |   charging; without it the firmware only         |
-|                                    |   refreshes power ~hourly. FAILS SILENTLY -      |
-|                                    |   check this FIRST. See "The refresh trick".     |
+|                                    |   refreshes power ~hourly. Used to fail          |
+|                                    |   silently; since 2026-08-14 the red banner on   |
+|                                    |   the dashboard catches it. Check FIRST.         |
+|                                    |   See "The refresh trick" and "The watchdog".    |
 | Battery-side energy stopped, or    | sensor.ev_battery_energy_gained is gated on      |
 | efficiency creeping upward         |   sensor.voldt_ev_cable_status == 'charging'.    |
 | toward 100%                        |   Renaming that entity, OR changing the enum     |
@@ -44,6 +46,11 @@ report kWh drawn from the wall.
 | Cable temperature more than 3 min  | Both refresh automations are off/broken. While   |
 | stale while idle                   |   idle, temperature is refreshed every 3 min     |
 |                                    |   by "EV cable refresh temperature while idle".  |
+|                                    |   binary_sensor.ev_cable_refresh_stale now       |
+|                                    |   detects this - see "The watchdog".             |
+| Red banner at the top of the EV    | Exactly what it says: DP 27 has not been pressed |
+| Charging dashboard                 |   for over 6 min, so every cable reading on the  |
+|                                    |   page is frozen. Check both automations.        |
 | Voltage / current read 0 while     | Expected, always. DP 6 only reports during a     |
 | idle                               |   session; refreshing does not change that.      |
 | Want to check the energy figures   | Compare sensor.voldt_ev_cable_last_charge (the   |
@@ -225,6 +232,66 @@ just no crossing to report.
 
 Voltage and current stay at 0 while idle no matter how often you refresh: DP 6 only
 reports during a session.
+
+### The watchdog — added 2026-08-14
+
+Everything above depends on two automations that fail *silently*. When they stop, the
+tuya-local entities do not go `unavailable` — the LAN connection is fine, the device just
+keeps handing back the last value it latched. A cooling cable reads hot forever and the
+energy integral quietly degrades from a measurement to an estimate, with nothing on screen
+to say so.
+
+`binary_sensor.ev_cable_refresh_stale` (in `/config/templates.yaml`) closes that gap. It
+watches **`button.voldt_ev_cable_refresh`**, whose state *is* an ISO timestamp of its own
+last press:
+
+```
+button.voldt_ev_cable_refresh   09:30   "2026-08-14T09:30:00.232783+00:00"
+button.voldt_ev_cable_refresh   09:27   "2026-08-14T09:27:00.232412+00:00"
+```
+
+That single entity covers both automations at once, since both act on it. It trips at
+**360 s** — the slower automation is the `/4` keep-alive, so the worst healthy gap is a
+little over 4 min. A missing or unparseable timestamp counts as stale: button state
+survives a restart (the entity has read `unknown` exactly once, when tuya-local created it
+on 2026-08-13, across every restart since), so an absent one is a real fault. The cable
+going offline also trips it, correctly — no device, no presses, no fresh readings.
+
+**Do not be tempted to watch `sensor.voldt_ev_cable_temperature`'s own `last_changed`
+instead.** DP 24 is an integer and a settled idle cable legitimately holds 40 C for hours;
+that rule would alarm more or less permanently. The press timestamp is the honest signal.
+
+A `conditional` card at the top of the dashboard's "Right now" section renders an
+`ha-alert` when it trips. The dashboard is storage-mode, so that half lives in
+`/config/.storage/lovelace.ev_charging` and is **not** git-tracked — it is only in the
+GitHub repo as this description.
+
+### Why the temperature chart says "5 minutes" when we poll every 3
+
+Both numbers are real and they belong to different layers. Ours is the 3 min press
+interval — how often HA *asks* the cable. HA's is its own, and is not configurable:
+
+```
++-------------------+-----------------------------------------------------------+
+| Layer             | What happens                                              |
++-------------------+-----------------------------------------------------------+
+| Sampling (ours)   | DP 27 pressed every 3 min idle / 4 min charging.          |
+| Raw recording     | A `states` row is written only when the value CHANGES -    |
+|   (HA recorder)   |   for an integer DP, once per degree crossing.             |
+| Statistics (HA)   | `statistics_short_term` gets a mean/min/max bucket every   |
+|                   |   5 min on a fixed clock, regardless of sampling.          |
++-------------------+-----------------------------------------------------------+
+```
+
+Observed on 2026-08-14: the last raw state row was 08:06 (40 C) and none followed for over
+an hour despite ~25 presses, because nothing crossed a degree — while the statistics table
+emitted 09:00, 09:05, 09:10, 09:15, 09:20, every one of them `mean 40.0 min 40.0 max 40.0`.
+
+So the aggregation discards nothing here: 3 min sampling puts 1–2 samples in each 5 min
+bucket, and with integer degrees and a peak cooling rate of ~1 C per 4 min, mean, min and
+max are almost always the same number. It matters for retention rather than resolution —
+raw states are purged after 10 days, so those 5 min buckets and the hourly long-term ones
+are what survive.
 
 ## Cable-side entities
 
@@ -572,7 +639,8 @@ never go looking in Settings → Devices & Services → Helpers for these entiti
 +--------------------------------------+------------------------------------------------+
 | ev_charger_power_estimated,          | /config/templates.yaml                         |
 | ev_battery_energy_gained,            |                                                |
-| ev_charging_efficiency{,_today}      |                                                |
+| ev_charging_efficiency{,_today},     |                                                |
+| ev_cable_refresh_stale (watchdog)    |                                                |
 | ev_charger_energy (Riemann),         | /config/configuration.yaml, sensor: block      |
 | ev_charging_time/sessions_today      |                                                |
 | the four utility_meters              | /config/configuration.yaml, utility_meter:     |
@@ -600,6 +668,9 @@ storage dashboards:
 |                                       |   accumulating; efficiency drifts up.     |
 | ev_charging_time/sessions_today       | SILENT. Counters sit at 0.                |
 |   (history_stats, entity + state)     |                                           |
+| ev_cable_refresh_stale (watchdog) -   | Banner stuck ON permanently. Loud by      |
+|   references button..._refresh, not   |   design: an unresolvable entity gives no |
+|   any sensor                          |   timestamp, which counts as stale.       |
 | Rest Of Home subtract_entities        | Points at the template, not the raw DP -  |
 |                                       |   needs no change.                        |
 | Energy dashboard "EV Charger (Enyaq)" | Points at sensor.ev_charger_energy -      |
