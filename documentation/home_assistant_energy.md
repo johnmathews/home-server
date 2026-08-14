@@ -115,12 +115,17 @@ the correct amount. No YAML involved.
 
 ### Long-gap sum reset (a different, sneakier failure)
 
-Seen 2026-08-13 with the dishwasher plug after ~106 days unplugged. There is **no
-`recorder:` block**, so state history purges after the default **10 days**. When a
-`total_increasing` sensor returns from a gap longer than that, HA has no retained prior
-state to diff against, treats the sensor as new, and **restarts the statistics `sum` at
-zero** — producing a large one-off *negative* bar on the Energy dashboard equal to the old
-sum.
+Seen 2026-08-13 with the dishwasher plug after ~106 days unplugged. At the time there was
+**no `recorder:` block**, so state history purged after the default **10 days**. When a
+`total_increasing` sensor returns from a gap longer than the retention window, HA has no
+retained prior state to diff against, treats the sensor as new, and **restarts the
+statistics `sum` at zero** — producing a large one-off *negative* bar on the Energy
+dashboard equal to the old sum.
+
+Retention is **90 days since 2026-08-14** (see "Recorder retention" below), so the window
+in which this can bite is now nine times wider — but note the incident that revealed it
+involved a 106-day gap, which would still have tripped it. The failure mode is reduced,
+not removed.
 
 The trap: the entity's **state** looks perfectly continuous (it resumed at exactly its old
 496.36 kWh), so a state-level check passes while the artifact sits in the statistics layer.
@@ -234,6 +239,61 @@ positive gaps. Cosmetic, already accepted, ages out of any recent window.
   <https://library.powercalc.nl> gains the profile.
 - `unavailable` counts as "off" (standby_power) — this is what makes smart-bulbs-behind-
   plugs and offline devices behave sanely.
+
+## Recorder retention
+
+`purge_keep_days: 90` since 2026-08-14 (`recorder:` block in `configuration.yaml`). Before
+that there was no `recorder:` block at all, so it ran on the default of 10 days.
+
+**One knob covers both resolutions.** `purge_keep_days` governs raw `states` *and*
+`statistics_short_term` (the 5-minute mean/min/max buckets) together — there is no separate
+setting for either, and no per-entity retention anywhere in HA. Hourly long-term statistics
+are a different thing entirely: never purged, already reaching back to 2024-08-12.
+
+Which of the three you are actually looking at matters when a number seems wrong:
+
+```
++------------------------+-------------+-----------+----------------------------------+
+| Layer                  | Resolution  | Retention | Written when                     |
++------------------------+-------------+-----------+----------------------------------+
+| states                 | per change  | 90 days   | the value CHANGES (or an         |
+|                        |             |           |   attribute does)                |
+| statistics_short_term  | 5 min       | 90 days   | every 5 min, fixed clock         |
+| statistics             | 1 hour      | forever   | every hour, fixed clock          |
++------------------------+-------------+-----------+----------------------------------+
+```
+
+Sizing, measured 2026-08-14 rather than estimated: 862k state rows per 10 days works out at
+~14.8 MB/day for `states` plus its five indexes, and ~1.5 MB/day for the 5-minute buckets.
+So 90 days lands the DB around **1.6 GB**, up from 260 MB. The data partition (`/dev/sda8`,
+30.8 GB) had 19.2 GB free. **Disk is not the constraint — the VM's 2 GB of RAM is**, which
+is why this stopped at 90 days rather than a year.
+
+**There is deliberately no `exclude:` block, and adding one is a trap.** Excluding an entity
+stops HA compiling *statistics* for it as well as recording its states. The obvious
+candidates to trim are the P1 per-phase power sensors, which alone are 35% of every state
+row:
+
+```
+sensor.p1_meter_power              159,299     |  top 5 P1 entities  = 542,426
+sensor.p1_meter_power_phase_1      156,132     |  all states         = 862,437
+sensor.p1_meter_power_phase_3       91,435     |                       = 63%
+sensor.p1_meter_energy_import       83,203     |
+sensor.p1_meter_power_phase_2       52,357     |
+```
+
+Excluding the three phase sensors would save ~464 MB at 90 days — and freeze 16 months of
+accumulating hourly per-phase history (11,685 rows each, since 2025-04-14). Rejected on
+those grounds: the saving is 2% of free disk, and the cost is exactly the long-range data
+the history UI exists to show.
+
+Changing `purge_keep_days` **requires a restart**; recorder has no reload service. The purge
+job runs nightly at 04:12, and `auto_repack` on the second Sunday of the month needs
+temporary free space roughly equal to the DB size.
+
+Separately, HA metrics are also scraped into Prometheus every 30 s with 100-day / 22 GB
+retention (`documentation/prometheus_lxc.md`) — a coarser but longer-lived copy of the same
+signals, useful for Grafana but not visible in the HA UI.
 
 ## Config repo & access
 
