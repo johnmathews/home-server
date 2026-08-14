@@ -325,9 +325,16 @@ signals, useful for Grafana but not visible in the HA UI.
 |    |   energy (Home Connect exposes no kWh) - full detail in          |                |
 |    |   home_assistant_dishwasher.md. Remaining: 4-6 weeks of          |                |
 |    |   cycles to build a per-programme calibration table              |                |
-| 2  | Re-pair office + bathroom JETSTROM panels (currently on the      | office/bath    |
-|    |   defunct ZHA network) to zigbee2mqtt, like the entrance panel   | light tracking |
-|    |   then: add powercalc entries for the new entities               |                |
+| 2  | SUPERSEDED 2026-08-14 by home_assistant_lighting.md, and the     | light tracking |
+|    |   description below was wrong on both counts. There is no        | for 6 panels   |
+|    |   "defunct ZHA network" (the ZHA entry has zero entities and     |                |
+|    |   no Matter/Thread entry exists at all), and "Ikea Smart         |                |
+|    |   Lightbulb 1/2" are KAJPLATS bulbs, not JETSTROM panels.        |                |
+|    |   Reality: 6 of 7 JETSTROM panels are Touchlink-paired direct    |                |
+|    |   to their STYRBAR remotes and on NO network. Migration is a     |                |
+|    |   z2m group + remote-to-group binding per zone, staged over 5    |                |
+|    |   phases. powercalc entries (L2207 has a LUT profile) follow     |                |
+|    |   once each panel is on the network.                             |                |
 | 3  | Living-room / dinner-table lights: old template referenced       | living room    |
 |    |   light.dinner_table_1 (gone). KAJPLATS bulbs now cover plugs    | clarity        |
 |    |   2/3; verify nothing else is missing                            |                |
