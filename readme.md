@@ -5,6 +5,28 @@ server based on Proxmox.
 
 Read the [documentation](https://docs.itsa-pizza.com).
 
+### Where plans and backlogs live
+
+Plans and open work are kept in the docs, not in issues:
+
+```
++---------------------------+--------------------------------------------------------------+
+| What                      | Where                                                        |
++---------------------------+--------------------------------------------------------------+
+| Active plans of record    | documentation/<topic>.md, at the top of the relevant service |
+|                           |   doc. Current example: home_assistant_lighting.md (the      |
+|                           |   JETSTROM panel + STYRBAR remote binding migration).        |
+| Home Assistant backlog    | documentation/home_assistant_energy.md, section "Jobs to be  |
+|   ("jobs to be done")     |   done". Covers all HA work, not only energy, despite        |
+|                           |   living in the energy doc.                                  |
+| Decisions and history     | journal/yymmdd-descriptive-name.md, newest last.             |
+| Superseded plans          | documentation/archive/, with a Status header naming the doc  |
+|                           |   that replaced them.                                        |
++---------------------------+--------------------------------------------------------------+
+```
+
+Every doc is indexed in the Documentation Index in `CLAUDE.md`.
+
 [Proxmox helper scripts](https://community-scripts.github.io/ProxmoxVE/) are used.
 
 Proxmox helper scripts are run manually, the configuration options are listed here.
