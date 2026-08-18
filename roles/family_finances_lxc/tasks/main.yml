@@ -27,6 +27,30 @@
     - "{{ family_finances_data_dir }}/households"
   tags: [docker, family_finances]
 
+# Its own directory, 0700, owned by the image's app uid -- and NOT inside
+# family_finances_data_dir, which is the family's financial record. 0400 on the
+# key because nothing needs to write it: it is generated once in the browser
+# when the application is registered, and Enable Banking never held a copy.
+- name: Create the bank-sync secrets directory
+  ansible.builtin.file:
+    path: "{{ family_finances_secrets_dir }}"
+    state: directory
+    owner: 10001
+    group: 10001
+    mode: '0700'
+  tags: [docker, family_finances]
+
+- name: Install the Enable Banking application key
+  ansible.builtin.copy:
+    content: "{{ enable_banking_private_key }}"
+    dest: "{{ family_finances_secrets_dir }}/enable-banking.pem"
+    owner: 10001
+    group: 10001
+    mode: '0400'
+  no_log: true
+  notify: Restart family finances
+  tags: [docker, family_finances]
+
 - name: Create environment file from template
   ansible.builtin.template:
     src: .env.j2

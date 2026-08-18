@@ -36,6 +36,31 @@ family_finances_port: 8080
 # (family-finances docs/adr/0016-invite-only-registration.md).
 family_finances_signup_code: "{{ vault_family_finances_signup_code }}"
 
+# Bank sync over PSD2 (family-finances docs/adr/0023-enable-banking-as-provider.md).
+#
+# All three unset means sync is OFF, which is the safe direction and the one
+# the app's tests assert -- a deployment that forgets them offers no bank
+# connections rather than failing when a household tries to use one.
+#
+# The key is the APPLICATION's, not a household's: it grants nothing without a
+# consent handle established by a member's own bank authorisation, and that
+# lives inside the encrypted household database. Deployment configuration, so
+# it sits beside the signup code rather than under the rules that govern
+# household material (family-finances docs/adr/0022 §2, item 4).
+enable_banking_app_id: "{{ vault_enable_banking_app_id }}"
+enable_banking_private_key: "{{ vault_enable_banking_private_key }}"
+
+# Deliberately NOT under family_finances_data_dir. That directory IS the
+# family's financial record; an application credential has no business inside
+# the thing the backups and the encryption exist to protect.
+family_finances_secrets_dir: /srv/family-finances-secrets
+
+# Must match a Redirect URL registered on the Enable Banking application
+# EXACTLY, and production requires HTTPS. This is the SPA route added in
+# d62ed1f; the /api/ variant is also registered and exists only so the probe
+# can read the callback without the router rewriting it away.
+enable_banking_redirect_url: "https://finances.itsa-pizza.com/oauth/callback"
+
 # ghcr credentials. The family-finances repository is private, so its packages
 # are private too — unlike library or sre-agent, whose repositories are public
 # and whose images therefore disclose nothing by being pullable. The image
