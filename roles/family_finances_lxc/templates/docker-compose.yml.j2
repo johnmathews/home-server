@@ -38,10 +38,16 @@ services:
       FAMILY_FINANCES_DIRECTORY: /data/directory.sqlite3
       FAMILY_FINANCES_HOUSEHOLDS: /data/households
       FAMILY_FINANCES_SIGNUP_CODE: ${FAMILY_FINANCES_SIGNUP_CODE}
+      ENABLE_BANKING_APP_ID: ${ENABLE_BANKING_APP_ID}
+      ENABLE_BANKING_PRIVATE_KEY_FILE: ${ENABLE_BANKING_PRIVATE_KEY_FILE}
+      ENABLE_BANKING_REDIRECT_URL: ${ENABLE_BANKING_REDIRECT_URL}
     volumes:
       # The family's financial record. This is the path the PBS guest backup
       # has to contain (family-finances docs/adr/0017).
       - "{{ family_finances_data_dir }}:/data"
+      # Read-only, and a separate mount from /data: the application key is
+      # deployment configuration, not part of the family's financial record.
+      - "{{ family_finances_secrets_dir }}:/secrets:ro"
     healthcheck:
       # curl is not in the slim image; the stdlib is.
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"]
