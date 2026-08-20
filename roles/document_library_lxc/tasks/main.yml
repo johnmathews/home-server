@@ -28,6 +28,19 @@
   loop:
     # library postgres data dir — uid 999 inside the image, must be 0700
     - {path: /srv/apps/library/pgdata, owner: 999, mode: '0700'}
+    # Claude CLI OAuth credentials for library's subscription LLM backend.
+    # 0700 + uid 999: the file holds an access token AND a refresh token, and
+    # library rewrites it in place on every refresh (~8-hourly), so the
+    # container's app user must own the directory, not just read it.
+    #
+    # The credentials themselves are deliberately NOT templated — they are
+    # short-lived, rotate on their own, and would be a secret in the repo.
+    # Provision once per host (see the comment in docker-compose.yml.j2):
+    #   CLAUDE_CONFIG_DIR=/srv/apps/library/claude claude auth login --claudeai
+    #   chown 999:999 /srv/apps/library/claude/.credentials.json
+    # This task is safe to re-run: it never touches an existing credentials
+    # file, only the directory.
+    - {path: /srv/apps/library/claude, owner: 999, mode: '0700'}
   tags: [docker, document_library]
 
 # Owner only — no mode, no group. The document-store dataset uses NFSv4 ACLs

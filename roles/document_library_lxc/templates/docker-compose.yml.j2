@@ -77,9 +77,19 @@ services:
       LIBRARY_DATABASE_URL: postgresql+asyncpg://library:${LIBRARY_DB_PASSWORD}@library-db:5432/library
       LIBRARY_DATA_DIR: /data
       LIBRARY_EMBEDDING_SERVICE_URL: http://library-embedder:80
-      LIBRARY_ANTHROPIC_API_KEY: "{{ vault_library_anthropic_api_key }}"
+      LIBRARY_CLAUDE_CONFIG_DIR: /app/.claude
     volumes:
       - "/mnt/nfs/document-store/data:/data"
+      # Claude CLI OAuth credentials for library's subscription LLM backend
+      # (library docs/llm-backends.md). Read-write: the access token expires
+      # ~8-hourly and library refreshes it in place, so a :ro mount would break
+      # it. The directory is created owner 999 by this role; the credentials
+      # themselves are NOT managed here — run, once, on the host:
+      #   CLAUDE_CONFIG_DIR=/srv/apps/library/claude claude auth login --claudeai
+      #   chown 999:999 /srv/apps/library/claude/.credentials.json
+      # (`claude setup-token` does NOT work for this: it prints a token and
+      # writes no credentials file.)
+      - "/srv/apps/library/claude:/app/.claude"
     depends_on:
       library-db:
         condition: service_healthy
@@ -113,10 +123,20 @@ services:
       # The consume dir is an NFS mount; inotify does not cross it.
       LIBRARY_CONSUME_FORCE_POLLING: "true"
       LIBRARY_EMBEDDING_SERVICE_URL: http://library-embedder:80
-      LIBRARY_ANTHROPIC_API_KEY: "{{ vault_library_anthropic_api_key }}"
+      LIBRARY_CLAUDE_CONFIG_DIR: /app/.claude
     volumes:
       - "/mnt/nfs/document-store/data:/data"
       - "/mnt/nfs/document-store/consume:/consume"
+      # Claude CLI OAuth credentials for library's subscription LLM backend
+      # (library docs/llm-backends.md). Read-write: the access token expires
+      # ~8-hourly and library refreshes it in place, so a :ro mount would break
+      # it. The directory is created owner 999 by this role; the credentials
+      # themselves are NOT managed here — run, once, on the host:
+      #   CLAUDE_CONFIG_DIR=/srv/apps/library/claude claude auth login --claudeai
+      #   chown 999:999 /srv/apps/library/claude/.credentials.json
+      # (`claude setup-token` does NOT work for this: it prints a token and
+      # writes no credentials file.)
+      - "/srv/apps/library/claude:/app/.claude"
     depends_on:
       library-db:
         condition: service_healthy
