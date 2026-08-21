@@ -61,6 +61,27 @@ scrape_configs:
         target_label: host
         replacement: '$1'
 
+  - job_name: 'library'
+    # The document library's own application metrics (OpenTelemetry via a
+    # Prometheus exporter): Ask token usage split by cache kind, estimated cost,
+    # turn latency, tool-loop depth, and errors by category.
+    #
+    # Port 8010, not 8000: the container listens on 8000 and compose publishes
+    # it as 8010 on the host (see document_library_lxc/docker-compose.yml.j2).
+    #
+    # Returns 404 unless LIBRARY_OTEL_METRICS_ENABLED=true is set in that role's
+    # .env.j2 — so a 404 here means the app setting, not this config.
+    scrape_interval: 60s
+    scrape_timeout: 15s
+    static_configs:
+      - targets: ['192.168.2.117:8010']
+        labels: {hostname: 'paperless'}
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: '([^:]+)(?::\d+)?'
+        target_label: host
+        replacement: '$1'
+
   - job_name: 'adguard'
     static_configs:
       - targets: ['192.168.2.111:9618']
