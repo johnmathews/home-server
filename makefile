@@ -157,8 +157,10 @@ clean:
 	rm -f *.retry
 	rm -f .ansible.log
 
+# Runs under the venv, not system python: the checker renders the templates with
+# jinja2 and parses them with pyyaml, both of which come from requirements.txt.
 check-ports:
-	python3 scripts/check-duplicate-ports.py
+	.venv/bin/python scripts/check-duplicate-ports.py
 
 ci: lint check-ports check
 
