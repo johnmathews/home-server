@@ -14,3 +14,8 @@ ansible-core==2.21.3
 proxmoxer==2.3.0
 requests==2.34.2
 ansible-lint==26.8.0
+
+# The test framework. `make test` and the CI lint job both run
+# `.venv/bin/python -m pytest`, so pytest has to be in this venv rather than
+# whatever the ambient python3 happens to have.
+pytest==9.0.2

@@ -172,14 +172,16 @@ check-ports:
 # unit bats suite had never run, in CI or locally.
 # Needs bats, docker, jq and curl for the integration suite.
 test:
-	python3 -m pytest tests/ -q
+	.venv/bin/python -m pytest tests/ -q
 	bash tests/run_tests.sh
 
 # Two composites, split by what they need to reach.
 #
 #   ci-offline  needs nothing but this checkout: no network, no SSH, no vault
-#               password. This is what a GitHub runner can execute, and it is
-#               what .github/workflows/lint.yml runs.
+#               password. .github/workflows/lint.yml runs the docker-free part
+#               of it (lint, check-ports, pytest) on every push; the docker
+#               integration suite stays in .github/workflows/test.yml behind its
+#               own gate.
 #   ci          adds `check`, a --check dry run of site.yml against the live
 #               fleet. It needs SSH to every production host and the gitignored
 #               .vault_pass.txt, so it is operator-only and cannot run in CI.
