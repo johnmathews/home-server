@@ -208,6 +208,62 @@ contains an example of the second — "`grep -c '^\`\`\`' CLAUDE.md` is even" is
 already true, at 8, while the fences are still broken — so it has been replaced in
 the handover with one that discriminates.
 
+### The "mechanical field shuffle" changed three things nobody mentioned
+
+W12 was described in the plan as a decomposition of a `repo:` one-liner into
+`uris` / `suites` / `components` / `signed_by`. It is not. Swapping
+`apt_repository` for `deb822_repository` changed three behaviours, none of which
+appears in the deprecation notice, and each of which was found the hard way:
+
+1. It stopped refreshing the apt cache (above).
+2. It left the old `.list` file in place (above).
+3. **It added a target-side Python dependency.** `deb822_repository` needs the
+   `python3-debian` library on the managed host, and `install_python_debian`
+   **defaults to `false`** — so on a host that has never had the package the module
+   hard-fails rather than installing it.
+
+Fifteen of sixteen hosts already had `python3-debian` for unrelated reasons.
+`key_server` did not, which is the only reason this was caught at all — and it was
+caught by running the role against the *whole fleet* rather than the two or three
+hosts the acceptance criteria named:
+
+```console
+$ make tailscale EXTRA="--check"          # before
+fatal: [key_server]: FAILED! => {"msg": "python3-debian must be installed to use
+  check mode. If run with install_python_debian, this module can auto-install it."}
+key_server : ok=2  changed=1  failed=1
+
+$ make tailscale LIMIT=key_server         # after adding the prerequisite
+key_server : ok=13 changed=5 failed=0
+```
+
+Left alone this would have broken **every host built from scratch** — which is
+exactly the rebuild path W7 spent the same session repairing. Filed as F33. All four
+deb822 sites now install the package explicitly.
+
+The wider point: the unit that looks mechanical is the one to run widest. Two of the
+three surprises above are invisible on a host that is already converged, and the
+third is invisible on any host that happens to have the library.
+
+### `make site` still cannot complete, for a second and unrelated reason
+
+Running the tailscale role across all 16 hosts turned up a failure that has nothing
+to do with this batch. `family_finances_lxc` deliberately omits the tailscale role
+from its own playbook — the guest was cloned, arrived holding the document-library
+host's node key, and re-registering it needs an auth key that is expired. That
+reasoning is written up carefully at `playbooks/family_finances_lxc.yml:21-36`.
+
+But `playbooks/tailscale.yml` targets `hosts: all:!nas`, which still includes it,
+and `site.yml` imports that playbook. So the deliberate exclusion is silently
+overridden and `make site` dies on `tailscale status`. Filed as **F34**.
+
+This is the same shape as F4, which this session fixed: a runbook-level claim
+(`make site` rebuilds everything) that the playbook graph does not honour. Adding
+`!family_finances_lxc` to `tailscale.yml`'s host pattern would make `make site`
+completable in one line, without touching the expired-credential question. Not done
+here — the credential is an explicit non-goal of this plan, and widening scope on
+the last unit of a session is how the previous two sessions' corrections happened.
+
 ## Follow-up filed but not fixed
 
 **F31** — `INJECT_FACTS_AS_VARS` is deprecated and removed in ansible-core
