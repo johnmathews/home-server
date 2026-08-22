@@ -9,15 +9,26 @@
         mode: '0644'
 
     - name: Add Tailscale repository
-      ansible.builtin.apt_repository:
-        repo: "deb [signed-by=/usr/share/keyrings/tailscale-archive-keyring.gpg] https://pkgs.tailscale.com/stable/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} main"
+      ansible.builtin.deb822_repository:
+        name: tailscale
+        types: deb
+        uris: "https://pkgs.tailscale.com/stable/{{ ansible_distribution | lower }}"
+        suites: "{{ ansible_distribution_release }}"
+        components: main
+        signed_by: /usr/share/keyrings/tailscale-archive-keyring.gpg
         state: present
-        filename: tailscale
+      register: tailscale_repo
+
+    - name: Remove the superseded Tailscale .list repository file
+      ansible.builtin.file:
+        path: /etc/apt/sources.list.d/tailscale.list
+        state: absent
 
     - name: Update apt cache
       ansible.builtin.apt:
         update_cache: true
-        cache_valid_time: 3600
+        # deb822_repository does not refresh the apt cache; apt_repository used to.
+        cache_valid_time: "{{ 0 if tailscale_repo is changed else 3600 }}"
 
     - name: Install Tailscale
       ansible.builtin.apt:

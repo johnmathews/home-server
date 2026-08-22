@@ -6,6 +6,10 @@
   register: nodejs_check
   changed_when: false
   failed_when: false
+  # Read-only probe. Without this the command module skips itself under --check,
+  # nodejs_needs_install evaluates against an empty result, and every task gated
+  # on it is reported as changed in a dry run when it would really be skipped.
+  check_mode: false
 
 - name: Set Node.js installation status
   ansible.builtin.set_fact:
@@ -44,17 +48,30 @@
   when: nodejs_needs_install
 
 - name: Add NodeSource repository
-  ansible.builtin.apt_repository:
-    repo: "deb [signed-by=/etc/apt/keyrings/nodesource.asc] https://deb.nodesource.com/node_{{ shell_environment_nodejs_major_version }}.x nodistro main"
+  ansible.builtin.deb822_repository:
+    name: nodesource
+    types: deb
+    uris: "https://deb.nodesource.com/node_{{ shell_environment_nodejs_major_version }}.x"
+    suites: nodistro
+    components: main
+    signed_by: /etc/apt/keyrings/nodesource.asc
     state: present
-    filename: nodesource
+  become: true
+  register: nodesource_repo
+  when: nodejs_needs_install
+
+- name: Remove the superseded NodeSource .list repository file
+  ansible.builtin.file:
+    path: /etc/apt/sources.list.d/nodesource.list
+    state: absent
   become: true
   when: nodejs_needs_install
 
 - name: Update apt cache after adding NodeSource repo
   ansible.builtin.apt:
     update_cache: true
-    cache_valid_time: 3600
+    # deb822_repository does not refresh the apt cache; apt_repository used to.
+    cache_valid_time: "{{ 0 if nodesource_repo is changed else 3600 }}"
   become: true
   when: nodejs_needs_install
 

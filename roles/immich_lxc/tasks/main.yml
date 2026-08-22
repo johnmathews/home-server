@@ -38,11 +38,12 @@
 
 - name: Deploy immich api file
   ansible.builtin.template:
-    src: files/immich_api_key.secret
+    src: immich_api_key.secret.j2
     dest: /srv/apps/immich/immich_api_key.secret
     owner: root
     group: root
-    mode: '0644'
+    mode: '0600'
+  no_log: true
   tags: docker
 
 - name: Upload alloy config files
@@ -70,12 +71,20 @@
   notify: Restart docker compose stack
   tags: docker
 
+# /etc/environment carries live API keys, so it must not keep its 0644 default.
+# pam_env reads it as root during session setup, so a 0600 file is still
+# delivered to every login shell (verified on media-vm 2026-08-22) while no
+# longer being readable by other local accounts.
 - name: Set Immich environment variables
   ansible.builtin.lineinfile:
     path: /etc/environment
     regexp: "^{{ item.key }}="
     line: "{{ item.key }}={{ item.value }}"
+    owner: root
+    group: root
+    mode: '0600'
   become: true
+  no_log: true
   loop:
     - {key: IMMICH_API_KEY, value: "{{ vault_immich_media_vm_api_key }}"}
     - {key: IMMICH_LIBRARY_ID, value: "{{ vault_immich_reference_library_id }}"}

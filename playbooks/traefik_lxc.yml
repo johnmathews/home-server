@@ -12,6 +12,3 @@
       tags: shell
     - role: tailscale
       tags: tailscale
-
-  vars:
-    foo: bar
