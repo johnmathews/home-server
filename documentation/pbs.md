@@ -1,5 +1,9 @@
 # Proxmox Backup Server (PBS)
 
+**Status:** current as of 2026-08-22 (covers: live). The datastore figures below were
+re-read from the appliance on that date; re-check them with the command in
+[Datastore](#datastore) rather than trusting the numbers.
+
 ## Overview
 
 PBS runs on a dedicated host at **192.168.2.200** (port **8007**) and is the destination for all
@@ -22,9 +26,25 @@ the appliance itself; this doc describes what's there, why, and how to interact 
 
 ## Datastore
 
-A single datastore named `pbs`, mounted at `/mnt/pbs` on `/dev/sdh1`. As of last check: 916 GB
-total, ~660 GB used (77%). When usage exceeds ~85% the prune retention or disk capacity should be
-reviewed.
+A single datastore named `pbs`, mounted at `/mnt/pbs` on `/dev/sdh1`.
+
+**Usage is a moving number — read it, do not trust a figure written down here.** Either of:
+
+```bash
+ssh pbs proxmox-backup-manager datastore list      # name, path, and comment
+ssh pbs df -h /mnt/pbs                             # size, used, available, use%
+```
+
+or the `pbs_datastore_status` tool on the `sre-agent` MCP server, which returns the same
+figures without a shell.
+
+At last verification (**2026-08-22**): 386 GiB used of 915 GiB (**42.2%**), 482 GiB available.
+When usage exceeds ~85% the prune retention or disk capacity should be reviewed.
+
+The two commands disagree by a few points and both are correct: PBS reports `used / total`,
+while `df` reports `used / (used + available)` and so counts the filesystem's reserved blocks
+against you. On the figures above that is 42.2% versus `df`'s 45%. Use the PBS number when
+comparing against the ~85% threshold.
 
 ```
 +------------------+----------------------+
@@ -34,7 +54,7 @@ reviewed.
 | Path             | /mnt/pbs             |
 | Backing device   | /dev/sdh1            |
 | Notification     | notification-system  |
-| Capacity         | 916 GB               |
+| Capacity         | 915 GiB              |
 +------------------+----------------------+
 ```
 
@@ -55,15 +75,38 @@ reviewed.
 
 ## Retention
 
-Configured on the **PVE side** in the vzdump job (not in PBS prune.cfg, which uses defaults):
+**Two prune policies exist and the stricter one wins.** This surprises people, so read the
+whole section before relying on a number.
 
-| Window      | Keep |
-|-------------|------|
-| Last        | 14   |
-| Daily       | 31   |
-| Weekly      | 26   |
-| Monthly     | 12   |
-| Yearly      | 1    |
+The PVE vzdump job carries its own `prune-backups` line, and PBS runs a *separate* prune job
+two hours later. PBS's job is both later and tighter, so **PBS's policy is the one that
+determines what you can actually restore.**
+
+```
++-------------------------+-------+--------------------------------------------------+
+| Policy                  | Runs  | Keeps                                            |
++-------------------------+-------+--------------------------------------------------+
+| PVE vzdump job          | 10:00 | last 14, daily 31, weekly 26, monthly 12,        |
+| (/etc/pve/jobs.cfg)     |       | yearly 1  -> up to ~84 snapshots                 |
+| PBS prune job  <-- WINS | 12:00 | daily 14, weekly 4, monthly 3                    |
+| (proxmox-backup-manager |       | -> 21 snapshots, no yearly                       |
+|  prune-job list)        |       |                                                  |
++-------------------------+-------+--------------------------------------------------+
+```
+
+**Effective retention is 21 snapshots per guest — roughly 3 months, with no yearly copy.**
+Confirmed 2026-08-22: every guest backed up for longer than 21 days holds exactly 21
+snapshots (`pbs_list_backups` on the `sre-agent` MCP server, or the command below).
+
+```bash
+ssh pbs proxmox-backup-manager prune-job list     # the binding policy
+ssh pve grep prune-backups /etc/pve/jobs.cfg      # the PVE-side policy (mostly moot)
+```
+
+If you want the longer PVE-side window to be real, relax the PBS prune job to match —
+editing only `/etc/pve/jobs.cfg` will not change what is kept. Note also that
+`/etc/pve/storage.cfg` sets `prune-backups keep-all=1` on the `pbs` storage, which disables
+*storage-level* pruning only; it does not override either job above.
 
 ## PVE-side configuration
 

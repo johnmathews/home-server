@@ -122,7 +122,7 @@ Host IPs are assigned statically on the MikroTik router. Source of truth: `inven
 | nas_vm               | 192.168.2.104  |                  | TrueNAS (NFS/SMB shares)             |
 | media-vm             | 192.168.2.105  |                  | Sonarr, Radarr, qBittorrent, etc.    |
 | infra-vm             | 192.168.2.106  |                  | Grafana, Prometheus, Loki, etc.      |
-| agent_lxc            | 192.168.2.107  | 100.125.185.47   | NanoClaw Gateway :18790              |
+| agent_lxc            | 192.168.2.107  | 100.125.185.47   | NanoClaw v2 (Slack via TS Funnel)    |
 | traefik_lxc          | 192.168.2.108  |                  | Reverse proxy (Traefik)              |
 | jellyfin_lxc         | 192.168.2.110  |                  | Jellyfin media server                |
 | immich_lxc           | 192.168.2.113  |                  | Immich photo management              |
@@ -131,16 +131,24 @@ Host IPs are assigned statically on the MikroTik router. Source of truth: `inven
 | tubearchivist_lxc    | 192.168.2.116  |                  | TubeArchivist                        |
 | document_library_lxc | 192.168.2.117  |                  | Library doc store (host: paperless)  |
 | open_webui_lxc       | 192.168.2.119  |                  | Open WebUI                           |
+| family_finances_lxc  | 192.168.2.120  |                  | Family finances app :8080            |
 | key_server           | 192.168.2.201  |                  | TrueNAS encryption key server        |
 +----------------------+----------------+------------------+--------------------------------------+
+```
 
 Not in `inventory.ini` and **not Ansible-managed**, but part of the estate — you will need
-these and they are otherwise undiscoverable from this file:
+these and they are otherwise undiscoverable from this file. The first three are Proxmox guests
+on `pve` (so `pct`/`qm` and PBS backups apply to them, and they appear in `proxmox_list_guests`);
+the last three are third-party devices on the LAN:
 
 ```
 +----------------------+----------------+------------------+--------------------------------------+
 | Host                 | Local IP       | Managed by       | Key Services                         |
 +----------------------+----------------+------------------+--------------------------------------+
+| librespeed-rust      | 192.168.2.100  | CT 100 on pve    | LAN speed test                       |
+|   (CT 100)           |                |   (not Ansible)  |                                      |
+| adguard (CT 111)     | 192.168.2.111  | CT 111 on pve    | AdGuard Home DNS :53, web UI :80     |
+|                      |                |   (not Ansible)  |   (see adguard-unbound.md)           |
 | home assistant (VM   | 192.168.2.102  | its own /config  | HA :8123, Mosquitto :1883,           |
 |   102, HAOS)         |                |   git repo       |   zigbee2mqtt, go2rtc :1984          |
 | bosch dishwasher     | 192.168.2.39   | Home Connect     | Home Connect local protocol :443     |
@@ -149,7 +157,6 @@ these and they are otherwise undiscoverable from this file:
 | voldt ev cable       | 192.168.2.29   | tuya-local via HA| EV charging (see ev_charging doc)    |
 | reolink doorbell     | 192.168.2.35   | HA + go2rtc      | Doorbell, two-way audio              |
 +----------------------+----------------+------------------+--------------------------------------+
-```
 ```
 
 ## SSH Aliases
@@ -160,6 +167,19 @@ alias names when SSH-ing. Run `grep "^Host " ~/.ssh/config` to list all aliases.
 ## Documentation Index
 
 Service-specific guides in `/documentation/`. Read the relevant doc before working on a service.
+Unprefixed names below are relative to `documentation/`; anything outside it is written with its
+path. To confirm this list is still complete:
+`diff <(grep -o '`[^`]*\.md`' CLAUDE.md | tr -d '`' | sort -u) <(cd documentation && ls *.md archive/*.md | sort)`
+
+**Outside `documentation/`:**
+
+- `readme.md` (repo root) — Project overview and entry point; also where plans and backlogs live
+- `building.md` (repo root) — Running notes on in-flight problems and their fixes; scratch, not a guide
+- `README-TAILSCALE.md` (repo root) — Tailscale quick-start: get remote Ansible/SSH working in ~30 min
+- `tests/README.md` — The `sleep_hours` end-to-end test suite: what it covers and how to run it
+- `tests/IMPLEMENTATION_SUMMARY.md` — How that test framework was built (completed 2025-11-22)
+
+**In `documentation/`:**
 
 - `adding-a-new-service.md` — Step-by-step guide for adding a new service to the infrastructure
 - `adguard-unbound.md` — DNS privacy and ad blocking (MikroTik → AdGuard → Unbound → Quad9)
@@ -171,7 +191,9 @@ Service-specific guides in `/documentation/`. Read the relevant doc before worki
 - `disaster-recovery.md` — Backup architecture, recovery scenarios, and rebuild procedures
 - `archive/domain-migration.md` — Completed migration from itsa.pizza to itsa-pizza.com (archived 2026-07-12)
 - `docserver.md` — Documentation MCP server on infra VM (indexing, search, MCP)
+- `document_library_lxc.md` — The `library` document store (guest is still named `paperless`); the repo's reference Docker role
 - `disks.md` — Proxmox host disk management and backup storage
+- `family_finances_lxc.md` — Family finances app: SHA-pinned private images, encrypted per-household DBs, why Tailscale is omitted
 - `doorbell.md` — Reolink video doorbell: usage guide (non-technical), notifications, two-way audio, HA/go2rtc setup
 - `grafana-alerting.md` — Grafana alert rules, concise Pushover notification templates, API access
 - `home_assistant_dishwasher.md` — Bosch dishwasher: LAN discovery, why Home Connect gives no kWh, metering plug, Home Connect integration, per-cycle energy attribution
@@ -189,6 +211,7 @@ Service-specific guides in `/documentation/`. Read the relevant doc before worki
 - `navidrome.md` — Navidrome music streaming, NFS mount, Subsonic API clients
 - `agent.md` — NanoClaw architecture, LXC setup, macOS app, Tailscale, known issues
 - `open_webui_lxc.md` — Open WebUI LLM chat interface, OpenAI backend, Docker setup
+- `archive/home-assistant-doorbell.md` — Doorbell two-way audio via go2rtc/WebRTC (superseded by `doorbell.md`, 2026-07-04)
 - `archive/paperless.md` — Paperless-ngx document store (decommissioned 2026-07-04, superseded by the `library` app on the same LXC)
 - `pbs.md` — Proxmox Backup Server: datastore, schedule, retention, restore procedure
 - `portainer.md` — Portainer server + fleet-wide Ansible-managed agents, endpoint registration, upgrades
@@ -209,6 +232,25 @@ Service-specific guides in `/documentation/`. Read the relevant doc before worki
 - `ups.md` — UPS monitoring via Network UPS Tools (NUT)
 - `vault.md` — Ansible Vault: layout, conventions, edit/rotate, recovery considerations
 
+## Decision Log — `journal/`
+
+`journal/` is this repo's **de-facto ADR log**, and nothing else links to it. If you are asking
+"why is it built this way" and `documentation/` does not say, the answer is usually here.
+
+- One file per working session, named `yymmdd-descriptive-name.md` (e.g.
+  `260704-jellyfin-brownouts-ffprobe-oom-root-cause.md`). 55 entries spanning 2026-03-19 to
+  2026-08-22 at last count — `ls journal/*.md | wc -l` for the current number.
+- **Append-only.** Entries are never rewritten to reflect later knowledge; a wrong call stays
+  on the record next to the entry that corrects it.
+- **A journal entry records what was true *then*; `documentation/` records what is true *now*.**
+  When the two disagree, `documentation/` wins for current state and the journal explains how
+  the state got there. Never "fix" a journal entry to match today's reality.
+- Searchable through the `docs` MCP server (`search_docs`, `query_docs`) alongside
+  `documentation/`, which is usually faster than grepping.
+
+Write an entry whenever you make a decision, hit a non-obvious failure, or change live state —
+see the "Development Journal" rules in the global instructions for the format.
+
 ## Editing Guardrails
 
 **Safe to edit:**
@@ -221,7 +263,9 @@ Service-specific guides in `/documentation/`. Read the relevant doc before worki
 
 **Never edit:**
 
-- `/roles/geerlingguy.*/` — External roles (managed by ansible-galaxy, installed during `make requirements`)
+- `~/.ansible/roles/` — External Galaxy roles, e.g. `geerlingguy.docker`, `geerlingguy.pip` (installed
+  during `make requirements`; `ansible.cfg` puts them on `roles_path` after `./roles`). They are **not**
+  in this repo — there is no `roles/geerlingguy.*/`. Pin versions in `requirements.yml` instead.
 - `~/.ansible/collections/` — External collections (managed by ansible-galaxy, installed during `make requirements`)
 - `.ansible-lint` — Only with maintainer approval
 - `ansible.cfg` — Core config (coordinate before changes)

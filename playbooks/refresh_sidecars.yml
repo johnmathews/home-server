@@ -4,15 +4,21 @@
 # Why this exists
 # ---------------
 # Alloy, node-exporter and cadvisor run as sidecars in every service's compose
-# stack. The roles that deliberately track `:latest` (agent, music, prometheus,
-# traefik, document_library) drift as upstream pushes new `:latest` builds,
-# because the compose handlers use `pull: never` and `make <host>` recreates but
-# never pulls. Refreshing them one host at a time is tedious. This playbook pulls
-# the newest images and recreates the sidecars in bulk, on demand — the manual
-# "apply" companion to the container-status-exporter freshness dashboard.
+# stack. Every host pins them — either via the `sidecar_*` vars in
+# group_vars/all/main.yml, or with literal versions in the role's own defaults
+# (agent, music, prometheus, traefik, document_library, family_finances). None
+# tracks `:latest`; an earlier version of this comment said six of them did.
 #
-# It is idempotent for pinned hosts: `docker compose pull` fetches the pinned tag
-# they already run, so nothing is recreated there.
+# So this playbook does NOT chase upstream. It exists because the compose
+# handlers use `pull: never` and `make <host>` recreates without pulling, which
+# means a host can sit on an old local image even after its pin was bumped.
+# Running `docker compose pull` here fetches whatever tag the host is currently
+# pinned to and recreates the sidecar, in bulk rather than one host at a time —
+# the manual "apply" companion to the container-status-exporter freshness
+# dashboard.
+#
+# It is therefore idempotent when the local image already matches the pin:
+# nothing is recreated.
 #
 # Usage
 # -----
