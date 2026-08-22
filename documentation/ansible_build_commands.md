@@ -1,3 +1,6 @@
+**Status:** current — verified 2026-08-22 · covers: makefile
+Every target listed here was checked against `makefile` on that date.
+
 A list of make commands with tags to remember how to do all the things:
 
 ### Docs and Observability
@@ -32,20 +35,48 @@ a shared role to setup the share drive monitoring probe. In the playbooks, these
 ## Quality checks
 
 `make help` is the source of truth for the full target list — it is generated from
-the makefile and cannot drift from it. The four that matter before a commit:
+the makefile and cannot drift from it. The five that matter before a commit:
 
 ```sh
 make lint         # ansible-lint over the WHOLE repo. Exits 2 on any failure.
 make check-ports  # render every compose template, fail on a duplicate host port
+make check-docs   # parse every doc's **Status:** stamp, fail on a stale or missing one
 make test         # pytest + bats (needs docker, bats, jq, curl)
-make ci-offline   # all three. No network, no SSH, no vault password.
+make ci-offline   # all four. No network, no SSH, no vault password.
 ```
 
-`make ci-offline` is exactly what `.github/workflows/lint.yml` runs on every push
-and every PR, so a green `ci-offline` locally means a green lint job. `make ci`
-adds `make check` — a `--check` dry run of `site.yml` against the live fleet —
-which needs SSH to every production host and the gitignored `.vault_pass.txt`, so
-it is operator-only and cannot run on a runner.
+`make check-docs` is the docs half. It parses the stamp rather than grepping for
+a label: docs whose `covers:` names repo paths are dated against `git log` of
+those paths (change-driven, 14-day grace), and only docs whose `covers:` is
+`live` — out-of-repo state git cannot see — get a calendar backstop. The
+convention, and the opt-out list at `documentation/.freshness-exempt`, are
+described in readme.md under "Documentation freshness stamps".
+
+`.github/workflows/lint.yml` runs on every push and every PR with no `paths:`
+filter. It and `make ci-offline` overlap but are not identical, and the
+difference matters when a local run is green and CI is not:
+
+```
++------------------------+--------------+---------------+
+| Stage                  | ci-offline   | lint.yml      |
++------------------------+--------------+---------------+
+| make lint              | yes          | yes           |
+| playbook syntax-check  | no           | yes           |
+| make check-ports       | yes          | yes           |
+| make check-docs        | yes          | yes           |
+| pytest tests/          | yes          | yes           |
+| bats integration suite | yes          | no (test.yml) |
+| sleep_hours gate check | no           | yes           |
++------------------------+--------------+---------------+
+```
+
+So a green local `ci-offline` does not by itself promise a green lint job — the
+syntax-check and the sleep-hours gate only run on the runner. The bats suite runs
+locally and in `test.yml`, which needs a docker daemon.
+
+`make ci` adds `make check` — a `--check` dry run of `site.yml` against the live
+fleet — which needs SSH to every production host and the gitignored
+`.vault_pass.txt`, so it is operator-only and cannot run on a runner.
 
 `make lint` is **blocking**, not advisory. Because make stops at the first failed
 prerequisite, a lint failure aborts `ci`/`ci-offline` before their later stages.

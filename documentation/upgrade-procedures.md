@@ -1,5 +1,9 @@
 # Upgrade Procedures
 
+**Status:** current — verified 2026-08-22 · covers: group_vars/all/main.yml, playbooks/refresh_sidecars.yml
+The sidecar pins were re-read from `group_vars/all/main.yml` on that date; nothing in the
+fleet runs `:latest`.
+
 How to upgrade the various components of the home server infrastructure.
 
 ## Docker Image Version Bumps

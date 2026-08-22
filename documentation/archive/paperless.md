@@ -1,9 +1,10 @@
 # Paperless-ngx Document Store
 
-**Status:** superseded — paperless decommissioned in favour of the `library` app (2026-07-04).
-The ansible layer was renamed `paperless_lxc → document_library_lxc` (role, playbook, host_vars,
-inventory group, `make document-library` target); the runtime hostname stays `paperless` (CT/117)
-for metric/backup continuity. Paperless data was left in place (not destroyed). See
+**Status:** superseded — verified 2026-07-04 · covers: none
+Paperless was decommissioned in favour of the `library` app. The ansible layer was renamed
+`paperless_lxc → document_library_lxc` (role, playbook, host_vars, inventory group,
+`make document-library` target); the runtime hostname stays `paperless` (CT/117) for
+metric/backup continuity. Paperless data was left in place (not destroyed). See
 `journal/260705-decommission-paperless-app.md` for the decommission record.
 
 ## Purpose

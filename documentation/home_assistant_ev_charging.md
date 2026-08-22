@@ -1,9 +1,10 @@
 # Home Assistant — EV Charging (Voldt granny cable + Skoda Enyaq)
 
-**Status:** LIVE. Cable side **fully local via tuya-local since 2026-08-13** (was Tuya
-cloud 2026-08-12 to 2026-08-13); car side since 2026-08-13 (MySkoda). Tracks charging of
-the **Skoda Enyaq** on the **Voldt Type 2 granny cable** (8–13 A, ~2.9 kW, WiFi). In the
-Energy dashboard as **"EV Charger (Enyaq)"**.
+**Status:** current — verified 2026-08-13 · covers: live
+Cable side **fully local via tuya-local since 2026-08-13** (was Tuya cloud 2026-08-12 to
+2026-08-13); car side since 2026-08-13 (MySkoda). Tracks charging of the **Skoda Enyaq** on
+the **Voldt Type 2 granny cable** (8–13 A, ~2.9 kW, WiFi). In the Energy dashboard as
+**"EV Charger (Enyaq)"**.
 
 There are two independent halves, and the distinction matters constantly:
 

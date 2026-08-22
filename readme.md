@@ -27,6 +27,56 @@ Plans and open work are kept in the docs, not in issues:
 
 Every doc is indexed in the Documentation Index in `CLAUDE.md`.
 
+### Documentation freshness stamps
+
+Every living doc carries a status stamp in its **first six lines**, and `make
+check-docs` parses it. One grammar, no variants:
+
+```
+**Status:** <state> — verified YYYY-MM-DD · covers: <what it describes>
+```
+
+- `<state>` — free prose, but the first word decides how the doc is checked.
+  `superseded`, `archived`, `closed`, `completed`, `complete` and
+  `decommissioned` are **terminal**: the doc is a record of something finished,
+  it is correct forever, and no staleness check applies. Anything else
+  (`current`, `live`, `plan of record`, `draft`) is **active** and is checked.
+- `verified YYYY-MM-DD` — the day somebody actually re-checked the doc's claims
+  against the thing they describe. It is not "the day the file was edited".
+  Bumping it without re-checking is the one failure this whole convention
+  exists to prevent.
+- `covers:` — a comma-separated list of what the doc describes. Each item is
+  either a repo path glob (`roles/immich_lxc/**`) or the literal `live`.
+  `none` is legal for terminal docs only.
+
+Prose may follow on the next line; the stamp line itself ends at the `covers:`
+list.
+
+**How staleness is decided.** Two signals, matched to the two kinds of claim,
+because only one of them has a commit to hang off:
+
+- **Path globs are change-driven.** The gate runs `git log -1` over the covered
+  paths. Commits newer than the stamp mean the doc is due — at any age. No
+  commits mean it cannot have drifted — at any age. There is a **14-day grace
+  window** so a code PR does not red a doc inside the same PR; past that it is
+  an error. A glob matching **zero files** is an error, which is what catches a
+  doc that outlived the role it describes.
+- **`live` is calendar-driven, and only `live`.** Out-of-repo state — a
+  datastore's used bytes, a VM's real RAM, a DNS chain — rots with no commit at
+  all, so those docs age out after `--max-age-days` (currently 180). This split
+  is deliberate: a calendar-only gate would red 28 accurate docs at once and get
+  switched off, and a change-only gate is blind to exactly the claims that were
+  found wrong.
+
+Unparseable is red, never skipped: a missing stamp, a malformed date, a future
+date and a stamp below line 6 all fail.
+
+**Enrolment is opt-out.** Every `documentation/**/*.md` and every root-level
+`*.md` is enrolled unless it is listed in `documentation/.freshness-exempt`.
+A doc added next month therefore reds on its first CI run rather than being
+silently uncovered. CI pins the list's size with `--assert-exempt-max`, so
+lowering it is a one-line commit and raising it is a visible, arguable diff.
+
 [Proxmox helper scripts](https://community-scripts.github.io/ProxmoxVE/) are used.
 
 Proxmox helper scripts are run manually, the configuration options are listed here.

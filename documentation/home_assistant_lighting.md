@@ -1,9 +1,9 @@
 # Home Assistant — Zigbee Lighting (JETSTRÖM panels + STYRBAR remotes)
 
-**Status:** plan of record as of 2026-08-14. Nothing migrated yet — Phase 1 is the next
-action. Supersedes the lighting half of backlog item #2 in
-[`home_assistant_energy.md`](home_assistant_energy.md), which misdescribed both the network
-and the hardware.
+**Status:** plan of record — verified 2026-08-14 · covers: live
+Nothing migrated yet — Phase 1 is the next action. Supersedes the lighting half of backlog
+item #2 in [`home_assistant_energy.md`](home_assistant_energy.md), which misdescribed both
+the network and the hardware.
 
 Home Assistant runs as Proxmox **VM 102** (HAOS) at `192.168.2.102:8123`, and is **not
 managed by this Ansible repo** — its config lives in

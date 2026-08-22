@@ -1,6 +1,7 @@
-**Status:** superseded by [cloudflared.md](../cloudflared.md) (2026-07-12). The migration is complete, and the
-"Tunnel API — Not applicable to our setup" section below is obsolete: `roles/cloudflared_lxc` now syncs the tunnel
-config AND DNS records to the Cloudflare API on every `make cloudflared` deploy.
+**Status:** superseded by [cloudflared.md](../cloudflared.md) — verified 2026-07-12 · covers: none
+The migration is complete, and the "Tunnel API — Not applicable to our setup" section below
+is obsolete: `roles/cloudflared_lxc` now syncs the tunnel config AND DNS records to the
+Cloudflare API on every `make cloudflared` deploy.
 
 # Cloudflare API Reference for Domain Migration
 

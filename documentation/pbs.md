@@ -1,8 +1,8 @@
 # Proxmox Backup Server (PBS)
 
-**Status:** current as of 2026-08-22 (covers: live). The datastore figures below were
-re-read from the appliance on that date; re-check them with the command in
-[Datastore](#datastore) rather than trusting the numbers.
+**Status:** current — verified 2026-08-22 · covers: live
+The datastore figures below were re-read from the appliance on that date; re-check them
+with the command in [Datastore](#datastore) rather than trusting the numbers.
 
 ## Overview
 

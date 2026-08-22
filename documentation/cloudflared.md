@@ -1,3 +1,7 @@
+**Status:** current — verified 2026-08-22 · covers: roles/cloudflared_lxc/**
+The ingress list and the source-of-truth note were checked against
+`roles/cloudflared_lxc/` on that date.
+
 This LXC container runs the `cloudflared` service, enabling secure remote access to services hosted on your Proxmox
 server via Cloudflare Tunnel.
 

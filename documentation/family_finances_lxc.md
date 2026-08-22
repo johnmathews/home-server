@@ -1,8 +1,9 @@
 # Family Finances
 
-**Status:** current as of 2026-08-22 (covers: live). The container list, data-directory
-ownership and the absence of Tailscale were read from the host on that date; everything
-else traces to `roles/family_finances_lxc/` and `playbooks/family_finances_lxc.yml`.
+**Status:** current — verified 2026-08-22 · covers: live, roles/family_finances_lxc/**, playbooks/family_finances_lxc.yml
+The container list, data-directory ownership and the absence of Tailscale were read from
+the host on that date; everything else traces to `roles/family_finances_lxc/` and
+`playbooks/family_finances_lxc.yml`.
 
 ## Purpose
 

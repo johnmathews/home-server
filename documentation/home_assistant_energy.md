@@ -1,7 +1,8 @@
 # Home Assistant — Energy Monitoring
 
-**Status:** current as of 2026-08-13 (dishwasher added; reconciliation check and long-gap
-runbook documented). Built in the 2026-08-12 powercalc overhaul.
+**Status:** current — verified 2026-08-13 · covers: live
+Dishwasher added; reconciliation check and long-gap runbook documented. Built in the
+2026-08-12 powercalc overhaul.
 
 Home Assistant runs as Proxmox **VM 102** (HAOS) at `192.168.2.102:8123`. It is **not
 managed by this Ansible repo** — its config lives in its own private repo,

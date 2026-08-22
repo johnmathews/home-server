@@ -48,7 +48,7 @@ ANSIBLE_OPTS := $(TAGS_ARG) $(SKIP_ARG) $(LIMIT_ARG) $(EXTRA)
         finances \
         shell nfs share_drive_probe tailscale requirements \
         jelly-upgrade immich-upgrade refresh-sidecars \
-        check lint clean ci ci-offline help check-ports test \
+        check lint clean ci ci-offline help check-ports check-docs test \
         requirements-python requirements-galaxy
 
 
@@ -178,6 +178,19 @@ clean:
 check-ports:
 	.venv/bin/python scripts/check-duplicate-ports.py
 
+# The ratchet on documentation/.freshness-exempt. Every doc that is not stamped
+# is listed there; this pins the list's size so it can only shrink. Lowering the
+# number is a one-line commit, raising it is a visible and arguable diff.
+DOCS_EXEMPT_MAX := 31
+
+# Parses every living doc's `**Status:**` stamp — it does not grep for a label.
+# Docs whose `covers:` names repo paths are checked against `git log` (change-
+# driven, 14-day grace); docs whose `covers:` is `live` describe out-of-repo
+# state git can never see, so only those get a calendar backstop. The
+# convention is documented in readme.md, "Documentation freshness stamps".
+check-docs:
+	.venv/bin/python scripts/check-docs-freshness.py --assert-exempt-max $(DOCS_EXEMPT_MAX)
+
 # Runs every suite in tests/. Until now nothing invoked pytest at all, and
 # tests/run_tests.sh globbed integration/ only — so the python tests and the
 # unit bats suite had never run, in CI or locally.
@@ -199,7 +212,7 @@ test:
 #
 # The old single `ci: lint check-ports check` never reached its last two stages:
 # `lint` exits 2 on any failure and make stops at the first failed prerequisite.
-ci-offline: lint check-ports test
+ci-offline: lint check-ports check-docs test
 
 ci: ci-offline check
 
@@ -251,8 +264,9 @@ help:
 	@echo " Quality checks"
 	@echo "  make lint             → ansible-lint over the WHOLE repo. Exits non-zero on any failure."
 	@echo "  make check-ports      → Render every compose template, fail on a duplicate host port"
+	@echo "  make check-docs       → Parse every doc status stamp, fail on a stale or missing one"
 	@echo "  make test             → pytest (tests/) + the bats suites (needs docker, bats, jq, curl)"
-	@echo "  make ci-offline       → lint + check-ports + test. No network, no SSH, no vault. What CI runs."
+	@echo "  make ci-offline       → lint + check-ports + check-docs + test. No network, no SSH, no vault. What CI runs."
 	@echo "  make check            → --check dry run of site.yml against the LIVE fleet (needs SSH + vault)"
 	@echo "  make ci               → ci-offline + check. Operator-only; cannot run on a CI runner."
 	@echo ""
