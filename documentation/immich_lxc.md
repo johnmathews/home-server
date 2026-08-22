@@ -34,11 +34,11 @@ object detection, smart search). Replaces Google Photos.
 | immich_machine_learning | ghcr.io/immich-app/immich-machine-learning:release                | -     |
 | immich_postgres         | ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0    | -     |
 | immich-redis            | valkey/valkey:8-bookworm (pinned by SHA)                          | -     |
-| immich_public_proxy     | alangrainger/immich-public-proxy:{{ immich_public_proxy_version }}| 3000  |
-| image_borders           | ghcr.io/johnmathews/image-borders:{{ image_borders_version }}     | -     |
-| cadvisor                | gcr.io/cadvisor/cadvisor:{{ cadvisor_version }}                   | 18080 |
-| node_exporter           | quay.io/prometheus/node-exporter:{{ node_exporter_version }}      | 9100  |
-| alloy                   | grafana/alloy:{{ alloy_version }}                                 | 12345 |
+| immich_public_proxy     | alangrainger/immich-public-proxy:{{ immich_lxc_immich_public_proxy_version }}| 3000  |
+| image_borders           | ghcr.io/johnmathews/image-borders:{{ immich_lxc_image_borders_version }}     | -     |
+| cadvisor                | gcr.io/cadvisor/cadvisor:{{ immich_lxc_cadvisor_version }}                   | 18080 |
+| node_exporter           | quay.io/prometheus/node-exporter:{{ immich_lxc_node_exporter_version }}      | 9100  |
+| alloy                   | grafana/alloy:{{ immich_lxc_alloy_version }}                                 | 12345 |
 +-------------------------+------------------------------------------------------------------+-------+
 ```
 

@@ -52,9 +52,9 @@ Nine, all from `roles/document_library_lxc/templates/docker-compose.yml.j2`:
 | library-db        | pgvector/pgvector:pg17                        | Postgres + vector index  |
 | library-embedder  | huggingface/text-embeddings-inference:cpu-1.7 | Local bge-m3 embeddings  |
 | portainer_agent   | portainer/agent:{{portainer_agent_version}}   | Fleet management         |
-| node_exporter     | node-exporter:{{node_exporter_version}}       | Host metrics :9100       |
-| alloy             | grafana/alloy:{{alloy_version}}               | Logs -> Loki :12345      |
-| cadvisor          | cadvisor:{{cadvisor_version}}                 | Container metrics :18080 |
+| node_exporter     | node-exporter:{{document_library_lxc_node_exporter_version}}       | Host metrics :9100       |
+| alloy             | grafana/alloy:{{document_library_lxc_alloy_version}}               | Logs -> Loki :12345      |
+| cadvisor          | cadvisor:{{document_library_lxc_cadvisor_version}}                 | Container metrics :18080 |
 +-------------------+-----------------------------------------------+--------------------------+
 ```
 
@@ -145,7 +145,7 @@ Secrets come from Ansible Vault via `templates/.env.j2` (see
 into the `environment:` blocks of the webserver and worker, which silently won over the env
 file — so changing the vault value did not reach the containers.
 
-The image tag is `library_version` in `defaults/main.yml`, currently **`latest`**. Combined
+The image tag is `document_library_lxc_library_version` in `defaults/main.yml`, currently **`latest`**. Combined
 with `pull: never`, that means the running image is whatever `latest` resolved to the last
 time it was pulled on the host — `docker images ghcr.io/johnmathews/library` to see what is
 actually there. Unlike `family_finances_lxc`, which pins a commit SHA, a rollback here is
@@ -200,7 +200,7 @@ prompt and response content — which for Ask is the text of the documents thems
 ## 8. Upgrading
 
 ```bash
-# 1. bump library_version in roles/document_library_lxc/defaults/main.yml
+# 1. bump document_library_lxc_library_version in roles/document_library_lxc/defaults/main.yml
 #    (or, while it is "latest", pull on the host)
 ssh paperless docker compose -f /srv/apps/docker-compose.yml pull library-webserver
 # 2. converge

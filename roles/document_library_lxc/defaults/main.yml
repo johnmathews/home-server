@@ -2,9 +2,9 @@
 # Monitoring sidecars — pinned to the versions deployed on this host (2026-07),
 # pulled and verified on the host first. Bump deliberately: pull the new tag on
 # the host first (handlers use pull:never), or run `make refresh-sidecars`.
-node_exporter_version: "v1.12.1"
-alloy_version: "v1.18.0"
-cadvisor_version: "v0.55.1"
+document_library_lxc_node_exporter_version: "v1.12.1"
+document_library_lxc_alloy_version: "v1.18.0"
+document_library_lxc_cadvisor_version: "v0.55.1"
 
 # Library (ghcr image tag = git commit sha of release)
-library_version: "latest"
+document_library_lxc_library_version: "latest"

@@ -26,9 +26,9 @@ by the OpenAI API (or compatible endpoints).
 | Container       | Image                                                         | Port  | Purpose                      |
 +-----------------+---------------------------------------------------------------+-------+------------------------------+
 | open-webui      | ghcr.io/open-webui/open-webui:main                            | 3000  | LLM chat interface           |
-| node_exporter   | quay.io/prometheus/node-exporter:{{ node_exporter_version }}  | 9100  | Host metrics for Prometheus  |
-| cadvisor        | gcr.io/cadvisor/cadvisor:{{ cadvisor_version }}               | 18080 | Container metrics            |
-| alloy           | grafana/alloy:{{ alloy_version }}                             | 12345 | Log shipping to Loki         |
+| node_exporter   | quay.io/prometheus/node-exporter:{{ open_webui_lxc_node_exporter_version }}  | 9100  | Host metrics for Prometheus  |
+| cadvisor        | gcr.io/cadvisor/cadvisor:{{ open_webui_lxc_cadvisor_version }}               | 18080 | Container metrics            |
+| alloy           | grafana/alloy:{{ open_webui_lxc_alloy_version }}                             | 12345 | Log shipping to Loki         |
 +-----------------+---------------------------------------------------------------+-------+------------------------------+
 ```
 

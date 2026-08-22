@@ -190,7 +190,7 @@ NanoClaw itself was installed manually and is managed as a systemd user service 
 
 ### Relay
 
-The `relay` container (image `ghcr.io/johnmathews/relay`, version pinned by `relay_version` in
+The `relay` container (image `ghcr.io/johnmathews/relay`, version pinned by `agent_lxc_relay_version` in
 `roles/agent_lxc/defaults/main.yml`) runs the relay orchestrator on port 7800. It is exposed publicly at
 `relay.itsa-pizza.com` via the Cloudflare Tunnel (`roles/cloudflared_lxc/defaults/main.yml`, prefix `relay` ->
 `192.168.2.107:7800`) — an SSH-free ingress into the agent LXC. It bind-mounts its SQLite event store
@@ -203,7 +203,7 @@ The `relay` container (image `ghcr.io/johnmathews/relay`, version pinned by `rel
 Syncthing (host network mode, GUI on `:8384`) syncs dev folders between the LXC and the MacBook
 (device "MacBook Pro"). Folder roots live under `/srv/apps/syncthing/` (`horizons`, `relay`,
 `meeting-assistant`, `screenshots`), mounted into the container at `/var/syncthing`. The folder
-list is the `syncthing_folders` variable in `roles/agent_lxc/defaults/main.yml`.
+list is the `agent_lxc_syncthing_folders` variable in `roles/agent_lxc/defaults/main.yml`.
 
 **Ignore patterns:** every synced folder gets the same `.stignore`
 (`roles/agent_lxc/templates/syncthing-stignore.j2`): `.DS_Store`, `node_modules`, `.venv`,
@@ -226,7 +226,7 @@ per week until ignores were aligned on 2026-06-10).
 ### MkDocs documentation sites
 
 MkDocs Material is used to serve markdown documentation from the LXC as browsable websites. Sites are defined in the
-`mkdocs_sites` variable in `roles/agent_lxc/defaults/main.yml`. Each entry generates a Docker container, an MkDocs
+`agent_lxc_mkdocs_sites` variable in `roles/agent_lxc/defaults/main.yml`. Each entry generates a Docker container, an MkDocs
 config file, and a unique port mapping.
 
 Current sites:
@@ -240,10 +240,10 @@ Current sites:
 +-----------------+--------+-------+-----------------------------------+
 ```
 
-To add a new documentation site, add an entry to the `mkdocs_sites` list:
+To add a new documentation site, add an entry to the `agent_lxc_mkdocs_sites` list:
 
 ```yaml
-mkdocs_sites:
+agent_lxc_mkdocs_sites:
   - name: journal
     site_name: NanoClaw Journal
     docs_path: /srv/apps/nanoclaw/journal

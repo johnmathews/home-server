@@ -25,12 +25,12 @@ full-text search via Elasticsearch. Used primarily for archiving kids' content.
 +-------------------+----------------------------------------------------------+-------+-------------------------------+
 | Container         | Image                                                    | Port  | Purpose                       |
 +-------------------+----------------------------------------------------------+-------+-------------------------------+
-| tubearchivist     | bbilly1/tubearchivist:{{ tubearchivist_version }}         | 8000  | Main web app + downloader     |
+| tubearchivist     | bbilly1/tubearchivist:{{ tubearchivist_lxc_tubearchivist_version }}         | 8000  | Main web app + downloader     |
 | archivist-es      | elasticsearch:8.18.0                                     | 9200* | Full-text search + indexing   |
 | archivist-redis   | redis/redis-stack-server:7.4.0-v3                        | 6379* | Task queue + caching          |
-| alloy             | grafana/alloy:{{ alloy_version }}                         | 12345 | Log shipping to Loki          |
-| node_exporter     | quay.io/prometheus/node-exporter:{{ node_exporter_version }} | 9100 | Host metrics for Prometheus |
-| cadvisor          | gcr.io/cadvisor/cadvisor:{{ cadvisor_version }}           | 18080 | Container metrics             |
+| alloy             | grafana/alloy:{{ tubearchivist_lxc_alloy_version }}                         | 12345 | Log shipping to Loki          |
+| node_exporter     | quay.io/prometheus/node-exporter:{{ tubearchivist_lxc_node_exporter_version }} | 9100 | Host metrics for Prometheus |
+| cadvisor          | gcr.io/cadvisor/cadvisor:{{ tubearchivist_lxc_cadvisor_version }}           | 18080 | Container metrics             |
 +-------------------+----------------------------------------------------------+-------+-------------------------------+
 ```
 
@@ -87,8 +87,8 @@ mounted read-only into the Jellyfin LXC at `/youtube-kids` for playback.
 
 ### Role Defaults (`roles/tubearchivist_lxc/defaults/main.yml`)
 
-- `tubearchivist_host` — Allowed hosts: `https://tube.{{ primary_domain_name }} 192.168.2.116:8000`
-- `ta_username: john` — Web UI username
+- `tubearchivist_lxc_tubearchivist_host` — Allowed hosts: `https://tube.{{ primary_domain_name }} 192.168.2.116:8000`
+- `tubearchivist_lxc_ta_username: john` — Web UI username
 
 ## External Access
 
@@ -122,7 +122,7 @@ Jellyfin from modifying the archive.
 
 ## Upgrading
 
-1. TubeArchivist is pinned — bump `tubearchivist_version` in `roles/tubearchivist_lxc/defaults/main.yml`
+1. TubeArchivist is pinned — bump `tubearchivist_lxc_tubearchivist_version` in `roles/tubearchivist_lxc/defaults/main.yml`
 2. Elasticsearch is pinned to `8.18.0` — update in the docker-compose template
 3. Run `make tube`
 4. After Elasticsearch upgrades, the index may need rebuilding via the TubeArchivist web UI

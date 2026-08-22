@@ -38,7 +38,7 @@
 - name: Rebuild mkdocs
   community.docker.docker_compose_v2:
     project_src: "{{ docker_compose_dir }}"
-    services: "{{ mkdocs_sites | map(attribute='name') | map('regex_replace', '^', 'mkdocs-') | list }}"
+    services: "{{ agent_lxc_mkdocs_sites | map(attribute='name') | map('regex_replace', '^', 'mkdocs-') | list }}"
     state: present
     build: always
     recreate: always
@@ -60,7 +60,7 @@
 - name: Restart mkdocs
   community.docker.docker_compose_v2:
     project_src: "{{ docker_compose_dir }}"
-    services: "{{ mkdocs_sites | map(attribute='name') | map('regex_replace', '^', 'mkdocs-') | list }}"
+    services: "{{ agent_lxc_mkdocs_sites | map(attribute='name') | map('regex_replace', '^', 'mkdocs-') | list }}"
     state: present
     recreate: always
     pull: never

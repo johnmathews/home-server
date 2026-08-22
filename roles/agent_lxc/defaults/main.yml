@@ -1,9 +1,9 @@
 # Docker image versions
-relay_version: "latest"
-syncthing_version: "latest"
+agent_lxc_relay_version: "latest"
+agent_lxc_syncthing_version: "latest"
 
 # Synced folder roots under /srv/apps/syncthing; each gets the shared .stignore
-syncthing_folders:
+agent_lxc_syncthing_folders:
   - horizons
   - relay
   - meeting-assistant
@@ -11,11 +11,11 @@ syncthing_folders:
 # Monitoring sidecars — pinned to the versions deployed on this host (2026-07).
 # Bump deliberately: pull the new tag on the host first (handlers use pull:never),
 # or run `make refresh-sidecars`.
-cadvisor_version: "v0.55.1"
-alloy_version: "v1.18.0"
-node_exporter_version: "v1.12.1"
+agent_lxc_cadvisor_version: "v0.55.1"
+agent_lxc_alloy_version: "v1.18.0"
+agent_lxc_node_exporter_version: "v1.12.1"
 
-mkdocs_sites:
+agent_lxc_mkdocs_sites:
   - name: journal
     site_name: NanoClaw Journal
     docs_path: /srv/apps/nanoclaw/journal

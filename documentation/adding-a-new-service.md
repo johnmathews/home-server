@@ -28,9 +28,15 @@ Use centralized variables from `group_vars/all/main.yml` where possible:
 
 ```yaml
 # Role-specific variables only — don't redefine puid, guid, TZ, etc.
-<service>_version: "1.0.0"         # Pin the Docker image version
-<service>_port: 8080
-<service>_docker_compose_dir: "{{ docker_compose_dir }}/<service>"
+# Every variable a role declares must start with the role name: ansible-lint's
+# var-naming[no-role-prefix] enforces it, and an unprefixed name can be shadowed
+# by group_vars without any error at apply time.
+<role>_version: "1.0.0"            # Pin the Docker image version
+<role>_port: 8080
+<role>_docker_compose_dir: "{{ docker_compose_dir }}/<service>"
+<role>_node_exporter_version: "{{ sidecar_node_exporter_version }}"
+<role>_cadvisor_version: "{{ sidecar_cadvisor_version }}"
+<role>_alloy_version: "{{ sidecar_alloy_version }}"
 ```
 
 ### tasks/main.yml
@@ -96,7 +102,7 @@ services:
 
   # --- Monitoring sidecars ---
   node-exporter:
-    image: quay.io/prometheus/node-exporter:{{ node_exporter_version }}
+    image: quay.io/prometheus/node-exporter:{{ <role>_node_exporter_version }}
     container_name: node-exporter
     restart: unless-stopped
     pid: host
@@ -112,7 +118,7 @@ services:
       - '--path.rootfs=/rootfs'
 
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:{{ cadvisor_version }}
+    image: gcr.io/cadvisor/cadvisor:{{ <role>_cadvisor_version }}
     container_name: cadvisor
     restart: unless-stopped
     ports:
@@ -124,7 +130,7 @@ services:
       - /var/lib/docker/:/var/lib/docker:ro
 
   alloy:
-    image: grafana/alloy:{{ alloy_version }}
+    image: grafana/alloy:{{ <role>_alloy_version }}
     container_name: alloy
     restart: unless-stopped
     ports:

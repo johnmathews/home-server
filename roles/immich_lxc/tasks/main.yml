@@ -96,5 +96,5 @@
 
 - name: Fix facebook-albums permissions (one-time)
   ansible.builtin.import_tasks: fix_facebook_albums_permissions.yml
-  when: fix_facebook_albums_perms | default(false) | bool
+  when: immich_lxc_fix_facebook_albums_perms | default(false) | bool
   tags: fix_permissions

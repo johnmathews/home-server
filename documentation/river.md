@@ -104,14 +104,21 @@ To change log shipping for a host, edit its file under `roles/`, then `make <hos
 
 ## Pinning the Alloy version
 
-The Alloy image tag comes from the role's `alloy_version` default, and roles split
+The Alloy image tag comes from the role's own alloy-version default, and roles split
 into two groups:
 
-- Most roles set `alloy_version: "{{ sidecar_alloy_version }}"`, single-sourced in
+- Most roles resolve it from `sidecar_alloy_version`, single-sourced in
   `group_vars/all/main.yml`.
 - Six roles (agent, music, prometheus, traefik, document_library, family_finances)
   pin a literal version in their own `defaults/main.yml`, currently ahead of the
   shared var. Nothing tracks `:latest`.
+
+The variable's **name** is mid-migration (W21-W24 of the var-naming refactor). Roles
+already prefixed use `<role>_alloy_version` — agent_lxc, document_library_lxc,
+immich_lxc, music_lxc, open_webui_lxc, prometheus_lxc, traefik_lxc,
+tubearchivist_lxc. The four not yet converted still use bare `alloy_version`:
+family_finances_lxc, infra_vm, media_vm, pve. `sidecar_alloy_version` in
+`group_vars/all/main.yml` is unaffected either way and keeps its name.
 
 `make refresh-sidecars` pulls and recreates the sidecars in bulk — it applies the
 pin each host already has, it does not upgrade anything. Full detail in

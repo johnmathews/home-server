@@ -34,7 +34,7 @@
     mode: '0755'
     owner: 1000
     group: 1000
-  loop: "{{ syncthing_folders }}"
+  loop: "{{ agent_lxc_syncthing_folders }}"
   tags: syncthing
 
 - name: Upload alloy config
@@ -57,7 +57,7 @@
     group: 1000
     mode: '0644'
   become: true
-  loop: "{{ syncthing_folders }}"
+  loop: "{{ agent_lxc_syncthing_folders }}"
   tags: syncthing
 
 - name: Deploy nanoclaw .env file from template
@@ -77,7 +77,7 @@
     mode: '0755'
     owner: root
     group: root
-  loop: "{{ mkdocs_sites }}"
+  loop: "{{ agent_lxc_mkdocs_sites }}"
   tags: docs
 
 - name: Copy mkdocs Dockerfile
@@ -109,7 +109,7 @@
     mode: '0644'
     owner: root
     group: root
-  loop: "{{ mkdocs_sites }}"
+  loop: "{{ agent_lxc_mkdocs_sites }}"
   vars:
     mkdocs_site_name: "{{ item.site_name }}"
     mkdocs_date_titles: "{{ item.date_titles | default(false) }}"
@@ -125,7 +125,7 @@
     owner: root
     group: root
   tags: docs
-  when: mkdocs_sites | selectattr('date_titles', 'defined') | list | length > 0
+  when: agent_lxc_mkdocs_sites | selectattr('date_titles', 'defined') | list | length > 0
 
 - name: Copy date-titles hook script
   ansible.builtin.template:
@@ -145,7 +145,7 @@
     mode: '0644'
     owner: root
     group: root
-  loop: "{{ mkdocs_sites | selectattr('order', 'defined') }}"
+  loop: "{{ agent_lxc_mkdocs_sites | selectattr('order', 'defined') }}"
   vars:
     mkdocs_order: "{{ item.order }}"
   tags: docs

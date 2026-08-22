@@ -21,7 +21,7 @@ services:
         max-size: "10m"
         max-file: "3"
   relay:
-    image: ghcr.io/johnmathews/relay:{{ relay_version }}
+    image: ghcr.io/johnmathews/relay:{{ agent_lxc_relay_version }}
     container_name: relay
     restart: unless-stopped
     # Image's relay user is uid 10001; this override runs the container as
@@ -64,7 +64,7 @@ services:
         max-file: "5"
 
   syncthing:
-    image: syncthing/syncthing:{{ syncthing_version }}
+    image: syncthing/syncthing:{{ agent_lxc_syncthing_version }}
     container_name: syncthing
     hostname: agent-lxc
     restart: unless-stopped
@@ -83,7 +83,7 @@ services:
         max-file: "5"
 
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:{{ cadvisor_version }}
+    image: gcr.io/cadvisor/cadvisor:{{ agent_lxc_cadvisor_version }}
     container_name: cadvisor
     restart: always
     command:
@@ -108,7 +108,7 @@ services:
         max-file: "5"
 
   alloy:
-    image: grafana/alloy:{{ alloy_version }}
+    image: grafana/alloy:{{ agent_lxc_alloy_version }}
     container_name: alloy
     restart: unless-stopped
     environment:
@@ -132,7 +132,7 @@ services:
         max-size: "10m"
         max-file: "5"
 
-{% for site in mkdocs_sites %}
+{% for site in agent_lxc_mkdocs_sites %}
   mkdocs-{{ site.name }}:
     build: ./mkdocs
     container_name: mkdocs-{{ site.name }}
@@ -157,7 +157,7 @@ services:
 
 {% endfor %}
   node_exporter:
-    image: quay.io/prometheus/node-exporter:{{ node_exporter_version }}
+    image: quay.io/prometheus/node-exporter:{{ agent_lxc_node_exporter_version }}
     container_name: node_exporter
     command:
       - '--path.rootfs=/host'

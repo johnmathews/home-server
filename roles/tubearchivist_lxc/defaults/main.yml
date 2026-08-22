@@ -1,8 +1,8 @@
-tubearchivist_host: "https://tube.{{ primary_domain_name }} 192.168.2.116:8000"
-ta_username: john
+tubearchivist_lxc_tubearchivist_host: "https://tube.{{ primary_domain_name }} 192.168.2.116:8000"
+tubearchivist_lxc_ta_username: john
 
 # Docker image versions
-tubearchivist_version: "v0.5.10"
-alloy_version: "{{ sidecar_alloy_version }}"
-node_exporter_version: "{{ sidecar_node_exporter_version }}"
-cadvisor_version: "{{ sidecar_cadvisor_version }}"
+tubearchivist_lxc_tubearchivist_version: "v0.5.10"
+tubearchivist_lxc_alloy_version: "{{ sidecar_alloy_version }}"
+tubearchivist_lxc_node_exporter_version: "{{ sidecar_node_exporter_version }}"
+tubearchivist_lxc_cadvisor_version: "{{ sidecar_cadvisor_version }}"
