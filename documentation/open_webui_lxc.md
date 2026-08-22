@@ -75,9 +75,10 @@ layer. Users must pass Zero Access before reaching the signup/login page.
 
 - `vault_openai_key` — OpenAI API key in `.env` template
 
-Note: the role defaults still carry vestigial `smb_username` / `smb_server` variables from a
+Note: the role defaults used to carry vestigial `smb_username` / `smb_server` variables from a
 removed Paperless SMB share config (Paperless was decommissioned 2026-07-04; the `smb_shares`
-entry was deleted from the defaults at that time).
+entry was deleted from the defaults at that time). Both were deleted on 2026-08-22 — nothing in
+the role referenced them.
 
 ## Troubleshooting
 

@@ -1,5 +1,3 @@
-pgid: 1001
-
 # Docker image versions
 # Monitoring sidecars — pinned to the versions deployed on this host (2026-07),
 # pulled and verified on the host first. Bump deliberately: pull the new tag on

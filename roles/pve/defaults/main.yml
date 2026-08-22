@@ -2,8 +2,6 @@
 
 ---
 
-proxmox_api_user: "api@pve"
-
 # iGPU
 radeontop_exporter_path: /usr/local/bin/radeontop-exporter.py
 
@@ -17,11 +15,6 @@ ipmi_exporter_listen_port: 9290
 # node_exporter_version: "1.9.1"
 # node_exporter_install_dir: "/opt/node_exporter"
 # node_exporter_listen_port: 9100
-
-# smartmon
-smartmon_exporter_version: "0.11.0"
-smartmon_exporter_install_dir: "/opt/smartmon_exporter"
-smartmon_exporter_listen_port: 9633
 
 # pve_exporter
 pve_exporter_version: "3.5.3"
@@ -52,18 +45,11 @@ nut_upsmon_pollfreqalert: 1
 nut_maxretry: 3
 
 nut_admin_user: "admin"
-nut_admin_pass: "{{ vault_nut_admin_pass }}"
 nut_mon_user: "monuser"
 nut_mon_pass: "{{ vault_nut_mon_pass }}"
-
 
 # Docker image versions
 alloy_version: "{{ sidecar_alloy_version }}"
 disk_status_exporter_version: "latest"
 node_exporter_version: "{{ sidecar_node_exporter_version }}"
 cadvisor_version: "{{ sidecar_cadvisor_version }}"
-
-# alloy container
-puid: 1001
-guid: 1001
-pgid: 1001

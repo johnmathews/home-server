@@ -2,10 +2,6 @@ pgid: 1001
 
 app_name: "open-webui"
 
-smb_username: smb_user
-
-smb_server: 192.168.2.104
-
 # Docker image versions
 cadvisor_version: "{{ sidecar_cadvisor_version }}"
 alloy_version: "{{ sidecar_alloy_version }}"

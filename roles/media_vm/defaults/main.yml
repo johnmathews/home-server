@@ -3,9 +3,7 @@
 # Docker image versions
 journal_agent_version: "latest"
 journal_chromadb_version: "latest"
-lidarr_version: "2.11.2"
 slskd_version: "latest"
-soularr_version: "v1.1.0"
 sabnzbd_version: "4.4.1"
 booklore_version: "latest"
 sonarr_version: "latest"
@@ -23,15 +21,7 @@ cadvisor_version: "{{ sidecar_cadvisor_version }}"
 reset_qbittorrent_config: false
 # qbittorrent_password_hash: 16c5e9c9b842bd6bf78aafa66643304e0cfe2586
 
-proxmox_api_host: "{{ hostvars['pve']['ansible_host'] }}"
 media_stack_base_dir: /srv/media
 media_stack_mount_dir: /mnt/media
 media_stack_user: john
 media_stack_group: john
-media_stack_services:
-  jellyfin_port: 8096
-  qbittorrent_port: 8080
-  sonarr_port: 8989
-  radarr_port: 7878
-  jackett_port: 9117
-  bazarr_port: 6767

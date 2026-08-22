@@ -163,12 +163,14 @@ Optionally clear old downloads: `rm -rf /mnt/nfs/downloads/slskd/*`
 ### Disabled services (Lidarr + Soularr)
 
 Lidarr and Soularr were removed from `roles/media_vm/templates/docker-compose.yml.j2` — there are
-no commented-out blocks left to uncomment. What remains for re-enablement: `lidarr_version` /
-`soularr_version` in `roles/media_vm/defaults/main.yml`, the Soularr config template
-(`roles/media_vm/templates/soularr/config.ini.j2`), and their vault variables. To re-enable:
+no commented-out blocks left to uncomment. Their `lidarr_version` / `soularr_version` defaults were
+deleted too (2026-08-22): they were referenced by nothing, so they pinned no image and only read as
+live configuration. What remains for re-enablement: the Soularr config template
+(`roles/media_vm/templates/soularr/config.ini.j2`) and their vault variables. To re-enable:
 
 1. Re-add `lidarr` and `soularr` service blocks to `roles/media_vm/templates/docker-compose.yml.j2`
-   (recover the old blocks from git history)
+   (recover the old blocks from git history) and re-add version pins to
+   `roles/media_vm/defaults/main.yml`
 2. Add `lidarr` and `soularr` back to `sleep_hours_stop_containers` in `host_vars/media-vm.yml`
 3. Run `make media`
 
