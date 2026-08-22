@@ -1,6 +1,6 @@
 # Home Assistant — Reolink Doorbell Two-Way Audio
 
-**Status:** superseded by [doorbell.md](../doorbell.md) (2026-07-04).
+**Status:** superseded by [doorbell.md](../doorbell.md) — verified 2026-07-04 · covers: none
 
 Two-way audio (talkback) from Home Assistant dashboards to the Reolink video doorbell,
 via go2rtc + WebRTC. Set up 2026-07-04.

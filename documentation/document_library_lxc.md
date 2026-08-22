@@ -1,8 +1,8 @@
 # Document Library
 
-**Status:** current as of 2026-08-22 (covers: live). Container list, NFS mount and the
-`/metrics` response were read from the host on that date; everything else traces to
-`roles/document_library_lxc/` in this repo.
+**Status:** current — verified 2026-08-22 · covers: live, roles/document_library_lxc/**
+Container list, NFS mount and the `/metrics` response were read from the host on that
+date; everything else traces to `roles/document_library_lxc/` in this repo.
 
 ## Purpose
 

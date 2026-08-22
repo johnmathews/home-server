@@ -1,5 +1,9 @@
 # Prometheus Metrics Collection
 
+**Status:** current — verified 2026-08-22 · covers: roles/prometheus_lxc/**
+The scrape-job counts were recounted from `roles/prometheus_lxc/templates/` on that date —
+17 jobs, 13 node_exporter targets, 12 cAdvisor targets.
+
 ## Purpose
 
 Central metrics collection for the entire home server infrastructure. Scrapes metrics from

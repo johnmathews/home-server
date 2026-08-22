@@ -1,0 +1,79 @@
+# Docs that `make check-docs` does not yet enforce.
+#
+# This list ONLY ratchets down. `make check-docs` passes
+# `--assert-exempt-max` with the number in the makefile (DOCS_EXEMPT_MAX), so
+# removing an entry is a two-line commit — delete the line, lower the number —
+# and adding one is a visible, arguable diff that has to be defended in review.
+#
+# Nothing here is exempt because it does not matter. Everything here is exempt
+# because nobody has re-verified it against the thing it describes, and a
+# status stamp is a claim that somebody did. Stamping these today would
+# manufacture exactly the false verification the gate exists to catch.
+#
+# To remove an entry: re-read the doc against the code or the live host, fix
+# what is wrong, add the stamp, delete the line, lower DOCS_EXEMPT_MAX.
+
+# ---------------------------------------------------------------------------
+# 1. `covers: live` docs — the ratchet's first target.
+#
+# These describe out-of-repo state that git can never see, which is the exact
+# category where evaluation finding F12 found every claim it checked to be
+# wrong. `pbs.md` and `proxmox_host_tuning.md` were the two that got checked;
+# they are now stamped and enforced. These six are the rest of that set, and
+# they are the highest-value entries to clear.
+# ---------------------------------------------------------------------------
+documentation/adguard-unbound.md
+documentation/doorbell.md
+documentation/index.md
+documentation/iperf3-speedtest.md
+documentation/systemd.md
+documentation/ups.md
+
+# ---------------------------------------------------------------------------
+# 2. Service docs describing in-repo roles.
+#
+# Cheaper to clear than group 1 — the check is reading the role — but no less
+# real. Each needs `covers: roles/<name>/**` once someone has actually read it
+# against the role.
+# ---------------------------------------------------------------------------
+documentation/adding-a-new-service.md
+documentation/agent.md
+documentation/disks.md
+documentation/docserver.md
+documentation/grafana-alerting.md
+documentation/journal_agent.md
+documentation/key_server.md
+documentation/media_vm.md
+documentation/mikrotik-exporter.md
+documentation/monitor_nfs_smb_mounts.md
+documentation/navidrome.md
+documentation/open_webui_lxc.md
+documentation/portainer.md
+documentation/quiet_hours.md
+documentation/share_drives_nfs_smb.md
+documentation/shell_environment.md
+documentation/tailscale.md
+documentation/traefik.md
+documentation/truenas.md
+documentation/tubearchivist_lxc.md
+documentation/vault.md
+
+# ---------------------------------------------------------------------------
+# 3. In flight elsewhere.
+#
+# `jellyfin_lxc.md` was being rewritten in another session when this gate
+# landed. Stamping a file mid-rewrite dates a version nobody verified.
+# ---------------------------------------------------------------------------
+documentation/jellyfin_lxc.md
+
+# ---------------------------------------------------------------------------
+# 4. Root-level narrative.
+#
+# `readme.md` defines this very convention, and its Proxmox install narrative
+# has not been walked through since it was written; `building.md` is explicitly
+# scratch notes rather than a guide; `README-TAILSCALE.md` is a one-off
+# quick-start.
+# ---------------------------------------------------------------------------
+readme.md
+building.md
+README-TAILSCALE.md

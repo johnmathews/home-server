@@ -1,8 +1,8 @@
 # Proxmox Host Performance Tuning
 
-**Status:** current as of 2026-08-22 (covers: live). Hardware, ARC sizing and the VM
-allocation table were re-read from `pve` on that date. Every figure here is mutable —
-each section names the command that reads it.
+**Status:** current — verified 2026-08-22 · covers: live
+Hardware, ARC sizing and the VM allocation table were re-read from `pve` on that date.
+Every figure here is mutable — each section names the command that reads it.
 
 ## Hardware
 

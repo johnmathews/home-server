@@ -1,3 +1,7 @@
+**Status:** current — verified 2026-08-22 · covers: roles/*/templates/config.alloy, roles/*/files/config.alloy
+The stage names and the two pipeline sections were checked against the deployed Alloy
+configs in this repo on that date.
+
 We use Grafana Alloy to send logs to Loki. Loki makes the logs available in
 Grafana.
 

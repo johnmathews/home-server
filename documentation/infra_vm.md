@@ -1,5 +1,9 @@
 # Infrastructure VM (infra-vm)
 
+**Status:** current — verified 2026-08-22 · covers: roles/infra_vm/**
+The service list and compose configuration were checked against `roles/infra_vm/` on that
+date.
+
 ## Purpose
 
 Central infrastructure VM hosting monitoring, dashboards, logging, documentation, and utility

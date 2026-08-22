@@ -1,4 +1,5 @@
-**Status:** completed — Stages 0–4 done; `itsa.pizza` is being allowed to expire. Archived 2026-07-12.
+**Status:** completed — verified 2026-07-12 · covers: none
+Stages 0–4 done; `itsa.pizza` is being allowed to expire. Archived 2026-07-12.
 
 # Domain Migration: itsa.pizza -> itsa-pizza.com
 

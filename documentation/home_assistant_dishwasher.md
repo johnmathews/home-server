@@ -1,8 +1,9 @@
 # Home Assistant — Dishwasher (Bosch / Home Connect)
 
-**Status:** complete as of 2026-08-13. Energy tracking live via the metering plug, Home
-Connect integration live for cycle/programme data, per-cycle attribution built and validated
-on a real cycle. Remaining work is time: 4–6 weeks of cycles to build a calibration table.
+**Status:** current — verified 2026-08-13 · covers: live
+Energy tracking live via the metering plug, Home Connect integration live for
+cycle/programme data, per-cycle attribution built and validated on a real cycle. Remaining
+work is time: 4–6 weeks of cycles to build a calibration table.
 
 Bosch **SMV6YCX00E** (Series 6, fully integrated, 60 cm, 14 place settings), installed
 ~May 2026, controlled day-to-day through the Bosch Home Connect phone app. This doc covers

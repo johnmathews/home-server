@@ -24,6 +24,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
+        with:
+          # `make check-docs` dates each doc against `git log` of the paths it
+          # covers. actions/checkout defaults to depth 1, under which every
+          # path looks like it changed in the single fetched commit.
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v7
@@ -77,6 +82,20 @@ jobs:
 
       - name: make check-ports
         run: make check-ports
+
+      # Deliberately a step in this job rather than a workflow of its own.
+      # This job already triggers on every push and pull_request with no
+      # `paths:` filter, so the gate reports on every PR under a job name that
+      # already exists. A separate `docs-freshness.yml` would create a second
+      # status context that blocks nothing until it is added to a ruleset —
+      # and this repo currently has no rulesets at all, so it would have been
+      # advisory anyway while looking like a gate.
+      #
+      # Needs full history: the change-driven half runs `git log -1` over the
+      # paths each doc declares, and a shallow clone would report every doc as
+      # never-committed.
+      - name: make check-docs
+        run: make check-docs
 
       # The docker-free half of `make test`. The bats integration suite needs a
       # docker daemon and lives in test.yml behind its own gate; these unit tests

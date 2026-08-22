@@ -1,5 +1,9 @@
 # Disaster Recovery
 
+**Status:** current — verified 2026-08-22 · covers: live
+Backup coverage, PBS retention and the restore procedure describe running systems, not
+repo state — re-read them from PBS and `pve` rather than trusting the numbers.
+
 How to recover the home server infrastructure from various failure scenarios.
 
 ## Backup Architecture

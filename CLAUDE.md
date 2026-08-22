@@ -1,3 +1,7 @@
+**Status:** current — verified 2026-08-22 · covers: live, inventory.ini, makefile
+The network table and the guest list were read from `pve` on that date; the make targets,
+role layout and documentation index trace to this repo.
+
 Always use context7 when I need code generation, setup or configuration steps, or library/API documentation. This means
 you should automatically use the Context7 MCP tools to resolve library id and get library docs without me having to
 explicitly ask.
@@ -30,8 +34,9 @@ deployment, configuration, and updates using a Makefile-driven workflow.
 make requirements   # Install Ansible roles, collections and Python deps
 make lint           # ansible-lint over the WHOLE repo. BLOCKING: exits 2 on any failure.
 make check-ports    # Render every compose template, fail on a duplicate host port
+make check-docs     # Parse every doc's **Status:** stamp, fail on a stale or missing one
 make test           # pytest + bats. Needs docker, bats, jq, curl.
-make ci-offline     # lint + check-ports + test. No network, SSH or vault — what CI runs.
+make ci-offline     # lint + check-ports + check-docs + test. No network, SSH or vault — what CI runs.
 make check          # --check dry-run of site.yml against the LIVE fleet (needs SSH + vault)
 make ci             # ci-offline + check. Operator-only; cannot run on a CI runner.
 make site           # Execute full provisioning
@@ -173,7 +178,8 @@ path. To confirm this list is still complete:
 
 **Outside `documentation/`:**
 
-- `readme.md` (repo root) — Project overview and entry point; also where plans and backlogs live
+- `readme.md` (repo root) — Project overview and entry point; where plans and backlogs live, and
+  where the documentation freshness-stamp convention that `make check-docs` enforces is defined
 - `building.md` (repo root) — Running notes on in-flight problems and their fixes; scratch, not a guide
 - `README-TAILSCALE.md` (repo root) — Tailscale quick-start: get remote Ansible/SSH working in ~30 min
 - `tests/README.md` — The `sleep_hours` end-to-end test suite: what it covers and how to run it

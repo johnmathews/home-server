@@ -1,5 +1,9 @@
 # Immich Photo Management
 
+**Status:** current — verified 2026-08-22 · covers: roles/immich_lxc/**
+The compose stack, NFS mounts and ML configuration were checked against
+`roles/immich_lxc/` on that date.
+
 ## Purpose
 
 Self-hosted photo and video management platform with machine learning features (face recognition,

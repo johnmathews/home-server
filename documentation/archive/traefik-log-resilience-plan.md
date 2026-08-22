@@ -1,8 +1,9 @@
 # Traefik Log Resilience Plan
 
-**Status:** closed — Option B (json-file log driver with rotation) implemented in
-`roles/traefik_lxc/templates/docker-compose.yml.j2`; Option A (Loki staleness alert) was never created; Option C
-deferred. Archived 2026-07-12.
+**Status:** closed — verified 2026-07-12 · covers: none
+Option B (json-file log driver with rotation) implemented in
+`roles/traefik_lxc/templates/docker-compose.yml.j2`; Option A (Loki staleness alert) was
+never created; Option C deferred. Archived 2026-07-12.
 **Created:** 2026-05-06
 **Owner:** John
 
