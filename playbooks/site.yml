@@ -17,4 +17,5 @@
 - import_playbook: share_drive_probe.yml  # noqa: name[play]
 - import_playbook: shell_environment.yml  # noqa: name[play]
 - import_playbook: tailscale.yml  # noqa: name[play]
+- import_playbook: traefik_lxc.yml  # noqa: name[play]
 - import_playbook: tubearchivist_lxc.yml  # noqa: name[play]

@@ -39,12 +39,14 @@
     /usr/local/bin/uv pip install --python {{ pve_exporter_install_dir }}/venv/bin/python
     prometheus-pve-exporter=={{ pve_exporter_version }}
 
+# The unit embeds vault_proxmox_api_password in an Environment= line, so it must
+# not be world-readable. systemd runs as root and reads 0600 units fine.
 - name: Create systemd service for pve_exporter
   ansible.builtin.copy:
     dest: /etc/systemd/system/pve_exporter.service
     owner: root
     group: root
-    mode: '0644'
+    mode: '0600'
     content: |
       [Unit]
       Description=Prometheus Proxmox VE Exporter (uv-managed)
@@ -59,6 +61,7 @@
 
       [Install]
       WantedBy=multi-user.target
+  no_log: true
   notify:
     - Reload systemd
     - Restart pve_exporter

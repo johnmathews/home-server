@@ -138,13 +138,43 @@ Several containers have explicit memory limits to prevent the VM from being over
 
 The role splits tasks across multiple files:
 
-- `tasks/main.yml` — Docker compose deployment, .env file, directory creation
+- `tasks/main.yml` — Docker apt repository, Docker compose deployment, .env file,
+  directory creation
 - `tasks/homepage.yml` — Homepage dashboard configuration files
 - `tasks/docserver.yml` — Documentation server source config
 - `tasks/file-browser.yml` — File browser setup (orphaned: not imported by `main.yml` and no
   filebrowser service in the compose file)
 - `tasks/mikrotik_exporter.yml` — MKTXP configuration
 - `tasks/mkdocs.yml` — MkDocs documentation site
+
+### Docker apt repository
+
+`tasks/main.yml` installs Docker from Docker's own apt repository, defined with
+`deb822_repository` and signed by a **scoped** keyring at
+`/etc/apt/keyrings/docker.asc`. The suite is `{{ ansible_distribution_release }}`.
+
+This was rebuilt on 2026-08-22 and the history matters, because the old shape
+left residue on the host that removing the tasks does not clean up:
+
+- The key used to be installed with `apt_key`, which puts it in the **global**
+  keyring `/etc/apt/trusted.gpg`, where it is trusted for *every* repository on
+  the host. The role now deletes that key by fingerprint after writing the
+  scoped one; the fingerprint lives in `defaults/main.yml`.
+- The suite used to be the literal `jammy`. The VM was upgraded to Ubuntu 24.04
+  (noble) in April 2025, but Ansible kept re-asserting the jammy line on every
+  `make infra`, so the host ran 22.04 Docker packages
+  (`5:29.6.1-1~ubuntu.22.04~jammy`) on a 24.04 system for over a year. Moving to
+  the templated suite migrates Docker to the noble build, which restarts the
+  daemon and therefore every container on this VM.
+- `apt_repository` derived its own filename,
+  `/etc/apt/sources.list.d/download_docker_com_linux_ubuntu.list`. The role now
+  deletes it explicitly; `deb822_repository` writes `docker.sources` instead, so
+  without that deletion the host would carry both.
+
+Two inert artifacts of the 2025 distro upgrade are deliberately left in place:
+`download_docker_com_linux_ubuntu.list.distUpgrade` and a disabled
+(`Enabled: no`) `download_docker_com_linux_ubuntu.sources`. Neither is read by
+apt and neither was written by Ansible.
 
 ### Ansible Tags
 

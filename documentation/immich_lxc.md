@@ -96,6 +96,23 @@ Set via Ansible `lineinfile` tasks for use by cron jobs and scripts:
 
 These are the same variables set on the media VM.
 
+The file is written `0600 root:root` and the task carries `no_log: true`, so the
+keys are neither world-readable on the host nor echoed to the terminal on
+deploy. This does **not** break non-root consumers: `pam_env` reads
+`/etc/environment` as root during session setup, so login shells still receive
+the variables — `media-vm:/home/john/extract-photos/bin/epm` is the consumer
+that depends on this. What changes is that the file itself can no longer be
+`cat`-ed by other local accounts.
+
+### API key file (`/srv/apps/immich/immich_api_key.secret`)
+
+Rendered from `roles/immich_lxc/templates/immich_api_key.secret.j2`, which
+contains nothing but `{{ vault_immich_key }}`. Before 2026-08-22 this was an
+untracked, gitignored plaintext file at `roles/immich_lxc/files/` that existed
+on exactly one machine and had never been committed — so a rebuild from a fresh
+clone failed at this task, and losing that machine lost the key. It is now
+vaulted like every other secret in the repo.
+
 ## External Access
 
 Immich is proxied through Traefik (not directly through Cloudflare Zero Access) because the mobile

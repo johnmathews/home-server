@@ -51,16 +51,70 @@
     PATH: "{{ ansible_env.PATH }}:/home/{{ docker_user }}/.local/bin"
   tags: [docker]
 
+- name: Ensure directory exists for /etc/apt/keyrings
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+  tags: [docker]
+
 - name: Add Docker GPG key
-  ansible.builtin.apt_key:
+  ansible.builtin.get_url:
     url: https://download.docker.com/linux/ubuntu/gpg
+    dest: /etc/apt/keyrings/docker.asc
+    mode: '0644'
+  tags: [docker]
+
+- name: Ensure python3-debian is installed
+  ansible.builtin.apt:
+    name: python3-debian
     state: present
   tags: [docker]
 
 - name: Add Docker repository
-  ansible.builtin.apt_repository:
-    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu jammy stable
+  ansible.builtin.deb822_repository:
+    name: docker
+    types: deb
+    architectures: amd64
+    uris: https://download.docker.com/linux/ubuntu
+    suites: "{{ ansible_distribution_release }}"
+    components: stable
+    signed_by: /etc/apt/keyrings/docker.asc
     state: present
+  tags: [docker]
+
+# The apt_repository task this replaced derived its own filename and pinned the
+# suite to jammy, so the host kept pulling 22.04 packages after the upgrade to
+# noble. Removing the task does not remove the file it wrote.
+- name: Remove the superseded Docker .list repository file
+  ansible.builtin.file:
+    path: /etc/apt/sources.list.d/download_docker_com_linux_ubuntu.list
+    state: absent
+  tags: [docker]
+
+# Likewise, apt_key put the Docker signing key in the global keyring, where it
+# is trusted for every repository on the host. The key stays there until it is
+# explicitly deleted.
+- name: Check whether the Docker key is still in the legacy global apt keyring
+  ansible.builtin.command:
+    cmd: >-
+      gpg --batch --no-default-keyring --keyring /etc/apt/trusted.gpg
+      --list-keys {{ infra_vm_docker_key_fingerprint }}
+  register: infra_vm_legacy_docker_key
+  changed_when: false
+  failed_when: false
+  # Read-only probe: run it during --check too, or the removal below cannot be
+  # evaluated in a dry run (the command module skips itself in check mode).
+  check_mode: false
+  tags: [docker]
+
+- name: Remove the Docker signing key from the legacy global apt keyring
+  ansible.builtin.command:
+    cmd: >-
+      gpg --batch --yes --no-default-keyring --keyring /etc/apt/trusted.gpg
+      --delete-key {{ infra_vm_docker_key_fingerprint }}
+  when: infra_vm_legacy_docker_key.rc | default(1) == 0
+  changed_when: true
   tags: [docker]
 
 - name: Install Docker packages

@@ -79,7 +79,10 @@ If the Proxmox host itself fails (hardware failure, corrupted OS).
 
 1. Install Proxmox VE
 2. Create all LXCs/VMs manually (use `inventory.ini` for IP assignments)
-3. Run `make site` to provision everything from scratch
+3. Run `make site` to provision everything from scratch. This includes Traefik —
+   `playbooks/site.yml` omitted `traefik_lxc.yml` until 2026-08-22, so a rebuild
+   run before that date left the reverse proxy undeployed and every public
+   hostname 502ing
 4. Restore data from TrueNAS NFS shares (media, photos, documents are on TrueNAS)
 
 ### Scenario 3: TrueNAS Failure
@@ -117,15 +120,46 @@ If external access stops working:
 
 Local network access (192.168.2.x) is independent of Cloudflare and should still work.
 
-### Scenario 5: Complete Infrastructure Loss
+### Scenario 5: Reverse Proxy (Traefik) Failure
+
+Traefik on `traefik_lxc` (192.168.2.108) is the **origin for every externally
+reachable hostname**. Cloudflare Tunnel terminates at Traefik, not at the
+individual services, so if Traefik is down or unconfigured *every* public
+hostname returns 502 while the services behind it are perfectly healthy — and
+the tunnel itself will look green in the Cloudflare dashboard.
+
+The routed hostnames are defined in
+`roles/traefik_lxc/templates/routers.yml.j2`, which is the source of truth:
+`immich`, `share`, `jelly`, `navidrome`, `finances`, `music`, `timer`, `docs`,
+`uptime`, `speed`, `sre`, `stats`, and the apex domain (`homepage`). Grafana is
+proxied as a backend service. The Traefik dashboard is bound to the LAN address
+only.
+
+**Diagnosis — every public hostname 502s at once:**
+
+1. `ssh traefik` then `docker compose ps` — is the `traefik` container up?
+2. `docker compose logs traefik --tail 100` — look for router/TLS config errors
+3. Check the local dashboard from the LAN: `http://192.168.2.108/dashboard/`
+4. Confirm the service behind it is actually healthy (e.g. `ssh immich`,
+   `docker compose ps`) before blaming the backend — a 502 here almost always
+   means Traefik, not the service
+
+**Recovery:** `make traefik` redeploys the container and re-renders
+`routers.yml`. Traefik holds no persistent state that needs restoring from
+backup; the whole configuration is templated from this repository.
+
+### Scenario 6: Complete Infrastructure Loss
 
 Worst case: everything is gone. Recovery order:
 
 1. **Proxmox host** — Install Proxmox VE, configure networking
 2. **TrueNAS VM** — Create VM, install TrueNAS, import ZFS pools (if disks survived)
-3. **Cloudflared LXC** — `make cloudflared` (restores external access)
-4. **Infra VM** — `make infra` (restores monitoring, so you can track remaining recovery)
-5. **Remaining services** — `make site` or deploy individually
+3. **Cloudflared LXC** — `make cloudflared` (restores the tunnel)
+4. **Traefik LXC** — `make traefik`. External access is *not* restored until this
+   runs: the tunnel terminates at Traefik, so until it exists every public
+   hostname 502s (see Scenario 5)
+5. **Infra VM** — `make infra` (restores monitoring, so you can track remaining recovery)
+6. **Remaining services** — `make site` or deploy individually
 
 The Ansible repository is the recovery runbook. As long as you have:
 - This git repository

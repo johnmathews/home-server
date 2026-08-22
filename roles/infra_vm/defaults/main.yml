@@ -3,6 +3,10 @@
 docker_user: john
 docker_compose_dir: /srv/infra
 
+# Docker's apt signing key, used to evict it from the legacy global keyring that
+# the old apt_key task populated. See roles/infra_vm/tasks/main.yml.
+infra_vm_docker_key_fingerprint: "9DC858229FC7DD38854AE2D88D81803C0EBFCD88"
+
 # Docker image versions
 docserver_version: "latest"
 documentation_ui_version: "latest"
