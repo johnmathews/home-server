@@ -27,12 +27,22 @@ deployment, configuration, and updates using a Makefile-driven workflow.
 **Build/Lint/Test Commands:**
 
 ```sh
-make requirements   # Install Ansible + Python deps
-make lint          # Run ansible-lint (warnings only, non-blocking)
-make check         # Dry-run of full site.yml (no changes)
-make ci            # lint + check (pre-commit validation)
-make site          # Execute full provisioning
+make requirements   # Install Ansible roles, collections and Python deps
+make lint           # ansible-lint over the WHOLE repo. BLOCKING: exits 2 on any failure.
+make check-ports    # Render every compose template, fail on a duplicate host port
+make test           # pytest + bats. Needs docker, bats, jq, curl.
+make ci-offline     # lint + check-ports + test. No network, SSH or vault — what CI runs.
+make check          # --check dry-run of site.yml against the LIVE fleet (needs SSH + vault)
+make ci             # ci-offline + check. Operator-only; cannot run on a CI runner.
+make site           # Execute full provisioning
 ```
+
+`make lint` is **not** "warnings only". It exits 2 when ansible-lint reports any
+failure, and because make stops at the first failed prerequisite, a failing `lint`
+aborts `ci`/`ci-offline` before their later stages run. Warnings (the `warn_list`
+in `.ansible-lint`) do not fail it; failures do.
+
+`make help` lists every target.
 
 **Running single targets:** `make <target>` (e.g., `make media`, `make traefik`) with optional flags:
 
