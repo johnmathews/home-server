@@ -26,9 +26,9 @@ by the OpenAI API (or compatible endpoints).
 | Container       | Image                                                         | Port  | Purpose                      |
 +-----------------+---------------------------------------------------------------+-------+------------------------------+
 | open-webui      | ghcr.io/open-webui/open-webui:main                            | 3000  | LLM chat interface           |
-| node_exporter   | quay.io/prometheus/node-exporter:{{ node_exporter_version }}  | 9100  | Host metrics for Prometheus  |
-| cadvisor        | gcr.io/cadvisor/cadvisor:{{ cadvisor_version }}               | 18080 | Container metrics            |
-| alloy           | grafana/alloy:{{ alloy_version }}                             | 12345 | Log shipping to Loki         |
+| node_exporter   | quay.io/prometheus/node-exporter:{{ open_webui_lxc_node_exporter_version }}  | 9100  | Host metrics for Prometheus  |
+| cadvisor        | gcr.io/cadvisor/cadvisor:{{ open_webui_lxc_cadvisor_version }}               | 18080 | Container metrics            |
+| alloy           | grafana/alloy:{{ open_webui_lxc_alloy_version }}                             | 12345 | Log shipping to Loki         |
 +-----------------+---------------------------------------------------------------+-------+------------------------------+
 ```
 
@@ -75,9 +75,10 @@ layer. Users must pass Zero Access before reaching the signup/login page.
 
 - `vault_openai_key` — OpenAI API key in `.env` template
 
-Note: the role defaults still carry vestigial `smb_username` / `smb_server` variables from a
+Note: the role defaults used to carry vestigial `smb_username` / `smb_server` variables from a
 removed Paperless SMB share config (Paperless was decommissioned 2026-07-04; the `smb_shares`
-entry was deleted from the defaults at that time).
+entry was deleted from the defaults at that time). Both were deleted on 2026-08-22 — nothing in
+the role referenced them.
 
 ## Troubleshooting
 

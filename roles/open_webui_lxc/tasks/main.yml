@@ -10,16 +10,16 @@
 
 - name: Ensure system group exists with fixed GID
   ansible.builtin.group:
-    name: "{{ app_name }}"
-    gid: "{{ pgid }}"
+    name: "{{ open_webui_lxc_app_name }}"
+    gid: "{{ open_webui_lxc_pgid }}"
     system: true
     state: present
 
 - name: Ensure user exists with fixed UID/GID
   ansible.builtin.user:
-    name: "{{ app_name }}"
+    name: "{{ open_webui_lxc_app_name }}"
     uid: "{{ puid }}"
-    group: "{{ app_name }}"
+    group: "{{ open_webui_lxc_app_name }}"
     system: true
     shell: /usr/sbin/nologin
     create_home: false
@@ -41,7 +41,7 @@
     path: /srv/apps/open-webui/data
     state: directory
     owner: "{{ puid }}"
-    group: "{{ pgid }}"
+    group: "{{ open_webui_lxc_pgid }}"
     mode: '0770'
   notify: Restart open-webui
 

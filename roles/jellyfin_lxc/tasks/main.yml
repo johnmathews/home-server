@@ -18,7 +18,7 @@
 #   ansible.builtin.copy:
 #     dest: "/etc/smb/.smbcredentials"
 #     content: |
-#       username={{ smb_username }}
+#       username={{ jellyfin_lxc_smb_username }}
 #       password={{ vault_smb_username_password }}
 #     owner: root
 #     group: root
@@ -27,8 +27,8 @@
 # - name: Persist SMB mount in /etc/fstab
 #   ansible.builtin.lineinfile:
 #     path: /etc/fstab
-#     regexp: '^//{{ smb_server }}/{{ item.name }}[ \t]+'
-#     line: "//{{ smb_server }}/{{ item.name }} {{ item.target }} cifs credentials=/etc/smb/.smbcredentials,iocharset=utf8,noperm,nofail,noauto,x-systemd.automount,x-systemd.device-timeout=10,_netdev,vers=3.1.1 0 0"
+#     regexp: '^//{{ jellyfin_lxc_smb_server }}/{{ item.name }}[ \t]+'
+#     line: "//{{ jellyfin_lxc_smb_server }}/{{ item.name }} {{ item.target }} cifs credentials=/etc/smb/.smbcredentials,iocharset=utf8,noperm,nofail,noauto,x-systemd.automount,x-systemd.device-timeout=10,_netdev,vers=3.1.1 0 0"
 #     state: present
 #     create: yes
 #   loop: "{{ smb_shares }}"
@@ -45,7 +45,7 @@
 # - name: Mount SMB shares
 #   mount:
 #     path: "{{ item.target }}"
-#     src: "//{{ smb_server }}/{{ item.name }}"
+#     src: "//{{ jellyfin_lxc_smb_server }}/{{ item.name }}"
 #     fstype: cifs
 #     opts: credentials=/etc/smb/.smbcredentials,iocharset=utf8,noperm,nofail,vers=3.1.1
 #     state: mounted

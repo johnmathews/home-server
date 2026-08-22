@@ -1,12 +1,8 @@
-pgid: 1001
+open_webui_lxc_pgid: 1001
 
-app_name: "open-webui"
-
-smb_username: smb_user
-
-smb_server: 192.168.2.104
+open_webui_lxc_app_name: "open-webui"
 
 # Docker image versions
-cadvisor_version: "{{ sidecar_cadvisor_version }}"
-alloy_version: "{{ sidecar_alloy_version }}"
-node_exporter_version: "{{ sidecar_node_exporter_version }}"
+open_webui_lxc_cadvisor_version: "{{ sidecar_cadvisor_version }}"
+open_webui_lxc_alloy_version: "{{ sidecar_alloy_version }}"
+open_webui_lxc_node_exporter_version: "{{ sidecar_node_exporter_version }}"

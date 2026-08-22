@@ -14,7 +14,7 @@ Most services run as Docker containers with pinned image versions in role defaul
 
 1. Check the current version in `roles/<service>/defaults/main.yml`
 2. Check the upstream release notes for breaking changes
-3. Update the version variable (e.g., `tubearchivist_version: "v0.5.10"`)
+3. Update the version variable (e.g., `tubearchivist_lxc_tubearchivist_version: "v0.5.10"`)
 4. Pull the new image on the host: `ssh <host> "cd /srv/<stack> && docker compose pull <service>"`
 5. Deploy: `make <service>`
 6. Verify the service starts and works correctly
@@ -64,7 +64,10 @@ Monitoring sidecars (node-exporter, cadvisor, alloy) run on every service host. 
 2026-07-12 the pinned versions are single-sourced in `group_vars/all/main.yml`:
 `sidecar_alloy_version`, `sidecar_node_exporter_version`, `sidecar_cadvisor_version`.
 The roles that pin (immich, infra_vm, pve, media_vm, open_webui, tubearchivist)
-reference these in their own defaults (`alloy_version: "{{ sidecar_alloy_version }}"`).
+reference these in their own defaults — `<role>_alloy_version: "{{ sidecar_alloy_version }}"`
+for the roles already through the var-naming refactor (immich_lxc, open_webui_lxc,
+tubearchivist_lxc), bare `alloy_version:` for the ones still to be converted
+(infra_vm, media_vm, pve). The `sidecar_*` names themselves never change.
 
 Two exceptions:
 
@@ -80,8 +83,12 @@ Two exceptions:
   Nothing in the repo tracks `:latest` for these three images any more. Verify with:
 
   ```bash
-  grep -rn '^\(alloy\|cadvisor\|node_exporter\)_version:' roles/*/defaults/main.yml
+  grep -rnE '^[a-z_]*(alloy|cadvisor|node_exporter)_version:' roles/*/defaults/main.yml
   ```
+
+  (The pattern allows a role prefix: the var-naming refactor is renaming these to
+  `<role>_alloy_version` role by role, so an anchored `^alloy_version:` now misses
+  most of them.)
 - `jellyfin_lxc` deploys a static `files/docker-compose.yml` (not a template), so its
   sidecar pins are literal in that file — update it by hand when bumping `sidecar_*`.
 

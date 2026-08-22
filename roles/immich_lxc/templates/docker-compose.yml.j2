@@ -19,7 +19,7 @@ services:
 
   image-borders:
     container_name: image_borders
-    image: ghcr.io/johnmathews/image-borders:{{ image_borders_version }}
+    image: ghcr.io/johnmathews/image-borders:{{ immich_lxc_image_borders_version }}
     profiles: ["image-borders"]
     restart: "no"
     volumes:
@@ -29,7 +29,7 @@ services:
       # command: ["/images", "-p", "5"]
 
   immich-public-proxy:
-    image: alangrainger/immich-public-proxy:{{ immich_public_proxy_version }}
+    image: alangrainger/immich-public-proxy:{{ immich_lxc_immich_public_proxy_version }}
     container_name: immich_public_proxy
     restart: always
     ports:
@@ -101,7 +101,7 @@ services:
     restart: always
 
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:{{ cadvisor_version }}
+    image: gcr.io/cadvisor/cadvisor:{{ immich_lxc_cadvisor_version }}
     container_name: cadvisor
     restart: always
     ports:
@@ -122,7 +122,7 @@ services:
         max-file: "5"
 
   node_exporter:
-    image: quay.io/prometheus/node-exporter:{{ node_exporter_version }}
+    image: quay.io/prometheus/node-exporter:{{ immich_lxc_node_exporter_version }}
     container_name: node_exporter
     command:
       - '--path.rootfs=/host'
@@ -136,7 +136,7 @@ services:
       - '/var/lib/node_exporter/textfile_collector:/textfile:ro'
 
   alloy:
-    image: grafana/alloy:{{ alloy_version }}
+    image: grafana/alloy:{{ immich_lxc_alloy_version }}
     container_name: alloy
     restart: unless-stopped
     environment:

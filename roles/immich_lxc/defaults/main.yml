@@ -1,10 +1,10 @@
 # Docker image versions
-image_borders_version: "latest"
-immich_public_proxy_version: "latest"
-cadvisor_version: "{{ sidecar_cadvisor_version }}"
-node_exporter_version: "{{ sidecar_node_exporter_version }}"
-alloy_version: "{{ sidecar_alloy_version }}"
+immich_lxc_image_borders_version: "latest"
+immich_lxc_immich_public_proxy_version: "latest"
+immich_lxc_cadvisor_version: "{{ sidecar_cadvisor_version }}"
+immich_lxc_node_exporter_version: "{{ sidecar_node_exporter_version }}"
+immich_lxc_alloy_version: "{{ sidecar_alloy_version }}"
 
 # One-time permission fix for facebook-albums
 # Set to true to run, then set back to false after successful execution
-fix_facebook_albums_perms: false
+immich_lxc_fix_facebook_albums_perms: false

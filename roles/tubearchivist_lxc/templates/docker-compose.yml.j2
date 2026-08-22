@@ -21,7 +21,7 @@ services:
         max-file: "3"
 
   tubearchivist:
-    image: bbilly1/tubearchivist:{{ tubearchivist_version }}
+    image: bbilly1/tubearchivist:{{ tubearchivist_lxc_tubearchivist_version }}
     container_name: tubearchivist
     restart: always
     ports:
@@ -36,8 +36,8 @@ services:
       - ES_URL=http://archivist-es:9200
       - ELASTIC_PASSWORD={{ vault_ta_elastic_search_password }}
       - REDIS_CON=redis://archivist-redis:6379
-      - TA_HOST={{ tubearchivist_host }}
-      - TA_USERNAME={{ ta_username }}
+      - TA_HOST={{ tubearchivist_lxc_tubearchivist_host }}
+      - TA_USERNAME={{ tubearchivist_lxc_ta_username }}
       - TA_PASSWORD={{ vault_ta_password }}
       - TA_AUTO_UPDATE_YTDLP=release
     healthcheck:
@@ -103,7 +103,7 @@ services:
         max-file: "5"
 
   alloy:
-    image: grafana/alloy:{{ alloy_version }}
+    image: grafana/alloy:{{ tubearchivist_lxc_alloy_version }}
     container_name: alloy
     restart: unless-stopped
     environment:
@@ -131,7 +131,7 @@ services:
         max-file: "5"
 
   node_exporter:
-    image: quay.io/prometheus/node-exporter:{{ node_exporter_version }}
+    image: quay.io/prometheus/node-exporter:{{ tubearchivist_lxc_node_exporter_version }}
     container_name: node_exporter
     command:
       - '--path.rootfs=/host'
@@ -150,7 +150,7 @@ services:
         max-file: "5"
 
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:{{ cadvisor_version }}
+    image: gcr.io/cadvisor/cadvisor:{{ tubearchivist_lxc_cadvisor_version }}
     container_name: cadvisor
     restart: always
     ports:

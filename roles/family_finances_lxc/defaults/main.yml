@@ -4,8 +4,6 @@
 # Two containers: a FastAPI backend holding one encrypted SQLite file per
 # household, and nginx serving the built Vue app and proxying /api to it.
 
-pgid: 1001
-
 # Monitoring sidecars — pinned to the versions deployed elsewhere on the
 # estate. Bump deliberately: handlers use pull:never, so pull on the host first
 # or run `make refresh-sidecars`.

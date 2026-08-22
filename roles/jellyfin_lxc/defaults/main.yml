@@ -1,7 +1,5 @@
-smb_username: smb_user
-smb_server: 192.168.2.104
-
-truenas_ip: "192.168.2.104"
+jellyfin_lxc_smb_username: smb_user
+jellyfin_lxc_smb_server: 192.168.2.104
 
 # No sidecar version vars here: jellyfin_lxc deploys a static files/docker-compose.yml,
 # so its alloy/cadvisor/node-exporter pins are literal in that file. Keep them in sync

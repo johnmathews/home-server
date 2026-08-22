@@ -2,6 +2,4 @@
 
 ---
 
-server_user: john
-
-truenas_ip: 192.168.2.104
+key_server_server_user: john

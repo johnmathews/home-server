@@ -20,7 +20,7 @@ services:
         max-size: "10m"
         max-file: "3"
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:{{ cadvisor_version }}
+    image: gcr.io/cadvisor/cadvisor:{{ open_webui_lxc_cadvisor_version }}
     container_name: cadvisor
     restart: always
     ports:
@@ -41,7 +41,7 @@ services:
         max-file: "5"
 
   alloy:
-    image: grafana/alloy:{{ alloy_version }}
+    image: grafana/alloy:{{ open_webui_lxc_alloy_version }}
     container_name: alloy
     restart: unless-stopped
     environment:
@@ -98,7 +98,7 @@ services:
         max-file: "5"
 
   node_exporter:
-    image: quay.io/prometheus/node-exporter:{{ node_exporter_version }}
+    image: quay.io/prometheus/node-exporter:{{ open_webui_lxc_node_exporter_version }}
     container_name: node_exporter
     command:
       - '--path.rootfs=/host'

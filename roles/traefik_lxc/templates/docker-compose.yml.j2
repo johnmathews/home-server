@@ -47,7 +47,7 @@ services:
         max-file: "5"
 
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:{{ cadvisor_version }}
+    image: gcr.io/cadvisor/cadvisor:{{ traefik_lxc_cadvisor_version }}
     container_name: cadvisor
     restart: always
     ports:
@@ -68,7 +68,7 @@ services:
         max-file: "5"
 
   alloy:
-    image: grafana/alloy:{{ alloy_version }}
+    image: grafana/alloy:{{ traefik_lxc_alloy_version }}
     container_name: alloy
     restart: unless-stopped
     environment:
