@@ -14,6 +14,11 @@ ACTION="${1:-}"
 # Allow override via QUIET_LIST env var, otherwise use default paths
 # Support CONFIG_DIR override for testing
 CONFIG_BASE="${CONFIG_DIR:-/etc/sleep-hours}"
+
+# Path to the TrueNAS share helper. Overridable for the same reason CONFIG_DIR
+# and GRACE_DIR are: the tests run this script outside its installed layout.
+# The default is the installed path, so production behaviour is unchanged.
+TRUENAS_SHARES_BIN="${TRUENAS_SHARES_BIN:-/usr/local/bin/truenas-shares.sh}"
 case "$ACTION" in
 pause | unpause) LIST="${QUIET_LIST:-$CONFIG_BASE/containers.pause.list}" ;;
 stop | start) LIST="${QUIET_LIST:-$CONFIG_BASE/containers.stop.list}" ;;
@@ -400,7 +405,7 @@ manage_nfs_smb_shares() {
     # Capture output and exit code separately to avoid masking exit status in pipe
     local tmpfile rc
     tmpfile="$(mktemp /tmp/sleep-hours-nfs.XXXXXX)" || fail_early tmpfile "failed to create temp file"
-    /usr/local/bin/truenas-shares.sh disable "$shares" >"$tmpfile" 2>&1
+    "$TRUENAS_SHARES_BIN" disable "$shares" >"$tmpfile" 2>&1
     rc=$?
     # Output captured messages
     while IFS= read -r line; do msg "$line"; done <"$tmpfile"
@@ -421,7 +426,7 @@ manage_nfs_smb_shares() {
     # Capture output and exit code separately to avoid masking exit status in pipe
     local tmpfile rc
     tmpfile="$(mktemp /tmp/sleep-hours-nfs.XXXXXX)" || fail_early tmpfile "failed to create temp file"
-    /usr/local/bin/truenas-shares.sh enable "$shares" "$containers" >"$tmpfile" 2>&1
+    "$TRUENAS_SHARES_BIN" enable "$shares" "$containers" >"$tmpfile" 2>&1
     rc=$?
     # Output captured messages
     while IFS= read -r line; do msg "$line"; done <"$tmpfile"
