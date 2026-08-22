@@ -1,4 +1,3 @@
-
 - name: Create john user
   ansible.builtin.user:
     name: john

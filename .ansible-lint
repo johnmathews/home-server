@@ -6,12 +6,12 @@ enable_list:
 
 # Rules we *want to see*, but not fail the build yet
 warn_list:
-   - fqcn                            # Migrating to fully qualified module names (in progress)
-   - var-naming                      # Gradually prefix variables inside roles
-   - no-changed-when                 # Flag missing changed_when where needed
-   - risky-file-permissions          # Warn if mode: is missing on sensitive files
-   - yaml[line-length]              # Non-blocking formatting issues
-   - package-latest                  # pip upgrades commonly use state: latest
+  - fqcn                            # Migrating to fully qualified module names (in progress)
+  - var-naming                      # Gradually prefix variables inside roles
+  - no-changed-when                 # Flag missing changed_when where needed
+  - risky-file-permissions          # Warn if mode: is missing on sensitive files
+  - yaml[line-length]              # Non-blocking formatting issues
+  - package-latest                  # pip upgrades commonly use state: latest
 
 # Files to exclude
 exclude_paths:

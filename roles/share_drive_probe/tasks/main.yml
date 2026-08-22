@@ -31,7 +31,10 @@
     group: root
     mode: "{{ share_drive_probe_metrics_mode }}"
   become: true
-  ignore_errors: true
+  # The .prom file only exists after the probe has run once; a missing file is
+  # expected on a first deploy, not an error.
+  register: share_drive_probe_metrics_perms
+  failed_when: false
   notify:
     - Reload daemon
     - Restart share-drive-probe timer

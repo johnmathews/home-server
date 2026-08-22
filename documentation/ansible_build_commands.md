@@ -29,6 +29,27 @@ a shared role to setup the share drive monitoring probe. In the playbooks, these
 
 - `make site tags=alloy`
 
+## Quality checks
+
+`make help` is the source of truth for the full target list — it is generated from
+the makefile and cannot drift from it. The four that matter before a commit:
+
+```sh
+make lint         # ansible-lint over the WHOLE repo. Exits 2 on any failure.
+make check-ports  # render every compose template, fail on a duplicate host port
+make test         # pytest + bats (needs docker, bats, jq, curl)
+make ci-offline   # all three. No network, no SSH, no vault password.
+```
+
+`make ci-offline` is exactly what `.github/workflows/lint.yml` runs on every push
+and every PR, so a green `ci-offline` locally means a green lint job. `make ci`
+adds `make check` — a `--check` dry run of `site.yml` against the live fleet —
+which needs SSH to every production host and the gitignored `.vault_pass.txt`, so
+it is operator-only and cannot run on a runner.
+
+`make lint` is **blocking**, not advisory. Because make stops at the first failed
+prerequisite, a lint failure aborts `ci`/`ci-offline` before their later stages.
+
 ## Useful Commands
 
 Copy the config.alloy file in `tubearchivist_lxc` to replace all other instances of `config.alloy`:

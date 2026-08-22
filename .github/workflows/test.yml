@@ -1,17 +1,53 @@
 name: Sleep Hours Tests
 
+# This workflow reported success while running zero tests from 2026-01-27 to
+# 2026-08-22. It gated every real step on a grep for `sleep_hours_enabled:\s*true`
+# in host_vars/, and all four host_vars files set it to false, so the grep never
+# matched, every step showed `skipped`, and the job showed green. Seven months of
+# passing checks on main and on PRs attested to nothing.
+#
+# The gate is kept — running a docker integration suite for a feature that is off
+# everywhere is a waste — but its failure mode is inverted. A missing host_vars/,
+# a file that will not parse, a renamed variable or a non-boolean value are now
+# ERRORS. Only an explicit `false` on every targeted host is a skip.
+#
+# The logic lives in scripts/check-sleep-hours-gate.py, so it is readable and
+# testable; tests/test_check_sleep_hours_gate.py drives each red path.
+
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
     paths:
       - 'roles/sleep_hours/**'
       - 'tests/**'
+      - 'host_vars/**'
+      - 'playbooks/**'
+      - 'scripts/check-sleep-hours-gate.py'
       - '.github/workflows/test.yml'
   pull_request:
-    branches: [ main ]
+    branches: [main]
     paths:
       - 'roles/sleep_hours/**'
       - 'tests/**'
+      - 'host_vars/**'
+      - 'playbooks/**'
+      - 'scripts/check-sleep-hours-gate.py'
+      - '.github/workflows/test.yml'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Run the suite even though the feature is disabled on every host'
+        type: boolean
+        default: false
+
+# host_vars/** and playbooks/** are in the filter because both feed the gate: the
+# variable is read from host_vars, and the set of hosts required to declare it is
+# derived from which playbooks apply the role. Renaming the variable in a
+# host_vars file must re-run this workflow, or the gate's own red path is
+# unreachable by the edit most likely to trigger it.
+#
+# Every other file in the repo is covered by lint.yml, which has no paths filter.
+# The narrow filter here is safe only because that is true; do not add one there.
 
 jobs:
   test:
@@ -22,46 +58,60 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7
 
-      - name: Check if sleep hours is enabled
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version-file: .python-version
+
+      - name: Create the venv the makefile expects
+        run: python -m venv .venv
+
+      - name: Install pinned dependencies
+        run: .venv/bin/pip install --disable-pip-version-check -r requirements.txt
+
+      # Exits non-zero on anything it cannot read. That is the whole point: the
+      # step it replaced could not fail.
+      - name: Check whether sleep hours is enabled
         id: check_enabled
+        run: .venv/bin/python scripts/check-sleep-hours-gate.py
+
+      - name: Decide whether to run the suite
+        id: decide
+        env:
+          ENABLED: ${{ steps.check_enabled.outputs.enabled }}
+          FORCED: ${{ inputs.force }}
         run: |
-          # Check if sleep_hours_enabled is true in any host_vars file
-          if grep -rq 'sleep_hours_enabled:\s*true' host_vars/; then
-            echo "enabled=true" >> $GITHUB_OUTPUT
-            echo "Sleep hours is enabled, running tests"
+          if [ "$ENABLED" = "true" ] || [ "$FORCED" = "true" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            if [ "$ENABLED" = "true" ]; then
+              echo "Feature is enabled on at least one host — running the suite."
+            else
+              echo "Feature is disabled everywhere, but this run was dispatched with force=true."
+            fi
           else
-            echo "enabled=false" >> $GITHUB_OUTPUT
-            echo "Sleep hours is disabled, skipping tests"
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "Config validated and the feature is disabled on every targeted host."
+            echo "Skipping the suite. Re-run this workflow with force=true to exercise it anyway."
           fi
 
-      - name: Skip message
-        if: steps.check_enabled.outputs.enabled == 'false'
-        run: echo "Skipping sleep hours tests - feature is disabled in config"
-
-      - name: Set up Python
-        if: steps.check_enabled.outputs.enabled == 'true'
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.14'
-
       - name: Install system dependencies
-        if: steps.check_enabled.outputs.enabled == 'true'
+        if: steps.decide.outputs.run == 'true'
         run: |
           sudo apt-get update
           sudo apt-get install -y bats jq curl netcat-openbsd
 
       - name: Verify Docker is running
-        if: steps.check_enabled.outputs.enabled == 'true'
+        if: steps.decide.outputs.run == 'true'
         run: docker --version
 
       - name: Run test suite
-        if: steps.check_enabled.outputs.enabled == 'true'
+        if: steps.decide.outputs.run == 'true'
         run: |
           cd tests
           ./run_tests.sh
 
       - name: Upload test logs on failure
-        if: failure() && steps.check_enabled.outputs.enabled == 'true'
+        if: failure() && steps.decide.outputs.run == 'true'
         uses: actions/upload-artifact@v7
         with:
           name: test-logs
@@ -69,6 +119,6 @@ jobs:
           retention-days: 7
 
       - name: Clean up test containers
-        if: always() && steps.check_enabled.outputs.enabled == 'true'
+        if: always() && steps.decide.outputs.run == 'true'
         run: |
           docker ps -a --filter label=quiet-hours-test=true -q | xargs -r docker rm -f || true

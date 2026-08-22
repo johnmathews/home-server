@@ -48,7 +48,8 @@ ANSIBLE_OPTS := $(TAGS_ARG) $(SKIP_ARG) $(LIMIT_ARG) $(EXTRA)
         finances \
         shell nfs share_drive_probe tailscale requirements \
         jelly-upgrade immich-upgrade refresh-sidecars \
-        check lint clean ci help check-ports test
+        check lint clean ci ci-offline help check-ports test \
+        requirements-python requirements-galaxy
 
 
 all: site
@@ -143,15 +144,30 @@ nfs:
 # requirements.yml to mean anything: ansible-galaxy skips anything already
 # installed unless told otherwise, so without these a changed pin is a no-op and
 # you get "whatever was installed first" rather than what the file asks for.
-requirements:
-	.venv/bin/ansible-galaxy role install -r requirements.yml -p ~/.ansible/roles --force && .venv/bin/ansible-galaxy collection install -r requirements.yml --upgrade && uv pip install -r requirements.txt
+requirements: requirements-python requirements-galaxy
+
+# Split so CI can install the galaxy half on its own: a runner builds .venv with
+# pip from requirements.txt directly (no uv on the box), then calls
+# requirements-galaxy. Without the galaxy roles, `--syntax-check` fails on
+# media_vm, pve and site with "the role 'geerlingguy.docker' was not found".
+requirements-python:
+	uv pip install -r requirements.txt
+
+requirements-galaxy:
+	.venv/bin/ansible-galaxy role install -r requirements.yml -p ~/.ansible/roles --force
+	.venv/bin/ansible-galaxy collection install -r requirements.yml --upgrade
 
 # ───────────── Quality Checks ─────────────
 check:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/site.yml --check $(VAULT)
 
+# No path arguments on purpose. Scoping to `playbooks/ roles/` excluded
+# host_vars/, group_vars/, requirements.yml, .ansible-lint and .github/ -- which
+# between them held 6 of the 21 failures, including one in .ansible-lint itself.
+# Bare ansible-lint reads exclude_paths from .ansible-lint, so this lints exactly
+# what CI lints.
 lint:
-	.venv/bin/ansible-lint $(PLAYBOOK_DIR) roles/
+	.venv/bin/ansible-lint
 
 clean:
 	rm -f *.retry
@@ -167,35 +183,80 @@ check-ports:
 # unit bats suite had never run, in CI or locally.
 # Needs bats, docker, jq and curl for the integration suite.
 test:
-	python3 -m pytest tests/ -q
+	.venv/bin/python -m pytest tests/ -q
 	bash tests/run_tests.sh
 
-ci: lint check-ports check
+# Two composites, split by what they need to reach.
+#
+#   ci-offline  needs nothing but this checkout: no network, no SSH, no vault
+#               password. .github/workflows/lint.yml runs the docker-free part
+#               of it (lint, check-ports, pytest) on every push; the docker
+#               integration suite stays in .github/workflows/test.yml behind its
+#               own gate.
+#   ci          adds `check`, a --check dry run of site.yml against the live
+#               fleet. It needs SSH to every production host and the gitignored
+#               .vault_pass.txt, so it is operator-only and cannot run in CI.
+#
+# The old single `ci: lint check-ports check` never reached its last two stages:
+# `lint` exits 2 on any failure and make stops at the first failed prerequisite.
+ci-offline: lint check-ports test
+
+ci: ci-offline check
 
 # ───────────── Help Message ───────────────
 help:
 	@echo ""
 	@echo "IMPORTANT: Run 'make requirements' first to install Ansible dependencies!"
 	@echo ""
-	@echo "Available make commands:"
+	@echo "Every target maps to one playbook and one role:"
+	@echo "  make <target> -> playbooks/<host>.yml -> roles/<host>/ -> host <host>"
+	@echo "Flags on any provisioning target:"
+	@echo "  TAGS=/t= run one tag   SKIP=/s= skip a tag   LIMIT=/l= one host   EXTRA=\"--check --diff\""
 	@echo ""
-	@echo "  make requirements     → Install Ansible roles and collections (RUN THIS FIRST!)"
+	@echo "  make requirements     → Install Ansible roles, collections and python deps (RUN THIS FIRST!)"
 	@echo ""
-	@echo "  make site             → Run full home server setup"
-	@echo "  make pve              → Setup the proxmox node, doesnt setup authentication"
-	@echo "  make nas              → Setup TrueNAS VM by provisioning a VM and uploading a TrueNAS ISO"
-	@echo "  make media            → Full Media VM config"
-	@echo "  make infra            → Full Infra VM config"
-	@echo "  make key              → Build key server"
-	@echo "  make traefik          → Traefik reverse proxy config"
+	@echo " Whole fleet"
+	@echo "  make site             → Run full home server setup (all hosts)"
+	@echo "  make all              → Alias for 'make site'"
 	@echo ""
+	@echo " Hosts"
+	@echo "  make pve              → Proxmox node (does not set up authentication)"
+	@echo "  make nas              → TrueNAS VM: provision the VM and upload the ISO"
+	@echo "  make media            → Media VM (Sonarr, Radarr, qBittorrent, Mullvad)"
+	@echo "  make infra            → Infra VM (Grafana, Loki, Homepage, Portainer, Atuin)"
+	@echo "  make key              → Key server (TrueNAS dataset encryption keys)"
+	@echo "  make traefik          → Traefik reverse proxy"
+	@echo "  make immich           → Immich photo management LXC"
+	@echo "  make jelly            → Jellyfin LXC"
+	@echo "  make tube             → TubeArchivist LXC"
+	@echo "  make music            → Navidrome music LXC"
+	@echo "  make prometheus       → Prometheus LXC"
+	@echo "  make document-library → Document library LXC (host: paperless)"
+	@echo "  make open-webui       → Open WebUI LXC"
+	@echo "  make cloudflared      → Cloudflare Tunnel LXC (syncs local config AND the CF API)"
+	@echo "  make agent            → Agent LXC (NanoClaw)"
+	@echo "  make finances         → Family finances LXC"
+	@echo ""
+	@echo " Cross-cutting roles (run against many hosts)"
+	@echo "  make shell            → Shell environment: zsh, p10k, CLI tools"
+	@echo "  make nfs              → NFS client mounts"
+	@echo "  make share_drive_probe→ Share-drive health probe + its textfile metrics"
+	@echo "  make tailscale        → Tailscale on all hosts"
+	@echo ""
+	@echo " Upgrades"
 	@echo "  make jelly-upgrade    → Pull newest Jellyfin base, rebuild, recreate, health-check"
 	@echo "  make immich-upgrade   → Pull newest Immich release images, redeploy, health-check"
 	@echo "  make refresh-sidecars → Pull+recreate alloy/node-exporter/cadvisor on all sidecar hosts"
 	@echo ""
-	@echo "  make check            → Dry run (no changes applied)"
-	@echo "  make lint             → Lint playbooks and roles"
-	@echo "  make ci               → Run lint + dry run (ideal for pre-commit or CI)"
+	@echo " Quality checks"
+	@echo "  make lint             → ansible-lint over the WHOLE repo. Exits non-zero on any failure."
+	@echo "  make check-ports      → Render every compose template, fail on a duplicate host port"
+	@echo "  make test             → pytest (tests/) + the bats suites (needs docker, bats, jq, curl)"
+	@echo "  make ci-offline       → lint + check-ports + test. No network, no SSH, no vault. What CI runs."
+	@echo "  make check            → --check dry run of site.yml against the LIVE fleet (needs SSH + vault)"
+	@echo "  make ci               → ci-offline + check. Operator-only; cannot run on a CI runner."
+	@echo ""
+	@echo " Housekeeping"
 	@echo "  make clean            → Remove temp files and retry logs"
 	@echo "  make help             → Show this message"
 	@echo ""

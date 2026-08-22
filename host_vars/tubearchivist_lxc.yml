@@ -29,4 +29,3 @@ sleep_hours_kuma_map:
 
 sleep_hours_plugins:
   - default.sh
-

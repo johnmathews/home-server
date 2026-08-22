@@ -1,0 +1,91 @@
+name: Lint and offline checks
+
+# NO `paths:` FILTER, DELIBERATELY.
+#
+# The only other workflow in this repo triggers on `roles/sleep_hours/**` and
+# `tests/**` — 57 of 580 tracked files. The other 523, including 23 of 24 roles,
+# all 22 playbooks, every Jinja template and the whole of scripts/, could be
+# changed with no workflow starting at all. A green check on a PR was therefore
+# evidence about almost nothing, and that is the structural reason the lint debt
+# this job now guards was able to accumulate unnoticed.
+#
+# Adding a paths: filter here would recreate exactly that hole. Don't.
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  offline-checks:
+    name: ansible-lint, syntax-check, duplicate ports, pytest
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          # .python-version is the repo's single source of truth for this.
+          python-version-file: .python-version
+
+      # Built at .venv on purpose: the makefile's targets invoke
+      # `.venv/bin/ansible-lint`, `.venv/bin/ansible-playbook` and
+      # `.venv/bin/python` by absolute path, so building the venv where the
+      # makefile expects it means CI runs the operator's commands verbatim
+      # rather than a re-implementation of them that can drift.
+      - name: Create the venv the makefile expects
+        run: python -m venv .venv
+
+      - name: Install pinned dependencies
+        run: .venv/bin/pip install --disable-pip-version-check -r requirements.txt
+
+      # --syntax-check resolves every `roles:` entry, so the galaxy roles and
+      # collections have to be on disk or media_vm, pve and site fail with
+      # "the role 'geerlingguy.docker' was not found".
+      - name: Install galaxy roles and collections
+        run: make requirements-galaxy
+
+      - name: Record the versions this run used
+        run: |
+          .venv/bin/ansible-lint --version
+          .venv/bin/ansible --version | head -1
+
+      # `make lint` runs bare ansible-lint over the whole repo. It used to be
+      # scoped to `playbooks/ roles/`, which hid 6 failures — including one in
+      # .ansible-lint itself.
+      - name: make lint
+        run: make lint
+
+      - name: Syntax-check every playbook
+        run: |
+          # No vault password on a runner, and --syntax-check does not need one:
+          # it parses structure without resolving vaulted values.
+          status=0
+          for playbook in playbooks/*.yml; do
+            if .venv/bin/ansible-playbook -i inventory.ini "$playbook" --syntax-check > /tmp/sc.log 2>&1; then
+              echo "ok    $playbook"
+            else
+              echo "FAIL  $playbook"
+              sed 's/^/        /' /tmp/sc.log
+              status=1
+            fi
+          done
+          exit $status
+
+      - name: make check-ports
+        run: make check-ports
+
+      # The docker-free half of `make test`. The bats integration suite needs a
+      # docker daemon and lives in test.yml behind its own gate; these unit tests
+      # do not, and had never run in CI at all.
+      - name: pytest
+        run: .venv/bin/python -m pytest tests/ -q
+
+      - name: Validate the sleep_hours enable-gate
+        # Not gated on anything: if this file cannot be read, every workflow that
+        # depends on it is untrustworthy, and that is worth knowing on every push
+        # rather than only when roles/sleep_hours/** changes.
+        run: .venv/bin/python scripts/check-sleep-hours-gate.py

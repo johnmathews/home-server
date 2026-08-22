@@ -33,10 +33,13 @@
     state: present
     update_cache: true
 
-- name: Install deno for yt-dlp JavaScript runtime
+# Vendor-supplied installer script; get_url/uri cannot pipe a script into a shell.
+- name: Install deno for yt-dlp JavaScript runtime # noqa: command-instead-of-module
   ansible.builtin.shell: |
+    set -eo pipefail
     curl -fsSL https://deno.land/install.sh | DENO_INSTALL=/usr/local sh
   args:
+    executable: /bin/bash
     creates: /usr/local/bin/deno
   tags: deno
 

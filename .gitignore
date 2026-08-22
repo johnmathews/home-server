@@ -27,3 +27,7 @@ htmlcov/
 # ELOOP and broke `make <host>` for anyone who checked the repo out.
 .venv/
 .venv
+
+# Engineering-team run artifacts are working state, not deliverables. (The three
+# committed files directly under .engineering-team/ predate this and stay tracked.)
+.engineering-team/runs/
