@@ -48,7 +48,8 @@ ANSIBLE_OPTS := $(TAGS_ARG) $(SKIP_ARG) $(LIMIT_ARG) $(EXTRA)
         finances \
         shell nfs share_drive_probe tailscale requirements \
         jelly-upgrade immich-upgrade refresh-sidecars \
-        check lint clean ci ci-offline help check-ports test
+        check lint clean ci ci-offline help check-ports test \
+        requirements-python requirements-galaxy
 
 
 all: site
@@ -143,8 +144,18 @@ nfs:
 # requirements.yml to mean anything: ansible-galaxy skips anything already
 # installed unless told otherwise, so without these a changed pin is a no-op and
 # you get "whatever was installed first" rather than what the file asks for.
-requirements:
-	.venv/bin/ansible-galaxy role install -r requirements.yml -p ~/.ansible/roles --force && .venv/bin/ansible-galaxy collection install -r requirements.yml --upgrade && uv pip install -r requirements.txt
+requirements: requirements-python requirements-galaxy
+
+# Split so CI can install the galaxy half on its own: a runner builds .venv with
+# pip from requirements.txt directly (no uv on the box), then calls
+# requirements-galaxy. Without the galaxy roles, `--syntax-check` fails on
+# media_vm, pve and site with "the role 'geerlingguy.docker' was not found".
+requirements-python:
+	uv pip install -r requirements.txt
+
+requirements-galaxy:
+	.venv/bin/ansible-galaxy role install -r requirements.yml -p ~/.ansible/roles --force
+	.venv/bin/ansible-galaxy collection install -r requirements.yml --upgrade
 
 # ───────────── Quality Checks ─────────────
 check:

@@ -42,6 +42,12 @@ jobs:
       - name: Install pinned dependencies
         run: .venv/bin/pip install --disable-pip-version-check -r requirements.txt
 
+      # --syntax-check resolves every `roles:` entry, so the galaxy roles and
+      # collections have to be on disk or media_vm, pve and site fail with
+      # "the role 'geerlingguy.docker' was not found".
+      - name: Install galaxy roles and collections
+        run: make requirements-galaxy
+
       - name: Record the versions this run used
         run: |
           .venv/bin/ansible-lint --version
