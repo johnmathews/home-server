@@ -14,11 +14,19 @@ ssh cloudflared
 
 ## Configuration
 
-Main configuration file:
+**The source of truth is `cloudflared_ingress` in
+`roles/cloudflared_lxc/defaults/main.yml`.** Read the route list there:
 
-```sh
-/etc/cloudflared/config.yml
+```bash
+grep -A2 'prefix:' roles/cloudflared_lxc/defaults/main.yml
 ```
+
+`/etc/cloudflared/config.yml` on the host is *rendered output*, not input — Ansible
+overwrites it on every `make cloudflared`, so edits made there are lost and reading it
+tells you only what the last deploy produced. The same variable also renders
+`tunnel_config_api.json.j2`, which is pushed to the Cloudflare API; the edge pushes its
+remote config back down and overrides the local file, so the API copy is what actually
+routes traffic — see the **Important** note under [Updating Configuration](#updating-configuration).
 
 ## Updating Configuration
 
@@ -100,7 +108,8 @@ Internet -> Cloudflare Edge (TLS) -> Tunnel -> cloudflared LXC
 
 ## Proxied Services
 
-All services listed in `/etc/cloudflared/config.yml`. Key subdomains:
+Derived from `cloudflared_ingress` in `roles/cloudflared_lxc/defaults/main.yml` — that
+list is authoritative and this one is a readable summary. Key subdomains:
 
 **Via Traefik (bypass Zero Access):**
 
@@ -114,6 +123,7 @@ All services listed in `/etc/cloudflared/config.yml`. Key subdomains:
 - `docs.itsa-pizza.com` -> Traefik -> Documentation Server (192.168.2.106:3003)
 - `uptime.itsa-pizza.com` -> Traefik -> Uptime Kuma (192.168.2.106:3001)
 - `speed.itsa-pizza.com` -> Traefik -> Speedtest (192.168.2.100:8080)
+- `finances.itsa-pizza.com` -> Traefik -> Family finances app (192.168.2.120:8080)
 - `sre.itsa-pizza.com` -> Traefik -> SRE Streamlit (192.168.2.106:8501) [Zero Access]
 - `stats.itsa-pizza.com` -> Traefik -> Grafana public dashboards (192.168.2.106:3000) [path-restricted]
 
@@ -125,7 +135,7 @@ All services listed in `/etc/cloudflared/config.yml`. Key subdomains:
 - `sonarr.itsa-pizza.com`, `radarr.itsa-pizza.com`, etc. -> Media VM services
 - `paperless.itsa-pizza.com` / `documents.itsa-pizza.com` / `library.itsa-pizza.com` -> Library app (192.168.2.117:8010; Paperless-ngx decommissioned 2026-07-04)
 - `proxmox.itsa-pizza.com` / `pve.itsa-pizza.com` -> Proxmox UI
-- ... (see full list in config.yml)
+- ... (full list: `cloudflared_ingress` in `roles/cloudflared_lxc/defaults/main.yml`)
 
 ## Ansible
 

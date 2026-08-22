@@ -30,11 +30,19 @@ ansible_python_interpreter: /usr/bin/python3
 # Atuin version — pins both the client binary and the server Docker image (infra VM compose)
 atuin_version: "v18.13.3"
 
-# Monitoring sidecar pins — single source for the roles that pin these images.
-# Roles reference them via their own defaults (alloy_version: "{{ sidecar_alloy_version }}"),
-# so roles that deliberately track :latest (agent, music, prometheus, traefik,
-# document_library) are unaffected. jellyfin_lxc hardcodes the same pins in its
-# static files/docker-compose.yml — keep it in sync by hand.
+# Monitoring sidecar pins — single source for the roles that reference them here.
+# Those roles point their own defaults at these vars
+# (alloy_version: "{{ sidecar_alloy_version }}"): immich, infra_vm, media_vm,
+# open_webui, pve, tubearchivist.
+#
+# NOTHING TRACKS :latest. Six roles — agent, music, prometheus, traefik,
+# document_library, family_finances — pin literal versions in their OWN
+# defaults/main.yml instead, so bumping the vars below does not move them.
+# They are currently AHEAD of these values (alloy v1.18.0, node-exporter
+# v1.12.1, cadvisor v0.55.1). traefik runs only alloy and cadvisor, no
+# node-exporter. jellyfin_lxc hardcodes its pins in a static
+# files/docker-compose.yml — keep it in sync by hand.
+# See documentation/upgrade-procedures.md for the full story.
 # Portainer agent — pin to the Portainer server version (infra VM). Agents are
 # deployed by every docker role's compose; register new endpoints in Portainer.
 portainer_agent_version: "2.39.1"

@@ -49,13 +49,26 @@ Global defaults: 30s scrape interval, 15s timeout, 15s evaluation interval.
 
 ### Scrape Jobs
 
+**This table is derived from
+`roles/prometheus_lxc/templates/prometheus/prometheus.yml.j2` — that template is the
+source of truth, and a scrape job added there without a row here is not a bug in
+Prometheus.** To re-check it:
+
+```bash
+grep -c job_name roles/prometheus_lxc/templates/prometheus/prometheus.yml.j2   # 17
+grep -n  job_name roles/prometheus_lxc/templates/prometheus/prometheus.yml.j2   # the list
+```
+
+Verified 2026-08-22: 17 jobs.
+
 ```
 +-------------------------------+-------------------------------------------+-----------+------------------------------+
 | Job Name                      | Targets                                   | Interval  | Notes                        |
 +-------------------------------+-------------------------------------------+-----------+------------------------------+
 | prometheus                    | localhost:9090                             | 30s       | Self-monitoring              |
-| node_exporter                 | 12 hosts on :9100                         | 30s       | Host metrics (all VMs/LXCs)  |
-| cadvisor                      | 11 hosts on :18080 (infra on :8080)       | 30s       | Container metrics            |
+| node_exporter                 | 13 hosts on :9100                         | 30s       | Host metrics (all VMs/LXCs)  |
+| cadvisor                      | 12 hosts on :18080 (infra on :8080)       | 30s       | Container metrics            |
+| library                       | 192.168.2.117:8010                        | 60s       | Library app metrics (see below)|
 | adguard                       | 192.168.2.111:9618                        | 30s       | DNS query metrics            |
 | container-status              | 192.168.2.106:8081                        | 30s       | Container health via Portainer|
 | home_assistant                | 192.168.2.102:8123/api/prometheus          | 30s       | Smart home metrics (Bearer)  |
@@ -80,12 +93,22 @@ All hosts scraped on port 9100:
 agent (192.168.2.107), proxmox (192.168.2.214), truenas (192.168.2.104),
 media (192.168.2.105), infra (192.168.2.106), jellyfin (192.168.2.110),
 immich (192.168.2.113), prometheus (192.168.2.115), tube-archivist (192.168.2.116),
-paperless (192.168.2.117), open-webui (192.168.2.119), music (192.168.2.109)
+paperless (192.168.2.117), open-webui (192.168.2.119), music (192.168.2.109),
+finance-app (192.168.2.120)
 ```
 
 ### cAdvisor Hosts
 
-Same hosts minus TrueNAS (no Docker). Note: infra uses port 8080 while all others use 18080.
+Same 13 hosts minus TrueNAS (no Docker) = 12. Note: infra uses port 8080 while all others
+use 18080.
+
+### The `library` job returns 404
+
+The document library's application metrics are published on **:8010**, not :8000 — the
+container listens on 8000 and compose republishes it as 8010 on the host. A 404 on
+`192.168.2.117:8010/metrics` almost always means **`LIBRARY_OTEL_METRICS_ENABLED=true` is
+missing from `roles/document_library_lxc/templates/.env.j2`**, not that this scrape config
+is wrong. The comment at `prometheus.yml.j2:69-73` says the same thing next to the job.
 
 ### AdGuard Client Name Mapping
 
