@@ -24,6 +24,6 @@
     marker: "# {mark} ANSIBLE MANAGED - shell_environment git include"
     block: |
       [include]
-      	path = ~/.gitconfig_managed
+        path = ~/.gitconfig_managed
   loop: "{{ target_shell_users }}"
   become: true

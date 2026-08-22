@@ -2,13 +2,13 @@ name: Sleep Hours Tests
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
     paths:
       - 'roles/sleep_hours/**'
       - 'tests/**'
       - '.github/workflows/test.yml'
   pull_request:
-    branches: [ main ]
+    branches: [main]
     paths:
       - 'roles/sleep_hours/**'
       - 'tests/**'

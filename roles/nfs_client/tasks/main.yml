@@ -30,7 +30,9 @@
     create_home: false
     uid: "{{ nfs_user_uid | default(omit) }}"
     group: "{{ nfs_user_name }}"
-  when: nfs_group is changed
+  # Not a handler: the user must exist before the mount tasks below run in the
+  # same play, so this cannot be deferred to the end of the play.
+  when: nfs_group is changed # noqa: no-handler
 
 - name: Check if UID already exists
   ansible.builtin.command: "getent passwd {{ nfs_user_uid }}"
@@ -93,7 +95,9 @@
     enabled: true
     state: started
 
-- name: Show systemd automount status
+# Read-only status probe. ansible.builtin.systemd_service cannot query without
+# also asserting a state, so `systemctl show` is the right tool here.
+- name: Show systemd automount status # noqa: command-instead-of-module
   become: true
   loop: "{{ nfs_shares }}"
   loop_control:
