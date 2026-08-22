@@ -48,7 +48,7 @@ ANSIBLE_OPTS := $(TAGS_ARG) $(SKIP_ARG) $(LIMIT_ARG) $(EXTRA)
         finances \
         shell nfs share_drive_probe tailscale requirements \
         jelly-upgrade immich-upgrade refresh-sidecars \
-        check lint clean ci help
+        check lint clean ci help check-ports test
 
 
 all: site
@@ -139,8 +139,12 @@ tailscale:
 nfs:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/nfs.yml $(VAULT) $(ANSIBLE_OPTS)
 
+# --force on roles and --upgrade on collections are both required for the pins in
+# requirements.yml to mean anything: ansible-galaxy skips anything already
+# installed unless told otherwise, so without these a changed pin is a no-op and
+# you get "whatever was installed first" rather than what the file asks for.
 requirements:
-	.venv/bin/ansible-galaxy role install -r requirements.yml -p ~/.ansible/roles && .venv/bin/ansible-galaxy collection install -r requirements.yml && uv pip install -r requirements.txt
+	.venv/bin/ansible-galaxy role install -r requirements.yml -p ~/.ansible/roles --force && .venv/bin/ansible-galaxy collection install -r requirements.yml --upgrade && uv pip install -r requirements.txt
 
 # ───────────── Quality Checks ─────────────
 check:
@@ -153,8 +157,18 @@ clean:
 	rm -f *.retry
 	rm -f .ansible.log
 
+# Runs under the venv, not system python: the checker renders the templates with
+# jinja2 and parses them with pyyaml, both of which come from requirements.txt.
 check-ports:
-	python3 scripts/check-duplicate-ports.py
+	.venv/bin/python scripts/check-duplicate-ports.py
+
+# Runs every suite in tests/. Until now nothing invoked pytest at all, and
+# tests/run_tests.sh globbed integration/ only — so the python tests and the
+# unit bats suite had never run, in CI or locally.
+# Needs bats, docker, jq and curl for the integration suite.
+test:
+	python3 -m pytest tests/ -q
+	bash tests/run_tests.sh
 
 ci: lint check-ports check
 

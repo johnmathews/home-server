@@ -77,6 +77,21 @@ for test_file in "$TEST_DIR/integration"/*.bats; do
     fi
 done
 
+# Unit tests. These were previously never executed: this loop globbed
+# integration/ only, CI runs this script, and nothing else globbed unit/ — so
+# tests/unit/io_sampler.bats sat in the tree, passing 20/20, run by nobody.
+echo ""
+echo -e "${YELLOW}=========================================="
+echo "Unit Tests"
+echo -e "==========================================${NC}"
+echo ""
+
+for test_file in "$TEST_DIR/unit"/*.bats; do
+    if [[ -f "$test_file" ]]; then
+        run_test_file "$test_file"
+    fi
+done
+
 # Global teardown
 global_teardown
 

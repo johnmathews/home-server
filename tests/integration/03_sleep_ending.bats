@@ -37,7 +37,7 @@ teardown() {
 
     # Assert: Log shows correct phases
     assert_log_contains "PHASE 1: PROCESS CONTAINERS" "$output"
-    assert_log_contains "PHASE 2: ENABLE NFS/SMB SHARES" "$output"
+    assert_log_contains "PHASE 0: ENABLE NFS/SMB SHARES" "$output"
 
     # Assert: Containers were actually unpaused
     assert_log_contains "test-nginx-1 unpaused" "$output"
@@ -67,7 +67,7 @@ teardown() {
 
     # Assert: Log shows phases
     assert_log_contains "PHASE 1: PROCESS CONTAINERS" "$output"
-    assert_log_contains "PHASE 2: ENABLE NFS/SMB SHARES" "$output"
+    assert_log_contains "PHASE 0: ENABLE NFS/SMB SHARES" "$output"
 }
 
 @test "Sleep ending: shares are enabled via TrueNAS API" {
@@ -124,10 +124,17 @@ teardown() {
 
     # Assert: Phases appear in correct order
     assert_log_sequence "$output" \
+        "PHASE 0: ENABLE NFS/SMB SHARES" \
         "PHASE 1: PROCESS CONTAINERS" \
-        "test-nginx-1 unpaused" \
-        "PHASE 2: ENABLE NFS/SMB SHARES"
+        "test-nginx-1 unpaused"
 
-    # Note: This verifies that containers are unpaused BEFORE shares are enabled
-    # which is the current implementation behavior
+    # Shares are enabled BEFORE containers are unpaused, and that ordering is
+    # the point: a container whose bind mount is a not-yet-enabled NFS share
+    # starts against an empty directory and writes to local disk.
+    #
+    # This assertion previously encoded the opposite order, with a comment
+    # claiming it was "the current implementation behavior". It was not — the
+    # script has done PHASE 0 then PHASE 1 for as long as the phase labels have
+    # existed, so the assertion could never have passed. It is one of the tests
+    # that has been red for the entire time CI was reporting green.
 }

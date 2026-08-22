@@ -281,7 +281,13 @@ verify_share_state() {
   
   if command -v jq >/dev/null 2>&1; then
     local actual_state
-    actual_state=$(echo "$verify" | jq -r '.enabled // "unknown"' 2>/dev/null)
+    # NOT `.enabled // "unknown"`. jq's // treats false as empty, exactly as it
+    # treats null, so a share that IS disabled reads back as "unknown" and never
+    # matches expected_state="false". Every disable therefore logged
+    # state_mismatch and returned 1 while the share had in fact been disabled
+    # correctly — and because enable compares against "true", which // passes
+    # through untouched, only the disable half was ever broken.
+    actual_state=$(echo "$verify" | jq -r 'if .enabled == null then "unknown" else .enabled end' 2>/dev/null)
     
     if [[ "$actual_state" == "$expected_state" ]]; then
       log_debug "$dataset" "${share_type}_verify" "ok" "share_id=$share_id enabled=$actual_state"

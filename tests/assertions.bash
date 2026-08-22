@@ -58,7 +58,10 @@ assert_share_enabled() {
     local share_type=${2:-nfs}
     local url="http://localhost:${TRUENAS_MOCK_PORT:-8888}/api/v2.0/sharing/${share_type}/id/${share_id}"
 
-    local enabled=$(curl -s "$url" 2>/dev/null | jq -r '.enabled // "unknown"')
+    # NOT `.enabled // "unknown"`: jq's // treats false as empty, exactly like
+    # null, so a correctly-disabled share would read back as "unknown" and
+    # assert_share_disabled could never pass. Test for null explicitly instead.
+    local enabled=$(curl -s "$url" 2>/dev/null | jq -r 'if .enabled == null then "unknown" else .enabled end')
 
     if [[ "$enabled" != "true" ]]; then
         echo "ASSERTION FAILED: Share $share_type/$share_id not enabled" >&2
@@ -73,7 +76,10 @@ assert_share_disabled() {
     local share_type=${2:-nfs}
     local url="http://localhost:${TRUENAS_MOCK_PORT:-8888}/api/v2.0/sharing/${share_type}/id/${share_id}"
 
-    local enabled=$(curl -s "$url" 2>/dev/null | jq -r '.enabled // "unknown"')
+    # NOT `.enabled // "unknown"`: jq's // treats false as empty, exactly like
+    # null, so a correctly-disabled share would read back as "unknown" and
+    # assert_share_disabled could never pass. Test for null explicitly instead.
+    local enabled=$(curl -s "$url" 2>/dev/null | jq -r 'if .enabled == null then "unknown" else .enabled end')
 
     if [[ "$enabled" != "false" ]]; then
         echo "ASSERTION FAILED: Share $share_type/$share_id not disabled" >&2

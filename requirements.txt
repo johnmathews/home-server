@@ -1,4 +1,16 @@
-ansible
-proxmoxer
-requests
-ansible-lint
+# Pinned to the versions this repo is known to work with.
+#
+# These are exact pins, not floors. `make requirements` installs whatever is
+# listed here, so an unpinned entry means a fresh checkout can get a different
+# Ansible than the one the roles were tested against — and, because ansible-lint
+# adds rules in every major, an unpinned linter means the CI lint gate's
+# threshold is whatever was published that morning rather than what this repo
+# agreed to.
+#
+# To move a pin: bump it here, run `make requirements`, run `make ci-offline`,
+# and commit the two together so the version and the green run are one change.
+ansible==14.3.0
+ansible-core==2.21.3
+proxmoxer==2.3.0
+requests==2.34.2
+ansible-lint==26.8.0
