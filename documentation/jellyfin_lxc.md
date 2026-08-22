@@ -22,9 +22,11 @@ can starve the LXC.
 
 ## Jellyfin version
 
-As of 2026-07-04: **Jellyfin 10.11.7** (image built 2026-04-01 from `jellyfin/jellyfin:latest`
-with yt-dlp added via custom Dockerfile — the tag is `latest`, so the actual version only moves
-when the image is rebuilt).
+As of 2026-08-22: **Jellyfin 10.11.11** (was 10.11.7 on 2026-07-04; the image is built from
+`jellyfin/jellyfin:latest` with yt-dlp added via custom Dockerfile — the tag is `latest`, so the
+actual version only moves when the image is rebuilt). The bundled `yt-dlp` (2026.07.04 as of
+this writing) warns that no JavaScript runtime (deno) is installed — metadata extraction still
+works but is degraded; the media VM role already installs deno for the same reason.
 
 ## NFS media mounts
 
@@ -35,17 +37,131 @@ when the image is rebuilt).
 /mnt/nfs/youtube-kids→ /youtube-kids   (read-only, TubeArchivist library)
 ```
 
-## Libraries (18 total)
+## Libraries
 
-Collections, Create, Gym, Heavy Club Basics, Heavy Club Exercise Tutorials, Humanity,
-Kettlebell Compilations, Kids Movies, Kids Shows, Kids Youtube, Math + Engineering, Movies,
-Our Movies, Shows, Sport, Travel, Turkish Get-Up, Ukraine Lectures.
+Collections, Create, **Health & Fitness** (Shows — see below), Humanity, Kids Movies, Kids Shows,
+Kids Youtube, Math + Engineering, Movies, Our Movies, Shows, Sport, Travel, Ukraine Lectures.
+(The five former fitness libraries — Gym, Heavy Club Basics, Heavy Club Exercise Tutorials,
+Kettlebell Compilations, Turkish Get-Up — still exist as empty shells until they are deleted;
+their folders were moved into `fitness/` on 2026-08-22.)
 
-The five club/kettlebell/Ukraine libraries were added 2026-07-01, each pointing at a
-`/movies/youtube/<subdir>` path. **New libraries default to real-time monitoring ON** — turn it
-off when creating NFS-backed libraries (see below).
+The non-fitness YouTube libraries (Create, Humanity, Travel, Math + Engineering, Ukraine Lectures)
+are still flat `movies`-type libraries, each pointing at one `/movies/youtube/<subdir>` folder.
+**New libraries default to real-time monitoring ON** — turn it off when creating NFS-backed
+libraries (see below).
 
 Library configs: `/srv/apps/jellyfin/appdata/root/default/<name>/options.xml`
+
+### Health & Fitness (Shows library, 2026-08-22)
+
+One *Shows* library replaces the five former per-playlist movie libraries. Series are the
+subcategories, seasons the sub-subcategories:
+
+```
+/movies/youtube/fitness/                      (NAS: /mnt/tank/movies/youtube/fitness/)
+├── Heavy Club/         Season 01 "Basics" (55)   Season 02 "Exercise Tutorials" (100)
+├── Kettlebell/         Season 01 "Compilations"  Season 02 "Turkish Get-Up"  Season 03 "Tutorials"
+├── Bodyweight/  Mobility & Physio/  Endurance/  Inspiration/  Combat Sports/  Health/   (one season each)
+```
+
+Conventions inside the tree:
+
+- Episode file: `<Series> SnnEnn - <original yt-dlp name>-[<youtubeId>].ext`. The original
+  filename (incl. the `[id]`) is kept verbatim after the `SxxExx - ` token. Playlist seasons keep
+  yt-dlp's `001-` playlist index as the episode number; loose seasons are numbered by upload date.
+- Every episode has a `<same stem>.nfo` (title, plot, aired, season/episode, sorttitle, `uniqueid
+  type="YoutubeMetadata"`) and most a `<same stem>-thumb.jpg`. `tvshow.nfo` / `season.nfo` carry
+  series and season names. **Metadata for this library comes from these nfo files, not from the
+  YouTube Metadata plugin** — see the landmine below.
+- Artwork: every series has a generated `poster.jpg` and every season a `folder.jpg` (2:3: the
+  season's *first* episode thumbnail, full width and uncropped, over a blurred copy of itself,
+  plus a name band; series posters use the first episode of the first season) — made by
+  `scripts/jellyfin-fitness-migration/make_posters.py` (`uv run --with pillow`). Without a season
+  image Jellyfin shows the series image for every season, so keep one per season. Re-run the
+  script after adding a season (it regenerates all posters and refreshes series/season images
+  only). Series overviews are a one-line list of the seasons — the YouTube Metadata plugin's
+  *series* provider had attached a random YouTube channel's avatar and "about" text to each
+  series when it was still enabled.
+- Episode overviews are a cleaned version of the YouTube description: `"<channel> · <d Mon YYYY>"`
+  + the first real paragraph, with link/merch/social/gear boilerplate stripped, capped ~480 chars
+  (`migrate.py fix-overviews` for Jellyfin, `write-nfo` applies the same cleaning to the nfo; raw
+  descriptions are kept in `state/metadata-sources.json`). Most Mark Wildman videos have no real
+  description at all, so they show just the channel/date line.
+- Library options: `tvshows`, `EnableRealtimeMonitor=false`, metadata fetchers **empty** for
+  Series/Season/Episode, image fetchers `Embedded Image Extractor, Screen Grabber` for episodes
+  (the provider *display names, with spaces* — `ScreenGrabber` silently matches nothing),
+  `LocalMetadataReaderOrder = [Nfo]`, `DisabledLocalMetadataReaders = [YoutubeMetadata]`.
+- Adding a new video: drop it into the right season folder with the next `SnnEnn` number and an
+  nfo (the `yt` wrapper's fitness mode does this — see `photo-video-music-tools/download-video`).
+  Without an nfo Jellyfin shows the filename as the title.
+
+**Custom CSS.** Two places, easy to confuse:
+
+- *Dashboard → General → Custom CSS* — **server-wide**, stored in `/config/config/branding.xml`
+  (appdata volume, PBS-backed), served to every user/browser; survives container restarts and
+  image upgrades. Runtime state, not Ansible — `GET/POST /System/Configuration/branding` if it
+  ever needs scripting (that is how the responsive version below was pushed on 2026-08-22; the
+  previous value is in `scripts/jellyfin-fitness-migration/state/branding-before.json`).
+- *Settings → Display → Custom CSS* — **per browser**: jellyfin-web keeps it in that browser's
+  localStorage only (not sent to the server), so it does not follow the user to another device
+  and vanishes with cleared site data. (As of 2026-08-22 both rules below are in the
+  server-wide field — `branding.xml` — so every browser gets them.)
+
+Either way it is CSS against jellyfin-web's DOM: a web-client upgrade that renames classes (the
+React rewrite is coming) silently stops it applying — it fails safe (back to the default list),
+so re-check after `make jelly-upgrade`. Native apps (TV, iOS/Android) ignore it entirely.
+
+These rules are the only way to change the detail pages — jellyfin-web exposes no per-library
+hooks (no class or attribute on the page identifies the library, and Season pages are always
+rendered as a list):
+
+```css
+/* hide "Next Up" on every series page */
+.nextUpSection { display: none; }
+/* Season page: episodes as a card grid instead of a list (verified on 10.11.11, desktop web) */
+/* 4 columns >= 1800px, 3 by default, 2 <= 1100px, 1 <= 640px */
+#childrenContent .itemsContainer.vertical-list { display: flex !important; flex-direction: row !important; flex-wrap: wrap !important; gap: 1.6em 1.2em; align-items: flex-start; --ep-cols: 3; }
+@media (min-width: 1800px) { #childrenContent .itemsContainer.vertical-list { --ep-cols: 4; } }
+@media (max-width: 1100px) { #childrenContent .itemsContainer.vertical-list { --ep-cols: 2; } }
+@media (max-width: 640px)  { #childrenContent .itemsContainer.vertical-list { --ep-cols: 1; } }
+#childrenContent .itemsContainer.vertical-list > .listItem { flex: 0 0 calc((100% - (var(--ep-cols) - 1) * 1.2em) / var(--ep-cols)) !important; width: auto !important; max-width: calc((100% - (var(--ep-cols) - 1) * 1.2em) / var(--ep-cols)); margin: 0 !important; padding: 0 !important; }
+#childrenContent .listItem-content { display: flex; flex-direction: column; align-items: stretch; }
+#childrenContent .listItemImage.listItemImage-large { width: 100% !important; height: auto !important; aspect-ratio: 16 / 9; margin: 0 !important; }
+#childrenContent .listItemBody { padding: 0.6em 0 0 0; }
+#childrenContent .listItemBody > .listItemBodyText:first-child { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3em; height: 2.6em; }
+#childrenContent .listItem-overview { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+#childrenContent .listItem-overview p { margin: 0; }
+#childrenContent .listViewUserDataButtons { align-self: flex-start; padding-top: 0.2em; }
+```
+Both rules affect every Shows-type library (Shows, Kids Shows, Kids Youtube too). The grid
+clamps titles to two lines and shows one line of overview (the channel/date line).
+
+**Landmine — YouTube Metadata plugin episode provider hard-codes episode numbers.** The plugin's
+`YTDLJsonToEpisode` sets `IndexNumber = 1` and `ParentIndexNumber = 1` on every episode it
+fetches (and a date-based `ForcedSortName`), so in a numbered `SxxExx` library every episode
+collapses to "E1" and ordering is destroyed. During the 2026-08-22 migration 237 of 249 fetched
+episodes ended up as E1 before this was caught. It is fine for the *channel-as-series* layout the
+plugin was written for (TubeArchivist-style, one season per year); it is **not usable** for
+curated numbered seasons. Hence the nfo approach above. A second, smaller landmine: the plugin's
+remote provider shells out to `yt-dlp` once per item, and a bulk scan of a few hundred items gets
+the LXC's IP rate-limited by YouTube (HTTP 429 / "sign in to confirm you're not a bot") for ~10
+minutes at a time — the Movie libraries are still exposed to that on big imports.
+
+**Landmine — never `ReplaceAllMetadata` on this library.** A refresh with
+`ReplaceAllMetadata=true` nulled every episode's IndexNumber and Overview and the nfo reader did
+not repopulate them (10.11.11, 2026-08-22). A plain `FullRefresh` is what works: Jellyfin
+re-parses `SxxExx` from the filename for episodes missing numbers and reads the nfo into empty
+fields. A non-replace refresh never overwrites an existing Name/ForcedSortName, so titles/season
+names/sort names are set with `migrate.py fix-names` (API item updates) when needed.
+
+**Migration tooling** (one-off, repeatable): `scripts/jellyfin-fitness-migration/` —
+`mapping.toml` (series/season ↔ folder/ids), `migrate.py` with `export-history`, `plan`,
+`apply-moves`, `apply-history`, `fix-library-options`, `write-nfo`, `refresh`, `fix-names`,
+`fix-overviews` sub-commands, `make_posters.py`, `retry_metadata.py`, `state/` (the exported
+history, plan, metadata snapshot and logs from the 2026-08-22 run), tests in
+`tests/test_jellyfin_fitness_migration.py`. Watched/in-progress state was carried across by
+YouTube ID (27 rows, 0 unmatched). Rollback snapshot: `tank/movies@pre-fitness-migration-20260822`
+(2-week retention). Journal: `journal/260822-jellyfin-health-fitness-shows-library.md`.
 
 ## Plugins
 

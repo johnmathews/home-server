@@ -1,0 +1,196 @@
+# Series / Season mapping for the Jellyfin "Health & Fitness" migration.
+#
+# Edit freely and re-run `migrate.py plan`. Rules enforced by the planner:
+#   * every media file in every referenced source folder must land in exactly
+#     one season (strays or duplicates abort the plan);
+#   * a season is either a whole playlist folder (`folder = "..."`, episode
+#     number = the existing `NNN-` prefix) or a list of YouTube IDs taken from a
+#     folder (`folder = "..."`, `ids = [...]`, episodes numbered by upload date).
+#
+# Paths are relative to /mnt/tank/movies/youtube (NAS) == /movies/youtube (Jellyfin).
+
+target_subdir = "fitness"           # new tree: /movies/youtube/fitness/<Series>/Season NN/
+library_name  = "Health & Fitness"
+
+# ----------------------------------------------------------------------------
+[[series]]
+name = "Heavy Club"
+
+  [[series.seasons]]
+  number = 1
+  name   = "Basics"
+  folder = "heavy-club-basics"
+
+  [[series.seasons]]
+  number = 2
+  name   = "Exercise Tutorials"
+  folder = "heavy-club-exercise-tutorials"
+
+# ----------------------------------------------------------------------------
+[[series]]
+name = "Kettlebell"
+
+  [[series.seasons]]
+  number = 1
+  name   = "Compilations"
+  folder = "kettlebell-compilations"
+
+  [[series.seasons]]
+  number = 2
+  name   = "Turkish Get-Up"
+  folder = "turkish-get-up"
+
+  [[series.seasons]]
+  number = 3
+  name   = "Tutorials"
+  folder = "training"
+  ids = [
+    "JTOzWVM9d0Y",  # 10 Minutes of Kettlebell Nonstop (Wildman)
+    "TjarIpMne1w",  # How to Do a Kettlebell Swing - 4 Versions
+    "4TgRTh_R6_w",  # If You Master This, Kettlebells Become Much More Fun
+    "xQqCyl-2ixQ",  # Kettlebell Snatch Technique
+    "9RRWCkMIRSs",  # Kettlebell Upper cut outside swing
+    "9YMRKqxUIsw",  # Kettlebell Walking Around the leg clean
+    "vUJ3sZVwZ4Y",  # Kettlebell 72 - deck squat
+    "QPxiClwIyKU",  # The Kettlebell Roadmap
+    "gLeRzQVc8xw",  # Pavel Tsatsouline - More Russian Kettlebell Challenges 2003
+  ]
+
+# ----------------------------------------------------------------------------
+[[series]]
+name = "Bodyweight"
+
+  [[series.seasons]]
+  number = 1
+  name   = "Bodyweight"
+  folder = "training"
+  ids = [
+    "Cu53h-mGHvM",  # 4 Foundational Core Exercises (Wildman)
+    "-xw66-Ggl9s",  # 5 Exercises That Will Transform Your Body (Movesmethod)
+    "0FSCi2viR2M",  # 99% FAIL at fitness - TOI Program Integration
+    "hYkLrrQH0og",  # Sit thru leg
+    "ugp8XuBIbRE",  # 2 hand Hip Drop
+    "Zn_aYiEXymg",  # Bodyweight Only "Flow" Workout (Steph Rose)
+    "7nP5m_8ig-A",  # Bear Squat
+    "Lu8wy6vs6hM",  # Can't Squat, Hang, or Crawl?
+    "oaPrRsS8diw",  # Cardio Doesn't Build Stamina Like This
+    "xeJJEZdaMm8",  # Gymnastic Rings Workout for Beginners
+    "PdT0uAg7wdw",  # How to Scale Pushups
+    "1OVEiwW1zvk",  # I Squatted Every Single Day
+    "P3fRCYwuKd4",  # Most Fitness Programs Burn You Out
+    "yOzaz5UBaxQ",  # Normal Pushups Are Boring
+    "Md8VZToFsoE",  # The Screwing Pushup
+    "7I-3qYUDhRk",  # The Bodyweight Protocol I Use When I Break Down
+    "38YXUYjbxnU",  # The Smartest Way to Use Bodyweight Training
+    "UOJBqPaFsDk",  # TRAINING YOUR BODY DESPERATELY NEEDS + DIY Rings (Meli)
+    "2piGF24kFrI",  # This Exercise Gives You Big Arms
+    "C4TVr2NtEg8",  # childs pose to outside lunge to step up
+    "jvU5b0s4BNg",  # learn to pistol squat (shai)
+    "XTbJZXXccpE",  # 7 Minutes Only... Do This Every Morning (Trevorsinstinct)
+  ]
+
+# ----------------------------------------------------------------------------
+[[series]]
+name = "Mobility & Physio"
+
+  [[series.seasons]]
+  number = 1
+  name   = "Mobility & Physio"
+  folder = "training"
+  ids = [
+    "y_s1Hel0yIE",  # 10-Minute Squat Mobility Routine
+    "LIcwEXUV5VU",  # 5 Mobility Exercises Too Good to Ignore
+    "mim6KgNDDb0",  # 5 Science-Backed Exercises That Reverse Aging
+    "4nhuBzBjWzQ",  # 7-Step ATG Mobility Routine
+    "u1rQP57Uef8",  # 8 Movements That Undo 40 Hours of Sitting
+    "y1Z1OaTUxSk",  # Ancient Mobility Exercises Men 35+ Need
+    "cUIrmL1ZlWk",  # Build a Bulletproof Lower Back (Capehart MD)
+    "d9s8iXNYFSk",  # Combat Mobility Workout
+    "VqafdE2n3Ls",  # Insane Mobility Gains
+    "XHGPw9aC9-o",  # The Only Mobility Routine I Use to Run Pain-Free
+    "DZPvK1MWGdg",  # The Forgotten PRIMAL MOVEMENT
+    "_laL7c1bESc",  # Why You Can't Do a Side Lunge
+    "1KZNyxjP19A",  # You'll Regret Not starting these before 40
+    "Us3wGbf4gQk",  # Kneesovertoesguy - Rebuild Your Lower Back From The GROUND Up
+    "koXiM8TXj1g",  # Kneesovertoesguy - Rebuild Your Shoulders, Lower Back AND Knees
+    "IiFnWHi11Uk",  # Kneesovertoesguy - Lower Back Gradient-Scale
+  ]
+
+# ----------------------------------------------------------------------------
+[[series]]
+name = "Endurance"
+
+  [[series.seasons]]
+  number = 1
+  name   = "Endurance"
+  folder = "training"
+  ids = [
+    "PE1EAf5XoDE",  # A Lap For Bill: Zach Miller's Hardrock 100
+    "AXqmmq1E3bc",  # An Almost Perfect Race with Courtney Dauwalter
+    "St3ZXLVhric",  # BARKLEY NUMBER FIFTEEN
+    "DQSiygnDm-U",  # Courtney Dauwalter | The Source
+    "NEg_p1Lw2l4",  # Courtney Dauwalter's Ultimate Challenge
+    "r6O5vI0cmAI",  # François D'Haene - Tor des Géants 2024
+    "bbleNcW2ub8",  # Sabrina Stanley - HURT 100 & Hardrock 100
+    "SKVUEZryL-s",  # I Trained With The World's Toughest Endurance Athlete
+    "_eluM9Mm1hk",  # Kilian Jornet Post-2025 Western States 100 Interview
+    "8NxXh3UqpAE",  # Kilian Jornet Running 54h in Norway
+    "KocK3m1yuyo",  # Kevin Schmidt & Courtney Dauwalter at Bear 100
+    "Ht6xzd-OoJA",  # My London Marathon experience
+    "WbRoXKGG3AI",  # REDEMPTION - Black Canyon 100K 2026 (Hans Troyer)
+    "hUl_MyzblOE",  # Racing Great North Run HALF MARATHON
+    "PjXmYmr1xSA",  # Racing for the Win - MOAB 240 Documentary
+    "E6TbeiKxpSs",  # Running 650km through the Australian Alps (Beau Miles)
+    "sLFZJ-42v7o",  # Scott Johnston's Winning Formula at UTMB
+    "XW1F79sfftA",  # The Great Southern Country (Lachlan Morton)
+    "MbXwKTZoLQ4",  # WALMSLEY | THE FILM
+    "NDZdsqbcGTU",  # WHERE DREAMS GO TO DIE - Gary Robbins / Barkley
+    "YL0p7Hsptac",  # Watching professional ULTRA RUNNERS train
+    "w85EM_usJnU",  # What it's like to do The Boat Race
+    "Aiyj88Al_xc",  # Who is Hans Troyer?
+  ]
+
+# ----------------------------------------------------------------------------
+[[series]]
+name = "Inspiration"
+
+  [[series.seasons]]
+  number = 1
+  name   = "Inspiration"
+  folder = "training"
+  ids = [
+    "c53F4MNGOrA",  # Conor McGregor Motivation
+    "ifGArcHIPI4",  # The Power of Ilia Topuria's Delusional Self Belief
+    "vWU5O7cK7aI",  # I Worked Out Like David Goggins for 100 Days
+    "ldQUuOc4eEM",  # IAN | 72-Year-Old Rock Climber
+  ]
+
+# ----------------------------------------------------------------------------
+[[series]]
+name = "Combat Sports"
+
+  [[series.seasons]]
+  number = 1
+  name   = "Combat Sports"
+  folder = "training"
+  ids = [
+    "J19ORjYOehE",  # Israel Adesanya vs Kelvin Gastelum | FULL FIGHT
+    "CvFIH0T5VJQ",  # Why Georges St-Pierre is better than everyone
+    "3lsGr4s9rGI",  # Why Was George Saint Pierre Better Than Everyone - Meta Training
+  ]
+
+# ----------------------------------------------------------------------------
+[[series]]
+name = "Health"
+
+  [[series.seasons]]
+  number = 1
+  name   = "Health"
+  folder = "training"
+  ids = [
+    "cHEOsKddURQ",  # Vaping Is Too Good To Be True
+    "qBRaI0ZeAf8",  # We Have To Talk About Weed
+    "25LUF8GmbFU",  # MIT Educated Neurosurgeon ... Alone In The Mountains
+    "uQaf25a1P0c",  # The REAL Reason You Feel Old and Exhausted at 40
+    "chT0J_XO80I",  # This Video Will Make You Happier Than Your Entire Feed
+  ]
