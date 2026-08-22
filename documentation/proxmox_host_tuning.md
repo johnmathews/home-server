@@ -1,5 +1,9 @@
 # Proxmox Host Performance Tuning
 
+**Status:** current as of 2026-08-22 (covers: live). Hardware, ARC sizing and the VM
+allocation table were re-read from `pve` on that date. Every figure here is mutable —
+each section names the command that reads it.
+
 ## Hardware
 
 - CPU: AMD Ryzen 5 PRO 4655G (12 threads)
@@ -122,11 +126,17 @@ top -b -n2 -d2 -p $(pgrep ksmd) | tail -5
 
 ### Current VM allocations
 
+Re-read these rather than trusting them — `ssh pve qm config <vmid> | grep -E '^(cores|memory|balloon):'`,
+or `proxmox_list_guests` / `proxmox_get_guest_config` on the `sre-agent` MCP server. A missing
+`balloon:` key ("none" below) leaves the driver **enabled** with its target at the full `memory`
+value, so `pvestatd` can still reclaim under host pressure; an explicit `balloon: 0` **disables the
+driver outright** (`man qm`: "Using zero disables the ballon driver"). Verified 2026-08-22.
+
 | VM   | Name           | Config  | Balloon | Notes                          |
 |------|----------------|---------|---------|--------------------------------|
 | 102  | home-assistant | 2048 MB | none    | Reduced from 4 GB (2026-03-17) |
 | 104  | truenas        | 16384 MB| 0 (off) | Needs full allocation for ZFS  |
-| 106  | infra          | 2048 MB | none    | Tight, leave as-is             |
+| 106  | infra          | 6144 MB | 0 (off) | Raised from 2 GB; 4 vCPU       |
 | 114  | media          | 16384 MB| 6144    | Balloon reclaims ~10 GB idle   |
 
 ### How balloon works
