@@ -20,6 +20,8 @@ on:
     paths:
       - 'roles/sleep_hours/**'
       - 'tests/**'
+      - 'host_vars/**'
+      - 'playbooks/**'
       - 'scripts/check-sleep-hours-gate.py'
       - '.github/workflows/test.yml'
   pull_request:
@@ -27,6 +29,8 @@ on:
     paths:
       - 'roles/sleep_hours/**'
       - 'tests/**'
+      - 'host_vars/**'
+      - 'playbooks/**'
       - 'scripts/check-sleep-hours-gate.py'
       - '.github/workflows/test.yml'
   workflow_dispatch:
@@ -36,6 +40,12 @@ on:
         type: boolean
         default: false
 
+# host_vars/** and playbooks/** are in the filter because both feed the gate: the
+# variable is read from host_vars, and the set of hosts required to declare it is
+# derived from which playbooks apply the role. Renaming the variable in a
+# host_vars file must re-run this workflow, or the gate's own red path is
+# unreachable by the edit most likely to trigger it.
+#
 # Every other file in the repo is covered by lint.yml, which has no paths filter.
 # The narrow filter here is safe only because that is true; do not add one there.
 
