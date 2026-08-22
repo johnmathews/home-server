@@ -1,6 +1,18 @@
+# Two deliberate exclusions, both of which break `make site` if reinstated:
+#
 # nas_vm: TrueNAS appliance — package installs get reverted on updates.
+#
+# family_finances_lxc: the guest was cloned and arrived holding the
+# document-library host's tailscale node key; that state was wiped, and
+# re-registering it needs an auth key. vault_tailscale_auth_key is currently
+# EXPIRED ("API key does not exist"), and the role calls fail() when
+# authentication does not work — so including this host kills the whole play,
+# and with it `make site`. The omission is recorded at
+# playbooks/family_finances_lxc.yml:21-36 and in
+# documentation/family_finances_lxc.md; this line is what makes it stick.
+# Remove the exclusion once the auth key is refreshed.
 - name: Install and configure Tailscale on all hosts
-  hosts: all:!nas
+  hosts: all:!nas:!family_finances
   become: true
   roles:
     - role: tailscale

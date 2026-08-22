@@ -109,19 +109,44 @@ running `tailscaled`.
 `tailscale` role back to `playbooks/family_finances_lxc.yml`. The app itself does not
 need the tailnet — it is reached over the Cloudflare tunnel.
 
+## F34 — `make site` unblocked (fixed here, with approval)
+
+`playbooks/tailscale.yml` targeted `all:!nas`, which overrode
+`family_finances_lxc`'s deliberate omission of the `tailscale` role. The role
+calls `fail()` when authentication does not work, and with F36's key expired the
+play died on that host — killing `make site` for the whole fleet. This was raised
+rather than absorbed, and fixed on approval.
+
+The host pattern is now `all:!nas:!family_finances`. Excluding by **group** matches
+the existing `!nas` convention (`nas` is the group; `nas_vm` is the host). Verified
+with `--list-hosts`: 15 hosts, with `nas_vm` and `family_finances_lxc` both absent.
+
+The exclusion carries a comment explaining that it is load-bearing — the previous
+one-line comment mentioned only TrueNAS, so a reader had no way to know the second
+exclusion existed for a different reason. Remove it once F36's key is refreshed.
+
+This is a second break in the same rebuild path W7 repaired, which is worth noting
+as a pattern: `make site` breaks quietly, because nobody runs it until they need it.
+
+## The immich secret file is gone (deleted here, with approval)
+
+`roles/immich_lxc/files/immich_api_key.secret` — untracked, left in place by session
+3 because deleting the last on-disk copy of a credential is the user's call.
+Deleted on approval, after confirming all three of:
+
+- its `sha256` still began `0f894a77`, matching session 3's recorded value;
+- `vault_immich_key` is present in `group_vars/all/vault.yml`;
+- **nothing references it.** The role deploys from
+  `roles/immich_lxc/templates/immich_api_key.secret.j2`, whose entire content is
+  `{{ vault_immich_key }}`. The loose file under `files/` was never an input.
+
 ## Carried forward, not actioned
 
-- **F34** — `make site` still cannot complete. `playbooks/tailscale.yml` targets
-  `all:!nas`, which overrides `family_finances_lxc`'s deliberate omission of the
-  tailscale role, and the play dies on `tailscale status`. A one-line fix exists
-  (`!family_finances_lxc` in the host pattern) that does not touch the expired-key
-  question. Not in this batch.
+- **F36** — see above. Needs the user's Tailscale admin access. Also added to the
+  improvement plan's open items so sessions 5-9 cannot lose it.
 - **F32** — two credentials leaked into session 3's transcript
   (`vault_immich_media_vm_api_key`, `vault_pushover_media_vm_app_api_token`) still
   need rotating.
-- The untracked `roles/immich_lxc/files/immich_api_key.secret` from session 3 is
-  redundant but was deliberately not deleted — deleting the last on-disk copy of a
-  credential is the user's call.
 
 ## Method note worth keeping
 
