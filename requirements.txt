@@ -18,4 +18,4 @@ ansible-lint==26.8.0
 # The test framework. `make test` and the CI lint job both run
 # `.venv/bin/python -m pytest`, so pytest has to be in this venv rather than
 # whatever the ambient python3 happens to have.
-pytest==9.0.2
+pytest==9.0.3
