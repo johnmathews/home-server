@@ -1,0 +1,108 @@
+{
+ "Name": "Health & Fitness",
+ "Locations": [
+  "/movies/youtube/fitness"
+ ],
+ "CollectionType": "tvshows",
+ "LibraryOptions": {
+  "Enabled": true,
+  "EnablePhotos": true,
+  "EnableRealtimeMonitor": false,
+  "EnableLUFSScan": false,
+  "EnableChapterImageExtraction": false,
+  "ExtractChapterImagesDuringLibraryScan": false,
+  "EnableTrickplayImageExtraction": true,
+  "ExtractTrickplayImagesDuringLibraryScan": false,
+  "PathInfos": [
+   {
+    "Path": "/movies/youtube/fitness"
+   }
+  ],
+  "SaveLocalMetadata": false,
+  "EnableInternetProviders": false,
+  "EnableAutomaticSeriesGrouping": false,
+  "EnableEmbeddedTitles": false,
+  "EnableEmbeddedExtrasTitles": false,
+  "EnableEmbeddedEpisodeInfos": false,
+  "AutomaticRefreshIntervalDays": 0,
+  "PreferredMetadataLanguage": "en",
+  "MetadataCountryCode": "GB",
+  "SeasonZeroDisplayName": "Specials",
+  "DisabledLocalMetadataReaders": [],
+  "LocalMetadataReaderOrder": [
+   "YoutubeMetadata",
+   "Nfo"
+  ],
+  "DisabledSubtitleFetchers": [],
+  "SubtitleFetcherOrder": [],
+  "DisabledMediaSegmentProviders": [],
+  "MediaSegmentProviderOrder": [],
+  "SkipSubtitlesIfEmbeddedSubtitlesPresent": false,
+  "SkipSubtitlesIfAudioTrackMatches": false,
+  "RequirePerfectSubtitleMatch": false,
+  "SaveSubtitlesWithMedia": true,
+  "SaveLyricsWithMedia": false,
+  "SaveTrickplayWithMedia": false,
+  "DisabledLyricFetchers": [],
+  "LyricFetcherOrder": [],
+  "PreferNonstandardArtistsTag": false,
+  "UseCustomTagDelimiters": false,
+  "CustomTagDelimiters": [
+   "/",
+   "|",
+   ";",
+   "\\"
+  ],
+  "DelimiterWhitelist": [],
+  "AutomaticallyAddToCollection": false,
+  "AllowEmbeddedSubtitles": "AllowAll",
+  "TypeOptions": [
+   {
+    "Type": "Series",
+    "MetadataFetchers": [
+     "YoutubeMetadata"
+    ],
+    "MetadataFetcherOrder": [
+     "YoutubeMetadata"
+    ],
+    "ImageFetchers": [
+     "YoutubeMetadata"
+    ],
+    "ImageFetcherOrder": [
+     "YoutubeMetadata"
+    ],
+    "ImageOptions": []
+   },
+   {
+    "Type": "Season",
+    "MetadataFetchers": [],
+    "MetadataFetcherOrder": [],
+    "ImageFetchers": [],
+    "ImageFetcherOrder": [],
+    "ImageOptions": []
+   },
+   {
+    "Type": "Episode",
+    "MetadataFetchers": [
+     "YoutubeMetadata"
+    ],
+    "MetadataFetcherOrder": [
+     "YoutubeMetadata"
+    ],
+    "ImageFetchers": [
+     "YoutubeMetadata",
+     "EmbeddedImageExtractor",
+     "ScreenGrabber"
+    ],
+    "ImageFetcherOrder": [
+     "YoutubeMetadata",
+     "EmbeddedImageExtractor",
+     "ScreenGrabber"
+    ],
+    "ImageOptions": []
+   }
+  ]
+ },
+ "ItemId": "32a72d777d01f45e4ce78cf08ae0fc71",
+ "RefreshStatus": "Idle"
+}

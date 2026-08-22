@@ -1,0 +1,4366 @@
+{
+ "target_subdir": "fitness",
+ "library_name": "Health & Fitness",
+ "moves": [
+  {
+   "src": "training/Mark_Wildman-How_to_Scale_Pushups-[PdT0uAg7wdw].mkv",
+   "dst": "fitness/Bodyweight/Season 01/Bodyweight S01E01 - Mark_Wildman-How_to_Scale_Pushups-[PdT0uAg7wdw].mkv",
+   "kind": "media",
+   "youtube_id": "PdT0uAg7wdw",
+   "series": "Bodyweight",
+   "season": 1,
+   "episode": 1
+  },
+  {
+   "src": "training/Mark_Wildman-The_BEST_PUSHUP_You_re_NOT_Doing_-_The_Screwing_Pushup-[Md8VZToFsoE].mkv",
+   "dst": "fitness/Bodyweight/Season 01/Bodyweight S01E02 - Mark_Wildman-The_BEST_PUSHUP_You_re_NOT_Doing_-_The_Screwing_Pushup-[Md8VZToFsoE].mkv",
+   "kind": "media",
+   "youtube_id": "Md8VZToFsoE",
+   "series": "Bodyweight",
+   "season": 1,
+   "episode": 2
+  },
+  {
+   "src": "training/Mark_Wildman-Body_Weight_training_-_the_2_hand_Hip_Drop_-_fundamental_getup_movement_for_martial_artists-[ugp8XuBIbRE].mkv",
+   "dst": "fitness/Bodyweight/Season 01/Bodyweight S01E03 - Mark_Wildman-Body_Weight_training_-_the_2_hand_Hip_Drop_-_fundamental_getup_movement_for_martial_artists-[ugp8XuBIbRE].mkv",
+   "kind": "media",
+   "youtube_id": "ugp8XuBIbRE",
+   "series": "Bodyweight",
+   "season": 1,
+   "episode": 3
+  },
+  {
+   "src": "training/Mark_Wildman-Body_Weight_Training_-_Sit_thru_leg_-_Getting_up_is_essential_to_human_movement-[hYkLrrQH0og].mkv",
+   "dst": "fitness/Bodyweight/Season 01/Bodyweight S01E04 - Mark_Wildman-Body_Weight_Training_-_Sit_thru_leg_-_Getting_up_is_essential_to_human_movement-[hYkLrrQH0og].mkv",
+   "kind": "media",
+   "youtube_id": "hYkLrrQH0og",
+   "series": "Bodyweight",
+   "season": 1,
+   "episode": 4
+  },
+  {
+   "src": "training/Steph_Rose-Bodyweight_Only_Flow_Workout-[Zn_aYiEXymg].mp4",
+   "dst": "fitness/Bodyweight/Season 01/Bodyweight S01E05 - Steph_Rose-Bodyweight_Only_Flow_Workout-[Zn_aYiEXymg].mp4",
+   "kind": "media",
+   "youtube_id": "Zn_aYiEXymg",
+   "series": "Bodyweight",
+   "season": 1,
+   "episode": 5
+  },
+  {
+   "src": "training/Mark_Wildman-Bodyweight_training_-_Bear_Squat_-_building_the_foundation_for_fighters_getups-[7nP5m_8ig-A].mkv",
+   "dst": "fitness/Bodyweight/Season 01/Bodyweight S01E06 - Mark_Wildman-Bodyweight_training_-_Bear_Squat_-_building_the_foundation_for_fighters_getups-[7nP5m_8ig-A].mkv",
+   "kind": "media",
+   "youtube_id": "7nP5m_8ig-A",
+   "series": "Bodyweight",
+   "season": 1,
+   "episode": 6
+  },
+  {
+   "src": "training/Mark_Wildman-bodyweight_getup_training_-_childs_pose_to_outside_lunge_to_step_up_--[C4TVr2NtEg8].mkv",
+   "dst": "fitness/Bodyweight/Season 01/Bodyweight S01E07 - Mark_Wildman-bodyweight_getup_training_-_childs_pose_to_outside_lunge_to_step_up_--[C4TVr2NtEg8].mkv",
+   "kind": "media",
+   "youtube_id": "C4TVr2NtEg8",
+   "series": "Bodyweight",
+   "season": 1,
+   "episode": 7
+  },
+  {
+   "src": "training/Gymnastic Rings Workout for Beginners (Strength & Muscle Builder) [xeJJEZdaMm8].mp4",
+   "dst": "fitness/Bodyweight/Season 01/Bodyweight S01E08 - Gymnastic Rings Workout for Beginners (Strength & Muscle Builder) [xeJJEZdaMm8].mp4",
+   "kind": "media",
+   "youtube_id": "xeJJEZdaMm8",
+   "series": "Bodyweight",
+   "season": 1,
+   "episode": 8
+  },
+  {
+   "src": "training/Mark_Wildman-99%_FAIL_at_fitness_don_t_waste_your_time_doing_useless_exercises_TOI_Program_Integration-[0FSCi2viR2M].mkv",
+   "dst": "fitness/Bodyweight/Season 01/Bodyweight S01E09 - Mark_Wildman-99%_FAIL_at_fitness_don_t_waste_your_time_doing_useless_exercises_TOI_Program_Integration-[0FSCi2viR2M].mkv",
+   "kind": "media",
+   "youtube_id": "0FSCi2viR2M",
+   "series": "Bodyweight",
+   "season": 1,
+   "episode": 9
+  },
+  {
+   "src": "training/Meli-The_TRAINING_YOUR_BODY_DESPERATELY_NEEDS_+_DIY_Rings-[UOJBqPaFsDk].mp4",
+   "dst": "fitness/Bodyweight/Season 01/Bodyweight S01E10 - Meli-The_TRAINING_YOUR_BODY_DESPERATELY_NEEDS_+_DIY_Rings-[UOJBqPaFsDk].mp4",
+   "kind": "media",
+   "youtube_id": "UOJBqPaFsDk",
+   "series": "Bodyweight",
+   "season": 1,
+   "episode": 10
+  },
+  {
+   "src": "training/Mark_Wildman-Normal_Pushups_Are_Boring_Try_This_Instead_Beginner_to_Advanced-[yOzaz5UBaxQ].mkv",
+   "dst": "fitness/Bodyweight/Season 01/Bodyweight S01E11 - Mark_Wildman-Normal_Pushups_Are_Boring_Try_This_Instead_Beginner_to_Advanced-[yOzaz5UBaxQ].mkv",
+   "kind": "media",
+   "youtube_id": "yOzaz5UBaxQ",
+   "series": "Bodyweight",
+   "season": 1,
+   "episode": 11
+  },
+  {
+   "src": "training/Mark_Wildman-4_Foundational_Core_Exercises_You_Can_Do_Anywhere-[Cu53h-mGHvM].mkv",
+   "dst": "fitness/Bodyweight/Season 01/Bodyweight S01E12 - Mark_Wildman-4_Foundational_Core_Exercises_You_Can_Do_Anywhere-[Cu53h-mGHvM].mkv",
+   "kind": "media",
+   "youtube_id": "Cu53h-mGHvM",
+   "series": "Bodyweight",
+   "season": 1,
+   "episode": 12
+  },
+  {
+   "src": "training/Movesmethod-I_Squatted_Every_Single_Day..._Here_s_What_Happened-[1OVEiwW1zvk].mp4",
+   "dst": "fitness/Bodyweight/Season 01/Bodyweight S01E13 - Movesmethod-I_Squatted_Every_Single_Day..._Here_s_What_Happened-[1OVEiwW1zvk].mp4",
+   "kind": "media",
+   "youtube_id": "1OVEiwW1zvk",
+   "series": "Bodyweight",
+   "season": 1,
+   "episode": 13
+  },
+  {
+   "src": "training/Mark_Wildman-The_Bodyweight_Protocol_I_Use_When_I_Break_Down-[7I-3qYUDhRk].mkv",
+   "dst": "fitness/Bodyweight/Season 01/Bodyweight S01E14 - Mark_Wildman-The_Bodyweight_Protocol_I_Use_When_I_Break_Down-[7I-3qYUDhRk].mkv",
+   "kind": "media",
+   "youtube_id": "7I-3qYUDhRk",
+   "series": "Bodyweight",
+   "season": 1,
+   "episode": 14
+  },
+  {
+   "src": "training/Mark_Wildman-Most_Fitness_Programs_Burn_You_Out_This_One_Rebuilds_You-[P3fRCYwuKd4].mkv",
+   "dst": "fitness/Bodyweight/Season 01/Bodyweight S01E15 - Mark_Wildman-Most_Fitness_Programs_Burn_You_Out_This_One_Rebuilds_You-[P3fRCYwuKd4].mkv",
+   "kind": "media",
+   "youtube_id": "P3fRCYwuKd4",
+   "series": "Bodyweight",
+   "season": 1,
+   "episode": 15
+  },
+  {
+   "src": "training/Movesmethod-5_Exercises_That_Will_Transform_Your_Body_With_No_Equipment-[-xw66-Ggl9s]_1.mkv",
+   "dst": "fitness/Bodyweight/Season 01/Bodyweight S01E16 - Movesmethod-5_Exercises_That_Will_Transform_Your_Body_With_No_Equipment-[-xw66-Ggl9s]_1.mkv",
+   "kind": "media",
+   "youtube_id": "-xw66-Ggl9s",
+   "series": "Bodyweight",
+   "season": 1,
+   "episode": 16
+  },
+  {
+   "src": "training/Mark_Wildman-The_Smartest_Way_to_Use_Bodyweight_Training-[38YXUYjbxnU].mkv",
+   "dst": "fitness/Bodyweight/Season 01/Bodyweight S01E17 - Mark_Wildman-The_Smartest_Way_to_Use_Bodyweight_Training-[38YXUYjbxnU].mkv",
+   "kind": "media",
+   "youtube_id": "38YXUYjbxnU",
+   "series": "Bodyweight",
+   "season": 1,
+   "episode": 17
+  },
+  {
+   "src": "training/Trevorsinstinct-7_Minutes_Only..._Do_This_Every_Morning-[XTbJZXXccpE].mp4",
+   "dst": "fitness/Bodyweight/Season 01/Bodyweight S01E18 - Trevorsinstinct-7_Minutes_Only..._Do_This_Every_Morning-[XTbJZXXccpE].mp4",
+   "kind": "media",
+   "youtube_id": "XTbJZXXccpE",
+   "series": "Bodyweight",
+   "season": 1,
+   "episode": 18
+  },
+  {
+   "src": "training/Movesmethod-Can_t_Squat_Hang_or_Crawl_You_Will_After_This_Full_Progressions-[Lu8wy6vs6hM].mkv",
+   "dst": "fitness/Bodyweight/Season 01/Bodyweight S01E19 - Movesmethod-Can_t_Squat_Hang_or_Crawl_You_Will_After_This_Full_Progressions-[Lu8wy6vs6hM].mkv",
+   "kind": "media",
+   "youtube_id": "Lu8wy6vs6hM",
+   "series": "Bodyweight",
+   "season": 1,
+   "episode": 19
+  },
+  {
+   "src": "training/shai-learn_to_pistol_squat_without_useless_progressions-[jvU5b0s4BNg].mkv",
+   "dst": "fitness/Bodyweight/Season 01/Bodyweight S01E20 - shai-learn_to_pistol_squat_without_useless_progressions-[jvU5b0s4BNg].mkv",
+   "kind": "media",
+   "youtube_id": "jvU5b0s4BNg",
+   "series": "Bodyweight",
+   "season": 1,
+   "episode": 20
+  },
+  {
+   "src": "training/Trevorsinstinct-Cardio_Doesn_t_Build_Stamina_Like_This-[oaPrRsS8diw].mkv",
+   "dst": "fitness/Bodyweight/Season 01/Bodyweight S01E21 - Trevorsinstinct-Cardio_Doesn_t_Build_Stamina_Like_This-[oaPrRsS8diw].mkv",
+   "kind": "media",
+   "youtube_id": "oaPrRsS8diw",
+   "series": "Bodyweight",
+   "season": 1,
+   "episode": 21
+  },
+  {
+   "src": "training/Mark_Wildman-This_Exercise_Gives_You_Big_Arms_for_the_Rest_of_Your_Life-[2piGF24kFrI].mkv",
+   "dst": "fitness/Bodyweight/Season 01/Bodyweight S01E22 - Mark_Wildman-This_Exercise_Gives_You_Big_Arms_for_the_Rest_of_Your_Life-[2piGF24kFrI].mkv",
+   "kind": "media",
+   "youtube_id": "2piGF24kFrI",
+   "series": "Bodyweight",
+   "season": 1,
+   "episode": 22
+  },
+  {
+   "src": "training/MindSmash-Why_Was_George_Saint_Pierre_Better_Than_Everyone_-_Meta_Training-[3lsGr4s9rGI].mp4",
+   "dst": "fitness/Combat Sports/Season 01/Combat Sports S01E01 - MindSmash-Why_Was_George_Saint_Pierre_Better_Than_Everyone_-_Meta_Training-[3lsGr4s9rGI].mp4",
+   "kind": "media",
+   "youtube_id": "3lsGr4s9rGI",
+   "series": "Combat Sports",
+   "season": 1,
+   "episode": 1
+  },
+  {
+   "src": "training/Lionel_Rivera-Why_Georges_St-Pierre_is_better_than_everyone-[CvFIH0T5VJQ].mp4",
+   "dst": "fitness/Combat Sports/Season 01/Combat Sports S01E02 - Lionel_Rivera-Why_Georges_St-Pierre_is_better_than_everyone-[CvFIH0T5VJQ].mp4",
+   "kind": "media",
+   "youtube_id": "CvFIH0T5VJQ",
+   "series": "Combat Sports",
+   "season": 1,
+   "episode": 2
+  },
+  {
+   "src": "training/UFC-Israel_Adesanya_vs_Kelvin_Gastelum_FULL_FIGHT_2025_Hall_of_Fame_Inductee-[J19ORjYOehE].mp4",
+   "dst": "fitness/Combat Sports/Season 01/Combat Sports S01E03 - UFC-Israel_Adesanya_vs_Kelvin_Gastelum_FULL_FIGHT_2025_Hall_of_Fame_Inductee-[J19ORjYOehE].mp4",
+   "kind": "media",
+   "youtube_id": "J19ORjYOehE",
+   "series": "Combat Sports",
+   "season": 1,
+   "episode": 3
+  },
+  {
+   "src": "training/Beau_Miles-Running_650km_through_the_Australian_Alps_in_13_days-[E6TbeiKxpSs].mp4",
+   "dst": "fitness/Endurance/Season 01/Endurance S01E01 - Beau_Miles-Running_650km_through_the_Australian_Alps_in_13_days-[E6TbeiKxpSs].mp4",
+   "kind": "media",
+   "youtube_id": "E6TbeiKxpSs",
+   "series": "Endurance",
+   "season": 1,
+   "episode": 1
+  },
+  {
+   "src": "training/Run_Steep_Get_High-BARKLEY_NUMBER_FIFTEEN-[St3ZXLVhric].mp4",
+   "dst": "fitness/Endurance/Season 01/Endurance S01E02 - Run_Steep_Get_High-BARKLEY_NUMBER_FIFTEEN-[St3ZXLVhric].mp4",
+   "kind": "media",
+   "youtube_id": "St3ZXLVhric",
+   "series": "Endurance",
+   "season": 1,
+   "episode": 2
+  },
+  {
+   "src": "training/TheGingerRunner-WHERE_DREAMS_GO_TO_DIE_-_Gary_Robbins_and_The_Barkley_Marathons-[NDZdsqbcGTU].mp4",
+   "dst": "fitness/Endurance/Season 01/Endurance S01E03 - TheGingerRunner-WHERE_DREAMS_GO_TO_DIE_-_Gary_Robbins_and_The_Barkley_Marathons-[NDZdsqbcGTU].mp4",
+   "kind": "media",
+   "youtube_id": "NDZdsqbcGTU",
+   "series": "Endurance",
+   "season": 1,
+   "episode": 3
+  },
+  {
+   "src": "training/Carrie_in_Motion-Courtney_Dauwalter_Ultra_running_documentary_film_exploring_Courtney_s_source_of_will_The_Source-[DQSiygnDm-U].mkv",
+   "dst": "fitness/Endurance/Season 01/Endurance S01E04 - Carrie_in_Motion-Courtney_Dauwalter_Ultra_running_documentary_film_exploring_Courtney_s_source_of_will_The_Source-[DQSiygnDm-U].mkv",
+   "kind": "media",
+   "youtube_id": "DQSiygnDm-U",
+   "series": "Endurance",
+   "season": 1,
+   "episode": 4
+  },
+  {
+   "src": "training/Carrie_in_Motion-Courtney_Dauwalter_Ultra_running_documentary_film_exploring_Courtney_s_source_of_will_The_Source-[DQSiygnDm-U].en.vtt",
+   "dst": "fitness/Endurance/Season 01/Endurance S01E04 - Carrie_in_Motion-Courtney_Dauwalter_Ultra_running_documentary_film_exploring_Courtney_s_source_of_will_The_Source-[DQSiygnDm-U].en.vtt",
+   "kind": "sidecar",
+   "youtube_id": "DQSiygnDm-U",
+   "series": "Endurance",
+   "season": 1,
+   "episode": 4
+  },
+  {
+   "src": "training/Salomon_TV-Kilian_Jornet_Running_54h_on_Mountain_Ridges_and_Trails_in_Norway_Salomon_TV-[8NxXh3UqpAE].mp4",
+   "dst": "fitness/Endurance/Season 01/Endurance S01E05 - Salomon_TV-Kilian_Jornet_Running_54h_on_Mountain_Ridges_and_Trails_in_Norway_Salomon_TV-[8NxXh3UqpAE].mp4",
+   "kind": "media",
+   "youtube_id": "8NxXh3UqpAE",
+   "series": "Endurance",
+   "season": 1,
+   "episode": 5
+  },
+  {
+   "src": "training/Salomon_TV-An_Almost_Perfect_Race_with_Courtney_Dauwalter_Salomon_TV-[AXqmmq1E3bc].mkv",
+   "dst": "fitness/Endurance/Season 01/Endurance S01E06 - Salomon_TV-An_Almost_Perfect_Race_with_Courtney_Dauwalter_Salomon_TV-[AXqmmq1E3bc].mkv",
+   "kind": "media",
+   "youtube_id": "AXqmmq1E3bc",
+   "series": "Endurance",
+   "season": 1,
+   "episode": 6
+  },
+  {
+   "src": "training/Salomon_TV-Kevin_Schmidt_Courtney_Dauwalter_at_Bear_100_Salomon_TV-[KocK3m1yuyo].mkv",
+   "dst": "fitness/Endurance/Season 01/Endurance S01E07 - Salomon_TV-Kevin_Schmidt_Courtney_Dauwalter_at_Bear_100_Salomon_TV-[KocK3m1yuyo].mkv",
+   "kind": "media",
+   "youtube_id": "KocK3m1yuyo",
+   "series": "Endurance",
+   "season": 1,
+   "episode": 7
+  },
+  {
+   "src": "training/Salomon_TV-Kevin_Schmidt_Courtney_Dauwalter_at_Bear_100_Salomon_TV-[KocK3m1yuyo].en.vtt",
+   "dst": "fitness/Endurance/Season 01/Endurance S01E07 - Salomon_TV-Kevin_Schmidt_Courtney_Dauwalter_at_Bear_100_Salomon_TV-[KocK3m1yuyo].en.vtt",
+   "kind": "sidecar",
+   "youtube_id": "KocK3m1yuyo",
+   "series": "Endurance",
+   "season": 1,
+   "episode": 7
+  },
+  {
+   "src": "training/sabrina-stanley-interview-[bbleNcW2ub8].mp4",
+   "dst": "fitness/Endurance/Season 01/Endurance S01E08 - sabrina-stanley-interview-[bbleNcW2ub8].mp4",
+   "kind": "media",
+   "youtube_id": "bbleNcW2ub8",
+   "series": "Endurance",
+   "season": 1,
+   "episode": 8
+  },
+  {
+   "src": "training/Racing Great North Run HALF MARATHON - Mental health struggles & discipline-[hUl_MyzblOE].mp4",
+   "dst": "fitness/Endurance/Season 01/Endurance S01E09 - Racing Great North Run HALF MARATHON - Mental health struggles & discipline-[hUl_MyzblOE].mp4",
+   "kind": "media",
+   "youtube_id": "hUl_MyzblOE",
+   "series": "Endurance",
+   "season": 1,
+   "episode": 9
+  },
+  {
+   "src": "training/Racing for the Win - MOAB 240-[PjXmYmr1xSA].mp4",
+   "dst": "fitness/Endurance/Season 01/Endurance S01E10 - Racing for the Win - MOAB 240-[PjXmYmr1xSA].mp4",
+   "kind": "media",
+   "youtube_id": "PjXmYmr1xSA",
+   "series": "Endurance",
+   "season": 1,
+   "episode": 10
+  },
+  {
+   "src": "training/My London Marathon experience \uff5c Olympics is over-[Ht6xzd-OoJA].mp4",
+   "dst": "fitness/Endurance/Season 01/Endurance S01E11 - My London Marathon experience \uff5c Olympics is over-[Ht6xzd-OoJA].mp4",
+   "kind": "media",
+   "youtube_id": "Ht6xzd-OoJA",
+   "series": "Endurance",
+   "season": 1,
+   "episode": 11
+  },
+  {
+   "src": "training/Wahoo_Fitness-WALMSLEY_THE_FILM-[MbXwKTZoLQ4].mkv",
+   "dst": "fitness/Endurance/Season 01/Endurance S01E12 - Wahoo_Fitness-WALMSLEY_THE_FILM-[MbXwKTZoLQ4].mkv",
+   "kind": "media",
+   "youtube_id": "MbXwKTZoLQ4",
+   "series": "Endurance",
+   "season": 1,
+   "episode": 12
+  },
+  {
+   "src": "training/Salomon_TV-Courtney_Dauwalter_s_Ultimate_Challenge_-_Three_Iconic_100-Mile_Races_in_One_Summer_Salomon_TV-[NEg_p1Lw2l4].mkv",
+   "dst": "fitness/Endurance/Season 01/Endurance S01E13 - Salomon_TV-Courtney_Dauwalter_s_Ultimate_Challenge_-_Three_Iconic_100-Mile_Races_in_One_Summer_Salomon_TV-[NEg_p1Lw2l4].mkv",
+   "kind": "media",
+   "youtube_id": "NEg_p1Lw2l4",
+   "series": "Endurance",
+   "season": 1,
+   "episode": 13
+  },
+  {
+   "src": "training/Tom_Lynch-What_it_s_like_to_do_The_Boat_Race-[w85EM_usJnU].mkv",
+   "dst": "fitness/Endurance/Season 01/Endurance S01E14 - Tom_Lynch-What_it_s_like_to_do_The_Boat_Race-[w85EM_usJnU].mkv",
+   "kind": "media",
+   "youtube_id": "w85EM_usJnU",
+   "series": "Endurance",
+   "season": 1,
+   "episode": 14
+  },
+  {
+   "src": "training/EF_Pro_Cycling-The_Great_Southern_Country_Full_Film_Lachlan_Morton_s_Around_Australia_Record_Cannondale_POC-[XW1F79sfftA].mp4",
+   "dst": "fitness/Endurance/Season 01/Endurance S01E15 - EF_Pro_Cycling-The_Great_Southern_Country_Full_Film_Lachlan_Morton_s_Around_Australia_Record_Cannondale_POC-[XW1F79sfftA].mp4",
+   "kind": "media",
+   "youtube_id": "XW1F79sfftA",
+   "series": "Endurance",
+   "season": 1,
+   "episode": 15
+  },
+  {
+   "src": "training/Salomon_TV-Francois_D_Haene_Takes_on_the_Tor_des_Geants_2024-[r6O5vI0cmAI].mkv",
+   "dst": "fitness/Endurance/Season 01/Endurance S01E16 - Salomon_TV-Francois_D_Haene_Takes_on_the_Tor_des_Geants_2024-[r6O5vI0cmAI].mkv",
+   "kind": "media",
+   "youtube_id": "r6O5vI0cmAI",
+   "series": "Endurance",
+   "season": 1,
+   "episode": 16
+  },
+  {
+   "src": "training/iRunFarMedia-Kilian_Jornet_Post-2025_Western_States_100_Interview-[_eluM9Mm1hk].mp4",
+   "dst": "fitness/Endurance/Season 01/Endurance S01E17 - iRunFarMedia-Kilian_Jornet_Post-2025_Western_States_100_Interview-[_eluM9Mm1hk].mp4",
+   "kind": "media",
+   "youtube_id": "_eluM9Mm1hk",
+   "series": "Endurance",
+   "season": 1,
+   "episode": 17
+  },
+  {
+   "src": "training/TrainingPeaks-Scott_Johnston_s_Winning_Formula_for_Ruth_Croft_and_Tom_Evans_at_UTMB-[sLFZJ-42v7o].mp4",
+   "dst": "fitness/Endurance/Season 01/Endurance S01E18 - TrainingPeaks-Scott_Johnston_s_Winning_Formula_for_Ruth_Croft_and_Tom_Evans_at_UTMB-[sLFZJ-42v7o].mp4",
+   "kind": "media",
+   "youtube_id": "sLFZJ-42v7o",
+   "series": "Endurance",
+   "season": 1,
+   "episode": 18
+  },
+  {
+   "src": "training/Freetrail-A_Lap_For_Bill_-_Zach_Miller_s_Hardrock_100-[PE1EAf5XoDE].mkv",
+   "dst": "fitness/Endurance/Season 01/Endurance S01E19 - Freetrail-A_Lap_For_Bill_-_Zach_Miller_s_Hardrock_100-[PE1EAf5XoDE].mkv",
+   "kind": "media",
+   "youtube_id": "PE1EAf5XoDE",
+   "series": "Endurance",
+   "season": 1,
+   "episode": 19
+  },
+  {
+   "src": "training/Fergus_Crawley-I_Trained_With_The_World_s_Toughest_Endurance_Athlete-[SKVUEZryL-s].mkv",
+   "dst": "fitness/Endurance/Season 01/Endurance S01E20 - Fergus_Crawley-I_Trained_With_The_World_s_Toughest_Endurance_Athlete-[SKVUEZryL-s].mkv",
+   "kind": "media",
+   "youtube_id": "SKVUEZryL-s",
+   "series": "Endurance",
+   "season": 1,
+   "episode": 20
+  },
+  {
+   "src": "training/Hans_Troyer-REDEMPTION_-_Black_Canyon_100K_2026-[WbRoXKGG3AI].mkv",
+   "dst": "fitness/Endurance/Season 01/Endurance S01E21 - Hans_Troyer-REDEMPTION_-_Black_Canyon_100K_2026-[WbRoXKGG3AI].mkv",
+   "kind": "media",
+   "youtube_id": "WbRoXKGG3AI",
+   "series": "Endurance",
+   "season": 1,
+   "episode": 21
+  },
+  {
+   "src": "training/Lytle_Labs-Watching_professional_ULTRA_RUNNERS_train_is_actually_crazy-[YL0p7Hsptac].mkv",
+   "dst": "fitness/Endurance/Season 01/Endurance S01E22 - Lytle_Labs-Watching_professional_ULTRA_RUNNERS_train_is_actually_crazy-[YL0p7Hsptac].mkv",
+   "kind": "media",
+   "youtube_id": "YL0p7Hsptac",
+   "series": "Endurance",
+   "season": 1,
+   "episode": 22
+  },
+  {
+   "src": "training/Lytle_Labs-Watching_professional_ULTRA_RUNNERS_train_is_actually_crazy-[YL0p7Hsptac].en.vtt",
+   "dst": "fitness/Endurance/Season 01/Endurance S01E22 - Lytle_Labs-Watching_professional_ULTRA_RUNNERS_train_is_actually_crazy-[YL0p7Hsptac].en.vtt",
+   "kind": "sidecar",
+   "youtube_id": "YL0p7Hsptac",
+   "series": "Endurance",
+   "season": 1,
+   "episode": 22
+  },
+  {
+   "src": "training/Hans_Troyer-Who_is_Hans_Troyer-[Aiyj88Al_xc].mkv",
+   "dst": "fitness/Endurance/Season 01/Endurance S01E23 - Hans_Troyer-Who_is_Hans_Troyer-[Aiyj88Al_xc].mkv",
+   "kind": "media",
+   "youtube_id": "Aiyj88Al_xc",
+   "series": "Endurance",
+   "season": 1,
+   "episode": 23
+  },
+  {
+   "src": "training/Hans_Troyer-Who_is_Hans_Troyer-[Aiyj88Al_xc].en.vtt",
+   "dst": "fitness/Endurance/Season 01/Endurance S01E23 - Hans_Troyer-Who_is_Hans_Troyer-[Aiyj88Al_xc].en.vtt",
+   "kind": "sidecar",
+   "youtube_id": "Aiyj88Al_xc",
+   "series": "Endurance",
+   "season": 1,
+   "episode": 23
+  },
+  {
+   "src": "training/I Was An MIT Educated Neurosurgeon Now I'm Unemployed And Alone In The Mountains How Did I Get Here\uff1f-[25LUF8GmbFU].mp4",
+   "dst": "fitness/Health/Season 01/Health S01E01 - I Was An MIT Educated Neurosurgeon Now I'm Unemployed And Alone In The Mountains How Did I Get Here\uff1f-[25LUF8GmbFU].mp4",
+   "kind": "media",
+   "youtube_id": "25LUF8GmbFU",
+   "series": "Health",
+   "season": 1,
+   "episode": 1
+  },
+  {
+   "src": "training/We Have To Talk About Weed-[qBRaI0ZeAf8].mp4",
+   "dst": "fitness/Health/Season 01/Health S01E02 - We Have To Talk About Weed-[qBRaI0ZeAf8].mp4",
+   "kind": "media",
+   "youtube_id": "qBRaI0ZeAf8",
+   "series": "Health",
+   "season": 1,
+   "episode": 2
+  },
+  {
+   "src": "training/Vaping Is Too Good To Be True-[cHEOsKddURQ].mp4",
+   "dst": "fitness/Health/Season 01/Health S01E03 - Vaping Is Too Good To Be True-[cHEOsKddURQ].mp4",
+   "kind": "media",
+   "youtube_id": "cHEOsKddURQ",
+   "series": "Health",
+   "season": 1,
+   "episode": 3
+  },
+  {
+   "src": "training/Seth_Capehart_MD-This_Video_Will_Make_You_Happier_Than_Your_Entire_Feed-[chT0J_XO80I].mkv",
+   "dst": "fitness/Health/Season 01/Health S01E04 - Seth_Capehart_MD-This_Video_Will_Make_You_Happier_Than_Your_Entire_Feed-[chT0J_XO80I].mkv",
+   "kind": "media",
+   "youtube_id": "chT0J_XO80I",
+   "series": "Health",
+   "season": 1,
+   "episode": 4
+  },
+  {
+   "src": "training/Seth_Capehart_MD-The_REAL_Reason_You_Feel_Old_and_Exhausted_at_40-[uQaf25a1P0c].mkv",
+   "dst": "fitness/Health/Season 01/Health S01E05 - Seth_Capehart_MD-The_REAL_Reason_You_Feel_Old_and_Exhausted_at_40-[uQaf25a1P0c].mkv",
+   "kind": "media",
+   "youtube_id": "uQaf25a1P0c",
+   "series": "Health",
+   "season": 1,
+   "episode": 5
+  },
+  {
+   "src": "heavy-club-basics/001-2_Hand_Heavy_club_1_-_side_to_side_swing_-_foundation_of_rotation_strength_training-[LMau5vr7qx4].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E01 - 2_Hand_Heavy_club_1_-_side_to_side_swing_-_foundation_of_rotation_strength_training-[LMau5vr7qx4].mkv",
+   "kind": "media",
+   "youtube_id": "LMau5vr7qx4",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 1
+  },
+  {
+   "src": "heavy-club-basics/001-2_Hand_Heavy_club_1_-_side_to_side_swing_-_foundation_of_rotation_strength_training-[LMau5vr7qx4].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E01 - 2_Hand_Heavy_club_1_-_side_to_side_swing_-_foundation_of_rotation_strength_training-[LMau5vr7qx4].trickplay",
+   "kind": "dir",
+   "youtube_id": "LMau5vr7qx4",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 1
+  },
+  {
+   "src": "heavy-club-basics/002-2_Hand_Heavy_Club_2_-_side_swing_low_to_high_with_dead_stop._Side_hip_snap_training_for_every_sport-[NoZCHTlmrCg].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E02 - 2_Hand_Heavy_Club_2_-_side_swing_low_to_high_with_dead_stop._Side_hip_snap_training_for_every_sport-[NoZCHTlmrCg].mkv",
+   "kind": "media",
+   "youtube_id": "NoZCHTlmrCg",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 2
+  },
+  {
+   "src": "heavy-club-basics/002-2_Hand_Heavy_Club_2_-_side_swing_low_to_high_with_dead_stop._Side_hip_snap_training_for_every_sport-[NoZCHTlmrCg].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E02 - 2_Hand_Heavy_Club_2_-_side_swing_low_to_high_with_dead_stop._Side_hip_snap_training_for_every_sport-[NoZCHTlmrCg].trickplay",
+   "kind": "dir",
+   "youtube_id": "NoZCHTlmrCg",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 2
+  },
+  {
+   "src": "heavy-club-basics/003-2_Hand_Heavy_club_training_3_-_hang_side_swing_low_to_high_-_endurance_hip_snap_core_for_all_sports-[RD1zOWaTjhQ].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E03 - 2_Hand_Heavy_club_training_3_-_hang_side_swing_low_to_high_-_endurance_hip_snap_core_for_all_sports-[RD1zOWaTjhQ].mkv",
+   "kind": "media",
+   "youtube_id": "RD1zOWaTjhQ",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 3
+  },
+  {
+   "src": "heavy-club-basics/003-2_Hand_Heavy_club_training_3_-_hang_side_swing_low_to_high_-_endurance_hip_snap_core_for_all_sports-[RD1zOWaTjhQ].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E03 - 2_Hand_Heavy_club_training_3_-_hang_side_swing_low_to_high_-_endurance_hip_snap_core_for_all_sports-[RD1zOWaTjhQ].trickplay",
+   "kind": "dir",
+   "youtube_id": "RD1zOWaTjhQ",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 3
+  },
+  {
+   "src": "heavy-club-basics/004-Basics_of_Heavy_club_4_-_dead_clean_-_don_t_hit_yourself_in_the_teeth-[69RGME9RTcY].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E04 - Basics_of_Heavy_club_4_-_dead_clean_-_don_t_hit_yourself_in_the_teeth-[69RGME9RTcY].mkv",
+   "kind": "media",
+   "youtube_id": "69RGME9RTcY",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 4
+  },
+  {
+   "src": "heavy-club-basics/004-Basics_of_Heavy_club_4_-_dead_clean_-_don_t_hit_yourself_in_the_teeth-[69RGME9RTcY].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E04 - Basics_of_Heavy_club_4_-_dead_clean_-_don_t_hit_yourself_in_the_teeth-[69RGME9RTcY].trickplay",
+   "kind": "dir",
+   "youtube_id": "69RGME9RTcY",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 4
+  },
+  {
+   "src": "heavy-club-basics/005-Heavy_club_5_-_2_hand_inside_circle_-_the_first_of_three_movements_that_define_humanity-[Mh6iWcLbE3k].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E05 - Heavy_club_5_-_2_hand_inside_circle_-_the_first_of_three_movements_that_define_humanity-[Mh6iWcLbE3k].mkv",
+   "kind": "media",
+   "youtube_id": "Mh6iWcLbE3k",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 5
+  },
+  {
+   "src": "heavy-club-basics/005-Heavy_club_5_-_2_hand_inside_circle_-_the_first_of_three_movements_that_define_humanity-[Mh6iWcLbE3k].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E05 - Heavy_club_5_-_2_hand_inside_circle_-_the_first_of_three_movements_that_define_humanity-[Mh6iWcLbE3k].trickplay",
+   "kind": "dir",
+   "youtube_id": "Mh6iWcLbE3k",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 5
+  },
+  {
+   "src": "heavy-club-basics/006-Heavy_club_6_-_2_hand_Outside_circle_-_the_second_of_the_three_most_important_movements_to_train-[QzMzCal-MYM].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E06 - Heavy_club_6_-_2_hand_Outside_circle_-_the_second_of_the_three_most_important_movements_to_train-[QzMzCal-MYM].mkv",
+   "kind": "media",
+   "youtube_id": "QzMzCal-MYM",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 6
+  },
+  {
+   "src": "heavy-club-basics/006-Heavy_club_6_-_2_hand_Outside_circle_-_the_second_of_the_three_most_important_movements_to_train-[QzMzCal-MYM].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E06 - Heavy_club_6_-_2_hand_Outside_circle_-_the_second_of_the_three_most_important_movements_to_train-[QzMzCal-MYM].trickplay",
+   "kind": "dir",
+   "youtube_id": "QzMzCal-MYM",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 6
+  },
+  {
+   "src": "heavy-club-basics/007-Heavy_Club_7_-_2_hand_Pullover_-_essential_to_improve_throwing_dynamics_-_a_basic_human_movement-[jpIn1Sumg78].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E07 - Heavy_Club_7_-_2_hand_Pullover_-_essential_to_improve_throwing_dynamics_-_a_basic_human_movement-[jpIn1Sumg78].mkv",
+   "kind": "media",
+   "youtube_id": "jpIn1Sumg78",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 7
+  },
+  {
+   "src": "heavy-club-basics/007-Heavy_Club_7_-_2_hand_Pullover_-_essential_to_improve_throwing_dynamics_-_a_basic_human_movement-[jpIn1Sumg78].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E07 - Heavy_Club_7_-_2_hand_Pullover_-_essential_to_improve_throwing_dynamics_-_a_basic_human_movement-[jpIn1Sumg78].trickplay",
+   "kind": "dir",
+   "youtube_id": "jpIn1Sumg78",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 7
+  },
+  {
+   "src": "heavy-club-basics/008-Heavy_Club_8_-_Back_position_side_to_side_swing_-_necessary_for_essential_human_athletic_development-[GKwGiB2UwyM].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E08 - Heavy_Club_8_-_Back_position_side_to_side_swing_-_necessary_for_essential_human_athletic_development-[GKwGiB2UwyM].mkv",
+   "kind": "media",
+   "youtube_id": "GKwGiB2UwyM",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 8
+  },
+  {
+   "src": "heavy-club-basics/008-Heavy_Club_8_-_Back_position_side_to_side_swing_-_necessary_for_essential_human_athletic_development-[GKwGiB2UwyM].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E08 - Heavy_Club_8_-_Back_position_side_to_side_swing_-_necessary_for_essential_human_athletic_development-[GKwGiB2UwyM].trickplay",
+   "kind": "dir",
+   "youtube_id": "GKwGiB2UwyM",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 8
+  },
+  {
+   "src": "heavy-club-basics/009-Heavy_Club_Swinging_9_-_2_hand_shield_cast_-_essential_for_every_athlete_for_a_lifetime_of_Gains-[W-iHvrjn72k].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E09 - Heavy_Club_Swinging_9_-_2_hand_shield_cast_-_essential_for_every_athlete_for_a_lifetime_of_Gains-[W-iHvrjn72k].mkv",
+   "kind": "media",
+   "youtube_id": "W-iHvrjn72k",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 9
+  },
+  {
+   "src": "heavy-club-basics/009-Heavy_Club_Swinging_9_-_2_hand_shield_cast_-_essential_for_every_athlete_for_a_lifetime_of_Gains-[W-iHvrjn72k].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E09 - Heavy_Club_Swinging_9_-_2_hand_shield_cast_-_essential_for_every_athlete_for_a_lifetime_of_Gains-[W-iHvrjn72k].trickplay",
+   "kind": "dir",
+   "youtube_id": "W-iHvrjn72k",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 9
+  },
+  {
+   "src": "heavy-club-basics/010-Heavy_club_10_-_2_hand_balance_squat_-_build_your_foundation_for_advanced_weight_swinging-[LSXticZ67Pw].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E10 - Heavy_club_10_-_2_hand_balance_squat_-_build_your_foundation_for_advanced_weight_swinging-[LSXticZ67Pw].mkv",
+   "kind": "media",
+   "youtube_id": "LSXticZ67Pw",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 10
+  },
+  {
+   "src": "heavy-club-basics/010-Heavy_club_10_-_2_hand_balance_squat_-_build_your_foundation_for_advanced_weight_swinging-[LSXticZ67Pw].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E10 - Heavy_club_10_-_2_hand_balance_squat_-_build_your_foundation_for_advanced_weight_swinging-[LSXticZ67Pw].trickplay",
+   "kind": "dir",
+   "youtube_id": "LSXticZ67Pw",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 10
+  },
+  {
+   "src": "heavy-club-basics/011-Heavy_club_11_-_swing_clean_-_go_up_in_weight_to_improve_structure_breathing_and_movement-[0oRuCQOkPRo].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E11 - Heavy_club_11_-_swing_clean_-_go_up_in_weight_to_improve_structure_breathing_and_movement-[0oRuCQOkPRo].mkv",
+   "kind": "media",
+   "youtube_id": "0oRuCQOkPRo",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 11
+  },
+  {
+   "src": "heavy-club-basics/011-Heavy_club_11_-_swing_clean_-_go_up_in_weight_to_improve_structure_breathing_and_movement-[0oRuCQOkPRo].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E11 - Heavy_club_11_-_swing_clean_-_go_up_in_weight_to_improve_structure_breathing_and_movement-[0oRuCQOkPRo].trickplay",
+   "kind": "dir",
+   "youtube_id": "0oRuCQOkPRo",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 11
+  },
+  {
+   "src": "heavy-club-basics/012-Heavy_club_12_-_robot_shield_cast_-_simple_training_to_improve_shoulder_mobility-[LDGi_lmzGR8].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E12 - Heavy_club_12_-_robot_shield_cast_-_simple_training_to_improve_shoulder_mobility-[LDGi_lmzGR8].mkv",
+   "kind": "media",
+   "youtube_id": "LDGi_lmzGR8",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 12
+  },
+  {
+   "src": "heavy-club-basics/012-Heavy_club_12_-_robot_shield_cast_-_simple_training_to_improve_shoulder_mobility-[LDGi_lmzGR8].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E12 - Heavy_club_12_-_robot_shield_cast_-_simple_training_to_improve_shoulder_mobility-[LDGi_lmzGR8].trickplay",
+   "kind": "dir",
+   "youtube_id": "LDGi_lmzGR8",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 12
+  },
+  {
+   "src": "heavy-club-basics/013-Heavy_club_13_-_front_press_-_total_body_press_in_the_standing_position-[HBRWtm3tTp4].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E13 - Heavy_club_13_-_front_press_-_total_body_press_in_the_standing_position-[HBRWtm3tTp4].mkv",
+   "kind": "media",
+   "youtube_id": "HBRWtm3tTp4",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 13
+  },
+  {
+   "src": "heavy-club-basics/013-Heavy_club_13_-_front_press_-_total_body_press_in_the_standing_position-[HBRWtm3tTp4].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E13 - Heavy_club_13_-_front_press_-_total_body_press_in_the_standing_position-[HBRWtm3tTp4].trickplay",
+   "kind": "dir",
+   "youtube_id": "HBRWtm3tTp4",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 13
+  },
+  {
+   "src": "heavy-club-basics/014-Heavy_Club_14_-_reverse_robot_shield_cast_-_improving_loaded_shoulder_mobility_for_sports_performance-[Fun_Lscq5go].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E14 - Heavy_Club_14_-_reverse_robot_shield_cast_-_improving_loaded_shoulder_mobility_for_sports_performance-[Fun_Lscq5go].mkv",
+   "kind": "media",
+   "youtube_id": "Fun_Lscq5go",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 14
+  },
+  {
+   "src": "heavy-club-basics/014-Heavy_Club_14_-_reverse_robot_shield_cast_-_improving_loaded_shoulder_mobility_for_sports_performance-[Fun_Lscq5go].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E14 - Heavy_Club_14_-_reverse_robot_shield_cast_-_improving_loaded_shoulder_mobility_for_sports_performance-[Fun_Lscq5go].trickplay",
+   "kind": "dir",
+   "youtube_id": "Fun_Lscq5go",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 14
+  },
+  {
+   "src": "heavy-club-basics/015-2_hand_heavy_club_15_-_side_to_side_rockit_-_endurance_side_hip_snap_training_for_every_sport-[4gvF-gARAIs].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E15 - 2_hand_heavy_club_15_-_side_to_side_rockit_-_endurance_side_hip_snap_training_for_every_sport-[4gvF-gARAIs].mkv",
+   "kind": "media",
+   "youtube_id": "4gvF-gARAIs",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 15
+  },
+  {
+   "src": "heavy-club-basics/015-2_hand_heavy_club_15_-_side_to_side_rockit_-_endurance_side_hip_snap_training_for_every_sport-[4gvF-gARAIs].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E15 - 2_hand_heavy_club_15_-_side_to_side_rockit_-_endurance_side_hip_snap_training_for_every_sport-[4gvF-gARAIs].trickplay",
+   "kind": "dir",
+   "youtube_id": "4gvF-gARAIs",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 15
+  },
+  {
+   "src": "heavy-club-basics/016-Outside_Hang_Power_Cleans_-_Essential_Athletic_Training_-_Heavy_Club_Swinging_16_Outside_Pendulum-[SRNTrFvHgz0].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E16 - Outside_Hang_Power_Cleans_-_Essential_Athletic_Training_-_Heavy_Club_Swinging_16_Outside_Pendulum-[SRNTrFvHgz0].mkv",
+   "kind": "media",
+   "youtube_id": "SRNTrFvHgz0",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 16
+  },
+  {
+   "src": "heavy-club-basics/016-Outside_Hang_Power_Cleans_-_Essential_Athletic_Training_-_Heavy_Club_Swinging_16_Outside_Pendulum-[SRNTrFvHgz0].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E16 - Outside_Hang_Power_Cleans_-_Essential_Athletic_Training_-_Heavy_Club_Swinging_16_Outside_Pendulum-[SRNTrFvHgz0].trickplay",
+   "kind": "dir",
+   "youtube_id": "SRNTrFvHgz0",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 16
+  },
+  {
+   "src": "heavy-club-basics/017-Build_your_glutes_and_core_to_reduce_back_pain-_Balance_step_back_lunge_-_Heavy_Club_series_17-[dNrYT5iU7BQ].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E17 - Build_your_glutes_and_core_to_reduce_back_pain-_Balance_step_back_lunge_-_Heavy_Club_series_17-[dNrYT5iU7BQ].mkv",
+   "kind": "media",
+   "youtube_id": "dNrYT5iU7BQ",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 17
+  },
+  {
+   "src": "heavy-club-basics/017-Build_your_glutes_and_core_to_reduce_back_pain-_Balance_step_back_lunge_-_Heavy_Club_series_17-[dNrYT5iU7BQ].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E17 - Build_your_glutes_and_core_to_reduce_back_pain-_Balance_step_back_lunge_-_Heavy_Club_series_17-[dNrYT5iU7BQ].trickplay",
+   "kind": "dir",
+   "youtube_id": "dNrYT5iU7BQ",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 17
+  },
+  {
+   "src": "heavy-club-basics/018-Training_Ancient_Athletic_power_-_2_hand_heavy_club_Alternating_circle_-_heavy_club_18-[ukkrHxGTGtI].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E18 - Training_Ancient_Athletic_power_-_2_hand_heavy_club_Alternating_circle_-_heavy_club_18-[ukkrHxGTGtI].mkv",
+   "kind": "media",
+   "youtube_id": "ukkrHxGTGtI",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 18
+  },
+  {
+   "src": "heavy-club-basics/018-Training_Ancient_Athletic_power_-_2_hand_heavy_club_Alternating_circle_-_heavy_club_18-[ukkrHxGTGtI].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E18 - Training_Ancient_Athletic_power_-_2_hand_heavy_club_Alternating_circle_-_heavy_club_18-[ukkrHxGTGtI].trickplay",
+   "kind": "dir",
+   "youtube_id": "ukkrHxGTGtI",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 18
+  },
+  {
+   "src": "heavy-club-basics/019-Increase_Your_Athleticism_With_Rotational_Hip_Snap_Training_-_Heavy_Club_19_Inside_Pendulum-[pV0Hh335Csg].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E19 - Increase_Your_Athleticism_With_Rotational_Hip_Snap_Training_-_Heavy_Club_19_Inside_Pendulum-[pV0Hh335Csg].mkv",
+   "kind": "media",
+   "youtube_id": "pV0Hh335Csg",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 19
+  },
+  {
+   "src": "heavy-club-basics/019-Increase_Your_Athleticism_With_Rotational_Hip_Snap_Training_-_Heavy_Club_19_Inside_Pendulum-[pV0Hh335Csg].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E19 - Increase_Your_Athleticism_With_Rotational_Hip_Snap_Training_-_Heavy_Club_19_Inside_Pendulum-[pV0Hh335Csg].trickplay",
+   "kind": "dir",
+   "youtube_id": "pV0Hh335Csg",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 19
+  },
+  {
+   "src": "heavy-club-basics/020-Better_Shoulder_Function_Better_Life_-_heavy_club_20_Shield_Cast-[ABQij0Zpt0U].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E20 - Better_Shoulder_Function_Better_Life_-_heavy_club_20_Shield_Cast-[ABQij0Zpt0U].mkv",
+   "kind": "media",
+   "youtube_id": "ABQij0Zpt0U",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 20
+  },
+  {
+   "src": "heavy-club-basics/020-Better_Shoulder_Function_Better_Life_-_heavy_club_20_Shield_Cast-[ABQij0Zpt0U].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E20 - Better_Shoulder_Function_Better_Life_-_heavy_club_20_Shield_Cast-[ABQij0Zpt0U].trickplay",
+   "kind": "dir",
+   "youtube_id": "ABQij0Zpt0U",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 20
+  },
+  {
+   "src": "heavy-club-basics/021-Best_10_minute_heavy_club_swinging_drill_to_eliminate_back_shoulder_pain_-_HC21_-_Gamma_Cast-[yHIEZN0Nl_U].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E21 - Best_10_minute_heavy_club_swinging_drill_to_eliminate_back_shoulder_pain_-_HC21_-_Gamma_Cast-[yHIEZN0Nl_U].mkv",
+   "kind": "media",
+   "youtube_id": "yHIEZN0Nl_U",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 21
+  },
+  {
+   "src": "heavy-club-basics/021-Best_10_minute_heavy_club_swinging_drill_to_eliminate_back_shoulder_pain_-_HC21_-_Gamma_Cast-[yHIEZN0Nl_U].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E21 - Best_10_minute_heavy_club_swinging_drill_to_eliminate_back_shoulder_pain_-_HC21_-_Gamma_Cast-[yHIEZN0Nl_U].trickplay",
+   "kind": "dir",
+   "youtube_id": "yHIEZN0Nl_U",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 21
+  },
+  {
+   "src": "heavy-club-basics/022-Add_Muscle_With_This_Total_Body_Gainer_-_Heavy_Club_22_-_Shield_Cast_Squat-[s6IId5PAruI].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E22 - Add_Muscle_With_This_Total_Body_Gainer_-_Heavy_Club_22_-_Shield_Cast_Squat-[s6IId5PAruI].mkv",
+   "kind": "media",
+   "youtube_id": "s6IId5PAruI",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 22
+  },
+  {
+   "src": "heavy-club-basics/022-Add_Muscle_With_This_Total_Body_Gainer_-_Heavy_Club_22_-_Shield_Cast_Squat-[s6IId5PAruI].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E22 - Add_Muscle_With_This_Total_Body_Gainer_-_Heavy_Club_22_-_Shield_Cast_Squat-[s6IId5PAruI].trickplay",
+   "kind": "dir",
+   "youtube_id": "s6IId5PAruI",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 22
+  },
+  {
+   "src": "heavy-club-basics/023-Stop_3_Sets_of_10_Train_To_Improve_Your_Athletic_Potential_-_Heavy_club_23_Half_Kneeling_Shield_Cast-[7SFKEKJ6dRY].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E23 - Stop_3_Sets_of_10_Train_To_Improve_Your_Athletic_Potential_-_Heavy_club_23_Half_Kneeling_Shield_Cast-[7SFKEKJ6dRY].mkv",
+   "kind": "media",
+   "youtube_id": "7SFKEKJ6dRY",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 23
+  },
+  {
+   "src": "heavy-club-basics/023-Stop_3_Sets_of_10_Train_To_Improve_Your_Athletic_Potential_-_Heavy_club_23_Half_Kneeling_Shield_Cast-[7SFKEKJ6dRY].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E23 - Stop_3_Sets_of_10_Train_To_Improve_Your_Athletic_Potential_-_Heavy_club_23_Half_Kneeling_Shield_Cast-[7SFKEKJ6dRY].trickplay",
+   "kind": "dir",
+   "youtube_id": "7SFKEKJ6dRY",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 23
+  },
+  {
+   "src": "heavy-club-basics/024-Strong_core_-_align_your_ankle_knee_hip_and_spine_-_Heavy_Club_24_Step_Back_Lunge_Pullover_At_Top-[ywqZ1uStz7U].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E24 - Strong_core_-_align_your_ankle_knee_hip_and_spine_-_Heavy_Club_24_Step_Back_Lunge_Pullover_At_Top-[ywqZ1uStz7U].mkv",
+   "kind": "media",
+   "youtube_id": "ywqZ1uStz7U",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 24
+  },
+  {
+   "src": "heavy-club-basics/024-Strong_core_-_align_your_ankle_knee_hip_and_spine_-_Heavy_Club_24_Step_Back_Lunge_Pullover_At_Top-[ywqZ1uStz7U].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E24 - Strong_core_-_align_your_ankle_knee_hip_and_spine_-_Heavy_Club_24_Step_Back_Lunge_Pullover_At_Top-[ywqZ1uStz7U].trickplay",
+   "kind": "dir",
+   "youtube_id": "ywqZ1uStz7U",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 24
+  },
+  {
+   "src": "heavy-club-basics/025-Swing_Heavier_Faster_-_Heavy_Club_25_-_Half_Kneeling_Back_Position_Swing-[XH_HFWZQt4c].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E25 - Swing_Heavier_Faster_-_Heavy_Club_25_-_Half_Kneeling_Back_Position_Swing-[XH_HFWZQt4c].mkv",
+   "kind": "media",
+   "youtube_id": "XH_HFWZQt4c",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 25
+  },
+  {
+   "src": "heavy-club-basics/025-Swing_Heavier_Faster_-_Heavy_Club_25_-_Half_Kneeling_Back_Position_Swing-[XH_HFWZQt4c].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E25 - Swing_Heavier_Faster_-_Heavy_Club_25_-_Half_Kneeling_Back_Position_Swing-[XH_HFWZQt4c].trickplay",
+   "kind": "dir",
+   "youtube_id": "XH_HFWZQt4c",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 25
+  },
+  {
+   "src": "heavy-club-basics/026-Target_Your_6_Pack_-A_Key_Core_Exercise_-_Flat_Back_Pullover_-_Heavy_Club_26-[43dnNYARiAc].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E26 - Target_Your_6_Pack_-A_Key_Core_Exercise_-_Flat_Back_Pullover_-_Heavy_Club_26-[43dnNYARiAc].mkv",
+   "kind": "media",
+   "youtube_id": "43dnNYARiAc",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 26
+  },
+  {
+   "src": "heavy-club-basics/026-Target_Your_6_Pack_-A_Key_Core_Exercise_-_Flat_Back_Pullover_-_Heavy_Club_26-[43dnNYARiAc].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E26 - Target_Your_6_Pack_-A_Key_Core_Exercise_-_Flat_Back_Pullover_-_Heavy_Club_26-[43dnNYARiAc].trickplay",
+   "kind": "dir",
+   "youtube_id": "43dnNYARiAc",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 26
+  },
+  {
+   "src": "heavy-club-basics/027-Better_Than_Crunches_-_Slow_The_Aging_Process_-_Heavy_Club_27_-_Flat_Back_Pullover_Situp-[Ii2WZgl5mHA].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E27 - Better_Than_Crunches_-_Slow_The_Aging_Process_-_Heavy_Club_27_-_Flat_Back_Pullover_Situp-[Ii2WZgl5mHA].mkv",
+   "kind": "media",
+   "youtube_id": "Ii2WZgl5mHA",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 27
+  },
+  {
+   "src": "heavy-club-basics/027-Better_Than_Crunches_-_Slow_The_Aging_Process_-_Heavy_Club_27_-_Flat_Back_Pullover_Situp-[Ii2WZgl5mHA].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E27 - Better_Than_Crunches_-_Slow_The_Aging_Process_-_Heavy_Club_27_-_Flat_Back_Pullover_Situp-[Ii2WZgl5mHA].trickplay",
+   "kind": "dir",
+   "youtube_id": "Ii2WZgl5mHA",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 27
+  },
+  {
+   "src": "heavy-club-basics/028-Get_rid_of_back_pain_with_a_simple_exercise_Heavy_Club_28_Step_Back_Lunge_Pullover_At_Bottom-[UpY9zHuTZds].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E28 - Get_rid_of_back_pain_with_a_simple_exercise_Heavy_Club_28_Step_Back_Lunge_Pullover_At_Bottom-[UpY9zHuTZds].mkv",
+   "kind": "media",
+   "youtube_id": "UpY9zHuTZds",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 28
+  },
+  {
+   "src": "heavy-club-basics/028-Get_rid_of_back_pain_with_a_simple_exercise_Heavy_Club_28_Step_Back_Lunge_Pullover_At_Bottom-[UpY9zHuTZds].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E28 - Get_rid_of_back_pain_with_a_simple_exercise_Heavy_Club_28_Step_Back_Lunge_Pullover_At_Bottom-[UpY9zHuTZds].trickplay",
+   "kind": "dir",
+   "youtube_id": "UpY9zHuTZds",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 28
+  },
+  {
+   "src": "heavy-club-basics/029-The_Ultimate_Core_Exercise_Heavy_Club_29_Flat_Back_Pullover_Situp_Press-[8VL8tvinc28].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E29 - The_Ultimate_Core_Exercise_Heavy_Club_29_Flat_Back_Pullover_Situp_Press-[8VL8tvinc28].mkv",
+   "kind": "media",
+   "youtube_id": "8VL8tvinc28",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 29
+  },
+  {
+   "src": "heavy-club-basics/029-The_Ultimate_Core_Exercise_Heavy_Club_29_Flat_Back_Pullover_Situp_Press-[8VL8tvinc28].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E29 - The_Ultimate_Core_Exercise_Heavy_Club_29_Flat_Back_Pullover_Situp_Press-[8VL8tvinc28].trickplay",
+   "kind": "dir",
+   "youtube_id": "8VL8tvinc28",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 29
+  },
+  {
+   "src": "heavy-club-basics/030-Work_your_CORE_CORRECTLY_to_eliminate_back_pain_Heavy_Club_30_Half_Kneeling_Front_Press-[9-AaRVozdZQ].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E30 - Work_your_CORE_CORRECTLY_to_eliminate_back_pain_Heavy_Club_30_Half_Kneeling_Front_Press-[9-AaRVozdZQ].mkv",
+   "kind": "media",
+   "youtube_id": "9-AaRVozdZQ",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 30
+  },
+  {
+   "src": "heavy-club-basics/030-Work_your_CORE_CORRECTLY_to_eliminate_back_pain_Heavy_Club_30_Half_Kneeling_Front_Press-[9-AaRVozdZQ].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E30 - Work_your_CORE_CORRECTLY_to_eliminate_back_pain_Heavy_Club_30_Half_Kneeling_Front_Press-[9-AaRVozdZQ].trickplay",
+   "kind": "dir",
+   "youtube_id": "9-AaRVozdZQ",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 30
+  },
+  {
+   "src": "heavy-club-basics/031-Improve_Tight_Hips_Back_with_this_amazing_stretch-_Heavy_Club_31_-_Balance_Alternating_Shin_Box-[jogIwgDj0KM].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E31 - Improve_Tight_Hips_Back_with_this_amazing_stretch-_Heavy_Club_31_-_Balance_Alternating_Shin_Box-[jogIwgDj0KM].mkv",
+   "kind": "media",
+   "youtube_id": "jogIwgDj0KM",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 31
+  },
+  {
+   "src": "heavy-club-basics/031-Improve_Tight_Hips_Back_with_this_amazing_stretch-_Heavy_Club_31_-_Balance_Alternating_Shin_Box-[jogIwgDj0KM].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E31 - Improve_Tight_Hips_Back_with_this_amazing_stretch-_Heavy_Club_31_-_Balance_Alternating_Shin_Box-[jogIwgDj0KM].trickplay",
+   "kind": "dir",
+   "youtube_id": "jogIwgDj0KM",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 31
+  },
+  {
+   "src": "heavy-club-basics/032-Why_Every_Human_Should_Train_With_Heavy_Clubs_-_2_Hand_Heavy_Club_32_Inside_Circle_Squat-[icFHo5ufhUc].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E32 - Why_Every_Human_Should_Train_With_Heavy_Clubs_-_2_Hand_Heavy_Club_32_Inside_Circle_Squat-[icFHo5ufhUc].mkv",
+   "kind": "media",
+   "youtube_id": "icFHo5ufhUc",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 32
+  },
+  {
+   "src": "heavy-club-basics/032-Why_Every_Human_Should_Train_With_Heavy_Clubs_-_2_Hand_Heavy_Club_32_Inside_Circle_Squat-[icFHo5ufhUc].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E32 - Why_Every_Human_Should_Train_With_Heavy_Clubs_-_2_Hand_Heavy_Club_32_Inside_Circle_Squat-[icFHo5ufhUc].trickplay",
+   "kind": "dir",
+   "youtube_id": "icFHo5ufhUc",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 32
+  },
+  {
+   "src": "heavy-club-basics/033-Strength_Hip_Mobility_for_Jiu_Jitsu_Martial_Arts_Heavy_Club_33-Alt_Shinbox_Front_Press-[D2AJzIVufeY].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E33 - Strength_Hip_Mobility_for_Jiu_Jitsu_Martial_Arts_Heavy_Club_33-Alt_Shinbox_Front_Press-[D2AJzIVufeY].mkv",
+   "kind": "media",
+   "youtube_id": "D2AJzIVufeY",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 33
+  },
+  {
+   "src": "heavy-club-basics/033-Strength_Hip_Mobility_for_Jiu_Jitsu_Martial_Arts_Heavy_Club_33-Alt_Shinbox_Front_Press-[D2AJzIVufeY].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E33 - Strength_Hip_Mobility_for_Jiu_Jitsu_Martial_Arts_Heavy_Club_33-Alt_Shinbox_Front_Press-[D2AJzIVufeY].trickplay",
+   "kind": "dir",
+   "youtube_id": "D2AJzIVufeY",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 33
+  },
+  {
+   "src": "heavy-club-basics/034-Train_like_a_human_with_movement_patterns_to_eliminate_pain_Heavy_Club_34_Outside_Circle_Squat-[z916C16iK54].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E34 - Train_like_a_human_with_movement_patterns_to_eliminate_pain_Heavy_Club_34_Outside_Circle_Squat-[z916C16iK54].mkv",
+   "kind": "media",
+   "youtube_id": "z916C16iK54",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 34
+  },
+  {
+   "src": "heavy-club-basics/034-Train_like_a_human_with_movement_patterns_to_eliminate_pain_Heavy_Club_34_Outside_Circle_Squat-[z916C16iK54].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E34 - Train_like_a_human_with_movement_patterns_to_eliminate_pain_Heavy_Club_34_Outside_Circle_Squat-[z916C16iK54].trickplay",
+   "kind": "dir",
+   "youtube_id": "z916C16iK54",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 34
+  },
+  {
+   "src": "heavy-club-basics/035-Don_t_be_a_victim_of_your_chair_Stand_Up_Heavy_Club_35_Step_Back_Lunge_Pullover_Step_Back_Press-[1cXPBXfKNhU].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E35 - Don_t_be_a_victim_of_your_chair_Stand_Up_Heavy_Club_35_Step_Back_Lunge_Pullover_Step_Back_Press-[1cXPBXfKNhU].mkv",
+   "kind": "media",
+   "youtube_id": "1cXPBXfKNhU",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 35
+  },
+  {
+   "src": "heavy-club-basics/035-Don_t_be_a_victim_of_your_chair_Stand_Up_Heavy_Club_35_Step_Back_Lunge_Pullover_Step_Back_Press-[1cXPBXfKNhU].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E35 - Don_t_be_a_victim_of_your_chair_Stand_Up_Heavy_Club_35_Step_Back_Lunge_Pullover_Step_Back_Press-[1cXPBXfKNhU].trickplay",
+   "kind": "dir",
+   "youtube_id": "1cXPBXfKNhU",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 35
+  },
+  {
+   "src": "heavy-club-basics/036-Why_Club_Squats_Are_Best_For_Core_Training_Heavy_Club_36_Squat_Press-[6p1niExqXSA].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E36 - Why_Club_Squats_Are_Best_For_Core_Training_Heavy_Club_36_Squat_Press-[6p1niExqXSA].mkv",
+   "kind": "media",
+   "youtube_id": "6p1niExqXSA",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 36
+  },
+  {
+   "src": "heavy-club-basics/036-Why_Club_Squats_Are_Best_For_Core_Training_Heavy_Club_36_Squat_Press-[6p1niExqXSA].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E36 - Why_Club_Squats_Are_Best_For_Core_Training_Heavy_Club_36_Squat_Press-[6p1niExqXSA].trickplay",
+   "kind": "dir",
+   "youtube_id": "6p1niExqXSA",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 36
+  },
+  {
+   "src": "heavy-club-basics/037-The_Forgotten_Movement_That_s_Actually_Better_-_Heavy_Club_37_Clean_and_Press-[6kpEYglMJ1c].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E37 - The_Forgotten_Movement_That_s_Actually_Better_-_Heavy_Club_37_Clean_and_Press-[6kpEYglMJ1c].mkv",
+   "kind": "media",
+   "youtube_id": "6kpEYglMJ1c",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 37
+  },
+  {
+   "src": "heavy-club-basics/037-The_Forgotten_Movement_That_s_Actually_Better_-_Heavy_Club_37_Clean_and_Press-[6kpEYglMJ1c].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E37 - The_Forgotten_Movement_That_s_Actually_Better_-_Heavy_Club_37_Clean_and_Press-[6kpEYglMJ1c].trickplay",
+   "kind": "dir",
+   "youtube_id": "6kpEYglMJ1c",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 37
+  },
+  {
+   "src": "heavy-club-basics/038-BEST_Core_Stability_Exercise_Everyone_Should_Do_Rotation_Is_the_Missing_Link_Heavy_Club_38_Mill_Prep-[G_OXuFs2bRs].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E38 - BEST_Core_Stability_Exercise_Everyone_Should_Do_Rotation_Is_the_Missing_Link_Heavy_Club_38_Mill_Prep-[G_OXuFs2bRs].mkv",
+   "kind": "media",
+   "youtube_id": "G_OXuFs2bRs",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 38
+  },
+  {
+   "src": "heavy-club-basics/038-BEST_Core_Stability_Exercise_Everyone_Should_Do_Rotation_Is_the_Missing_Link_Heavy_Club_38_Mill_Prep-[G_OXuFs2bRs].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E38 - BEST_Core_Stability_Exercise_Everyone_Should_Do_Rotation_Is_the_Missing_Link_Heavy_Club_38_Mill_Prep-[G_OXuFs2bRs].trickplay",
+   "kind": "dir",
+   "youtube_id": "G_OXuFs2bRs",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 38
+  },
+  {
+   "src": "heavy-club-basics/039-Two_Hand_Heavy_Club_39_Pullover_Squat-[3yf3VO2sd-4].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E39 - Two_Hand_Heavy_Club_39_Pullover_Squat-[3yf3VO2sd-4].mkv",
+   "kind": "media",
+   "youtube_id": "3yf3VO2sd-4",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 39
+  },
+  {
+   "src": "heavy-club-basics/039-Two_Hand_Heavy_Club_39_Pullover_Squat-[3yf3VO2sd-4].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E39 - Two_Hand_Heavy_Club_39_Pullover_Squat-[3yf3VO2sd-4].trickplay",
+   "kind": "dir",
+   "youtube_id": "3yf3VO2sd-4",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 39
+  },
+  {
+   "src": "heavy-club-basics/040-Two_Hand_Heavy_Club_40_Technical_Swipe-[nQ7npb0krRg].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E40 - Two_Hand_Heavy_Club_40_Technical_Swipe-[nQ7npb0krRg].mkv",
+   "kind": "media",
+   "youtube_id": "nQ7npb0krRg",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 40
+  },
+  {
+   "src": "heavy-club-basics/040-Two_Hand_Heavy_Club_40_Technical_Swipe-[nQ7npb0krRg].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E40 - Two_Hand_Heavy_Club_40_Technical_Swipe-[nQ7npb0krRg].trickplay",
+   "kind": "dir",
+   "youtube_id": "nQ7npb0krRg",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 40
+  },
+  {
+   "src": "heavy-club-basics/041-Modern_Chairs_Make_Your_Hips_Tight_Two_Hand_Heavy_Club_41_Step_Back_Lunge_Front_Press_at_Bottom-[mf2dOl-QzEs].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E41 - Modern_Chairs_Make_Your_Hips_Tight_Two_Hand_Heavy_Club_41_Step_Back_Lunge_Front_Press_at_Bottom-[mf2dOl-QzEs].mkv",
+   "kind": "media",
+   "youtube_id": "mf2dOl-QzEs",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 41
+  },
+  {
+   "src": "heavy-club-basics/041-Modern_Chairs_Make_Your_Hips_Tight_Two_Hand_Heavy_Club_41_Step_Back_Lunge_Front_Press_at_Bottom-[mf2dOl-QzEs].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E41 - Modern_Chairs_Make_Your_Hips_Tight_Two_Hand_Heavy_Club_41_Step_Back_Lunge_Front_Press_at_Bottom-[mf2dOl-QzEs].trickplay",
+   "kind": "dir",
+   "youtube_id": "mf2dOl-QzEs",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 41
+  },
+  {
+   "src": "heavy-club-basics/042-Two_Hand_Heavy_Club_42_Half_Kneeling_Pullover-[FhIn5to6NmM].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E42 - Two_Hand_Heavy_Club_42_Half_Kneeling_Pullover-[FhIn5to6NmM].mkv",
+   "kind": "media",
+   "youtube_id": "FhIn5to6NmM",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 42
+  },
+  {
+   "src": "heavy-club-basics/042-Two_Hand_Heavy_Club_42_Half_Kneeling_Pullover-[FhIn5to6NmM].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E42 - Two_Hand_Heavy_Club_42_Half_Kneeling_Pullover-[FhIn5to6NmM].trickplay",
+   "kind": "dir",
+   "youtube_id": "FhIn5to6NmM",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 42
+  },
+  {
+   "src": "heavy-club-basics/043-Heavy_Club_43_Pullover_Squat_Press-[pHjBhj7SHWo].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E43 - Heavy_Club_43_Pullover_Squat_Press-[pHjBhj7SHWo].mkv",
+   "kind": "media",
+   "youtube_id": "pHjBhj7SHWo",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 43
+  },
+  {
+   "src": "heavy-club-basics/043-Heavy_Club_43_Pullover_Squat_Press-[pHjBhj7SHWo].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E43 - Heavy_Club_43_Pullover_Squat_Press-[pHjBhj7SHWo].trickplay",
+   "kind": "dir",
+   "youtube_id": "pHjBhj7SHWo",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 43
+  },
+  {
+   "src": "heavy-club-basics/044-Every_Sport_Has_Rotation_Heavy_Club_44_Clockwork_Shoulder-[XjaBfgQW1qw].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E44 - Every_Sport_Has_Rotation_Heavy_Club_44_Clockwork_Shoulder-[XjaBfgQW1qw].mkv",
+   "kind": "media",
+   "youtube_id": "XjaBfgQW1qw",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 44
+  },
+  {
+   "src": "heavy-club-basics/044-Every_Sport_Has_Rotation_Heavy_Club_44_Clockwork_Shoulder-[XjaBfgQW1qw].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E44 - Every_Sport_Has_Rotation_Heavy_Club_44_Clockwork_Shoulder-[XjaBfgQW1qw].trickplay",
+   "kind": "dir",
+   "youtube_id": "XjaBfgQW1qw",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 44
+  },
+  {
+   "src": "heavy-club-basics/045-Heavy_Club_45_Dead_Clean_Squat-[V1V6PTM5TQ0].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E45 - Heavy_Club_45_Dead_Clean_Squat-[V1V6PTM5TQ0].mkv",
+   "kind": "media",
+   "youtube_id": "V1V6PTM5TQ0",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 45
+  },
+  {
+   "src": "heavy-club-basics/045-Heavy_Club_45_Dead_Clean_Squat-[V1V6PTM5TQ0].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E45 - Heavy_Club_45_Dead_Clean_Squat-[V1V6PTM5TQ0].trickplay",
+   "kind": "dir",
+   "youtube_id": "V1V6PTM5TQ0",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 45
+  },
+  {
+   "src": "heavy-club-basics/046-This_One_Is_Hard_Heavy_Club_46_Alternating_Shin_Box_Shield_Cast-[wr8CwhFofNw].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E46 - This_One_Is_Hard_Heavy_Club_46_Alternating_Shin_Box_Shield_Cast-[wr8CwhFofNw].mkv",
+   "kind": "media",
+   "youtube_id": "wr8CwhFofNw",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 46
+  },
+  {
+   "src": "heavy-club-basics/046-This_One_Is_Hard_Heavy_Club_46_Alternating_Shin_Box_Shield_Cast-[wr8CwhFofNw].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E46 - This_One_Is_Hard_Heavy_Club_46_Alternating_Shin_Box_Shield_Cast-[wr8CwhFofNw].trickplay",
+   "kind": "dir",
+   "youtube_id": "wr8CwhFofNw",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 46
+  },
+  {
+   "src": "heavy-club-basics/047-Master_the_Shield_Cast_Heavy_Club_47_Full_Kneeling_Back_Position_Swing-[76UsJCUVEUQ].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E47 - Master_the_Shield_Cast_Heavy_Club_47_Full_Kneeling_Back_Position_Swing-[76UsJCUVEUQ].mkv",
+   "kind": "media",
+   "youtube_id": "76UsJCUVEUQ",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 47
+  },
+  {
+   "src": "heavy-club-basics/047-Master_the_Shield_Cast_Heavy_Club_47_Full_Kneeling_Back_Position_Swing-[76UsJCUVEUQ].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E47 - Master_the_Shield_Cast_Heavy_Club_47_Full_Kneeling_Back_Position_Swing-[76UsJCUVEUQ].trickplay",
+   "kind": "dir",
+   "youtube_id": "76UsJCUVEUQ",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 47
+  },
+  {
+   "src": "heavy-club-basics/048-Check_Your_Hip_Health_Heavy_Club_48_Flat_Back_Pullover_Sit-up_Alt_Leg_Thread-[o1k7ZreDxHI].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E48 - Check_Your_Hip_Health_Heavy_Club_48_Flat_Back_Pullover_Sit-up_Alt_Leg_Thread-[o1k7ZreDxHI].mkv",
+   "kind": "media",
+   "youtube_id": "o1k7ZreDxHI",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 48
+  },
+  {
+   "src": "heavy-club-basics/048-Check_Your_Hip_Health_Heavy_Club_48_Flat_Back_Pullover_Sit-up_Alt_Leg_Thread-[o1k7ZreDxHI].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E48 - Check_Your_Hip_Health_Heavy_Club_48_Flat_Back_Pullover_Sit-up_Alt_Leg_Thread-[o1k7ZreDxHI].trickplay",
+   "kind": "dir",
+   "youtube_id": "o1k7ZreDxHI",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 48
+  },
+  {
+   "src": "heavy-club-basics/049-You_ve_Fallen_Can_You_Get_Up_Heavy_Club_49_Flat_Back_Pullover_Sit-up_Leg_Thread_Hip_Extension-[nTG7bBwgEjI].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E49 - You_ve_Fallen_Can_You_Get_Up_Heavy_Club_49_Flat_Back_Pullover_Sit-up_Leg_Thread_Hip_Extension-[nTG7bBwgEjI].mkv",
+   "kind": "media",
+   "youtube_id": "nTG7bBwgEjI",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 49
+  },
+  {
+   "src": "heavy-club-basics/049-You_ve_Fallen_Can_You_Get_Up_Heavy_Club_49_Flat_Back_Pullover_Sit-up_Leg_Thread_Hip_Extension-[nTG7bBwgEjI].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E49 - You_ve_Fallen_Can_You_Get_Up_Heavy_Club_49_Flat_Back_Pullover_Sit-up_Leg_Thread_Hip_Extension-[nTG7bBwgEjI].trickplay",
+   "kind": "dir",
+   "youtube_id": "nTG7bBwgEjI",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 49
+  },
+  {
+   "src": "heavy-club-basics/050-This_Is_How_Hercules_Would_Have_Trained_Heavy_Club_50_Mill-[N-k-lreqpfg].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E50 - This_Is_How_Hercules_Would_Have_Trained_Heavy_Club_50_Mill-[N-k-lreqpfg].mkv",
+   "kind": "media",
+   "youtube_id": "N-k-lreqpfg",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 50
+  },
+  {
+   "src": "heavy-club-basics/050-This_Is_How_Hercules_Would_Have_Trained_Heavy_Club_50_Mill-[N-k-lreqpfg].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E50 - This_Is_How_Hercules_Would_Have_Trained_Heavy_Club_50_Mill-[N-k-lreqpfg].trickplay",
+   "kind": "dir",
+   "youtube_id": "N-k-lreqpfg",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 50
+  },
+  {
+   "src": "heavy-club-basics/051-Balance_Your_Body_and_Get_Stronger_at_Everything_Heavy_Club_51_Reverse_Mill-[ATxShkV2YRU].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E51 - Balance_Your_Body_and_Get_Stronger_at_Everything_Heavy_Club_51_Reverse_Mill-[ATxShkV2YRU].mkv",
+   "kind": "media",
+   "youtube_id": "ATxShkV2YRU",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 51
+  },
+  {
+   "src": "heavy-club-basics/051-Balance_Your_Body_and_Get_Stronger_at_Everything_Heavy_Club_51_Reverse_Mill-[ATxShkV2YRU].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E51 - Balance_Your_Body_and_Get_Stronger_at_Everything_Heavy_Club_51_Reverse_Mill-[ATxShkV2YRU].trickplay",
+   "kind": "dir",
+   "youtube_id": "ATxShkV2YRU",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 51
+  },
+  {
+   "src": "heavy-club-basics/052-Hips_Shoulders_Spine_All_Working_Together_Heavy_Club_52_Half_Kneeling_Shield_Cast_Front_Press-[gojChv9yttQ].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E52 - Hips_Shoulders_Spine_All_Working_Together_Heavy_Club_52_Half_Kneeling_Shield_Cast_Front_Press-[gojChv9yttQ].mkv",
+   "kind": "media",
+   "youtube_id": "gojChv9yttQ",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 52
+  },
+  {
+   "src": "heavy-club-basics/052-Hips_Shoulders_Spine_All_Working_Together_Heavy_Club_52_Half_Kneeling_Shield_Cast_Front_Press-[gojChv9yttQ].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E52 - Hips_Shoulders_Spine_All_Working_Together_Heavy_Club_52_Half_Kneeling_Shield_Cast_Front_Press-[gojChv9yttQ].trickplay",
+   "kind": "dir",
+   "youtube_id": "gojChv9yttQ",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 52
+  },
+  {
+   "src": "heavy-club-basics/053-Build_Total_Body_Mobility_Heavy_Club_53_Gama_Cast_Squat-[tp2SB0jguzY].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E53 - Build_Total_Body_Mobility_Heavy_Club_53_Gama_Cast_Squat-[tp2SB0jguzY].mkv",
+   "kind": "media",
+   "youtube_id": "tp2SB0jguzY",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 53
+  },
+  {
+   "src": "heavy-club-basics/053-Build_Total_Body_Mobility_Heavy_Club_53_Gama_Cast_Squat-[tp2SB0jguzY].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E53 - Build_Total_Body_Mobility_Heavy_Club_53_Gama_Cast_Squat-[tp2SB0jguzY].trickplay",
+   "kind": "dir",
+   "youtube_id": "tp2SB0jguzY",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 53
+  },
+  {
+   "src": "heavy-club-basics/054-Rotating_Squats_the_Missing_Link_in_Your_Athletic_Training_Heavy_Club_54_Alt_Circle_Squat-[kdPuPtngYVw].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E54 - Rotating_Squats_the_Missing_Link_in_Your_Athletic_Training_Heavy_Club_54_Alt_Circle_Squat-[kdPuPtngYVw].mkv",
+   "kind": "media",
+   "youtube_id": "kdPuPtngYVw",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 54
+  },
+  {
+   "src": "heavy-club-basics/054-Rotating_Squats_the_Missing_Link_in_Your_Athletic_Training_Heavy_Club_54_Alt_Circle_Squat-[kdPuPtngYVw].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E54 - Rotating_Squats_the_Missing_Link_in_Your_Athletic_Training_Heavy_Club_54_Alt_Circle_Squat-[kdPuPtngYVw].trickplay",
+   "kind": "dir",
+   "youtube_id": "kdPuPtngYVw",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 54
+  },
+  {
+   "src": "heavy-club-basics/055-The_Shoulder_Exercise_No_One_Told_You_About-[_TTaZX9FKao].mkv",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E55 - The_Shoulder_Exercise_No_One_Told_You_About-[_TTaZX9FKao].mkv",
+   "kind": "media",
+   "youtube_id": "_TTaZX9FKao",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 55
+  },
+  {
+   "src": "heavy-club-basics/055-The_Shoulder_Exercise_No_One_Told_You_About-[_TTaZX9FKao].trickplay",
+   "dst": "fitness/Heavy Club/Season 01/Heavy Club S01E55 - The_Shoulder_Exercise_No_One_Told_You_About-[_TTaZX9FKao].trickplay",
+   "kind": "dir",
+   "youtube_id": "_TTaZX9FKao",
+   "series": "Heavy Club",
+   "season": 1,
+   "episode": 55
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/001-Heavy_Club_Exercises_-_2_Hand_Inside_Circle-[Exuf3a7RhYs].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E001 - Heavy_Club_Exercises_-_2_Hand_Inside_Circle-[Exuf3a7RhYs].mkv",
+   "kind": "media",
+   "youtube_id": "Exuf3a7RhYs",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 1
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/001-Heavy_Club_Exercises_-_2_Hand_Inside_Circle-[Exuf3a7RhYs].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E001 - Heavy_Club_Exercises_-_2_Hand_Inside_Circle-[Exuf3a7RhYs].trickplay",
+   "kind": "dir",
+   "youtube_id": "Exuf3a7RhYs",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 1
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/002-Heavy_Club_Exercises_-_2_Hand_Outside_Circle-[-MuseVIc0bg].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E002 - Heavy_Club_Exercises_-_2_Hand_Outside_Circle-[-MuseVIc0bg].mkv",
+   "kind": "media",
+   "youtube_id": "-MuseVIc0bg",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 2
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/002-Heavy_Club_Exercises_-_2_Hand_Outside_Circle-[-MuseVIc0bg].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E002 - Heavy_Club_Exercises_-_2_Hand_Outside_Circle-[-MuseVIc0bg].trickplay",
+   "kind": "dir",
+   "youtube_id": "-MuseVIc0bg",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 2
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/003-Heavy_Club_Exercises_-_2_Hand_Pullover-[HsM0J39EmXg].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E003 - Heavy_Club_Exercises_-_2_Hand_Pullover-[HsM0J39EmXg].mkv",
+   "kind": "media",
+   "youtube_id": "HsM0J39EmXg",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 3
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/003-Heavy_Club_Exercises_-_2_Hand_Pullover-[HsM0J39EmXg].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E003 - Heavy_Club_Exercises_-_2_Hand_Pullover-[HsM0J39EmXg].trickplay",
+   "kind": "dir",
+   "youtube_id": "HsM0J39EmXg",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 3
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/004-Heavy_Club_Exercises_-_2_Hand_Shield_Cast-[oBdXsknqSEM].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E004 - Heavy_Club_Exercises_-_2_Hand_Shield_Cast-[oBdXsknqSEM].mkv",
+   "kind": "media",
+   "youtube_id": "oBdXsknqSEM",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 4
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/004-Heavy_Club_Exercises_-_2_Hand_Shield_Cast-[oBdXsknqSEM].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E004 - Heavy_Club_Exercises_-_2_Hand_Shield_Cast-[oBdXsknqSEM].trickplay",
+   "kind": "dir",
+   "youtube_id": "oBdXsknqSEM",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 4
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/005-Heavy_Club_Exercises_-_2_Hand_Gamma_Cast-[rjhwF50fyd8].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E005 - Heavy_Club_Exercises_-_2_Hand_Gamma_Cast-[rjhwF50fyd8].mkv",
+   "kind": "media",
+   "youtube_id": "rjhwF50fyd8",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 5
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/005-Heavy_Club_Exercises_-_2_Hand_Gamma_Cast-[rjhwF50fyd8].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E005 - Heavy_Club_Exercises_-_2_Hand_Gamma_Cast-[rjhwF50fyd8].trickplay",
+   "kind": "dir",
+   "youtube_id": "rjhwF50fyd8",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 5
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/006-Heavy_Club_Exercises_-_Single_Arm_Inside_Circle-[0ZzoCasyoAM].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E006 - Heavy_Club_Exercises_-_Single_Arm_Inside_Circle-[0ZzoCasyoAM].mkv",
+   "kind": "media",
+   "youtube_id": "0ZzoCasyoAM",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 6
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/006-Heavy_Club_Exercises_-_Single_Arm_Inside_Circle-[0ZzoCasyoAM].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E006 - Heavy_Club_Exercises_-_Single_Arm_Inside_Circle-[0ZzoCasyoAM].trickplay",
+   "kind": "dir",
+   "youtube_id": "0ZzoCasyoAM",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 6
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/007-Heavy_Club_Exercises_-_Single_Arm_Outside_Circle-[OydLETgLfMA].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E007 - Heavy_Club_Exercises_-_Single_Arm_Outside_Circle-[OydLETgLfMA].mkv",
+   "kind": "media",
+   "youtube_id": "OydLETgLfMA",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 7
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/007-Heavy_Club_Exercises_-_Single_Arm_Outside_Circle-[OydLETgLfMA].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E007 - Heavy_Club_Exercises_-_Single_Arm_Outside_Circle-[OydLETgLfMA].trickplay",
+   "kind": "dir",
+   "youtube_id": "OydLETgLfMA",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 7
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/008-Heavy_Club_Exercises_-_Single_Arm_Shield_Cast-[LKNgPDX2wRk].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E008 - Heavy_Club_Exercises_-_Single_Arm_Shield_Cast-[LKNgPDX2wRk].mkv",
+   "kind": "media",
+   "youtube_id": "LKNgPDX2wRk",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 8
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/008-Heavy_Club_Exercises_-_Single_Arm_Shield_Cast-[LKNgPDX2wRk].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E008 - Heavy_Club_Exercises_-_Single_Arm_Shield_Cast-[LKNgPDX2wRk].trickplay",
+   "kind": "dir",
+   "youtube_id": "LKNgPDX2wRk",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 8
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/009-Heavy_Club_Exercises_-_2_Hand_Inside_Pendulum-[Maz36Iuixk4].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E009 - Heavy_Club_Exercises_-_2_Hand_Inside_Pendulum-[Maz36Iuixk4].mkv",
+   "kind": "media",
+   "youtube_id": "Maz36Iuixk4",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 9
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/009-Heavy_Club_Exercises_-_2_Hand_Inside_Pendulum-[Maz36Iuixk4].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E009 - Heavy_Club_Exercises_-_2_Hand_Inside_Pendulum-[Maz36Iuixk4].trickplay",
+   "kind": "dir",
+   "youtube_id": "Maz36Iuixk4",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 9
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/010-Heavy_Club_Exercises_-_2_Hand_Outside_Pendulum-[y9qsJ0bpmzs].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E010 - Heavy_Club_Exercises_-_2_Hand_Outside_Pendulum-[y9qsJ0bpmzs].mkv",
+   "kind": "media",
+   "youtube_id": "y9qsJ0bpmzs",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 10
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/010-Heavy_Club_Exercises_-_2_Hand_Outside_Pendulum-[y9qsJ0bpmzs].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E010 - Heavy_Club_Exercises_-_2_Hand_Outside_Pendulum-[y9qsJ0bpmzs].trickplay",
+   "kind": "dir",
+   "youtube_id": "y9qsJ0bpmzs",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 10
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/011-BREATHING_TECHNIQUES_-_Single_and_Double_breath_for_the_single_arm_Mill_and_Reverse_Mill-[MqVk-qZruus].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E011 - BREATHING_TECHNIQUES_-_Single_and_Double_breath_for_the_single_arm_Mill_and_Reverse_Mill-[MqVk-qZruus].mkv",
+   "kind": "media",
+   "youtube_id": "MqVk-qZruus",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 11
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/011-BREATHING_TECHNIQUES_-_Single_and_Double_breath_for_the_single_arm_Mill_and_Reverse_Mill-[MqVk-qZruus].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E011 - BREATHING_TECHNIQUES_-_Single_and_Double_breath_for_the_single_arm_Mill_and_Reverse_Mill-[MqVk-qZruus].trickplay",
+   "kind": "dir",
+   "youtube_id": "MqVk-qZruus",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 11
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/012-OUTSIDE_PENDULUM_SINGLE_ARM_-_a_heavy_club_exercise_-_Martial_Specific_Training-[SchCGLfQbjI].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E012 - OUTSIDE_PENDULUM_SINGLE_ARM_-_a_heavy_club_exercise_-_Martial_Specific_Training-[SchCGLfQbjI].mkv",
+   "kind": "media",
+   "youtube_id": "SchCGLfQbjI",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 12
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/012-OUTSIDE_PENDULUM_SINGLE_ARM_-_a_heavy_club_exercise_-_Martial_Specific_Training-[SchCGLfQbjI].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E012 - OUTSIDE_PENDULUM_SINGLE_ARM_-_a_heavy_club_exercise_-_Martial_Specific_Training-[SchCGLfQbjI].trickplay",
+   "kind": "dir",
+   "youtube_id": "SchCGLfQbjI",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 12
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/013-INSIDE_PENDULUM_SINGLE_ARM_-_a_heavy_club_exercise_-_Martial_Specific_Training-[n-fzOSaOiKY].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E013 - INSIDE_PENDULUM_SINGLE_ARM_-_a_heavy_club_exercise_-_Martial_Specific_Training-[n-fzOSaOiKY].mkv",
+   "kind": "media",
+   "youtube_id": "n-fzOSaOiKY",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 13
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/013-INSIDE_PENDULUM_SINGLE_ARM_-_a_heavy_club_exercise_-_Martial_Specific_Training-[n-fzOSaOiKY].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E013 - INSIDE_PENDULUM_SINGLE_ARM_-_a_heavy_club_exercise_-_Martial_Specific_Training-[n-fzOSaOiKY].trickplay",
+   "kind": "dir",
+   "youtube_id": "n-fzOSaOiKY",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 13
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/014-2_Hand_Alternating_Heavy_Club_Pendulum_-_Martial_Specific_Training-[GULjXPS_ba4].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E014 - 2_Hand_Alternating_Heavy_Club_Pendulum_-_Martial_Specific_Training-[GULjXPS_ba4].mkv",
+   "kind": "media",
+   "youtube_id": "GULjXPS_ba4",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 14
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/014-2_Hand_Alternating_Heavy_Club_Pendulum_-_Martial_Specific_Training-[GULjXPS_ba4].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E014 - 2_Hand_Alternating_Heavy_Club_Pendulum_-_Martial_Specific_Training-[GULjXPS_ba4].trickplay",
+   "kind": "dir",
+   "youtube_id": "GULjXPS_ba4",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 14
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/015-Single_Hand_Heavy_Club_Alternating_Pendulum_-_Martial_Specific_Training-[CTPm9DBfZEU].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E015 - Single_Hand_Heavy_Club_Alternating_Pendulum_-_Martial_Specific_Training-[CTPm9DBfZEU].mkv",
+   "kind": "media",
+   "youtube_id": "CTPm9DBfZEU",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 15
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/015-Single_Hand_Heavy_Club_Alternating_Pendulum_-_Martial_Specific_Training-[CTPm9DBfZEU].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E015 - Single_Hand_Heavy_Club_Alternating_Pendulum_-_Martial_Specific_Training-[CTPm9DBfZEU].trickplay",
+   "kind": "dir",
+   "youtube_id": "CTPm9DBfZEU",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 15
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/016-Heavy_Club_-_2_Hand_Alternating_Circles_-_Martial_Specific_Training-[bIr0q5k9x8I].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E016 - Heavy_Club_-_2_Hand_Alternating_Circles_-_Martial_Specific_Training-[bIr0q5k9x8I].mkv",
+   "kind": "media",
+   "youtube_id": "bIr0q5k9x8I",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 16
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/016-Heavy_Club_-_2_Hand_Alternating_Circles_-_Martial_Specific_Training-[bIr0q5k9x8I].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E016 - Heavy_Club_-_2_Hand_Alternating_Circles_-_Martial_Specific_Training-[bIr0q5k9x8I].trickplay",
+   "kind": "dir",
+   "youtube_id": "bIr0q5k9x8I",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 16
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/017-Heavy_Club_-_Single_Arm_Inside_Circle_Hand_Change_Technique_-_Mill_Mastery_series-[AWh_AdoASRY].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E017 - Heavy_Club_-_Single_Arm_Inside_Circle_Hand_Change_Technique_-_Mill_Mastery_series-[AWh_AdoASRY].mkv",
+   "kind": "media",
+   "youtube_id": "AWh_AdoASRY",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 17
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/017-Heavy_Club_-_Single_Arm_Inside_Circle_Hand_Change_Technique_-_Mill_Mastery_series-[AWh_AdoASRY].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E017 - Heavy_Club_-_Single_Arm_Inside_Circle_Hand_Change_Technique_-_Mill_Mastery_series-[AWh_AdoASRY].trickplay",
+   "kind": "dir",
+   "youtube_id": "AWh_AdoASRY",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 17
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/018-Heavy_Club_Single_Arm_Outside_Hand_Change_-_Mill_Mastery_series-[ucLZBDCYX3o].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E018 - Heavy_Club_Single_Arm_Outside_Hand_Change_-_Mill_Mastery_series-[ucLZBDCYX3o].mkv",
+   "kind": "media",
+   "youtube_id": "ucLZBDCYX3o",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 18
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/018-Heavy_Club_Single_Arm_Outside_Hand_Change_-_Mill_Mastery_series-[ucLZBDCYX3o].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E018 - Heavy_Club_Single_Arm_Outside_Hand_Change_-_Mill_Mastery_series-[ucLZBDCYX3o].trickplay",
+   "kind": "dir",
+   "youtube_id": "ucLZBDCYX3o",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 18
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/019-Heavy_Club_Continuous_Inside_Transition_-_Mill_Mastery_Series-[XPZgv-vf7ME].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E019 - Heavy_Club_Continuous_Inside_Transition_-_Mill_Mastery_Series-[XPZgv-vf7ME].mkv",
+   "kind": "media",
+   "youtube_id": "XPZgv-vf7ME",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 19
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/019-Heavy_Club_Continuous_Inside_Transition_-_Mill_Mastery_Series-[XPZgv-vf7ME].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E019 - Heavy_Club_Continuous_Inside_Transition_-_Mill_Mastery_Series-[XPZgv-vf7ME].trickplay",
+   "kind": "dir",
+   "youtube_id": "XPZgv-vf7ME",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 19
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/020-Heavy_Club_Continuous_Outside_Transition_-_Mill_Mastery_series-[49iRIY2fMpE].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E020 - Heavy_Club_Continuous_Outside_Transition_-_Mill_Mastery_series-[49iRIY2fMpE].mkv",
+   "kind": "media",
+   "youtube_id": "49iRIY2fMpE",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 20
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/020-Heavy_Club_Continuous_Outside_Transition_-_Mill_Mastery_series-[49iRIY2fMpE].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E020 - Heavy_Club_Continuous_Outside_Transition_-_Mill_Mastery_series-[49iRIY2fMpE].trickplay",
+   "kind": "dir",
+   "youtube_id": "49iRIY2fMpE",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 20
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/021-Heavy_Club_-_Single_Hand_Alternating_180_degree_Pullover_-_Mill_Mastery-[9JeH7kTi1ys].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E021 - Heavy_Club_-_Single_Hand_Alternating_180_degree_Pullover_-_Mill_Mastery-[9JeH7kTi1ys].mkv",
+   "kind": "media",
+   "youtube_id": "9JeH7kTi1ys",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 21
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/021-Heavy_Club_-_Single_Hand_Alternating_180_degree_Pullover_-_Mill_Mastery-[9JeH7kTi1ys].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E021 - Heavy_Club_-_Single_Hand_Alternating_180_degree_Pullover_-_Mill_Mastery-[9JeH7kTi1ys].trickplay",
+   "kind": "dir",
+   "youtube_id": "9JeH7kTi1ys",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 21
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/022-Heavy_Club_Recommendations_for_Women-[095b_r5ATbI].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E022 - Heavy_Club_Recommendations_for_Women-[095b_r5ATbI].mkv",
+   "kind": "media",
+   "youtube_id": "095b_r5ATbI",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 22
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/022-Heavy_Club_Recommendations_for_Women-[095b_r5ATbI].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E022 - Heavy_Club_Recommendations_for_Women-[095b_r5ATbI].trickplay",
+   "kind": "dir",
+   "youtube_id": "095b_r5ATbI",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 22
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/023-Heavy_Club_Recommendations_for_Men-[l7_G4_rtp1Q].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E023 - Heavy_Club_Recommendations_for_Men-[l7_G4_rtp1Q].mkv",
+   "kind": "media",
+   "youtube_id": "l7_G4_rtp1Q",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 23
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/023-Heavy_Club_Recommendations_for_Men-[l7_G4_rtp1Q].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E023 - Heavy_Club_Recommendations_for_Men-[l7_G4_rtp1Q].trickplay",
+   "kind": "dir",
+   "youtube_id": "l7_G4_rtp1Q",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 23
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/024-Double_Heavy_Club_-_Alternating_Shield_cast_-_old_School_Bicep_work-[Iv2zqpFZieg].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E024 - Double_Heavy_Club_-_Alternating_Shield_cast_-_old_School_Bicep_work-[Iv2zqpFZieg].mkv",
+   "kind": "media",
+   "youtube_id": "Iv2zqpFZieg",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 24
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/024-Double_Heavy_Club_-_Alternating_Shield_cast_-_old_School_Bicep_work-[Iv2zqpFZieg].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E024 - Double_Heavy_Club_-_Alternating_Shield_cast_-_old_School_Bicep_work-[Iv2zqpFZieg].trickplay",
+   "kind": "dir",
+   "youtube_id": "Iv2zqpFZieg",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 24
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/025-Double_Heavy_Club_-_Alternating_Inside_Circles_-_double_club_series-[GP_7J_ncdBc].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E025 - Double_Heavy_Club_-_Alternating_Inside_Circles_-_double_club_series-[GP_7J_ncdBc].mkv",
+   "kind": "media",
+   "youtube_id": "GP_7J_ncdBc",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 25
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/025-Double_Heavy_Club_-_Alternating_Inside_Circles_-_double_club_series-[GP_7J_ncdBc].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E025 - Double_Heavy_Club_-_Alternating_Inside_Circles_-_double_club_series-[GP_7J_ncdBc].trickplay",
+   "kind": "dir",
+   "youtube_id": "GP_7J_ncdBc",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 25
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/026-Double_Heavy_Clubs_-_Alternating_outside_Circles_-_Double_club_series_3-[5kSlzeUzVUU].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E026 - Double_Heavy_Clubs_-_Alternating_outside_Circles_-_Double_club_series_3-[5kSlzeUzVUU].mkv",
+   "kind": "media",
+   "youtube_id": "5kSlzeUzVUU",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 26
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/026-Double_Heavy_Clubs_-_Alternating_outside_Circles_-_Double_club_series_3-[5kSlzeUzVUU].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E026 - Double_Heavy_Clubs_-_Alternating_outside_Circles_-_Double_club_series_3-[5kSlzeUzVUU].trickplay",
+   "kind": "dir",
+   "youtube_id": "5kSlzeUzVUU",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 26
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/027-Heavy_Club_Double_Swing_Clean_-_foundational_move_-_its_looks_like_an_arm_exercise_but_its_way_more-[XRyFEfRbHYY].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E027 - Heavy_Club_Double_Swing_Clean_-_foundational_move_-_its_looks_like_an_arm_exercise_but_its_way_more-[XRyFEfRbHYY].mkv",
+   "kind": "media",
+   "youtube_id": "XRyFEfRbHYY",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 27
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/027-Heavy_Club_Double_Swing_Clean_-_foundational_move_-_its_looks_like_an_arm_exercise_but_its_way_more-[XRyFEfRbHYY].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E027 - Heavy_Club_Double_Swing_Clean_-_foundational_move_-_its_looks_like_an_arm_exercise_but_its_way_more-[XRyFEfRbHYY].trickplay",
+   "kind": "dir",
+   "youtube_id": "XRyFEfRbHYY",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 27
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/028-Heavy_Club_Double_Pullover_-_Double_club_series_-_Lots_of_abs-[d6x6YACiUx8].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E028 - Heavy_Club_Double_Pullover_-_Double_club_series_-_Lots_of_abs-[d6x6YACiUx8].mkv",
+   "kind": "media",
+   "youtube_id": "d6x6YACiUx8",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 28
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/028-Heavy_Club_Double_Pullover_-_Double_club_series_-_Lots_of_abs-[d6x6YACiUx8].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E028 - Heavy_Club_Double_Pullover_-_Double_club_series_-_Lots_of_abs-[d6x6YACiUx8].trickplay",
+   "kind": "dir",
+   "youtube_id": "d6x6YACiUx8",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 28
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/029-Heavy_Club_Double_Swipe_-_heavy_club_foundations_-_double_club_series-[Ec7n3S5G3Ko].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E029 - Heavy_Club_Double_Swipe_-_heavy_club_foundations_-_double_club_series-[Ec7n3S5G3Ko].mkv",
+   "kind": "media",
+   "youtube_id": "Ec7n3S5G3Ko",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 29
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/029-Heavy_Club_Double_Swipe_-_heavy_club_foundations_-_double_club_series-[Ec7n3S5G3Ko].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E029 - Heavy_Club_Double_Swipe_-_heavy_club_foundations_-_double_club_series-[Ec7n3S5G3Ko].trickplay",
+   "kind": "dir",
+   "youtube_id": "Ec7n3S5G3Ko",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 29
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/030-Double_outside_Swing_-_Kettlebell_and_Heavy_Club_Variations_-_Hamstring_killer-[_Uy18LZ5sI0].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E030 - Double_outside_Swing_-_Kettlebell_and_Heavy_Club_Variations_-_Hamstring_killer-[_Uy18LZ5sI0].mkv",
+   "kind": "media",
+   "youtube_id": "_Uy18LZ5sI0",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 30
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/030-Double_outside_Swing_-_Kettlebell_and_Heavy_Club_Variations_-_Hamstring_killer-[_Uy18LZ5sI0].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E030 - Double_outside_Swing_-_Kettlebell_and_Heavy_Club_Variations_-_Hamstring_killer-[_Uy18LZ5sI0].trickplay",
+   "kind": "dir",
+   "youtube_id": "_Uy18LZ5sI0",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 30
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/031-Heavy_Club_Half_Kneeling_2_hand_Shield_Cast_-_Fix_back_problems_you_didn_t_know_you_had-[vyLu0AFD-Mc].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E031 - Heavy_Club_Half_Kneeling_2_hand_Shield_Cast_-_Fix_back_problems_you_didn_t_know_you_had-[vyLu0AFD-Mc].mkv",
+   "kind": "media",
+   "youtube_id": "vyLu0AFD-Mc",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 31
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/031-Heavy_Club_Half_Kneeling_2_hand_Shield_Cast_-_Fix_back_problems_you_didn_t_know_you_had-[vyLu0AFD-Mc].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E031 - Heavy_Club_Half_Kneeling_2_hand_Shield_Cast_-_Fix_back_problems_you_didn_t_know_you_had-[vyLu0AFD-Mc].trickplay",
+   "kind": "dir",
+   "youtube_id": "vyLu0AFD-Mc",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 31
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/032-Double_Rock-it_-_Kettlebell_and_Heavy_Club_versions-[RT8BNDpSe70].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E032 - Double_Rock-it_-_Kettlebell_and_Heavy_Club_versions-[RT8BNDpSe70].mkv",
+   "kind": "media",
+   "youtube_id": "RT8BNDpSe70",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 32
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/032-Double_Rock-it_-_Kettlebell_and_Heavy_Club_versions-[RT8BNDpSe70].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E032 - Double_Rock-it_-_Kettlebell_and_Heavy_Club_versions-[RT8BNDpSe70].trickplay",
+   "kind": "dir",
+   "youtube_id": "RT8BNDpSe70",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 32
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/033-Mace_360_-_a_FUNDAMENTAL_human_movement_-_mace_movement_1-[TyZ8iYv6Ip0].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E033 - Mace_360_-_a_FUNDAMENTAL_human_movement_-_mace_movement_1-[TyZ8iYv6Ip0].mkv",
+   "kind": "media",
+   "youtube_id": "TyZ8iYv6Ip0",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 33
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/033-Mace_360_-_a_FUNDAMENTAL_human_movement_-_mace_movement_1-[TyZ8iYv6Ip0].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E033 - Mace_360_-_a_FUNDAMENTAL_human_movement_-_mace_movement_1-[TyZ8iYv6Ip0].trickplay",
+   "kind": "dir",
+   "youtube_id": "TyZ8iYv6Ip0",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 33
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/034-Heavy_Club_-_Hammer_Swing_-_a_perfect_rotational_core_exercise-[Zk_uT6dHfFM].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E034 - Heavy_Club_-_Hammer_Swing_-_a_perfect_rotational_core_exercise-[Zk_uT6dHfFM].mkv",
+   "kind": "media",
+   "youtube_id": "Zk_uT6dHfFM",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 34
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/034-Heavy_Club_-_Hammer_Swing_-_a_perfect_rotational_core_exercise-[Zk_uT6dHfFM].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E034 - Heavy_Club_-_Hammer_Swing_-_a_perfect_rotational_core_exercise-[Zk_uT6dHfFM].trickplay",
+   "kind": "dir",
+   "youtube_id": "Zk_uT6dHfFM",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 34
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/035-Mace_Heavy_Club_Back_Position_Swing_-_360_breakout_exercise_to_improve_efficiency_-_Mace_5-[XN-5l6SiSZU].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E035 - Mace_Heavy_Club_Back_Position_Swing_-_360_breakout_exercise_to_improve_efficiency_-_Mace_5-[XN-5l6SiSZU].mkv",
+   "kind": "media",
+   "youtube_id": "XN-5l6SiSZU",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 35
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/035-Mace_Heavy_Club_Back_Position_Swing_-_360_breakout_exercise_to_improve_efficiency_-_Mace_5-[XN-5l6SiSZU].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E035 - Mace_Heavy_Club_Back_Position_Swing_-_360_breakout_exercise_to_improve_efficiency_-_Mace_5-[XN-5l6SiSZU].trickplay",
+   "kind": "dir",
+   "youtube_id": "XN-5l6SiSZU",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 35
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/036-Mace_7_-_inverted_side_to_side_swings_-_Abs_and_Arms_galore-[bLA2KSghSdc].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E036 - Mace_7_-_inverted_side_to_side_swings_-_Abs_and_Arms_galore-[bLA2KSghSdc].mkv",
+   "kind": "media",
+   "youtube_id": "bLA2KSghSdc",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 36
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/036-Mace_7_-_inverted_side_to_side_swings_-_Abs_and_Arms_galore-[bLA2KSghSdc].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E036 - Mace_7_-_inverted_side_to_side_swings_-_Abs_and_Arms_galore-[bLA2KSghSdc].trickplay",
+   "kind": "dir",
+   "youtube_id": "bLA2KSghSdc",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 36
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/037-Mace_8_-_Low_Block_Spin_With_Prayer_Transition.-[fk8AG0s1-UI].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E037 - Mace_8_-_Low_Block_Spin_With_Prayer_Transition.-[fk8AG0s1-UI].mkv",
+   "kind": "media",
+   "youtube_id": "fk8AG0s1-UI",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 37
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/037-Mace_8_-_Low_Block_Spin_With_Prayer_Transition.-[fk8AG0s1-UI].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E037 - Mace_8_-_Low_Block_Spin_With_Prayer_Transition.-[fk8AG0s1-UI].trickplay",
+   "kind": "dir",
+   "youtube_id": "fk8AG0s1-UI",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 37
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/038-Double_Heavy_Club_Chair_pose_Squat_-_an_Abs_and_Arms_connection_exercise.-[WqkHfUtPmS0].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E038 - Double_Heavy_Club_Chair_pose_Squat_-_an_Abs_and_Arms_connection_exercise.-[WqkHfUtPmS0].mkv",
+   "kind": "media",
+   "youtube_id": "WqkHfUtPmS0",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 38
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/038-Double_Heavy_Club_Chair_pose_Squat_-_an_Abs_and_Arms_connection_exercise.-[WqkHfUtPmS0].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E038 - Double_Heavy_Club_Chair_pose_Squat_-_an_Abs_and_Arms_connection_exercise.-[WqkHfUtPmS0].trickplay",
+   "kind": "dir",
+   "youtube_id": "WqkHfUtPmS0",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 38
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/039-Double_Heavy_Club_Alternating_symmetric_circles_-_Crazy_load_on_the_Arms_and_Abs-[olY-kqcOHDM].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E039 - Double_Heavy_Club_Alternating_symmetric_circles_-_Crazy_load_on_the_Arms_and_Abs-[olY-kqcOHDM].mkv",
+   "kind": "media",
+   "youtube_id": "olY-kqcOHDM",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 39
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/039-Double_Heavy_Club_Alternating_symmetric_circles_-_Crazy_load_on_the_Arms_and_Abs-[olY-kqcOHDM].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E039 - Double_Heavy_Club_Alternating_symmetric_circles_-_Crazy_load_on_the_Arms_and_Abs-[olY-kqcOHDM].trickplay",
+   "kind": "dir",
+   "youtube_id": "olY-kqcOHDM",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 39
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/040-Heavy_club_crossbody_clean_-_aka_forward_pendulum_-_discus_progression_video_4-[HevZY3DmWhA].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E040 - Heavy_club_crossbody_clean_-_aka_forward_pendulum_-_discus_progression_video_4-[HevZY3DmWhA].mkv",
+   "kind": "media",
+   "youtube_id": "HevZY3DmWhA",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 40
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/040-Heavy_club_crossbody_clean_-_aka_forward_pendulum_-_discus_progression_video_4-[HevZY3DmWhA].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E040 - Heavy_club_crossbody_clean_-_aka_forward_pendulum_-_discus_progression_video_4-[HevZY3DmWhA].trickplay",
+   "kind": "dir",
+   "youtube_id": "HevZY3DmWhA",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 40
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/041-Heavy_club_cross_body_swipe_-_Discobolus_of_Myron_6-[ASZw05sMCxw].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E041 - Heavy_club_cross_body_swipe_-_Discobolus_of_Myron_6-[ASZw05sMCxw].mkv",
+   "kind": "media",
+   "youtube_id": "ASZw05sMCxw",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 41
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/041-Heavy_club_cross_body_swipe_-_Discobolus_of_Myron_6-[ASZw05sMCxw].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E041 - Heavy_club_cross_body_swipe_-_Discobolus_of_Myron_6-[ASZw05sMCxw].trickplay",
+   "kind": "dir",
+   "youtube_id": "ASZw05sMCxw",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 41
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/042-Heavy_club_stagger_crossbody_clean_-_discus_progression_8-[PbxiyoCg1NU].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E042 - Heavy_club_stagger_crossbody_clean_-_discus_progression_8-[PbxiyoCg1NU].mkv",
+   "kind": "media",
+   "youtube_id": "PbxiyoCg1NU",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 42
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/042-Heavy_club_stagger_crossbody_clean_-_discus_progression_8-[PbxiyoCg1NU].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E042 - Heavy_club_stagger_crossbody_clean_-_discus_progression_8-[PbxiyoCg1NU].trickplay",
+   "kind": "dir",
+   "youtube_id": "PbxiyoCg1NU",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 42
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/043-Heavy_Club_stagger_stance_cross_body_body_swipe_-_an_ideal_exercise_for_racket_sports_and_throwing-[Yc5kVA2hH1A].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E043 - Heavy_Club_stagger_stance_cross_body_body_swipe_-_an_ideal_exercise_for_racket_sports_and_throwing-[Yc5kVA2hH1A].mkv",
+   "kind": "media",
+   "youtube_id": "Yc5kVA2hH1A",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 43
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/043-Heavy_Club_stagger_stance_cross_body_body_swipe_-_an_ideal_exercise_for_racket_sports_and_throwing-[Yc5kVA2hH1A].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E043 - Heavy_Club_stagger_stance_cross_body_body_swipe_-_an_ideal_exercise_for_racket_sports_and_throwing-[Yc5kVA2hH1A].trickplay",
+   "kind": "dir",
+   "youtube_id": "Yc5kVA2hH1A",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 43
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/044-Adex_club_box_opening_-_initial_impressions-[a-Ufhgk7kWg].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E044 - Adex_club_box_opening_-_initial_impressions-[a-Ufhgk7kWg].mkv",
+   "kind": "media",
+   "youtube_id": "a-Ufhgk7kWg",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 44
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/044-Adex_club_box_opening_-_initial_impressions-[a-Ufhgk7kWg].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E044 - Adex_club_box_opening_-_initial_impressions-[a-Ufhgk7kWg].trickplay",
+   "kind": "dir",
+   "youtube_id": "a-Ufhgk7kWg",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 44
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/045-Palavandle_TG_heroic_sport_heavy_club_-_fill_it_up_with_sand-[scMnuG4Wx9A].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E045 - Palavandle_TG_heroic_sport_heavy_club_-_fill_it_up_with_sand-[scMnuG4Wx9A].mkv",
+   "kind": "media",
+   "youtube_id": "scMnuG4Wx9A",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 45
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/045-Palavandle_TG_heroic_sport_heavy_club_-_fill_it_up_with_sand-[scMnuG4Wx9A].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E045 - Palavandle_TG_heroic_sport_heavy_club_-_fill_it_up_with_sand-[scMnuG4Wx9A].trickplay",
+   "kind": "dir",
+   "youtube_id": "scMnuG4Wx9A",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 45
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/046-Heavy_Club_Balance_Squat_Heavy_Club_Order_Squat-[8KklJS7yYlk].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E046 - Heavy_Club_Balance_Squat_Heavy_Club_Order_Squat-[8KklJS7yYlk].mkv",
+   "kind": "media",
+   "youtube_id": "8KklJS7yYlk",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 46
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/046-Heavy_Club_Balance_Squat_Heavy_Club_Order_Squat-[8KklJS7yYlk].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E046 - Heavy_Club_Balance_Squat_Heavy_Club_Order_Squat-[8KklJS7yYlk].trickplay",
+   "kind": "dir",
+   "youtube_id": "8KklJS7yYlk",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 46
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/047-Overview_of_progressive_kettlebell_nerd_math_training-[dpOtGxEVaX4].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E047 - Overview_of_progressive_kettlebell_nerd_math_training-[dpOtGxEVaX4].mkv",
+   "kind": "media",
+   "youtube_id": "dpOtGxEVaX4",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 47
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/047-Overview_of_progressive_kettlebell_nerd_math_training-[dpOtGxEVaX4].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E047 - Overview_of_progressive_kettlebell_nerd_math_training-[dpOtGxEVaX4].trickplay",
+   "kind": "dir",
+   "youtube_id": "dpOtGxEVaX4",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 47
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/048-Adex_club_and_mace_ARC_box_opening-[FZLIpU53Hak].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E048 - Adex_club_and_mace_ARC_box_opening-[FZLIpU53Hak].mkv",
+   "kind": "media",
+   "youtube_id": "FZLIpU53Hak",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 48
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/048-Adex_club_and_mace_ARC_box_opening-[FZLIpU53Hak].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E048 - Adex_club_and_mace_ARC_box_opening-[FZLIpU53Hak].trickplay",
+   "kind": "dir",
+   "youtube_id": "FZLIpU53Hak",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 48
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/049-Adex_Mace_and_Club_Add_on_Kit_Box_Opening-[drtnfNJZnt0].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E049 - Adex_Mace_and_Club_Add_on_Kit_Box_Opening-[drtnfNJZnt0].mkv",
+   "kind": "media",
+   "youtube_id": "drtnfNJZnt0",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 49
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/049-Adex_Mace_and_Club_Add_on_Kit_Box_Opening-[drtnfNJZnt0].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E049 - Adex_Mace_and_Club_Add_on_Kit_Box_Opening-[drtnfNJZnt0].trickplay",
+   "kind": "dir",
+   "youtube_id": "drtnfNJZnt0",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 49
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/050-Kettlebells_Heavy_Clubs_Maces_and_Chalk.-[2liJG-oIdtk].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E050 - Kettlebells_Heavy_Clubs_Maces_and_Chalk.-[2liJG-oIdtk].mkv",
+   "kind": "media",
+   "youtube_id": "2liJG-oIdtk",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 50
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/050-Kettlebells_Heavy_Clubs_Maces_and_Chalk.-[2liJG-oIdtk].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E050 - Kettlebells_Heavy_Clubs_Maces_and_Chalk.-[2liJG-oIdtk].trickplay",
+   "kind": "dir",
+   "youtube_id": "2liJG-oIdtk",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 50
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/051-Heavy_Club_2_Hand_Pullover_Squat_-_improve_squat_dynamics-[2Cejb6rcqis].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E051 - Heavy_Club_2_Hand_Pullover_Squat_-_improve_squat_dynamics-[2Cejb6rcqis].mkv",
+   "kind": "media",
+   "youtube_id": "2Cejb6rcqis",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 51
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/051-Heavy_Club_2_Hand_Pullover_Squat_-_improve_squat_dynamics-[2Cejb6rcqis].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E051 - Heavy_Club_2_Hand_Pullover_Squat_-_improve_squat_dynamics-[2Cejb6rcqis].trickplay",
+   "kind": "dir",
+   "youtube_id": "2Cejb6rcqis",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 51
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/052-Which_to_Learn_First_Heavy_Club_or_Mace-[V1nADaIba2s].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E052 - Which_to_Learn_First_Heavy_Club_or_Mace-[V1nADaIba2s].mkv",
+   "kind": "media",
+   "youtube_id": "V1nADaIba2s",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 52
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/052-Which_to_Learn_First_Heavy_Club_or_Mace-[V1nADaIba2s].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E052 - Which_to_Learn_First_Heavy_Club_or_Mace-[V1nADaIba2s].trickplay",
+   "kind": "dir",
+   "youtube_id": "V1nADaIba2s",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 52
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/053-Shot_gun_problem_solving_for_questions_people_ask_me_on_da_interwebs_-_problems_with_a_2_hand_swing-[xB949KdpvYM].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E053 - Shot_gun_problem_solving_for_questions_people_ask_me_on_da_interwebs_-_problems_with_a_2_hand_swing-[xB949KdpvYM].mkv",
+   "kind": "media",
+   "youtube_id": "xB949KdpvYM",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 53
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/053-Shot_gun_problem_solving_for_questions_people_ask_me_on_da_interwebs_-_problems_with_a_2_hand_swing-[xB949KdpvYM].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E053 - Shot_gun_problem_solving_for_questions_people_ask_me_on_da_interwebs_-_problems_with_a_2_hand_swing-[xB949KdpvYM].trickplay",
+   "kind": "dir",
+   "youtube_id": "xB949KdpvYM",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 53
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/054-2_Hand_Heavy_Club_-_Order_of_operation_-_strategy_for_training-[CGU8U5OuNvc].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E054 - 2_Hand_Heavy_Club_-_Order_of_operation_-_strategy_for_training-[CGU8U5OuNvc].mkv",
+   "kind": "media",
+   "youtube_id": "CGU8U5OuNvc",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 54
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/054-2_Hand_Heavy_Club_-_Order_of_operation_-_strategy_for_training-[CGU8U5OuNvc].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E054 - 2_Hand_Heavy_Club_-_Order_of_operation_-_strategy_for_training-[CGU8U5OuNvc].trickplay",
+   "kind": "dir",
+   "youtube_id": "CGU8U5OuNvc",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 54
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/055-Single_Arm_Heavy_Club_Steel_Club_-_order_of_operation_-_general_training_overview-[ZPJd77RvVSM].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E055 - Single_Arm_Heavy_Club_Steel_Club_-_order_of_operation_-_general_training_overview-[ZPJd77RvVSM].mkv",
+   "kind": "media",
+   "youtube_id": "ZPJd77RvVSM",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 55
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/055-Single_Arm_Heavy_Club_Steel_Club_-_order_of_operation_-_general_training_overview-[ZPJd77RvVSM].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E055 - Single_Arm_Heavy_Club_Steel_Club_-_order_of_operation_-_general_training_overview-[ZPJd77RvVSM].trickplay",
+   "kind": "dir",
+   "youtube_id": "ZPJd77RvVSM",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 55
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/056-Tetris_Training_Program_Design_-_Kettlebell_and_2_Hand_Club_-_most_effective_basic_program_design-[-DoSWaLHDGc].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E056 - Tetris_Training_Program_Design_-_Kettlebell_and_2_Hand_Club_-_most_effective_basic_program_design-[-DoSWaLHDGc].mkv",
+   "kind": "media",
+   "youtube_id": "-DoSWaLHDGc",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 56
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/056-Tetris_Training_Program_Design_-_Kettlebell_and_2_Hand_Club_-_most_effective_basic_program_design-[-DoSWaLHDGc].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E056 - Tetris_Training_Program_Design_-_Kettlebell_and_2_Hand_Club_-_most_effective_basic_program_design-[-DoSWaLHDGc].trickplay",
+   "kind": "dir",
+   "youtube_id": "-DoSWaLHDGc",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 56
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/057-Tetris_of_Training_-_Program_Design_-_Kettlebells_Club_Mace_-_the_most_effective_simple_strategy-[El95-pFY0GA].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E057 - Tetris_of_Training_-_Program_Design_-_Kettlebells_Club_Mace_-_the_most_effective_simple_strategy-[El95-pFY0GA].mkv",
+   "kind": "media",
+   "youtube_id": "El95-pFY0GA",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 57
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/057-Tetris_of_Training_-_Program_Design_-_Kettlebells_Club_Mace_-_the_most_effective_simple_strategy-[El95-pFY0GA].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E057 - Tetris_of_Training_-_Program_Design_-_Kettlebells_Club_Mace_-_the_most_effective_simple_strategy-[El95-pFY0GA].trickplay",
+   "kind": "dir",
+   "youtube_id": "El95-pFY0GA",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 57
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/058-Single_arm_Heavy_Club_steel_club_-_order_of_operation_-_video_2-[3l4bSG5Nd90].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E058 - Single_arm_Heavy_Club_steel_club_-_order_of_operation_-_video_2-[3l4bSG5Nd90].mkv",
+   "kind": "media",
+   "youtube_id": "3l4bSG5Nd90",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 58
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/058-Single_arm_Heavy_Club_steel_club_-_order_of_operation_-_video_2-[3l4bSG5Nd90].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E058 - Single_arm_Heavy_Club_steel_club_-_order_of_operation_-_video_2-[3l4bSG5Nd90].trickplay",
+   "kind": "dir",
+   "youtube_id": "3l4bSG5Nd90",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 58
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/059-Questions_answered_about_the_Size_of_the_2_hand_club_program_in_the_april_2021_app_release-[nBTg15mQy-0].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E059 - Questions_answered_about_the_Size_of_the_2_hand_club_program_in_the_april_2021_app_release-[nBTg15mQy-0].mkv",
+   "kind": "media",
+   "youtube_id": "nBTg15mQy-0",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 59
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/059-Questions_answered_about_the_Size_of_the_2_hand_club_program_in_the_april_2021_app_release-[nBTg15mQy-0].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E059 - Questions_answered_about_the_Size_of_the_2_hand_club_program_in_the_april_2021_app_release-[nBTg15mQy-0].trickplay",
+   "kind": "dir",
+   "youtube_id": "nBTg15mQy-0",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 59
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/060-Adex_Arc_-_half_way_between_a_club_and_a_mace-[y8fJyhwNTHE].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E060 - Adex_Arc_-_half_way_between_a_club_and_a_mace-[y8fJyhwNTHE].mkv",
+   "kind": "media",
+   "youtube_id": "y8fJyhwNTHE",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 60
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/060-Adex_Arc_-_half_way_between_a_club_and_a_mace-[y8fJyhwNTHE].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E060 - Adex_Arc_-_half_way_between_a_club_and_a_mace-[y8fJyhwNTHE].trickplay",
+   "kind": "dir",
+   "youtube_id": "y8fJyhwNTHE",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 60
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/061-Single_arm_club_-_stagger_stance_rear_hand_swing_clean_-_a_build_of_of_discus_progression_ideas-[QTWt14JBk7s].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E061 - Single_arm_club_-_stagger_stance_rear_hand_swing_clean_-_a_build_of_of_discus_progression_ideas-[QTWt14JBk7s].mkv",
+   "kind": "media",
+   "youtube_id": "QTWt14JBk7s",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 61
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/061-Single_arm_club_-_stagger_stance_rear_hand_swing_clean_-_a_build_of_of_discus_progression_ideas-[QTWt14JBk7s].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E061 - Single_arm_club_-_stagger_stance_rear_hand_swing_clean_-_a_build_of_of_discus_progression_ideas-[QTWt14JBk7s].trickplay",
+   "kind": "dir",
+   "youtube_id": "QTWt14JBk7s",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 61
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/062-Single_arm_heavy_club_-_rear_hand_stagger_stance_swing_clean_to_order_+_look-[aAXh7RyLlBA].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E062 - Single_arm_heavy_club_-_rear_hand_stagger_stance_swing_clean_to_order_+_look-[aAXh7RyLlBA].mkv",
+   "kind": "media",
+   "youtube_id": "aAXh7RyLlBA",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 62
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/062-Single_arm_heavy_club_-_rear_hand_stagger_stance_swing_clean_to_order_+_look-[aAXh7RyLlBA].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E062 - Single_arm_heavy_club_-_rear_hand_stagger_stance_swing_clean_to_order_+_look-[aAXh7RyLlBA].trickplay",
+   "kind": "dir",
+   "youtube_id": "aAXh7RyLlBA",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 62
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/063-Single_Arm_Heavy_Club_-_Stagger_Stance_rear_hand_swing_to_order_with_look_+_the_shield_cast-[1ai4dMzNfTg].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E063 - Single_Arm_Heavy_Club_-_Stagger_Stance_rear_hand_swing_to_order_with_look_+_the_shield_cast-[1ai4dMzNfTg].mkv",
+   "kind": "media",
+   "youtube_id": "1ai4dMzNfTg",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 63
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/063-Single_Arm_Heavy_Club_-_Stagger_Stance_rear_hand_swing_to_order_with_look_+_the_shield_cast-[1ai4dMzNfTg].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E063 - Single_Arm_Heavy_Club_-_Stagger_Stance_rear_hand_swing_to_order_with_look_+_the_shield_cast-[1ai4dMzNfTg].trickplay",
+   "kind": "dir",
+   "youtube_id": "1ai4dMzNfTg",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 63
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/064-Single_arm_heavy_club_-_stagger_stance_rear_swing_to_order_with_look_+_shield_cast_+_cross_body-[MMJtXvnj2Kw].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E064 - Single_arm_heavy_club_-_stagger_stance_rear_swing_to_order_with_look_+_shield_cast_+_cross_body-[MMJtXvnj2Kw].mkv",
+   "kind": "media",
+   "youtube_id": "MMJtXvnj2Kw",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 64
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/064-Single_arm_heavy_club_-_stagger_stance_rear_swing_to_order_with_look_+_shield_cast_+_cross_body-[MMJtXvnj2Kw].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E064 - Single_arm_heavy_club_-_stagger_stance_rear_swing_to_order_with_look_+_shield_cast_+_cross_body-[MMJtXvnj2Kw].trickplay",
+   "kind": "dir",
+   "youtube_id": "MMJtXvnj2Kw",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 64
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/065-Single_arm_heavy_club_-_stagger_stance_rear_swing_clean_shield_cast_+_RUSH_STEP_+_cross_body_clean-[M1odDXOFRO8].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E065 - Single_arm_heavy_club_-_stagger_stance_rear_swing_clean_shield_cast_+_RUSH_STEP_+_cross_body_clean-[M1odDXOFRO8].mkv",
+   "kind": "media",
+   "youtube_id": "M1odDXOFRO8",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 65
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/065-Single_arm_heavy_club_-_stagger_stance_rear_swing_clean_shield_cast_+_RUSH_STEP_+_cross_body_clean-[M1odDXOFRO8].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E065 - Single_arm_heavy_club_-_stagger_stance_rear_swing_clean_shield_cast_+_RUSH_STEP_+_cross_body_clean-[M1odDXOFRO8].trickplay",
+   "kind": "dir",
+   "youtube_id": "M1odDXOFRO8",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 65
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/066-Mace_79_and_single_arm_club_-_inside_circle_same_leg_front_180_degree_pivot_step._martial_footwork-[cS_l9xFCLrY].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E066 - Mace_79_and_single_arm_club_-_inside_circle_same_leg_front_180_degree_pivot_step._martial_footwork-[cS_l9xFCLrY].mkv",
+   "kind": "media",
+   "youtube_id": "cS_l9xFCLrY",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 66
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/066-Mace_79_and_single_arm_club_-_inside_circle_same_leg_front_180_degree_pivot_step._martial_footwork-[cS_l9xFCLrY].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E066 - Mace_79_and_single_arm_club_-_inside_circle_same_leg_front_180_degree_pivot_step._martial_footwork-[cS_l9xFCLrY].trickplay",
+   "kind": "dir",
+   "youtube_id": "cS_l9xFCLrY",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 66
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/067-Economics_of_the_Adex_Club-[58oqCmFi7cg].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E067 - Economics_of_the_Adex_Club-[58oqCmFi7cg].mkv",
+   "kind": "media",
+   "youtube_id": "58oqCmFi7cg",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 67
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/067-Economics_of_the_Adex_Club-[58oqCmFi7cg].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E067 - Economics_of_the_Adex_Club-[58oqCmFi7cg].trickplay",
+   "kind": "dir",
+   "youtube_id": "58oqCmFi7cg",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 67
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/068-Mace_80_and_single_arm_club_-_inside_circle_step_in_front_180_degree_pivot_step-[oztTEECevqs].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E068 - Mace_80_and_single_arm_club_-_inside_circle_step_in_front_180_degree_pivot_step-[oztTEECevqs].mkv",
+   "kind": "media",
+   "youtube_id": "oztTEECevqs",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 68
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/068-Mace_80_and_single_arm_club_-_inside_circle_step_in_front_180_degree_pivot_step-[oztTEECevqs].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E068 - Mace_80_and_single_arm_club_-_inside_circle_step_in_front_180_degree_pivot_step-[oztTEECevqs].trickplay",
+   "kind": "dir",
+   "youtube_id": "oztTEECevqs",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 68
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/069-Mace_81_-_single_arm_inside_circle_with_same_side_180_degree_step_behind_pivot-[a5SsRKh3L6c].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E069 - Mace_81_-_single_arm_inside_circle_with_same_side_180_degree_step_behind_pivot-[a5SsRKh3L6c].mkv",
+   "kind": "media",
+   "youtube_id": "a5SsRKh3L6c",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 69
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/069-Mace_81_-_single_arm_inside_circle_with_same_side_180_degree_step_behind_pivot-[a5SsRKh3L6c].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E069 - Mace_81_-_single_arm_inside_circle_with_same_side_180_degree_step_behind_pivot-[a5SsRKh3L6c].trickplay",
+   "kind": "dir",
+   "youtube_id": "a5SsRKh3L6c",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 69
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/070-mace_82_-_inside_circle_-_opposite_leg_step_behind_180_degree_rotating_pivot_step-[7Gw66Dg6qCo].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E070 - mace_82_-_inside_circle_-_opposite_leg_step_behind_180_degree_rotating_pivot_step-[7Gw66Dg6qCo].mkv",
+   "kind": "media",
+   "youtube_id": "7Gw66Dg6qCo",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 70
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/070-mace_82_-_inside_circle_-_opposite_leg_step_behind_180_degree_rotating_pivot_step-[7Gw66Dg6qCo].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E070 - mace_82_-_inside_circle_-_opposite_leg_step_behind_180_degree_rotating_pivot_step-[7Gw66Dg6qCo].trickplay",
+   "kind": "dir",
+   "youtube_id": "7Gw66Dg6qCo",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 70
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/071-Mace_83_-_outside_circle_with_same_side_leg_step_in_front_180_degree_pivot-[BtrJW8rrtMM].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E071 - Mace_83_-_outside_circle_with_same_side_leg_step_in_front_180_degree_pivot-[BtrJW8rrtMM].mkv",
+   "kind": "media",
+   "youtube_id": "BtrJW8rrtMM",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 71
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/071-Mace_83_-_outside_circle_with_same_side_leg_step_in_front_180_degree_pivot-[BtrJW8rrtMM].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E071 - Mace_83_-_outside_circle_with_same_side_leg_step_in_front_180_degree_pivot-[BtrJW8rrtMM].trickplay",
+   "kind": "dir",
+   "youtube_id": "BtrJW8rrtMM",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 71
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/072-Adex_Club_in_the_Apache_5800_hard_case_from_Harbour_Freight-[W50KUSmS-Dk].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E072 - Adex_Club_in_the_Apache_5800_hard_case_from_Harbour_Freight-[W50KUSmS-Dk].mkv",
+   "kind": "media",
+   "youtube_id": "W50KUSmS-Dk",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 72
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/072-Adex_Club_in_the_Apache_5800_hard_case_from_Harbour_Freight-[W50KUSmS-Dk].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E072 - Adex_Club_in_the_Apache_5800_hard_case_from_Harbour_Freight-[W50KUSmS-Dk].trickplay",
+   "kind": "dir",
+   "youtube_id": "W50KUSmS-Dk",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 72
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/073-mace_84_-_outside_circle_step_in_front_with_180_degree_pivot_step-[5LzbCnVc8so].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E073 - mace_84_-_outside_circle_step_in_front_with_180_degree_pivot_step-[5LzbCnVc8so].mkv",
+   "kind": "media",
+   "youtube_id": "5LzbCnVc8so",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 73
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/073-mace_84_-_outside_circle_step_in_front_with_180_degree_pivot_step-[5LzbCnVc8so].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E073 - mace_84_-_outside_circle_step_in_front_with_180_degree_pivot_step-[5LzbCnVc8so].trickplay",
+   "kind": "dir",
+   "youtube_id": "5LzbCnVc8so",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 73
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/074-Mace_85_-_outside_circle_same_leg_step_behind_180_degree_pivot_step-[XKcg-g4LKFY].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E074 - Mace_85_-_outside_circle_same_leg_step_behind_180_degree_pivot_step-[XKcg-g4LKFY].mkv",
+   "kind": "media",
+   "youtube_id": "XKcg-g4LKFY",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 74
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/074-Mace_85_-_outside_circle_same_leg_step_behind_180_degree_pivot_step-[XKcg-g4LKFY].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E074 - Mace_85_-_outside_circle_same_leg_step_behind_180_degree_pivot_step-[XKcg-g4LKFY].trickplay",
+   "kind": "dir",
+   "youtube_id": "XKcg-g4LKFY",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 74
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/075-Mace_86_-_outside_circle_opposite_leg_step_behind_pivot_-_the_end_of_an_8_part_series-[UoWSuXvF3ig].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E075 - Mace_86_-_outside_circle_opposite_leg_step_behind_pivot_-_the_end_of_an_8_part_series-[UoWSuXvF3ig].mkv",
+   "kind": "media",
+   "youtube_id": "UoWSuXvF3ig",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 75
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/075-Mace_86_-_outside_circle_opposite_leg_step_behind_pivot_-_the_end_of_an_8_part_series-[UoWSuXvF3ig].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E075 - Mace_86_-_outside_circle_opposite_leg_step_behind_pivot_-_the_end_of_an_8_part_series-[UoWSuXvF3ig].trickplay",
+   "kind": "dir",
+   "youtube_id": "UoWSuXvF3ig",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 75
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/076-Strengthen_your_core_with_the_Inside_Circle_if_you_are_overweight_or_deconditioned-[j3K0VByun6w].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E076 - Strengthen_your_core_with_the_Inside_Circle_if_you_are_overweight_or_deconditioned-[j3K0VByun6w].mkv",
+   "kind": "media",
+   "youtube_id": "j3K0VByun6w",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 76
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/076-Strengthen_your_core_with_the_Inside_Circle_if_you_are_overweight_or_deconditioned-[j3K0VByun6w].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E076 - Strengthen_your_core_with_the_Inside_Circle_if_you_are_overweight_or_deconditioned-[j3K0VByun6w].trickplay",
+   "kind": "dir",
+   "youtube_id": "j3K0VByun6w",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 76
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/077-Training_for_Overweight_Individuals_-_Expanding_on_the_single_arm_Outside_circle_to_improve_posture-[66BuPCRIPdg].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E077 - Training_for_Overweight_Individuals_-_Expanding_on_the_single_arm_Outside_circle_to_improve_posture-[66BuPCRIPdg].mkv",
+   "kind": "media",
+   "youtube_id": "66BuPCRIPdg",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 77
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/077-Training_for_Overweight_Individuals_-_Expanding_on_the_single_arm_Outside_circle_to_improve_posture-[66BuPCRIPdg].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E077 - Training_for_Overweight_Individuals_-_Expanding_on_the_single_arm_Outside_circle_to_improve_posture-[66BuPCRIPdg].trickplay",
+   "kind": "dir",
+   "youtube_id": "66BuPCRIPdg",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 77
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/078-Single_arm_heavy_club_alt_circle_with_180_degree_pivot_step-[KOa9QmYRGJI].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E078 - Single_arm_heavy_club_alt_circle_with_180_degree_pivot_step-[KOa9QmYRGJI].mkv",
+   "kind": "media",
+   "youtube_id": "KOa9QmYRGJI",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 78
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/078-Single_arm_heavy_club_alt_circle_with_180_degree_pivot_step-[KOa9QmYRGJI].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E078 - Single_arm_heavy_club_alt_circle_with_180_degree_pivot_step-[KOa9QmYRGJI].trickplay",
+   "kind": "dir",
+   "youtube_id": "KOa9QmYRGJI",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 78
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/079-Effective_Strength_and_Conditioning_Product_Launch_announcement._Mill_Squat_program-[mt07Fma56y0].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E079 - Effective_Strength_and_Conditioning_Product_Launch_announcement._Mill_Squat_program-[mt07Fma56y0].mkv",
+   "kind": "media",
+   "youtube_id": "mt07Fma56y0",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 79
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/079-Effective_Strength_and_Conditioning_Product_Launch_announcement._Mill_Squat_program-[mt07Fma56y0].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E079 - Effective_Strength_and_Conditioning_Product_Launch_announcement._Mill_Squat_program-[mt07Fma56y0].trickplay",
+   "kind": "dir",
+   "youtube_id": "mt07Fma56y0",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 79
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/080-Exercises_for_overweight_individuals-_beyond_circles-_outside_pendulum-[R8KESUPKlu4].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E080 - Exercises_for_overweight_individuals-_beyond_circles-_outside_pendulum-[R8KESUPKlu4].mkv",
+   "kind": "media",
+   "youtube_id": "R8KESUPKlu4",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 80
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/080-Exercises_for_overweight_individuals-_beyond_circles-_outside_pendulum-[R8KESUPKlu4].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E080 - Exercises_for_overweight_individuals-_beyond_circles-_outside_pendulum-[R8KESUPKlu4].trickplay",
+   "kind": "dir",
+   "youtube_id": "R8KESUPKlu4",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 80
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/081-Effective_strength_and_conditioning_heavy_club_program_update._Corrections_have_been_made.-[17_gml0DoIw].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E081 - Effective_strength_and_conditioning_heavy_club_program_update._Corrections_have_been_made.-[17_gml0DoIw].mkv",
+   "kind": "media",
+   "youtube_id": "17_gml0DoIw",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 81
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/081-Effective_strength_and_conditioning_heavy_club_program_update._Corrections_have_been_made.-[17_gml0DoIw].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E081 - Effective_strength_and_conditioning_heavy_club_program_update._Corrections_have_been_made.-[17_gml0DoIw].trickplay",
+   "kind": "dir",
+   "youtube_id": "17_gml0DoIw",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 81
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/082-Heavy_Club_-_anchored_inside_circles-[FYbwpZl0fw4].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E082 - Heavy_Club_-_anchored_inside_circles-[FYbwpZl0fw4].mkv",
+   "kind": "media",
+   "youtube_id": "FYbwpZl0fw4",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 82
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/082-Heavy_Club_-_anchored_inside_circles-[FYbwpZl0fw4].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E082 - Heavy_Club_-_anchored_inside_circles-[FYbwpZl0fw4].trickplay",
+   "kind": "dir",
+   "youtube_id": "FYbwpZl0fw4",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 82
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/083-Heavy_Club_Anchored_Outside_Circles_-_Double_club_training-[70CFp8QLXKo].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E083 - Heavy_Club_Anchored_Outside_Circles_-_Double_club_training-[70CFp8QLXKo].mkv",
+   "kind": "media",
+   "youtube_id": "70CFp8QLXKo",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 83
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/083-Heavy_Club_Anchored_Outside_Circles_-_Double_club_training-[70CFp8QLXKo].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E083 - Heavy_Club_Anchored_Outside_Circles_-_Double_club_training-[70CFp8QLXKo].trickplay",
+   "kind": "dir",
+   "youtube_id": "70CFp8QLXKo",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 83
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/084-Heavy_Club_Anchored_Shield_Cast-[6QRJyfpE7A0].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E084 - Heavy_Club_Anchored_Shield_Cast-[6QRJyfpE7A0].mkv",
+   "kind": "media",
+   "youtube_id": "6QRJyfpE7A0",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 84
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/084-Heavy_Club_Anchored_Shield_Cast-[6QRJyfpE7A0].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E084 - Heavy_Club_Anchored_Shield_Cast-[6QRJyfpE7A0].trickplay",
+   "kind": "dir",
+   "youtube_id": "6QRJyfpE7A0",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 84
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/085-Primary_Differences_between_single_hand_heavy_club_training_and_2_hand_heavy_club_training-[hZDJmxiEYCs].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E085 - Primary_Differences_between_single_hand_heavy_club_training_and_2_hand_heavy_club_training-[hZDJmxiEYCs].mkv",
+   "kind": "media",
+   "youtube_id": "hZDJmxiEYCs",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 85
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/085-Primary_Differences_between_single_hand_heavy_club_training_and_2_hand_heavy_club_training-[hZDJmxiEYCs].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E085 - Primary_Differences_between_single_hand_heavy_club_training_and_2_hand_heavy_club_training-[hZDJmxiEYCs].trickplay",
+   "kind": "dir",
+   "youtube_id": "hZDJmxiEYCs",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 85
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/086-Heavy_Club_swinging_-_super_mill-[e6ggciYjwe4].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E086 - Heavy_Club_swinging_-_super_mill-[e6ggciYjwe4].mkv",
+   "kind": "media",
+   "youtube_id": "e6ggciYjwe4",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 86
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/086-Heavy_Club_swinging_-_super_mill-[e6ggciYjwe4].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E086 - Heavy_Club_swinging_-_super_mill-[e6ggciYjwe4].trickplay",
+   "kind": "dir",
+   "youtube_id": "e6ggciYjwe4",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 86
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/087-2_Hand_Heavy_Club_dead_clean-[KB6RrgpMDDo].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E087 - 2_Hand_Heavy_Club_dead_clean-[KB6RrgpMDDo].mkv",
+   "kind": "media",
+   "youtube_id": "KB6RrgpMDDo",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 87
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/087-2_Hand_Heavy_Club_dead_clean-[KB6RrgpMDDo].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E087 - 2_Hand_Heavy_Club_dead_clean-[KB6RrgpMDDo].trickplay",
+   "kind": "dir",
+   "youtube_id": "KB6RrgpMDDo",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 87
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/088-Heavy_club_2_hand_Front_Press-[TTgtSN8Q42Y].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E088 - Heavy_club_2_hand_Front_Press-[TTgtSN8Q42Y].mkv",
+   "kind": "media",
+   "youtube_id": "TTgtSN8Q42Y",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 88
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/088-Heavy_club_2_hand_Front_Press-[TTgtSN8Q42Y].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E088 - Heavy_club_2_hand_Front_Press-[TTgtSN8Q42Y].trickplay",
+   "kind": "dir",
+   "youtube_id": "TTgtSN8Q42Y",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 88
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/089-Adex_Wildman_prototype_mace_club_ARC_handles-[mk2BRKejyk8].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E089 - Adex_Wildman_prototype_mace_club_ARC_handles-[mk2BRKejyk8].mkv",
+   "kind": "media",
+   "youtube_id": "mk2BRKejyk8",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 89
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/089-Adex_Wildman_prototype_mace_club_ARC_handles-[mk2BRKejyk8].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E089 - Adex_Wildman_prototype_mace_club_ARC_handles-[mk2BRKejyk8].trickplay",
+   "kind": "dir",
+   "youtube_id": "mk2BRKejyk8",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 89
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/090-Heavy_club_2_hand_clean_and_press-[yhflnuxOOb0].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E090 - Heavy_club_2_hand_clean_and_press-[yhflnuxOOb0].mkv",
+   "kind": "media",
+   "youtube_id": "yhflnuxOOb0",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 90
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/090-Heavy_club_2_hand_clean_and_press-[yhflnuxOOb0].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E090 - Heavy_club_2_hand_clean_and_press-[yhflnuxOOb0].trickplay",
+   "kind": "dir",
+   "youtube_id": "yhflnuxOOb0",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 90
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/091-Heavy_club_inside_circle_with_a_kettlebell_low_outside_anchor-[R5JbnEvw69c].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E091 - Heavy_club_inside_circle_with_a_kettlebell_low_outside_anchor-[R5JbnEvw69c].mkv",
+   "kind": "media",
+   "youtube_id": "R5JbnEvw69c",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 91
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/091-Heavy_club_inside_circle_with_a_kettlebell_low_outside_anchor-[R5JbnEvw69c].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E091 - Heavy_club_inside_circle_with_a_kettlebell_low_outside_anchor-[R5JbnEvw69c].trickplay",
+   "kind": "dir",
+   "youtube_id": "R5JbnEvw69c",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 91
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/092-Heavy_club_single_arm_dead_clean-[nOGsjZZQGqE].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E092 - Heavy_club_single_arm_dead_clean-[nOGsjZZQGqE].mkv",
+   "kind": "media",
+   "youtube_id": "nOGsjZZQGqE",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 92
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/092-Heavy_club_single_arm_dead_clean-[nOGsjZZQGqE].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E092 - Heavy_club_single_arm_dead_clean-[nOGsjZZQGqE].trickplay",
+   "kind": "dir",
+   "youtube_id": "nOGsjZZQGqE",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 92
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/093-Vulpes_Fiji_war_club_trainer_box_opening-[EttGTi4MkwY].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E093 - Vulpes_Fiji_war_club_trainer_box_opening-[EttGTi4MkwY].mkv",
+   "kind": "media",
+   "youtube_id": "EttGTi4MkwY",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 93
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/093-Vulpes_Fiji_war_club_trainer_box_opening-[EttGTi4MkwY].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E093 - Vulpes_Fiji_war_club_trainer_box_opening-[EttGTi4MkwY].trickplay",
+   "kind": "dir",
+   "youtube_id": "EttGTi4MkwY",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 93
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/094-Heavy_club_single_arm_outside_circle_with_kettlebell_anchor-[27Uvu-5G1vc].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E094 - Heavy_club_single_arm_outside_circle_with_kettlebell_anchor-[27Uvu-5G1vc].mkv",
+   "kind": "media",
+   "youtube_id": "27Uvu-5G1vc",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 94
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/094-Heavy_club_single_arm_outside_circle_with_kettlebell_anchor-[27Uvu-5G1vc].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E094 - Heavy_club_single_arm_outside_circle_with_kettlebell_anchor-[27Uvu-5G1vc].trickplay",
+   "kind": "dir",
+   "youtube_id": "27Uvu-5G1vc",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 94
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/095-Heavy_Club_single_arm_shield_cast_with_Kettlebell_Anchor_to_maximize_strength_with_limited_equipment-[75B2pCcVS48].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E095 - Heavy_Club_single_arm_shield_cast_with_Kettlebell_Anchor_to_maximize_strength_with_limited_equipment-[75B2pCcVS48].mkv",
+   "kind": "media",
+   "youtube_id": "75B2pCcVS48",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 95
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/095-Heavy_Club_single_arm_shield_cast_with_Kettlebell_Anchor_to_maximize_strength_with_limited_equipment-[75B2pCcVS48].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E095 - Heavy_Club_single_arm_shield_cast_with_Kettlebell_Anchor_to_maximize_strength_with_limited_equipment-[75B2pCcVS48].trickplay",
+   "kind": "dir",
+   "youtube_id": "75B2pCcVS48",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 95
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/096-Heavy_club_gunfighter_hang_dead_clean-[N006SH3Xqqg].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E096 - Heavy_club_gunfighter_hang_dead_clean-[N006SH3Xqqg].mkv",
+   "kind": "media",
+   "youtube_id": "N006SH3Xqqg",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 96
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/096-Heavy_club_gunfighter_hang_dead_clean-[N006SH3Xqqg].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E096 - Heavy_club_gunfighter_hang_dead_clean-[N006SH3Xqqg].trickplay",
+   "kind": "dir",
+   "youtube_id": "N006SH3Xqqg",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 96
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/097-Heavy_Club_2Hand_mill_prep_and_mill-[iFtaPBDwG7w].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E097 - Heavy_Club_2Hand_mill_prep_and_mill-[iFtaPBDwG7w].mkv",
+   "kind": "media",
+   "youtube_id": "iFtaPBDwG7w",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 97
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/097-Heavy_Club_2Hand_mill_prep_and_mill-[iFtaPBDwG7w].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E097 - Heavy_Club_2Hand_mill_prep_and_mill-[iFtaPBDwG7w].trickplay",
+   "kind": "dir",
+   "youtube_id": "iFtaPBDwG7w",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 97
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/098-Heavy_Club_Single_Arm_Swipe-[4nt-vtNLLo4].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E098 - Heavy_Club_Single_Arm_Swipe-[4nt-vtNLLo4].mkv",
+   "kind": "media",
+   "youtube_id": "4nt-vtNLLo4",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 98
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/098-Heavy_Club_Single_Arm_Swipe-[4nt-vtNLLo4].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E098 - Heavy_Club_Single_Arm_Swipe-[4nt-vtNLLo4].trickplay",
+   "kind": "dir",
+   "youtube_id": "4nt-vtNLLo4",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 98
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/099-answering_viewers_question_on_rib_cage_position_in_gun_getups-[Fs7J_ydqayA].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E099 - answering_viewers_question_on_rib_cage_position_in_gun_getups-[Fs7J_ydqayA].mkv",
+   "kind": "media",
+   "youtube_id": "Fs7J_ydqayA",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 99
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/099-answering_viewers_question_on_rib_cage_position_in_gun_getups-[Fs7J_ydqayA].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E099 - answering_viewers_question_on_rib_cage_position_in_gun_getups-[Fs7J_ydqayA].trickplay",
+   "kind": "dir",
+   "youtube_id": "Fs7J_ydqayA",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 99
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/100-mace_and_heavy_club_shield_cast_and_360_for_adaptive_athletes-[J4OefJ8KVcQ].mkv",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E100 - mace_and_heavy_club_shield_cast_and_360_for_adaptive_athletes-[J4OefJ8KVcQ].mkv",
+   "kind": "media",
+   "youtube_id": "J4OefJ8KVcQ",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 100
+  },
+  {
+   "src": "heavy-club-exercise-tutorials/100-mace_and_heavy_club_shield_cast_and_360_for_adaptive_athletes-[J4OefJ8KVcQ].trickplay",
+   "dst": "fitness/Heavy Club/Season 02/Heavy Club S02E100 - mace_and_heavy_club_shield_cast_and_360_for_adaptive_athletes-[J4OefJ8KVcQ].trickplay",
+   "kind": "dir",
+   "youtube_id": "J4OefJ8KVcQ",
+   "series": "Heavy Club",
+   "season": 2,
+   "episode": 100
+  },
+  {
+   "src": "training/find404-I_Worked_Out_Like_David_Goggins_for_100_Days-[vWU5O7cK7aI].mp4",
+   "dst": "fitness/Inspiration/Season 01/Inspiration S01E01 - find404-I_Worked_Out_Like_David_Goggins_for_100_Days-[vWU5O7cK7aI].mp4",
+   "kind": "media",
+   "youtube_id": "vWU5O7cK7aI",
+   "series": "Inspiration",
+   "season": 1,
+   "episode": 1
+  },
+  {
+   "src": "training/Matt_Raimondo-IAN_This_72-Year-Old_Rock_Climber_Will_Change_How_You_See_Aging-[ldQUuOc4eEM].mkv",
+   "dst": "fitness/Inspiration/Season 01/Inspiration S01E02 - Matt_Raimondo-IAN_This_72-Year-Old_Rock_Climber_Will_Change_How_You_See_Aging-[ldQUuOc4eEM].mkv",
+   "kind": "media",
+   "youtube_id": "ldQUuOc4eEM",
+   "series": "Inspiration",
+   "season": 1,
+   "episode": 2
+  },
+  {
+   "src": "training/Grind_Fuel-It_Was_Isolation_And_Dedication_-_Conor_McGregor_Motivation_2025-[c53F4MNGOrA].mp4",
+   "dst": "fitness/Inspiration/Season 01/Inspiration S01E03 - Grind_Fuel-It_Was_Isolation_And_Dedication_-_Conor_McGregor_Motivation_2025-[c53F4MNGOrA].mp4",
+   "kind": "media",
+   "youtube_id": "c53F4MNGOrA",
+   "series": "Inspiration",
+   "season": 1,
+   "episode": 3
+  },
+  {
+   "src": "training/Beridox-The_Power_of_Ilia_Topuria_s_Delusional_Self_Belief-[ifGArcHIPI4].mp4",
+   "dst": "fitness/Inspiration/Season 01/Inspiration S01E04 - Beridox-The_Power_of_Ilia_Topuria_s_Delusional_Self_Belief-[ifGArcHIPI4].mp4",
+   "kind": "media",
+   "youtube_id": "ifGArcHIPI4",
+   "series": "Inspiration",
+   "season": 1,
+   "episode": 4
+  },
+  {
+   "src": "kettlebell-compilations/001-How_to_Use_a_Kettlebell_Kettlebell_Manual_Part_1-[sQx_ChXs2BY].mkv",
+   "dst": "fitness/Kettlebell/Season 01/Kettlebell S01E01 - How_to_Use_a_Kettlebell_Kettlebell_Manual_Part_1-[sQx_ChXs2BY].mkv",
+   "kind": "media",
+   "youtube_id": "sQx_ChXs2BY",
+   "series": "Kettlebell",
+   "season": 1,
+   "episode": 1
+  },
+  {
+   "src": "kettlebell-compilations/001-How_to_Use_a_Kettlebell_Kettlebell_Manual_Part_1-[sQx_ChXs2BY].trickplay",
+   "dst": "fitness/Kettlebell/Season 01/Kettlebell S01E01 - How_to_Use_a_Kettlebell_Kettlebell_Manual_Part_1-[sQx_ChXs2BY].trickplay",
+   "kind": "dir",
+   "youtube_id": "sQx_ChXs2BY",
+   "series": "Kettlebell",
+   "season": 1,
+   "episode": 1
+  },
+  {
+   "src": "kettlebell-compilations/002-How_to_Use_a_Kettlebell_Kettlebell_Manual_Part_2-[H_ByFHcO-ZU].mkv",
+   "dst": "fitness/Kettlebell/Season 01/Kettlebell S01E02 - How_to_Use_a_Kettlebell_Kettlebell_Manual_Part_2-[H_ByFHcO-ZU].mkv",
+   "kind": "media",
+   "youtube_id": "H_ByFHcO-ZU",
+   "series": "Kettlebell",
+   "season": 1,
+   "episode": 2
+  },
+  {
+   "src": "kettlebell-compilations/002-How_to_Use_a_Kettlebell_Kettlebell_Manual_Part_2-[H_ByFHcO-ZU].trickplay",
+   "dst": "fitness/Kettlebell/Season 01/Kettlebell S01E02 - How_to_Use_a_Kettlebell_Kettlebell_Manual_Part_2-[H_ByFHcO-ZU].trickplay",
+   "kind": "dir",
+   "youtube_id": "H_ByFHcO-ZU",
+   "series": "Kettlebell",
+   "season": 1,
+   "episode": 2
+  },
+  {
+   "src": "kettlebell-compilations/003-How_to_Use_a_Kettlebell_Kettlebell_Manual_Part_3-[VntvuF5tAvI].mkv",
+   "dst": "fitness/Kettlebell/Season 01/Kettlebell S01E03 - How_to_Use_a_Kettlebell_Kettlebell_Manual_Part_3-[VntvuF5tAvI].mkv",
+   "kind": "media",
+   "youtube_id": "VntvuF5tAvI",
+   "series": "Kettlebell",
+   "season": 1,
+   "episode": 3
+  },
+  {
+   "src": "kettlebell-compilations/003-How_to_Use_a_Kettlebell_Kettlebell_Manual_Part_3-[VntvuF5tAvI].trickplay",
+   "dst": "fitness/Kettlebell/Season 01/Kettlebell S01E03 - How_to_Use_a_Kettlebell_Kettlebell_Manual_Part_3-[VntvuF5tAvI].trickplay",
+   "kind": "dir",
+   "youtube_id": "VntvuF5tAvI",
+   "series": "Kettlebell",
+   "season": 1,
+   "episode": 3
+  },
+  {
+   "src": "kettlebell-compilations/004-How_to_Use_a_Kettlebell_Kettlebell_Manual_Part_4-[se0piLa6cSY].mkv",
+   "dst": "fitness/Kettlebell/Season 01/Kettlebell S01E04 - How_to_Use_a_Kettlebell_Kettlebell_Manual_Part_4-[se0piLa6cSY].mkv",
+   "kind": "media",
+   "youtube_id": "se0piLa6cSY",
+   "series": "Kettlebell",
+   "season": 1,
+   "episode": 4
+  },
+  {
+   "src": "kettlebell-compilations/004-How_to_Use_a_Kettlebell_Kettlebell_Manual_Part_4-[se0piLa6cSY].trickplay",
+   "dst": "fitness/Kettlebell/Season 01/Kettlebell S01E04 - How_to_Use_a_Kettlebell_Kettlebell_Manual_Part_4-[se0piLa6cSY].trickplay",
+   "kind": "dir",
+   "youtube_id": "se0piLa6cSY",
+   "series": "Kettlebell",
+   "season": 1,
+   "episode": 4
+  },
+  {
+   "src": "kettlebell-compilations/005-These_Drills_Will_Help_You_Master_Kettlebell_Clean_And_Press_Kettlebell_Manual_5-[lKWWWgZ7XQc].mkv",
+   "dst": "fitness/Kettlebell/Season 01/Kettlebell S01E05 - These_Drills_Will_Help_You_Master_Kettlebell_Clean_And_Press_Kettlebell_Manual_5-[lKWWWgZ7XQc].mkv",
+   "kind": "media",
+   "youtube_id": "lKWWWgZ7XQc",
+   "series": "Kettlebell",
+   "season": 1,
+   "episode": 5
+  },
+  {
+   "src": "kettlebell-compilations/005-These_Drills_Will_Help_You_Master_Kettlebell_Clean_And_Press_Kettlebell_Manual_5-[lKWWWgZ7XQc].trickplay",
+   "dst": "fitness/Kettlebell/Season 01/Kettlebell S01E05 - These_Drills_Will_Help_You_Master_Kettlebell_Clean_And_Press_Kettlebell_Manual_5-[lKWWWgZ7XQc].trickplay",
+   "kind": "dir",
+   "youtube_id": "lKWWWgZ7XQc",
+   "series": "Kettlebell",
+   "season": 1,
+   "episode": 5
+  },
+  {
+   "src": "kettlebell-compilations/006-Kettlebell_Squat_Progression_for_Every_Fitness_Level_Kettlebell_Manual_6-[e4mizgRSqcg].mkv",
+   "dst": "fitness/Kettlebell/Season 01/Kettlebell S01E06 - Kettlebell_Squat_Progression_for_Every_Fitness_Level_Kettlebell_Manual_6-[e4mizgRSqcg].mkv",
+   "kind": "media",
+   "youtube_id": "e4mizgRSqcg",
+   "series": "Kettlebell",
+   "season": 1,
+   "episode": 6
+  },
+  {
+   "src": "kettlebell-compilations/006-Kettlebell_Squat_Progression_for_Every_Fitness_Level_Kettlebell_Manual_6-[e4mizgRSqcg].trickplay",
+   "dst": "fitness/Kettlebell/Season 01/Kettlebell S01E06 - Kettlebell_Squat_Progression_for_Every_Fitness_Level_Kettlebell_Manual_6-[e4mizgRSqcg].trickplay",
+   "kind": "dir",
+   "youtube_id": "e4mizgRSqcg",
+   "series": "Kettlebell",
+   "season": 1,
+   "episode": 6
+  },
+  {
+   "src": "kettlebell-compilations/007-Train_Asymmetric_Load_With_Kettlebell_Lunges_Kettlebell_Manual_7-[ZjwmQepbJjY].mkv",
+   "dst": "fitness/Kettlebell/Season 01/Kettlebell S01E07 - Train_Asymmetric_Load_With_Kettlebell_Lunges_Kettlebell_Manual_7-[ZjwmQepbJjY].mkv",
+   "kind": "media",
+   "youtube_id": "ZjwmQepbJjY",
+   "series": "Kettlebell",
+   "season": 1,
+   "episode": 7
+  },
+  {
+   "src": "kettlebell-compilations/007-Train_Asymmetric_Load_With_Kettlebell_Lunges_Kettlebell_Manual_7-[ZjwmQepbJjY].trickplay",
+   "dst": "fitness/Kettlebell/Season 01/Kettlebell S01E07 - Train_Asymmetric_Load_With_Kettlebell_Lunges_Kettlebell_Manual_7-[ZjwmQepbJjY].trickplay",
+   "kind": "dir",
+   "youtube_id": "ZjwmQepbJjY",
+   "series": "Kettlebell",
+   "season": 1,
+   "episode": 7
+  },
+  {
+   "src": "kettlebell-compilations/008-4_Simple_Drills_To_Perfect_Your_Turkish_Get-Up_Kettlebell_Manual_8-[mJAaVi8oBHM].mkv",
+   "dst": "fitness/Kettlebell/Season 01/Kettlebell S01E08 - 4_Simple_Drills_To_Perfect_Your_Turkish_Get-Up_Kettlebell_Manual_8-[mJAaVi8oBHM].mkv",
+   "kind": "media",
+   "youtube_id": "mJAaVi8oBHM",
+   "series": "Kettlebell",
+   "season": 1,
+   "episode": 8
+  },
+  {
+   "src": "kettlebell-compilations/008-4_Simple_Drills_To_Perfect_Your_Turkish_Get-Up_Kettlebell_Manual_8-[mJAaVi8oBHM].trickplay",
+   "dst": "fitness/Kettlebell/Season 01/Kettlebell S01E08 - 4_Simple_Drills_To_Perfect_Your_Turkish_Get-Up_Kettlebell_Manual_8-[mJAaVi8oBHM].trickplay",
+   "kind": "dir",
+   "youtube_id": "mJAaVi8oBHM",
+   "series": "Kettlebell",
+   "season": 1,
+   "episode": 8
+  },
+  {
+   "src": "kettlebell-compilations/009-4_More_Drills_To_Perfect_Your_Turkish_Get-Up_Kettlebell_Manual_9-[S-a07RSIE3Y].mkv",
+   "dst": "fitness/Kettlebell/Season 01/Kettlebell S01E09 - 4_More_Drills_To_Perfect_Your_Turkish_Get-Up_Kettlebell_Manual_9-[S-a07RSIE3Y].mkv",
+   "kind": "media",
+   "youtube_id": "S-a07RSIE3Y",
+   "series": "Kettlebell",
+   "season": 1,
+   "episode": 9
+  },
+  {
+   "src": "kettlebell-compilations/009-4_More_Drills_To_Perfect_Your_Turkish_Get-Up_Kettlebell_Manual_9-[S-a07RSIE3Y].trickplay",
+   "dst": "fitness/Kettlebell/Season 01/Kettlebell S01E09 - 4_More_Drills_To_Perfect_Your_Turkish_Get-Up_Kettlebell_Manual_9-[S-a07RSIE3Y].trickplay",
+   "kind": "dir",
+   "youtube_id": "S-a07RSIE3Y",
+   "series": "Kettlebell",
+   "season": 1,
+   "episode": 9
+  },
+  {
+   "src": "kettlebell-compilations/010-The_Hardest_Parts_of_the_Turkish_Get-up_Kettlebell_Manual_10-[qEN0XGcelJs].mkv",
+   "dst": "fitness/Kettlebell/Season 01/Kettlebell S01E10 - The_Hardest_Parts_of_the_Turkish_Get-up_Kettlebell_Manual_10-[qEN0XGcelJs].mkv",
+   "kind": "media",
+   "youtube_id": "qEN0XGcelJs",
+   "series": "Kettlebell",
+   "season": 1,
+   "episode": 10
+  },
+  {
+   "src": "kettlebell-compilations/010-The_Hardest_Parts_of_the_Turkish_Get-up_Kettlebell_Manual_10-[qEN0XGcelJs].trickplay",
+   "dst": "fitness/Kettlebell/Season 01/Kettlebell S01E10 - The_Hardest_Parts_of_the_Turkish_Get-up_Kettlebell_Manual_10-[qEN0XGcelJs].trickplay",
+   "kind": "dir",
+   "youtube_id": "qEN0XGcelJs",
+   "series": "Kettlebell",
+   "season": 1,
+   "episode": 10
+  },
+  {
+   "src": "kettlebell-compilations/011-This_Squat_Builds_Insane_Core_Strength_Kettlebell_Manual_11-[lz7uO7Tl2ls].mkv",
+   "dst": "fitness/Kettlebell/Season 01/Kettlebell S01E11 - This_Squat_Builds_Insane_Core_Strength_Kettlebell_Manual_11-[lz7uO7Tl2ls].mkv",
+   "kind": "media",
+   "youtube_id": "lz7uO7Tl2ls",
+   "series": "Kettlebell",
+   "season": 1,
+   "episode": 11
+  },
+  {
+   "src": "kettlebell-compilations/011-This_Squat_Builds_Insane_Core_Strength_Kettlebell_Manual_11-[lz7uO7Tl2ls].trickplay",
+   "dst": "fitness/Kettlebell/Season 01/Kettlebell S01E11 - This_Squat_Builds_Insane_Core_Strength_Kettlebell_Manual_11-[lz7uO7Tl2ls].trickplay",
+   "kind": "dir",
+   "youtube_id": "lz7uO7Tl2ls",
+   "series": "Kettlebell",
+   "season": 1,
+   "episode": 11
+  },
+  {
+   "src": "kettlebell-compilations/012-Mobilize_Your_Hips_with_Kettlebell_Deck_Squats_-_A_Beginner_s_Tutorial-[AYi75lwhApE].mkv",
+   "dst": "fitness/Kettlebell/Season 01/Kettlebell S01E12 - Mobilize_Your_Hips_with_Kettlebell_Deck_Squats_-_A_Beginner_s_Tutorial-[AYi75lwhApE].mkv",
+   "kind": "media",
+   "youtube_id": "AYi75lwhApE",
+   "series": "Kettlebell",
+   "season": 1,
+   "episode": 12
+  },
+  {
+   "src": "kettlebell-compilations/012-Mobilize_Your_Hips_with_Kettlebell_Deck_Squats_-_A_Beginner_s_Tutorial-[AYi75lwhApE].trickplay",
+   "dst": "fitness/Kettlebell/Season 01/Kettlebell S01E12 - Mobilize_Your_Hips_with_Kettlebell_Deck_Squats_-_A_Beginner_s_Tutorial-[AYi75lwhApE].trickplay",
+   "kind": "dir",
+   "youtube_id": "AYi75lwhApE",
+   "series": "Kettlebell",
+   "season": 1,
+   "episode": 12
+  },
+  {
+   "src": "kettlebell-compilations/013-Simple_Drills_to_Master_the_Kettlebell_Snatch-[crNLMShSSh0].mkv",
+   "dst": "fitness/Kettlebell/Season 01/Kettlebell S01E13 - Simple_Drills_to_Master_the_Kettlebell_Snatch-[crNLMShSSh0].mkv",
+   "kind": "media",
+   "youtube_id": "crNLMShSSh0",
+   "series": "Kettlebell",
+   "season": 1,
+   "episode": 13
+  },
+  {
+   "src": "kettlebell-compilations/013-Simple_Drills_to_Master_the_Kettlebell_Snatch-[crNLMShSSh0].trickplay",
+   "dst": "fitness/Kettlebell/Season 01/Kettlebell S01E13 - Simple_Drills_to_Master_the_Kettlebell_Snatch-[crNLMShSSh0].trickplay",
+   "kind": "dir",
+   "youtube_id": "crNLMShSSh0",
+   "series": "Kettlebell",
+   "season": 1,
+   "episode": 13
+  },
+  {
+   "src": "kettlebell-compilations/014-3_Double_Kettlebell_Exercises_to_Build_an_Athletic_Physique-[ALNTijVJWew].mkv",
+   "dst": "fitness/Kettlebell/Season 01/Kettlebell S01E14 - 3_Double_Kettlebell_Exercises_to_Build_an_Athletic_Physique-[ALNTijVJWew].mkv",
+   "kind": "media",
+   "youtube_id": "ALNTijVJWew",
+   "series": "Kettlebell",
+   "season": 1,
+   "episode": 14
+  },
+  {
+   "src": "kettlebell-compilations/014-3_Double_Kettlebell_Exercises_to_Build_an_Athletic_Physique-[ALNTijVJWew].trickplay",
+   "dst": "fitness/Kettlebell/Season 01/Kettlebell S01E14 - 3_Double_Kettlebell_Exercises_to_Build_an_Athletic_Physique-[ALNTijVJWew].trickplay",
+   "kind": "dir",
+   "youtube_id": "ALNTijVJWew",
+   "series": "Kettlebell",
+   "season": 1,
+   "episode": 14
+  },
+  {
+   "src": "kettlebell-compilations/015-3_Double_Kettlebell_Exercises_For_Strong_Legs-[XYkPEPi2GCQ].mkv",
+   "dst": "fitness/Kettlebell/Season 01/Kettlebell S01E15 - 3_Double_Kettlebell_Exercises_For_Strong_Legs-[XYkPEPi2GCQ].mkv",
+   "kind": "media",
+   "youtube_id": "XYkPEPi2GCQ",
+   "series": "Kettlebell",
+   "season": 1,
+   "episode": 15
+  },
+  {
+   "src": "kettlebell-compilations/015-3_Double_Kettlebell_Exercises_For_Strong_Legs-[XYkPEPi2GCQ].trickplay",
+   "dst": "fitness/Kettlebell/Season 01/Kettlebell S01E15 - 3_Double_Kettlebell_Exercises_For_Strong_Legs-[XYkPEPi2GCQ].trickplay",
+   "kind": "dir",
+   "youtube_id": "XYkPEPi2GCQ",
+   "series": "Kettlebell",
+   "season": 1,
+   "episode": 15
+  },
+  {
+   "src": "kettlebell-compilations/016-Double_Kettlebell_Exercises_That_Add_Muscle_Fast-[aNRhidKiYN4].mkv",
+   "dst": "fitness/Kettlebell/Season 01/Kettlebell S01E16 - Double_Kettlebell_Exercises_That_Add_Muscle_Fast-[aNRhidKiYN4].mkv",
+   "kind": "media",
+   "youtube_id": "aNRhidKiYN4",
+   "series": "Kettlebell",
+   "season": 1,
+   "episode": 16
+  },
+  {
+   "src": "kettlebell-compilations/016-Double_Kettlebell_Exercises_That_Add_Muscle_Fast-[aNRhidKiYN4].trickplay",
+   "dst": "fitness/Kettlebell/Season 01/Kettlebell S01E16 - Double_Kettlebell_Exercises_That_Add_Muscle_Fast-[aNRhidKiYN4].trickplay",
+   "kind": "dir",
+   "youtube_id": "aNRhidKiYN4",
+   "series": "Kettlebell",
+   "season": 1,
+   "episode": 16
+  },
+  {
+   "src": "kettlebell-compilations/017-Bench_Press_Can_Wreck_Your_Shoulders._Use_the_Floor_Press-[qsjWGLnugEo].mkv",
+   "dst": "fitness/Kettlebell/Season 01/Kettlebell S01E17 - Bench_Press_Can_Wreck_Your_Shoulders._Use_the_Floor_Press-[qsjWGLnugEo].mkv",
+   "kind": "media",
+   "youtube_id": "qsjWGLnugEo",
+   "series": "Kettlebell",
+   "season": 1,
+   "episode": 17
+  },
+  {
+   "src": "kettlebell-compilations/017-Bench_Press_Can_Wreck_Your_Shoulders._Use_the_Floor_Press-[qsjWGLnugEo].trickplay",
+   "dst": "fitness/Kettlebell/Season 01/Kettlebell S01E17 - Bench_Press_Can_Wreck_Your_Shoulders._Use_the_Floor_Press-[qsjWGLnugEo].trickplay",
+   "kind": "dir",
+   "youtube_id": "qsjWGLnugEo",
+   "series": "Kettlebell",
+   "season": 1,
+   "episode": 17
+  },
+  {
+   "src": "turkish-get-up/001-Kettlebell_Half-Kneeling_Clean_-_Turkish_Get_Up_Mastery_Series-[e-mFHJIVwYE].mkv",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E01 - Kettlebell_Half-Kneeling_Clean_-_Turkish_Get_Up_Mastery_Series-[e-mFHJIVwYE].mkv",
+   "kind": "media",
+   "youtube_id": "e-mFHJIVwYE",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 1
+  },
+  {
+   "src": "turkish-get-up/001-Kettlebell_Half-Kneeling_Clean_-_Turkish_Get_Up_Mastery_Series-[e-mFHJIVwYE].trickplay",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E01 - Kettlebell_Half-Kneeling_Clean_-_Turkish_Get_Up_Mastery_Series-[e-mFHJIVwYE].trickplay",
+   "kind": "dir",
+   "youtube_id": "e-mFHJIVwYE",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 1
+  },
+  {
+   "src": "turkish-get-up/002-3_ways_to_MASTER_the_Turkish_Get-up_-_Turkish_Getup_Mastery_Series-[4UA4JG5-8BE].mkv",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E02 - 3_ways_to_MASTER_the_Turkish_Get-up_-_Turkish_Getup_Mastery_Series-[4UA4JG5-8BE].mkv",
+   "kind": "media",
+   "youtube_id": "4UA4JG5-8BE",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 2
+  },
+  {
+   "src": "turkish-get-up/002-3_ways_to_MASTER_the_Turkish_Get-up_-_Turkish_Getup_Mastery_Series-[4UA4JG5-8BE].trickplay",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E02 - 3_ways_to_MASTER_the_Turkish_Get-up_-_Turkish_Getup_Mastery_Series-[4UA4JG5-8BE].trickplay",
+   "kind": "dir",
+   "youtube_id": "4UA4JG5-8BE",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 2
+  },
+  {
+   "src": "turkish-get-up/003-TURKISH_GET_UP_-_A_PRIMER-[2YollP91Wro].mkv",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E03 - TURKISH_GET_UP_-_A_PRIMER-[2YollP91Wro].mkv",
+   "kind": "media",
+   "youtube_id": "2YollP91Wro",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 3
+  },
+  {
+   "src": "turkish-get-up/003-TURKISH_GET_UP_-_A_PRIMER-[2YollP91Wro].trickplay",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E03 - TURKISH_GET_UP_-_A_PRIMER-[2YollP91Wro].trickplay",
+   "kind": "dir",
+   "youtube_id": "2YollP91Wro",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 3
+  },
+  {
+   "src": "turkish-get-up/004-KettleBell_Half_Kneeling_Press_-_Turkish_Getup_Mastery_series-[xAwVy089Lgg].mkv",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E04 - KettleBell_Half_Kneeling_Press_-_Turkish_Getup_Mastery_series-[xAwVy089Lgg].mkv",
+   "kind": "media",
+   "youtube_id": "xAwVy089Lgg",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 4
+  },
+  {
+   "src": "turkish-get-up/004-KettleBell_Half_Kneeling_Press_-_Turkish_Getup_Mastery_series-[xAwVy089Lgg].trickplay",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E04 - KettleBell_Half_Kneeling_Press_-_Turkish_Getup_Mastery_series-[xAwVy089Lgg].trickplay",
+   "kind": "dir",
+   "youtube_id": "xAwVy089Lgg",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 4
+  },
+  {
+   "src": "turkish-get-up/005-Kettlebell_Half_Kneeling_Cleans_Press_-_Turkish_getup_mastery_series-[-7l8nhRXy6s].mkv",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E05 - Kettlebell_Half_Kneeling_Cleans_Press_-_Turkish_getup_mastery_series-[-7l8nhRXy6s].mkv",
+   "kind": "media",
+   "youtube_id": "-7l8nhRXy6s",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 5
+  },
+  {
+   "src": "turkish-get-up/005-Kettlebell_Half_Kneeling_Cleans_Press_-_Turkish_getup_mastery_series-[-7l8nhRXy6s].trickplay",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E05 - Kettlebell_Half_Kneeling_Cleans_Press_-_Turkish_getup_mastery_series-[-7l8nhRXy6s].trickplay",
+   "kind": "dir",
+   "youtube_id": "-7l8nhRXy6s",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 5
+  },
+  {
+   "src": "turkish-get-up/006-Kettlebell_Clean_to_Opposite_Leg_Step_Back_Lunge-[8mC0eaIAXMk].mkv",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E06 - Kettlebell_Clean_to_Opposite_Leg_Step_Back_Lunge-[8mC0eaIAXMk].mkv",
+   "kind": "media",
+   "youtube_id": "8mC0eaIAXMk",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 6
+  },
+  {
+   "src": "turkish-get-up/006-Kettlebell_Clean_to_Opposite_Leg_Step_Back_Lunge-[8mC0eaIAXMk].trickplay",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E06 - Kettlebell_Clean_to_Opposite_Leg_Step_Back_Lunge-[8mC0eaIAXMk].trickplay",
+   "kind": "dir",
+   "youtube_id": "8mC0eaIAXMk",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 6
+  },
+  {
+   "src": "turkish-get-up/007-Kettlebell_Half_Kneeling_Clean_and_Press_Windmill-[2pzh4ZigTjE].mkv",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E07 - Kettlebell_Half_Kneeling_Clean_and_Press_Windmill-[2pzh4ZigTjE].mkv",
+   "kind": "media",
+   "youtube_id": "2pzh4ZigTjE",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 7
+  },
+  {
+   "src": "turkish-get-up/007-Kettlebell_Half_Kneeling_Clean_and_Press_Windmill-[2pzh4ZigTjE].trickplay",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E07 - Kettlebell_Half_Kneeling_Clean_and_Press_Windmill-[2pzh4ZigTjE].trickplay",
+   "kind": "dir",
+   "youtube_id": "2pzh4ZigTjE",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 7
+  },
+  {
+   "src": "turkish-get-up/008-Kettlebell_Kneeling_Snatch-[guwI1RWTiag].mkv",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E08 - Kettlebell_Kneeling_Snatch-[guwI1RWTiag].mkv",
+   "kind": "media",
+   "youtube_id": "guwI1RWTiag",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 8
+  },
+  {
+   "src": "turkish-get-up/008-Kettlebell_Kneeling_Snatch-[guwI1RWTiag].trickplay",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E08 - Kettlebell_Kneeling_Snatch-[guwI1RWTiag].trickplay",
+   "kind": "dir",
+   "youtube_id": "guwI1RWTiag",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 8
+  },
+  {
+   "src": "turkish-get-up/009-Kettlebell_Kneeling_Windmill-[uwVEb1fKqLM].mkv",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E09 - Kettlebell_Kneeling_Windmill-[uwVEb1fKqLM].mkv",
+   "kind": "media",
+   "youtube_id": "uwVEb1fKqLM",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 9
+  },
+  {
+   "src": "turkish-get-up/009-Kettlebell_Kneeling_Windmill-[uwVEb1fKqLM].trickplay",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E09 - Kettlebell_Kneeling_Windmill-[uwVEb1fKqLM].trickplay",
+   "kind": "dir",
+   "youtube_id": "uwVEb1fKqLM",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 9
+  },
+  {
+   "src": "turkish-get-up/010-Kettlebell_Kneeling_Side_Press-[6GjtemsVJQk].mkv",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E10 - Kettlebell_Kneeling_Side_Press-[6GjtemsVJQk].mkv",
+   "kind": "media",
+   "youtube_id": "6GjtemsVJQk",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 10
+  },
+  {
+   "src": "turkish-get-up/010-Kettlebell_Kneeling_Side_Press-[6GjtemsVJQk].trickplay",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E10 - Kettlebell_Kneeling_Side_Press-[6GjtemsVJQk].trickplay",
+   "kind": "dir",
+   "youtube_id": "6GjtemsVJQk",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 10
+  },
+  {
+   "src": "turkish-get-up/011-Kettlebell_Bent_position_-_Press_to_the_Side-[Bc3kZPDt6WE].mkv",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E11 - Kettlebell_Bent_position_-_Press_to_the_Side-[Bc3kZPDt6WE].mkv",
+   "kind": "media",
+   "youtube_id": "Bc3kZPDt6WE",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 11
+  },
+  {
+   "src": "turkish-get-up/011-Kettlebell_Bent_position_-_Press_to_the_Side-[Bc3kZPDt6WE].trickplay",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E11 - Kettlebell_Bent_position_-_Press_to_the_Side-[Bc3kZPDt6WE].trickplay",
+   "kind": "dir",
+   "youtube_id": "Bc3kZPDt6WE",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 11
+  },
+  {
+   "src": "turkish-get-up/012-Kettlebell_Turkish_Getup_Base_Floor_Press-[DSYpqFSpZEg].mkv",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E12 - Kettlebell_Turkish_Getup_Base_Floor_Press-[DSYpqFSpZEg].mkv",
+   "kind": "media",
+   "youtube_id": "DSYpqFSpZEg",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 12
+  },
+  {
+   "src": "turkish-get-up/012-Kettlebell_Turkish_Getup_Base_Floor_Press-[DSYpqFSpZEg].trickplay",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E12 - Kettlebell_Turkish_Getup_Base_Floor_Press-[DSYpqFSpZEg].trickplay",
+   "kind": "dir",
+   "youtube_id": "DSYpqFSpZEg",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 12
+  },
+  {
+   "src": "turkish-get-up/013-Kettlebell_4_Count_Turkish_Getup_Press_to_Roll-[XIy_XOUAEto].mkv",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E13 - Kettlebell_4_Count_Turkish_Getup_Press_to_Roll-[XIy_XOUAEto].mkv",
+   "kind": "media",
+   "youtube_id": "XIy_XOUAEto",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 13
+  },
+  {
+   "src": "turkish-get-up/013-Kettlebell_4_Count_Turkish_Getup_Press_to_Roll-[XIy_XOUAEto].trickplay",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E13 - Kettlebell_4_Count_Turkish_Getup_Press_to_Roll-[XIy_XOUAEto].trickplay",
+   "kind": "dir",
+   "youtube_id": "XIy_XOUAEto",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 13
+  },
+  {
+   "src": "turkish-get-up/014-Kettlebell_1_2_Turkish_Getup_to_Elbow-[LDS7Grx3mLc].mkv",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E14 - Kettlebell_1_2_Turkish_Getup_to_Elbow-[LDS7Grx3mLc].mkv",
+   "kind": "media",
+   "youtube_id": "LDS7Grx3mLc",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 14
+  },
+  {
+   "src": "turkish-get-up/014-Kettlebell_1_2_Turkish_Getup_to_Elbow-[LDS7Grx3mLc].trickplay",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E14 - Kettlebell_1_2_Turkish_Getup_to_Elbow-[LDS7Grx3mLc].trickplay",
+   "kind": "dir",
+   "youtube_id": "LDS7Grx3mLc",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 14
+  },
+  {
+   "src": "turkish-get-up/015-Kettlebell_Half_Getup_to_Hand_-_TGU_Breakdown_series_-_Pressing_and_Abs-[3JXbBTysXpA].mkv",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E15 - Kettlebell_Half_Getup_to_Hand_-_TGU_Breakdown_series_-_Pressing_and_Abs-[3JXbBTysXpA].mkv",
+   "kind": "media",
+   "youtube_id": "3JXbBTysXpA",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 15
+  },
+  {
+   "src": "turkish-get-up/015-Kettlebell_Half_Getup_to_Hand_-_TGU_Breakdown_series_-_Pressing_and_Abs-[3JXbBTysXpA].trickplay",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E15 - Kettlebell_Half_Getup_to_Hand_-_TGU_Breakdown_series_-_Pressing_and_Abs-[3JXbBTysXpA].trickplay",
+   "kind": "dir",
+   "youtube_id": "3JXbBTysXpA",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 15
+  },
+  {
+   "src": "turkish-get-up/016-Reverse_Turkish_Getup_-_aka_Turkish_Get_Down_-_TGU_series-[8Qb5IIcaTG8].mkv",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E16 - Reverse_Turkish_Getup_-_aka_Turkish_Get_Down_-_TGU_series-[8Qb5IIcaTG8].mkv",
+   "kind": "media",
+   "youtube_id": "8Qb5IIcaTG8",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 16
+  },
+  {
+   "src": "turkish-get-up/016-Reverse_Turkish_Getup_-_aka_Turkish_Get_Down_-_TGU_series-[8Qb5IIcaTG8].trickplay",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E16 - Reverse_Turkish_Getup_-_aka_Turkish_Get_Down_-_TGU_series-[8Qb5IIcaTG8].trickplay",
+   "kind": "dir",
+   "youtube_id": "8Qb5IIcaTG8",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 16
+  },
+  {
+   "src": "turkish-get-up/017-Kettlebell_Clean_-_Step_Back_-_Clean_-_A_Turkish_Getup_breakdown_drill-[WdG1lZ9b4cw].mkv",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E17 - Kettlebell_Clean_-_Step_Back_-_Clean_-_A_Turkish_Getup_breakdown_drill-[WdG1lZ9b4cw].mkv",
+   "kind": "media",
+   "youtube_id": "WdG1lZ9b4cw",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 17
+  },
+  {
+   "src": "turkish-get-up/017-Kettlebell_Clean_-_Step_Back_-_Clean_-_A_Turkish_Getup_breakdown_drill-[WdG1lZ9b4cw].trickplay",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E17 - Kettlebell_Clean_-_Step_Back_-_Clean_-_A_Turkish_Getup_breakdown_drill-[WdG1lZ9b4cw].trickplay",
+   "kind": "dir",
+   "youtube_id": "WdG1lZ9b4cw",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 17
+  },
+  {
+   "src": "turkish-get-up/018-Clean_press_to_Half_kneeling_Clean_Press_-_Turkish_getup_breakdown._Standing_ABs_development-[5Uai_S4drVU].mkv",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E18 - Clean_press_to_Half_kneeling_Clean_Press_-_Turkish_getup_breakdown._Standing_ABs_development-[5Uai_S4drVU].mkv",
+   "kind": "media",
+   "youtube_id": "5Uai_S4drVU",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 18
+  },
+  {
+   "src": "turkish-get-up/018-Clean_press_to_Half_kneeling_Clean_Press_-_Turkish_getup_breakdown._Standing_ABs_development-[5Uai_S4drVU].trickplay",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E18 - Clean_press_to_Half_kneeling_Clean_Press_-_Turkish_getup_breakdown._Standing_ABs_development-[5Uai_S4drVU].trickplay",
+   "kind": "dir",
+   "youtube_id": "5Uai_S4drVU",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 18
+  },
+  {
+   "src": "turkish-get-up/019-Complex_Turkish_Getup_-_Complex_1_-_Add_complexity_to_get_more_out_of_lighter_kettlebells-[dNLd-OF4ydg].mkv",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E19 - Complex_Turkish_Getup_-_Complex_1_-_Add_complexity_to_get_more_out_of_lighter_kettlebells-[dNLd-OF4ydg].mkv",
+   "kind": "media",
+   "youtube_id": "dNLd-OF4ydg",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 19
+  },
+  {
+   "src": "turkish-get-up/019-Complex_Turkish_Getup_-_Complex_1_-_Add_complexity_to_get_more_out_of_lighter_kettlebells-[dNLd-OF4ydg].trickplay",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E19 - Complex_Turkish_Getup_-_Complex_1_-_Add_complexity_to_get_more_out_of_lighter_kettlebells-[dNLd-OF4ydg].trickplay",
+   "kind": "dir",
+   "youtube_id": "dNLd-OF4ydg",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 19
+  },
+  {
+   "src": "turkish-get-up/020-The_Most_Complete_Turkish_Get-Up_Training_Available_Now-Only_at_Wildman_Athletica-[Dwa7r8QVzUU].mkv",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E20 - The_Most_Complete_Turkish_Get-Up_Training_Available_Now-Only_at_Wildman_Athletica-[Dwa7r8QVzUU].mkv",
+   "kind": "media",
+   "youtube_id": "Dwa7r8QVzUU",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 20
+  },
+  {
+   "src": "turkish-get-up/020-The_Most_Complete_Turkish_Get-Up_Training_Available_Now-Only_at_Wildman_Athletica-[Dwa7r8QVzUU].trickplay",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E20 - The_Most_Complete_Turkish_Get-Up_Training_Available_Now-Only_at_Wildman_Athletica-[Dwa7r8QVzUU].trickplay",
+   "kind": "dir",
+   "youtube_id": "Dwa7r8QVzUU",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 20
+  },
+  {
+   "src": "turkish-get-up/021-Kettlebell_29_-_Half_kneeling_clean_and_press_-_change_the_base_of_support_to_improve_the_core-[_SSEgx0GK_o].mkv",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E21 - Kettlebell_29_-_Half_kneeling_clean_and_press_-_change_the_base_of_support_to_improve_the_core-[_SSEgx0GK_o].mkv",
+   "kind": "media",
+   "youtube_id": "_SSEgx0GK_o",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 21
+  },
+  {
+   "src": "turkish-get-up/021-Kettlebell_29_-_Half_kneeling_clean_and_press_-_change_the_base_of_support_to_improve_the_core-[_SSEgx0GK_o].trickplay",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E21 - Kettlebell_29_-_Half_kneeling_clean_and_press_-_change_the_base_of_support_to_improve_the_core-[_SSEgx0GK_o].trickplay",
+   "kind": "dir",
+   "youtube_id": "_SSEgx0GK_o",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 21
+  },
+  {
+   "src": "turkish-get-up/022-kettlebell_30_-_floor_press_with_roll._building_the_bottom_of_the_turkish_gets_up-[_Qv-c8TrfXk].mkv",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E22 - kettlebell_30_-_floor_press_with_roll._building_the_bottom_of_the_turkish_gets_up-[_Qv-c8TrfXk].mkv",
+   "kind": "media",
+   "youtube_id": "_Qv-c8TrfXk",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 22
+  },
+  {
+   "src": "turkish-get-up/022-kettlebell_30_-_floor_press_with_roll._building_the_bottom_of_the_turkish_gets_up-[_Qv-c8TrfXk].trickplay",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E22 - kettlebell_30_-_floor_press_with_roll._building_the_bottom_of_the_turkish_gets_up-[_Qv-c8TrfXk].trickplay",
+   "kind": "dir",
+   "youtube_id": "_Qv-c8TrfXk",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 22
+  },
+  {
+   "src": "turkish-get-up/023-Kettlebell_31_-_Half_Kneeling_Windmill_-_Mid_point_TGU_abs_isolation_drill-[gHOyJgH1I5U].mkv",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E23 - Kettlebell_31_-_Half_Kneeling_Windmill_-_Mid_point_TGU_abs_isolation_drill-[gHOyJgH1I5U].mkv",
+   "kind": "media",
+   "youtube_id": "gHOyJgH1I5U",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 23
+  },
+  {
+   "src": "turkish-get-up/023-Kettlebell_31_-_Half_Kneeling_Windmill_-_Mid_point_TGU_abs_isolation_drill-[gHOyJgH1I5U].trickplay",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E23 - Kettlebell_31_-_Half_Kneeling_Windmill_-_Mid_point_TGU_abs_isolation_drill-[gHOyJgH1I5U].trickplay",
+   "kind": "dir",
+   "youtube_id": "gHOyJgH1I5U",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 23
+  },
+  {
+   "src": "turkish-get-up/024-Kettlebell_32_-_quarter_turkish_getup_-_core_strength_for_martial_artists-[TCnGI6icldM].mkv",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E24 - Kettlebell_32_-_quarter_turkish_getup_-_core_strength_for_martial_artists-[TCnGI6icldM].mkv",
+   "kind": "media",
+   "youtube_id": "TCnGI6icldM",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 24
+  },
+  {
+   "src": "turkish-get-up/024-Kettlebell_32_-_quarter_turkish_getup_-_core_strength_for_martial_artists-[TCnGI6icldM].trickplay",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E24 - Kettlebell_32_-_quarter_turkish_getup_-_core_strength_for_martial_artists-[TCnGI6icldM].trickplay",
+   "kind": "dir",
+   "youtube_id": "TCnGI6icldM",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 24
+  },
+  {
+   "src": "turkish-get-up/025-Kettlebell_33_-_half_kneeling_clean_and_press_with_windmill_-_this_is_where_kbs_get_good-[HQOiWX0zF28].mkv",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E25 - Kettlebell_33_-_half_kneeling_clean_and_press_with_windmill_-_this_is_where_kbs_get_good-[HQOiWX0zF28].mkv",
+   "kind": "media",
+   "youtube_id": "HQOiWX0zF28",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 25
+  },
+  {
+   "src": "turkish-get-up/025-Kettlebell_33_-_half_kneeling_clean_and_press_with_windmill_-_this_is_where_kbs_get_good-[HQOiWX0zF28].trickplay",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E25 - Kettlebell_33_-_half_kneeling_clean_and_press_with_windmill_-_this_is_where_kbs_get_good-[HQOiWX0zF28].trickplay",
+   "kind": "dir",
+   "youtube_id": "HQOiWX0zF28",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 25
+  },
+  {
+   "src": "turkish-get-up/026-Common_Kettlebell_Turkish_Get-Up_Mistakes-[dMVLKHHDN-o].mkv",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E26 - Common_Kettlebell_Turkish_Get-Up_Mistakes-[dMVLKHHDN-o].mkv",
+   "kind": "media",
+   "youtube_id": "dMVLKHHDN-o",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 26
+  },
+  {
+   "src": "turkish-get-up/026-Common_Kettlebell_Turkish_Get-Up_Mistakes-[dMVLKHHDN-o].trickplay",
+   "dst": "fitness/Kettlebell/Season 02/Kettlebell S02E26 - Common_Kettlebell_Turkish_Get-Up_Mistakes-[dMVLKHHDN-o].trickplay",
+   "kind": "dir",
+   "youtube_id": "dMVLKHHDN-o",
+   "series": "Kettlebell",
+   "season": 2,
+   "episode": 26
+  },
+  {
+   "src": "training/Matheus_F.-Pavel_Tsatsouline_-_More_Russian_Kettlebell_Challenges_2003-[gLeRzQVc8xw].mkv",
+   "dst": "fitness/Kettlebell/Season 03/Kettlebell S03E01 - Matheus_F.-Pavel_Tsatsouline_-_More_Russian_Kettlebell_Challenges_2003-[gLeRzQVc8xw].mkv",
+   "kind": "media",
+   "youtube_id": "gLeRzQVc8xw",
+   "series": "Kettlebell",
+   "season": 3,
+   "episode": 1
+  },
+  {
+   "src": "training/Mark_Wildman-Kettlebell_Snatch_Technique-[xQqCyl-2ixQ].mkv",
+   "dst": "fitness/Kettlebell/Season 03/Kettlebell S03E02 - Mark_Wildman-Kettlebell_Snatch_Technique-[xQqCyl-2ixQ].mkv",
+   "kind": "media",
+   "youtube_id": "xQqCyl-2ixQ",
+   "series": "Kettlebell",
+   "season": 3,
+   "episode": 2
+  },
+  {
+   "src": "training/Mark_Wildman-Kettlebell_Upper_cut_outside_swing_-_a_Fight_movement_pattern_training_exercise-[9RRWCkMIRSs].mkv",
+   "dst": "fitness/Kettlebell/Season 03/Kettlebell S03E03 - Mark_Wildman-Kettlebell_Upper_cut_outside_swing_-_a_Fight_movement_pattern_training_exercise-[9RRWCkMIRSs].mkv",
+   "kind": "media",
+   "youtube_id": "9RRWCkMIRSs",
+   "series": "Kettlebell",
+   "season": 3,
+   "episode": 3
+  },
+  {
+   "src": "training/Mark_Wildman-Kettlebell_Walking_Around_the_leg_clean_with_high_transition_-_ideal_for_martial_artists_and_runners-[9YMRKqxUIsw].mkv",
+   "dst": "fitness/Kettlebell/Season 03/Kettlebell S03E04 - Mark_Wildman-Kettlebell_Walking_Around_the_leg_clean_with_high_transition_-_ideal_for_martial_artists_and_runners-[9YMRKqxUIsw].mkv",
+   "kind": "media",
+   "youtube_id": "9YMRKqxUIsw",
+   "series": "Kettlebell",
+   "season": 3,
+   "episode": 4
+  },
+  {
+   "src": "training/Mark_Wildman-THE_MOST_important_BEST_squat_you_can_do_for_sports_life_Kettlebell_72_Deck_Squat-[vUJ3sZVwZ4Y].mkv",
+   "dst": "fitness/Kettlebell/Season 03/Kettlebell S03E05 - Mark_Wildman-THE_MOST_important_BEST_squat_you_can_do_for_sports_life_Kettlebell_72_Deck_Squat-[vUJ3sZVwZ4Y].mkv",
+   "kind": "media",
+   "youtube_id": "vUJ3sZVwZ4Y",
+   "series": "Kettlebell",
+   "season": 3,
+   "episode": 5
+  },
+  {
+   "src": "training/Mark_Wildman-The_Kettlebell_Roadmap_Beginner_to_Advanced-[QPxiClwIyKU].mp4",
+   "dst": "fitness/Kettlebell/Season 03/Kettlebell S03E06 - Mark_Wildman-The_Kettlebell_Roadmap_Beginner_to_Advanced-[QPxiClwIyKU].mp4",
+   "kind": "media",
+   "youtube_id": "QPxiClwIyKU",
+   "series": "Kettlebell",
+   "season": 3,
+   "episode": 6
+  },
+  {
+   "src": "training/Mark_Wildman-10_Minutes_of_Kettlebell_Nonstop_You_Will_Get_Very_Strong_Secret_Service_Snatch_Test-[JTOzWVM9d0Y].mp4",
+   "dst": "fitness/Kettlebell/Season 03/Kettlebell S03E07 - Mark_Wildman-10_Minutes_of_Kettlebell_Nonstop_You_Will_Get_Very_Strong_Secret_Service_Snatch_Test-[JTOzWVM9d0Y].mp4",
+   "kind": "media",
+   "youtube_id": "JTOzWVM9d0Y",
+   "series": "Kettlebell",
+   "season": 3,
+   "episode": 7
+  },
+  {
+   "src": "training/Mark_Wildman-If_You_Master_This_Kettlebells_Become_Much_More_Fun_Beginner_Friendly-[4TgRTh_R6_w].mkv",
+   "dst": "fitness/Kettlebell/Season 03/Kettlebell S03E08 - Mark_Wildman-If_You_Master_This_Kettlebells_Become_Much_More_Fun_Beginner_Friendly-[4TgRTh_R6_w].mkv",
+   "kind": "media",
+   "youtube_id": "4TgRTh_R6_w",
+   "series": "Kettlebell",
+   "season": 3,
+   "episode": 8
+  },
+  {
+   "src": "training/Mark_Wildman-How_to_Do_a_Kettlebell_Swing_-_4_Versions_Everyone_Should_Try-[TjarIpMne1w].mp4",
+   "dst": "fitness/Kettlebell/Season 03/Kettlebell S03E09 - Mark_Wildman-How_to_Do_a_Kettlebell_Swing_-_4_Versions_Everyone_Should_Try-[TjarIpMne1w].mp4",
+   "kind": "media",
+   "youtube_id": "TjarIpMne1w",
+   "series": "Kettlebell",
+   "season": 3,
+   "episode": 9
+  },
+  {
+   "src": "training/The 7 ATG Mobility Standards Checklist-[4nhuBzBjWzQ].mp4",
+   "dst": "fitness/Mobility & Physio/Season 01/Mobility & Physio S01E01 - The 7 ATG Mobility Standards Checklist-[4nhuBzBjWzQ].mp4",
+   "kind": "media",
+   "youtube_id": "4nhuBzBjWzQ",
+   "series": "Mobility & Physio",
+   "season": 1,
+   "episode": 1
+  },
+  {
+   "src": "training/The Forgotten PRIMAL MOVEMENT-[DZPvK1MWGdg].mp4",
+   "dst": "fitness/Mobility & Physio/Season 01/Mobility & Physio S01E02 - The Forgotten PRIMAL MOVEMENT-[DZPvK1MWGdg].mp4",
+   "kind": "media",
+   "youtube_id": "DZPvK1MWGdg",
+   "series": "Mobility & Physio",
+   "season": 1,
+   "episode": 2
+  },
+  {
+   "src": "training/Movesmethod-Insane_Mobility_Gains_Only_10min_per_Day-[VqafdE2n3Ls].mkv",
+   "dst": "fitness/Mobility & Physio/Season 01/Mobility & Physio S01E03 - Movesmethod-Insane_Mobility_Gains_Only_10min_per_Day-[VqafdE2n3Ls].mkv",
+   "kind": "media",
+   "youtube_id": "VqafdE2n3Ls",
+   "series": "Mobility & Physio",
+   "season": 1,
+   "episode": 3
+  },
+  {
+   "src": "training/Movesmethod-10-Minute_Squat_Mobility_Routine_For_Beginners-[y_s1Hel0yIE].mkv",
+   "dst": "fitness/Mobility & Physio/Season 01/Mobility & Physio S01E04 - Movesmethod-10-Minute_Squat_Mobility_Routine_For_Beginners-[y_s1Hel0yIE].mkv",
+   "kind": "media",
+   "youtube_id": "y_s1Hel0yIE",
+   "series": "Mobility & Physio",
+   "season": 1,
+   "episode": 4
+  },
+  {
+   "src": "training/Movesmethod-5_Science-Backed_Exercises_That_Reverse_Aging-[mim6KgNDDb0].mp4",
+   "dst": "fitness/Mobility & Physio/Season 01/Mobility & Physio S01E05 - Movesmethod-5_Science-Backed_Exercises_That_Reverse_Aging-[mim6KgNDDb0].mp4",
+   "kind": "media",
+   "youtube_id": "mim6KgNDDb0",
+   "series": "Mobility & Physio",
+   "season": 1,
+   "episode": 5
+  },
+  {
+   "src": "training/Strength_Side-You_ll_Regret_Not_starting_these_before_40.-[1KZNyxjP19A].mkv",
+   "dst": "fitness/Mobility & Physio/Season 01/Mobility & Physio S01E06 - Strength_Side-You_ll_Regret_Not_starting_these_before_40.-[1KZNyxjP19A].mkv",
+   "kind": "media",
+   "youtube_id": "1KZNyxjP19A",
+   "series": "Mobility & Physio",
+   "season": 1,
+   "episode": 6
+  },
+  {
+   "src": "training/Steph_Rose-Combat_Mobility_Workout_The_Full_Breakdown-[d9s8iXNYFSk].mp4",
+   "dst": "fitness/Mobility & Physio/Season 01/Mobility & Physio S01E07 - Steph_Rose-Combat_Mobility_Workout_The_Full_Breakdown-[d9s8iXNYFSk].mp4",
+   "kind": "media",
+   "youtube_id": "d9s8iXNYFSk",
+   "series": "Mobility & Physio",
+   "season": 1,
+   "episode": 7
+  },
+  {
+   "src": "training/Strength_Side-5_Mobility_Exercises_Too_Good_to_Ignore.-[LIcwEXUV5VU].mkv",
+   "dst": "fitness/Mobility & Physio/Season 01/Mobility & Physio S01E08 - Strength_Side-5_Mobility_Exercises_Too_Good_to_Ignore.-[LIcwEXUV5VU].mkv",
+   "kind": "media",
+   "youtube_id": "LIcwEXUV5VU",
+   "series": "Mobility & Physio",
+   "season": 1,
+   "episode": 8
+  },
+  {
+   "src": "training/Strength_Side-Ancient_Mobility_Exercises_Men_35+_Need.-[y1Z1OaTUxSk].mkv",
+   "dst": "fitness/Mobility & Physio/Season 01/Mobility & Physio S01E09 - Strength_Side-Ancient_Mobility_Exercises_Men_35+_Need.-[y1Z1OaTUxSk].mkv",
+   "kind": "media",
+   "youtube_id": "y1Z1OaTUxSk",
+   "series": "Mobility & Physio",
+   "season": 1,
+   "episode": 9
+  },
+  {
+   "src": "training/The_Kneesovertoesguy-How_to_Rebuild_Your_Shoulders_Lower_Back_AND_Knees_From_The_Ground_Up-[koXiM8TXj1g].mkv",
+   "dst": "fitness/Mobility & Physio/Season 01/Mobility & Physio S01E10 - The_Kneesovertoesguy-How_to_Rebuild_Your_Shoulders_Lower_Back_AND_Knees_From_The_Ground_Up-[koXiM8TXj1g].mkv",
+   "kind": "media",
+   "youtube_id": "koXiM8TXj1g",
+   "series": "Mobility & Physio",
+   "season": 1,
+   "episode": 10
+  },
+  {
+   "src": "training/Movesmethod-8_Movements_That_Undo_40_Hours_of_Sitting-[u1rQP57Uef8].mkv",
+   "dst": "fitness/Mobility & Physio/Season 01/Mobility & Physio S01E11 - Movesmethod-8_Movements_That_Undo_40_Hours_of_Sitting-[u1rQP57Uef8].mkv",
+   "kind": "media",
+   "youtube_id": "u1rQP57Uef8",
+   "series": "Mobility & Physio",
+   "season": 1,
+   "episode": 11
+  },
+  {
+   "src": "training/Mark_Wildman-Why_You_Can_t_Do_a_Side_Lunge_And_How_to_Fix_It-[_laL7c1bESc].mkv",
+   "dst": "fitness/Mobility & Physio/Season 01/Mobility & Physio S01E12 - Mark_Wildman-Why_You_Can_t_Do_a_Side_Lunge_And_How_to_Fix_It-[_laL7c1bESc].mkv",
+   "kind": "media",
+   "youtube_id": "_laL7c1bESc",
+   "series": "Mobility & Physio",
+   "season": 1,
+   "episode": 12
+  },
+  {
+   "src": "training/The_Kneesovertoesguy-How_to_Rebuild_Your_Lower_Back_From_The_GROUND_Up-[Us3wGbf4gQk].mkv",
+   "dst": "fitness/Mobility & Physio/Season 01/Mobility & Physio S01E13 - The_Kneesovertoesguy-How_to_Rebuild_Your_Lower_Back_From_The_GROUND_Up-[Us3wGbf4gQk].mkv",
+   "kind": "media",
+   "youtube_id": "Us3wGbf4gQk",
+   "series": "Mobility & Physio",
+   "season": 1,
+   "episode": 13
+  },
+  {
+   "src": "training/Movesmethod-The_Only_Mobility_Routine_I_Use_to_Run_Pain-Free_15-Min_Follow_Along-[XHGPw9aC9-o].mkv",
+   "dst": "fitness/Mobility & Physio/Season 01/Mobility & Physio S01E14 - Movesmethod-The_Only_Mobility_Routine_I_Use_to_Run_Pain-Free_15-Min_Follow_Along-[XHGPw9aC9-o].mkv",
+   "kind": "media",
+   "youtube_id": "XHGPw9aC9-o",
+   "series": "Mobility & Physio",
+   "season": 1,
+   "episode": 14
+  },
+  {
+   "src": "training/Seth_Capehart_MD-Build_a_Bulletproof_Lower_Back-[cUIrmL1ZlWk].mkv",
+   "dst": "fitness/Mobility & Physio/Season 01/Mobility & Physio S01E15 - Seth_Capehart_MD-Build_a_Bulletproof_Lower_Back-[cUIrmL1ZlWk].mkv",
+   "kind": "media",
+   "youtube_id": "cUIrmL1ZlWk",
+   "series": "Mobility & Physio",
+   "season": 1,
+   "episode": 15
+  },
+  {
+   "src": "training/The_Kneesovertoesguy-Lower_Back_Gradient-Scale_From_Rehab_to_Sports_Performance-[IiFnWHi11Uk].mkv",
+   "dst": "fitness/Mobility & Physio/Season 01/Mobility & Physio S01E16 - The_Kneesovertoesguy-Lower_Back_Gradient-Scale_From_Rehab_to_Sports_Performance-[IiFnWHi11Uk].mkv",
+   "kind": "media",
+   "youtube_id": "IiFnWHi11Uk",
+   "series": "Mobility & Physio",
+   "season": 1,
+   "episode": 16
+  }
+ ],
+ "nfo_files": {
+  "fitness/Bodyweight/tvshow.nfo": "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\n<tvshow>\n  <title>Bodyweight</title>\n  <lockdata>false</lockdata>\n</tvshow>\n",
+  "fitness/Bodyweight/Season 01/season.nfo": "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\n<season>\n  <title>Bodyweight</title>\n  <seasonnumber>1</seasonnumber>\n  <lockdata>false</lockdata>\n</season>\n",
+  "fitness/Combat Sports/tvshow.nfo": "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\n<tvshow>\n  <title>Combat Sports</title>\n  <lockdata>false</lockdata>\n</tvshow>\n",
+  "fitness/Combat Sports/Season 01/season.nfo": "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\n<season>\n  <title>Combat Sports</title>\n  <seasonnumber>1</seasonnumber>\n  <lockdata>false</lockdata>\n</season>\n",
+  "fitness/Endurance/tvshow.nfo": "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\n<tvshow>\n  <title>Endurance</title>\n  <lockdata>false</lockdata>\n</tvshow>\n",
+  "fitness/Endurance/Season 01/season.nfo": "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\n<season>\n  <title>Endurance</title>\n  <seasonnumber>1</seasonnumber>\n  <lockdata>false</lockdata>\n</season>\n",
+  "fitness/Health/tvshow.nfo": "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\n<tvshow>\n  <title>Health</title>\n  <lockdata>false</lockdata>\n</tvshow>\n",
+  "fitness/Health/Season 01/season.nfo": "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\n<season>\n  <title>Health</title>\n  <seasonnumber>1</seasonnumber>\n  <lockdata>false</lockdata>\n</season>\n",
+  "fitness/Heavy Club/tvshow.nfo": "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\n<tvshow>\n  <title>Heavy Club</title>\n  <lockdata>false</lockdata>\n</tvshow>\n",
+  "fitness/Heavy Club/Season 01/season.nfo": "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\n<season>\n  <title>Basics</title>\n  <seasonnumber>1</seasonnumber>\n  <lockdata>false</lockdata>\n</season>\n",
+  "fitness/Heavy Club/Season 02/season.nfo": "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\n<season>\n  <title>Exercise Tutorials</title>\n  <seasonnumber>2</seasonnumber>\n  <lockdata>false</lockdata>\n</season>\n",
+  "fitness/Inspiration/tvshow.nfo": "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\n<tvshow>\n  <title>Inspiration</title>\n  <lockdata>false</lockdata>\n</tvshow>\n",
+  "fitness/Inspiration/Season 01/season.nfo": "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\n<season>\n  <title>Inspiration</title>\n  <seasonnumber>1</seasonnumber>\n  <lockdata>false</lockdata>\n</season>\n",
+  "fitness/Kettlebell/tvshow.nfo": "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\n<tvshow>\n  <title>Kettlebell</title>\n  <lockdata>false</lockdata>\n</tvshow>\n",
+  "fitness/Kettlebell/Season 01/season.nfo": "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\n<season>\n  <title>Compilations</title>\n  <seasonnumber>1</seasonnumber>\n  <lockdata>false</lockdata>\n</season>\n",
+  "fitness/Kettlebell/Season 02/season.nfo": "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\n<season>\n  <title>Turkish Get-Up</title>\n  <seasonnumber>2</seasonnumber>\n  <lockdata>false</lockdata>\n</season>\n",
+  "fitness/Kettlebell/Season 03/season.nfo": "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\n<season>\n  <title>Tutorials</title>\n  <seasonnumber>3</seasonnumber>\n  <lockdata>false</lockdata>\n</season>\n",
+  "fitness/Mobility & Physio/tvshow.nfo": "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\n<tvshow>\n  <title>Mobility &amp; Physio</title>\n  <lockdata>false</lockdata>\n</tvshow>\n",
+  "fitness/Mobility & Physio/Season 01/season.nfo": "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\n<season>\n  <title>Mobility &amp; Physio</title>\n  <seasonnumber>1</seasonnumber>\n  <lockdata>false</lockdata>\n</season>\n"
+ },
+ "unmapped": []
+}
