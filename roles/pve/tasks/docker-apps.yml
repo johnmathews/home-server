@@ -10,6 +10,11 @@
     dest: /etc/apt/keyrings/docker.asc
     mode: '0644'
 
+- name: Ensure python3-debian is installed
+  ansible.builtin.apt:
+    name: python3-debian
+    state: present
+
 - name: Add Docker apt repository
   ansible.builtin.deb822_repository:
     name: docker

@@ -8,6 +8,15 @@
         dest: /usr/share/keyrings/tailscale-archive-keyring.gpg
         mode: '0644'
 
+    # deb822_repository needs the python3-debian library on the target and will
+    # NOT install it itself (install_python_debian defaults to false). Without
+    # this, the module hard-fails on any host that has never had it -- including
+    # every host in a rebuild-from-scratch.
+    - name: Ensure python3-debian is installed
+      ansible.builtin.apt:
+        name: python3-debian
+        state: present
+
     - name: Add Tailscale repository
       ansible.builtin.deb822_repository:
         name: tailscale

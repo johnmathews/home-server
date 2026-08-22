@@ -47,6 +47,13 @@
   register: nodesource_key
   when: nodejs_needs_install
 
+- name: Ensure python3-debian is installed
+  ansible.builtin.apt:
+    name: python3-debian
+    state: present
+  become: true
+  when: nodejs_needs_install
+
 - name: Add NodeSource repository
   ansible.builtin.deb822_repository:
     name: nodesource
