@@ -7,11 +7,17 @@
     name: curl
     state: present
 
-- name: Install uv (if not already present)
+# Vendor-supplied installer script; get_url/uri cannot pipe a script into a shell.
+# `creates:` must name the path uv actually installs to (/root/.local/bin/uv) --
+# it previously named /root/.cargo/bin/uv, which uv abandoned, so the guard never
+# matched and this re-ran `curl | sh` as root on every play.
+- name: Install uv (if not already present) # noqa: command-instead-of-module
   ansible.builtin.shell: |
+    set -eo pipefail
     curl -LsSf https://astral.sh/uv/install.sh | sh
   args:
-    creates: /root/.cargo/bin/uv
+    executable: /bin/bash
+    creates: /root/.local/bin/uv
 
 - name: Symlink uv to /usr/local/bin
   ansible.builtin.file:
@@ -19,12 +25,6 @@
     dest: /usr/local/bin/uv
     state: link
     force: true
-
-- name: Add uv bin to shell profile
-  ansible.builtin.lineinfile:
-    path: /root/.profile
-    line: 'export PATH="$HOME/.cargo/bin:$PATH"'
-    create: true
 
 - name: Create virtualenv using uv
   ansible.builtin.command: /root/.local/bin/uv venv --python=python3 {{ pve_exporter_install_dir }}/venv

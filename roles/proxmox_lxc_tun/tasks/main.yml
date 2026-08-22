@@ -26,7 +26,10 @@
   block:
     - name: Get list of all LXC containers
       ansible.builtin.shell: |
+        set -o pipefail
         pct list | awk 'NR>1 {print $1}'
+      args:
+        executable: /bin/bash
       register: lxc_containers
       changed_when: false
 
