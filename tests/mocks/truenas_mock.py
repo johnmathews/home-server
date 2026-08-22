@@ -29,6 +29,19 @@ class TrueNASState:
         ]
         self.request_count = 0
 
+    def reset(self):
+        """Restore every share to enabled.
+
+        Tests share one mock process, so state leaks between them: a test that
+        runs `pause` disables the shares, and the next test's precondition
+        ("shares start enabled") then fails through no fault of its own.
+        test_setup() calls this so each test starts from a known state.
+        """
+        for share in self.nfs_shares:
+            share['enabled'] = True
+        for share in self.smb_shares:
+            share['enabled'] = True
+
     def get_nfs_share(self, share_id):
         for share in self.nfs_shares:
             if share['id'] == share_id:
@@ -88,6 +101,15 @@ class TrueNASMockHandler(BaseHTTPRequestHandler):
         """Handle GET requests"""
         parsed = urlparse(self.path)
         path = parsed.path
+
+        # Test-control endpoint, deliberately outside the /api/v2.0 namespace so
+        # it cannot be confused with something TrueNAS actually serves. Bypasses
+        # the failure simulation below: resetting state must work even when the
+        # mock is configured to fail API calls.
+        if path == '/_test/reset':
+            state.reset()
+            self.send_json_response(200, {'reset': True})
+            return
 
         # Check for simulated failures
         if self.should_fail():

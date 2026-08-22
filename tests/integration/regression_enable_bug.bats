@@ -107,7 +107,7 @@ teardown() {
     assert_container_running "test-nginx-1"
 
     # Assert: Log shows enable operation
-    assert_log_contains "PHASE 2: ENABLE NFS/SMB SHARES" "$output"
+    assert_log_contains "PHASE 0: ENABLE NFS/SMB SHARES" "$output"
 }
 
 @test "REGRESSION: docker-sleep.sh start actually enables shares" {

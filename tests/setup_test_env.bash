@@ -91,12 +91,45 @@ setup_test_config() {
 
     # Override config file paths (scripts check these env vars)
     export CONFIG_DIR="$TEST_TMP/config"
-    export QUIET_LIST="$TEST_TMP/config/containers.pause.list"
+    # Deliberately NOT exporting QUIET_LIST.
+    #
+    # It used to be exported here, hardcoded to the PAUSE list. But
+    # docker-sleep.sh uses QUIET_LIST for every action, so a `stop` or `start`
+    # run also read the pause list, found none of its containers, and did
+    # nothing — while still exiting 0. CONFIG_DIR alone is the right override:
+    # the script derives containers.pause.list or containers.stop.list from it
+    # per action (docker-sleep.sh:15-19).
+    #
+    # This was also why the suite behaved differently depending on how it was
+    # started: run_tests.sh leaked this export into bats, direct `bats` did not,
+    # so the same test passed one way and failed the other.
     export TRUENAS_CONF_FILE="$TEST_TMP/config/truenas.conf"
 
-    # Disable quiet hours window check for tests (always allow operations)
-    export QUIET_HOURS_START=""
-    export QUIET_HOURS_END=""
+    # docker-sleep.sh defaults LOCK_DIR to /run/sleep-hours, which is a tmpfs
+    # that only exists on a real systemd host. Without this override the whole
+    # suite fails before doing any work, and it fails SILENTLY: `mkdir -p` is
+    # swallowed by `|| true`, and on a box with no flock(1) the fallback branch
+    # just returns 1 without logging, so every test reports a bare "Exit code: 1"
+    # with no cause. That is why this looked like a test-logic bug for months.
+    mkdir -p "$TEST_TMP/run"
+    export LOCK_DIR="$TEST_TMP/run"
+
+    # Force the quiet-hours window OPEN for tests.
+    #
+    # These used to be set to "" with the comment "disable the window check".
+    # That is the opposite of what docker-sleep.sh does: is_within_quiet_window()
+    # returns FALSE when either bound is empty, and the pause/stop guard then
+    # exits 0 without touching a container. The suite therefore ran clean and
+    # asserted on containers nothing had acted upon.
+    #
+    # Do not "fix" that in the script — unconfigured window means do nothing is
+    # the correct production behaviour. Configure a window here instead.
+    #
+    # 00:00-00:00 is deliberate, not a placeholder: equal bounds take the
+    # wrap-around branch, which returns true whenever now >= today 00:00, i.e.
+    # always. A 00:00-23:59 window would leave a one-minute hole at 23:59.
+    export QUIET_HOURS_START="00:00"
+    export QUIET_HOURS_END="00:00"
 
     # Set log level
     export QUIET_LOG_LEVEL="${QUIET_LOG_LEVEL:-info}"
@@ -168,14 +201,54 @@ test_setup() {
         cp "$FIXTURES_DIR/configs/"* "$TEST_TMP/config/" 2>/dev/null || true
     fi
 
-    # Re-export environment variables for this test (bats runs in subshells)
+    # Re-export environment variables for this test (bats runs in subshells).
+    #
+    # This list must stay complete. Anything the script reads that is set only in
+    # setup_test_config() does NOT reach here: that function runs once inside
+    # global_setup, and whether its exports survive depends on whether bats was
+    # invoked from run_tests.sh (they leak through the environment) or directly
+    # (they do not). That inconsistency is why the suite failed differently
+    # depending on how it was started, and why the cause looked like it moved.
     export CONFIG_DIR="$TEST_TMP/config"
     export TRUENAS_CONF_FILE="$TEST_TMP/config/truenas.conf"
     export TRUENAS_API_URL="http://localhost:${TRUENAS_MOCK_PORT:-8888}/api/v2.0"
     export TRUENAS_API_KEY="test-api-key-12345"
 
+    # docker-sleep.sh defaults LOCK_DIR to /run/sleep-hours — a tmpfs that only
+    # exists on a real systemd host. On macOS /run is a read-only filesystem, so
+    # `mkdir -p` fails, `|| true` swallows it, and the lock write then fails.
+    mkdir -p "$TEST_TMP/run"
+    export LOCK_DIR="$TEST_TMP/run"
+
+    # Force the quiet-hours window OPEN. See setup_test_config() for why equal
+    # bounds mean "always inside" and why the script must not be changed instead.
+    export QUIET_HOURS_START="00:00"
+    export QUIET_HOURS_END="00:00"
+
+    # docker-sleep.sh reads GRACE_DIR with `set -u` and never assigns it — in
+    # production it comes from the systemd unit
+    # (roles/sleep_hours/templates/docker-sleep@.service:48), which points at
+    # /usr/local/lib/sleep-hours/plugins. Running the script outside systemd, as
+    # these tests do, leaves it unbound and the script dies at PHASE 1. The repo
+    # copy of those plugins is files/plugins.
+    #
+    # More broadly: that unit sets ~30 environment variables and this harness
+    # replicates a handful. If a test fails on an unbound variable, check the
+    # unit file first — it is the production environment these tests approximate.
+    export GRACE_DIR="$PROJECT_ROOT/roles/sleep_hours/files/plugins"
+
+    # Same reason: docker-sleep.sh shells out to the TrueNAS share helper at its
+    # installed path. Point it at the repo copy.
+    export TRUENAS_SHARES_BIN="$PROJECT_ROOT/roles/sleep_hours/files/truenas-shares.sh"
+
     # Clean up any leftover containers from previous tests
     cleanup_test_containers
+
+    # Reset TrueNAS mock share state. All tests share one mock process, so a
+    # test that runs `pause` leaves the shares disabled and the next test's
+    # "shares start enabled" precondition fails for reasons unrelated to what it
+    # is testing. Silent if the mock is not running (direct `bats` invocation).
+    curl -s -m 2 "http://localhost:${TRUENAS_MOCK_PORT:-8888}/_test/reset" >/dev/null 2>&1 || true
 }
 
 # Per-test teardown (called after each test)

@@ -277,14 +277,17 @@ Running: regression_enable_bug
 ==========================================
 Test Summary
 ==========================================
-Total test files: 5
+Total test files: 6
 Passed: 5
-Failed: 0
-
-==========================================
-✓ All tests passed!
-==========================================
+Failed: 1
 ```
+
+> **This block is illustrative, not a recorded run.** An earlier version of this
+> document printed a fabricated `Passed: 5 / Failed: 0` transcript. At the time it
+> was written the suite could not pass at all — six separate defects in the
+> harness meant 18 of 20 tests failed, and CI had been skipping the suite
+> entirely since 2026-01-27, so nothing contradicted the claim. Run the suite and
+> read its real output; do not trust a transcript in a document.
 
 ### Run Specific Tests
 
@@ -364,7 +367,9 @@ cat /tmp/sleep-hours-test-*/logs/*
 - Provides examples for new contributors
 
 ### CI/CD Integration
-- Automated testing on every commit
+- Automated testing on every commit — ASPIRATIONAL, not current. The workflow
+  gates on `sleep_hours_enabled: true` in host_vars/, which is false everywhere,
+  so it has skipped every step since 2026-01-27 while reporting success.
 - Catches bugs before they reach production
 - Faster feedback loop for developers
 
@@ -386,6 +391,6 @@ This test suite provides comprehensive coverage of the sleep hours system's crit
 - ✅ **Reliable** (deterministic, repeatable)
 - ✅ **Isolated** (no side effects on real systems)
 - ✅ **Maintainable** (clear structure, reusable helpers)
-- ✅ **CI/CD ready** (automated on every commit)
+- ⚠️ **CI/CD**: wired but inert — see above. Fixing the gate is tracked as W5.
 
 Most importantly, the **regression tests ensure the enable/unpause bug will never return**.

@@ -48,7 +48,7 @@ ANSIBLE_OPTS := $(TAGS_ARG) $(SKIP_ARG) $(LIMIT_ARG) $(EXTRA)
         finances \
         shell nfs share_drive_probe tailscale requirements \
         jelly-upgrade immich-upgrade refresh-sidecars \
-        check lint clean ci help
+        check lint clean ci help check-ports test
 
 
 all: site
@@ -161,6 +161,14 @@ clean:
 # jinja2 and parses them with pyyaml, both of which come from requirements.txt.
 check-ports:
 	.venv/bin/python scripts/check-duplicate-ports.py
+
+# Runs every suite in tests/. Until now nothing invoked pytest at all, and
+# tests/run_tests.sh globbed integration/ only — so the python tests and the
+# unit bats suite had never run, in CI or locally.
+# Needs bats, docker, jq and curl for the integration suite.
+test:
+	python3 -m pytest tests/ -q
+	bash tests/run_tests.sh
 
 ci: lint check-ports check
 
