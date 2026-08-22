@@ -139,8 +139,12 @@ tailscale:
 nfs:
 	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/nfs.yml $(VAULT) $(ANSIBLE_OPTS)
 
+# --force on roles and --upgrade on collections are both required for the pins in
+# requirements.yml to mean anything: ansible-galaxy skips anything already
+# installed unless told otherwise, so without these a changed pin is a no-op and
+# you get "whatever was installed first" rather than what the file asks for.
 requirements:
-	.venv/bin/ansible-galaxy role install -r requirements.yml -p ~/.ansible/roles && .venv/bin/ansible-galaxy collection install -r requirements.yml && uv pip install -r requirements.txt
+	.venv/bin/ansible-galaxy role install -r requirements.yml -p ~/.ansible/roles --force && .venv/bin/ansible-galaxy collection install -r requirements.yml --upgrade && uv pip install -r requirements.txt
 
 # ───────────── Quality Checks ─────────────
 check:
