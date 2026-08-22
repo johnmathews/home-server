@@ -191,7 +191,9 @@ path. To confirm this list is still complete:
 - `disaster-recovery.md` — Backup architecture, recovery scenarios, and rebuild procedures
 - `archive/domain-migration.md` — Completed migration from itsa.pizza to itsa-pizza.com (archived 2026-07-12)
 - `docserver.md` — Documentation MCP server on infra VM (indexing, search, MCP)
+- `document_library_lxc.md` — The `library` document store (guest is still named `paperless`); the repo's reference Docker role
 - `disks.md` — Proxmox host disk management and backup storage
+- `family_finances_lxc.md` — Family finances app: SHA-pinned private images, encrypted per-household DBs, why Tailscale is omitted
 - `doorbell.md` — Reolink video doorbell: usage guide (non-technical), notifications, two-way audio, HA/go2rtc setup
 - `grafana-alerting.md` — Grafana alert rules, concise Pushover notification templates, API access
 - `home_assistant_dishwasher.md` — Bosch dishwasher: LAN discovery, why Home Connect gives no kWh, metering plug, Home Connect integration, per-cycle energy attribution
@@ -236,7 +238,7 @@ path. To confirm this list is still complete:
 "why is it built this way" and `documentation/` does not say, the answer is usually here.
 
 - One file per working session, named `yymmdd-descriptive-name.md` (e.g.
-  `260704-jellyfin-brownouts-ffprobe-oom-root-cause.md`). 54 entries spanning 2026-03-19 to
+  `260704-jellyfin-brownouts-ffprobe-oom-root-cause.md`). 55 entries spanning 2026-03-19 to
   2026-08-22 at last count — `ls journal/*.md | wc -l` for the current number.
 - **Append-only.** Entries are never rewritten to reflect later knowledge; a wrong call stays
   on the record next to the entry that corrects it.
