@@ -158,8 +158,11 @@ requirements-galaxy:
 	.venv/bin/ansible-galaxy collection install -r requirements.yml --upgrade
 
 # ───────────── Quality Checks ─────────────
+# $(ANSIBLE_OPTS) is not decoration: without it `make check TAGS=... SKIP=...
+# LIMIT=... EXTRA=--diff` silently ran the whole fleet with none of them, so a
+# scoped dry-run was impossible and `EXTRA="--diff"` produced no diffs at all.
 check:
-	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/site.yml --check $(VAULT)
+	$(ANSIBLE) $(INVENTORY) $(PLAYBOOK_DIR)/site.yml --check $(VAULT) $(ANSIBLE_OPTS)
 
 # No path arguments on purpose. Scoping to `playbooks/ roles/` excluded
 # host_vars/, group_vars/, requirements.yml, .ansible-lint and .github/ -- which

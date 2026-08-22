@@ -54,6 +54,10 @@ in `.ansible-lint`) do not fail it; failures do.
 - `TAGS=tagname` or `t=tagname` — run specific tag
 - `SKIP=tagname` or `s=tagname` — skip specific tag
 - `LIMIT=hostname` or `l=hostname` — limit to one host
+- `EXTRA="--diff -vv"` — anything else to pass straight to `ansible-playbook`
+
+`make check` accepts the same flags, so a scoped dry run is
+`make check LIMIT=<host> EXTRA="--diff"`.
 
 ## Deployment Model
 

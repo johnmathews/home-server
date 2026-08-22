@@ -78,6 +78,11 @@ locally and in `test.yml`, which needs a docker daemon.
 fleet — which needs SSH to every production host and the gitignored
 `.vault_pass.txt`, so it is operator-only and cannot run on a runner.
 
+`make check` takes the same `TAGS=` / `SKIP=` / `LIMIT=` / `EXTRA=` flags as the
+per-host targets (fixed 2026-08-22 — the target was missing `$(ANSIBLE_OPTS)`, so
+until then every flag passed to it was silently dropped and the dry run always ran
+the whole fleet). `make check LIMIT=jellyfin_lxc EXTRA="--diff"` is the scoped form.
+
 `make lint` is **blocking**, not advisory. Because make stops at the first failed
 prerequisite, a lint failure aborts `ci`/`ci-offline` before their later stages.
 
