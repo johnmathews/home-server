@@ -9,7 +9,7 @@
 # Full-stack recreate; the only handler that should remove orphans.
 - name: Restart media stack
   community.docker.docker_compose_v2:
-    project_src: "{{ media_stack_base_dir }}"
+    project_src: "{{ media_vm_media_stack_base_dir }}"
     state: present
     recreate: always
     pull: never
@@ -19,7 +19,7 @@
 # Notified when journal context files or mood-dimensions.toml change.
 - name: Restart journal-insights
   community.docker.docker_compose_v2:
-    project_src: "{{ media_stack_base_dir }}"
+    project_src: "{{ media_vm_media_stack_base_dir }}"
     services:
       - journal-server
       - journal-webapp
@@ -34,7 +34,7 @@
 # Declared before alloy so any later "alloy" handler doesn't run before its deps.
 - name: Restart gluetun
   community.docker.docker_compose_v2:
-    project_src: "{{ media_stack_base_dir }}"
+    project_src: "{{ media_vm_media_stack_base_dir }}"
     services:
       - gluetun
       - qbittorrent
@@ -47,7 +47,7 @@
 # Notified when alloy config file changes.
 - name: Restart alloy
   community.docker.docker_compose_v2:
-    project_src: "{{ media_stack_base_dir }}"
+    project_src: "{{ media_vm_media_stack_base_dir }}"
     services:
       - alloy
     state: present

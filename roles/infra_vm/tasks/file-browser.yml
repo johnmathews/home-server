@@ -23,7 +23,7 @@
   ansible.builtin.find:
     paths: /srv/infra/filebrowser/config
     file_type: file
-  register: filebrowser_files
+  register: infra_vm_filebrowser_files
   tags: [filebrowser]
   notify: Restart filebrowser container
 
@@ -31,7 +31,7 @@
   ansible.builtin.file:
     path: "{{ item.path }}"
     mode: '0644'
-  loop: "{{ filebrowser_files.files }}"
+  loop: "{{ infra_vm_filebrowser_files.files }}"
   notify: restart filebrowser
   tags: [filebrowser]
 
@@ -39,7 +39,7 @@
   ansible.builtin.find:
     paths: /srv/infra/filebrowser/config
     file_type: directory
-  register: filebrowser_dirs
+  register: infra_vm_filebrowser_dirs
   tags: [filebrowser]
   notify: restart filebrowser
 
@@ -47,6 +47,6 @@
   ansible.builtin.file:
     path: "{{ item.path }}"
     mode: '0755'
-  loop: "{{ filebrowser_dirs.files }}"
+  loop: "{{ infra_vm_filebrowser_dirs.files }}"
   notify: restart filebrowser
   tags: [filebrowser]

@@ -58,7 +58,7 @@
 
 - name: Create media stack base directory
   ansible.builtin.file:
-    path: "{{ media_stack_base_dir | dirname }}"
+    path: "{{ media_vm_media_stack_base_dir | dirname }}"
     state: directory
     mode: '0755'
 
@@ -67,45 +67,45 @@
     path: "{{ item }}"
     state: directory
     recurse: true
-    owner: "{{ media_stack_user }}"
-    group: "{{ media_stack_group }}"
+    owner: "{{ media_vm_media_stack_user }}"
+    group: "{{ media_vm_media_stack_group }}"
     mode: '0755'
   loop:
-    - "{{ media_stack_base_dir }}"
-    - "{{ media_stack_mount_dir }}/library"
-    - "{{ media_stack_mount_dir }}/media"
+    - "{{ media_vm_media_stack_base_dir }}"
+    - "{{ media_vm_media_stack_mount_dir }}/library"
+    - "{{ media_vm_media_stack_mount_dir }}/media"
 
 - name: Ensure journal-server data directory exists
   ansible.builtin.file:
-    path: "{{ media_stack_base_dir }}/config/journal/data"
+    path: "{{ media_vm_media_stack_base_dir }}/config/journal/data"
     state: directory
-    owner: "{{ media_stack_user }}"
-    group: "{{ media_stack_user }}"
+    owner: "{{ media_vm_media_stack_user }}"
+    group: "{{ media_vm_media_stack_user }}"
     mode: '0755'
   tags: journal
 
 - name: Ensure journal-server chromadb directory exists
   ansible.builtin.file:
-    path: "{{ media_stack_base_dir }}/config/journal/chromadb"
+    path: "{{ media_vm_media_stack_base_dir }}/config/journal/chromadb"
     state: directory
-    owner: "{{ media_stack_user }}"
-    group: "{{ media_stack_user }}"
+    owner: "{{ media_vm_media_stack_user }}"
+    group: "{{ media_vm_media_stack_user }}"
     mode: '0755'
   tags: journal
 
 - name: Ensure journal-server context directory exists
   ansible.builtin.file:
-    path: "{{ media_stack_base_dir }}/config/journal/context"
+    path: "{{ media_vm_media_stack_base_dir }}/config/journal/context"
     state: directory
-    owner: "{{ media_stack_user }}"
-    group: "{{ media_stack_user }}"
+    owner: "{{ media_vm_media_stack_user }}"
+    group: "{{ media_vm_media_stack_user }}"
     mode: '0755'
   tags: journal
 
 - name: Upload journal-server mood dimensions
   ansible.builtin.copy:
     src: templates/journal/moods/mood-dimensions.toml
-    dest: "{{ media_stack_base_dir }}/config/journal/mood-dimensions.toml"
+    dest: "{{ media_vm_media_stack_base_dir }}/config/journal/mood-dimensions.toml"
     owner: "{{ puid }}"
     group: "{{ guid }}"
     mode: '0644'
@@ -116,7 +116,7 @@
 - name: Upload journal-server context files
   ansible.builtin.copy:
     src: "{{ item }}"
-    dest: "{{ media_stack_base_dir }}/config/journal/context/{{ item | basename }}"
+    dest: "{{ media_vm_media_stack_base_dir }}/config/journal/context/{{ item | basename }}"
     owner: "{{ puid }}"
     group: "{{ guid }}"
     mode: '0644'
@@ -128,41 +128,41 @@
 
 - name: Ensure alloy config directory exists
   ansible.builtin.file:
-    path: "{{ media_stack_base_dir }}/config/alloy"
+    path: "{{ media_vm_media_stack_base_dir }}/config/alloy"
     state: directory
-    owner: "{{ media_stack_user }}"
-    group: "{{ media_stack_user }}"
+    owner: "{{ media_vm_media_stack_user }}"
+    group: "{{ media_vm_media_stack_user }}"
     mode: '0755'
   tags: alloy
 
 - name: Ensure gluetun config directory exists
   ansible.builtin.file:
-    path: "{{ media_stack_base_dir }}/config/gluetun/auth"
+    path: "{{ media_vm_media_stack_base_dir }}/config/gluetun/auth"
     state: directory
-    owner: "{{ media_stack_user }}"
-    group: "{{ media_stack_user }}"
+    owner: "{{ media_vm_media_stack_user }}"
+    group: "{{ media_vm_media_stack_user }}"
     mode: '0755'
   tags: gluetun
 
 - name: Re-create qbittorrent config directory
   ansible.builtin.file:
-    path: "{{ media_stack_base_dir }}/config/qBittorrent"
+    path: "{{ media_vm_media_stack_base_dir }}/config/qBittorrent"
     state: directory
-    owner: "{{ media_stack_user }}"
-    group: "{{ media_stack_user }}"
+    owner: "{{ media_vm_media_stack_user }}"
+    group: "{{ media_vm_media_stack_user }}"
     mode: '0755'
-  when: reset_qbittorrent_config | default(false)
+  when: media_vm_reset_qbittorrent_config | default(false)
   tags: qbittorrent
 
 - name: Pre-seed qBittorrent.conf if missing and not resetting
   ansible.builtin.template:
     src: qBittorrent.conf.j2
-    dest: "{{ media_stack_base_dir }}/config/qBittorrent/qBittorrent.conf"
+    dest: "{{ media_vm_media_stack_base_dir }}/config/qBittorrent/qBittorrent.conf"
     owner: "{{ puid }}"
     group: "{{ guid }}"
     mode: '0644'
     force: false # Do not overwrite if already exists
-  when: reset_qbittorrent_config | default(false)
+  when: media_vm_reset_qbittorrent_config | default(false)
   tags: qbittorrent
 
 - name: Copy docker-compose.yml
@@ -216,8 +216,8 @@
 - name: Ensure .env and docker-compose.yml are owned by "john"
   ansible.builtin.file:
     path: "{{ item }}"
-    owner: "{{ media_stack_user }}"
-    group: "{{ media_stack_user }}"
+    owner: "{{ media_vm_media_stack_user }}"
+    group: "{{ media_vm_media_stack_user }}"
   loop:
     - /srv/media/.env
   notify: Restart media stack
@@ -225,7 +225,7 @@
 
 - name: Ensure Radarr config directory has correct UID/GID
   ansible.builtin.file:
-    path: "{{ media_stack_base_dir }}/config/radarr"
+    path: "{{ media_vm_media_stack_base_dir }}/config/radarr"
     state: directory
     recurse: true
     owner: "{{ puid }}"
@@ -235,7 +235,7 @@
 
 - name: Ensure Sonarr config directory has correct UID/GID
   ansible.builtin.file:
-    path: "{{ media_stack_base_dir }}/config/sonarr"
+    path: "{{ media_vm_media_stack_base_dir }}/config/sonarr"
     state: directory
     recurse: true
     owner: "{{ puid }}"
@@ -245,7 +245,7 @@
 
 - name: Ensure slskd config directory has correct UID/GID
   ansible.builtin.file:
-    path: "{{ media_stack_base_dir }}/config/slskd"
+    path: "{{ media_vm_media_stack_base_dir }}/config/slskd"
     state: directory
     recurse: true
     owner: "{{ puid }}"
@@ -256,7 +256,7 @@
 - name: Deploy slskd config from template
   ansible.builtin.template:
     src: templates/slskd/slskd.yml.j2
-    dest: "{{ media_stack_base_dir }}/config/slskd/slskd.yml"
+    dest: "{{ media_vm_media_stack_base_dir }}/config/slskd/slskd.yml"
     owner: "{{ puid }}"
     group: "{{ guid }}"
     mode: '0600'
@@ -264,11 +264,11 @@
   tags: slskd, docker
 
 - name: Set permissions of file browser config directory
-  ansible.builtin.command: chown -R 1001:1001 "{{ media_stack_base_dir }}/config/filebrowser"
+  ansible.builtin.command: chown -R 1001:1001 "{{ media_vm_media_stack_base_dir }}/config/filebrowser"
   become: true
 
 - name: Set permissions of booklore config directory
-  ansible.builtin.command: chown -R 1001:1001 "{{ media_stack_base_dir }}/config/booklore"
+  ansible.builtin.command: chown -R 1001:1001 "{{ media_vm_media_stack_base_dir }}/config/booklore"
   become: true
 
 # /etc/environment carries live API keys, so it must not keep its 0644 default.

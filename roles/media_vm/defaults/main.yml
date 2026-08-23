@@ -1,27 +1,27 @@
 # media_vm/defaults/main.yml
 
 # Docker image versions
-journal_agent_version: "latest"
-journal_chromadb_version: "latest"
-slskd_version: "latest"
-sabnzbd_version: "4.4.1"
-booklore_version: "latest"
-sonarr_version: "latest"
-radarr_version: "latest"
-flaresolverr_version: "v3.3.21"
-prowlarr_version: "latest"
-jellyseerr_version: "latest"
-alloy_version: "{{ sidecar_alloy_version }}"
-node_exporter_version: "{{ sidecar_node_exporter_version }}"
-cadvisor_version: "{{ sidecar_cadvisor_version }}"
+media_vm_journal_agent_version: "latest"
+media_vm_journal_chromadb_version: "latest"
+media_vm_slskd_version: "latest"
+media_vm_sabnzbd_version: "4.4.1"
+media_vm_booklore_version: "latest"
+media_vm_sonarr_version: "latest"
+media_vm_radarr_version: "latest"
+media_vm_flaresolverr_version: "v3.3.21"
+media_vm_prowlarr_version: "latest"
+media_vm_jellyseerr_version: "latest"
+media_vm_alloy_version: "{{ sidecar_alloy_version }}"
+media_vm_node_exporter_version: "{{ sidecar_node_exporter_version }}"
+media_vm_cadvisor_version: "{{ sidecar_cadvisor_version }}"
 
 # defaults/main.yml has the lowest priority. host_vars/media-vm.yml has highest priority.
 # Changing this will require you to `cd /src/media && docker compose logs qbittorrent`
 # to get the new temp password. Then in qBittorrent set the old password again
-reset_qbittorrent_config: false
+media_vm_reset_qbittorrent_config: false
 # qbittorrent_password_hash: 16c5e9c9b842bd6bf78aafa66643304e0cfe2586
 
-media_stack_base_dir: /srv/media
-media_stack_mount_dir: /mnt/media
-media_stack_user: john
-media_stack_group: john
+media_vm_media_stack_base_dir: /srv/media
+media_vm_media_stack_mount_dir: /mnt/media
+media_vm_media_stack_user: john
+media_vm_media_stack_group: john
