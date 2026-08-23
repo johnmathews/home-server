@@ -37,7 +37,8 @@ full-text search via Elasticsearch. Used primarily for archiving kids' content.
 *Ports marked with `*` are internal only (exposed within Docker network, not on host).
 
 Version pins live in `roles/tubearchivist_lxc/defaults/main.yml` (currently: tubearchivist
-`v0.5.10`, alloy `v1.5.1`, node_exporter `v1.8.2`, cadvisor `v0.49.1`).
+`v0.5.10`, alloy `v1.18.0`, node_exporter `v1.12.1`, cadvisor `v0.55.1` — the three
+sidecars from `sidecar_*` in `group_vars/all/main.yml`).
 
 ### Container Details
 

@@ -1,6 +1,10 @@
 jellyfin_lxc_smb_username: smb_user
 jellyfin_lxc_smb_server: 192.168.2.104
 
-# No sidecar version vars here: jellyfin_lxc deploys a static files/docker-compose.yml,
-# so its alloy/cadvisor/node-exporter pins are literal in that file. Keep them in sync
-# with sidecar_*_version in group_vars/all/main.yml.
+# Monitoring sidecars — versions come from `sidecar_*` in group_vars/all/main.yml,
+# which is the single source for the whole fleet. Do not pin a literal here.
+# Bumping the shared var needs `make refresh-sidecars`: compose handlers use
+# pull:never, so `make jelly` alone will not fetch the new image.
+jellyfin_lxc_alloy_version: "{{ sidecar_alloy_version }}"
+jellyfin_lxc_cadvisor_version: "{{ sidecar_cadvisor_version }}"
+jellyfin_lxc_node_exporter_version: "{{ sidecar_node_exporter_version }}"

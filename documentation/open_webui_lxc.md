@@ -33,7 +33,8 @@ by the OpenAI API (or compatible endpoints).
 ```
 
 Sidecar version pins live in `roles/open_webui_lxc/defaults/main.yml` (currently:
-cadvisor `v0.49.1`, alloy `v1.5.1`, node_exporter `v1.8.2`).
+cadvisor `v0.55.1`, alloy `v1.18.0`, node_exporter `v1.12.1` — all three from `sidecar_*`
+in `group_vars/all/main.yml`).
 
 ## Configuration
 

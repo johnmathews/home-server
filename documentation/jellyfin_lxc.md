@@ -4,16 +4,18 @@
 - SSH: `ssh jelly`
 - Ansible: `make jelly`, role: `roles/jellyfin_lxc`
 - LXC config: 12 CPU cores, 6144 MB RAM (was 4 GB; raised ~2026-06-28)
-- Docker compose: `roles/jellyfin_lxc/files/docker-compose.yml`
+- Docker compose: `roles/jellyfin_lxc/templates/docker-compose.yml.j2` (was a static
+  `files/docker-compose.yml` until 2026-08-22; the sidecar pins now come from `sidecar_*`
+  in `group_vars/all/main.yml` like every other role)
 
 ## Containers
 
 | Container     | Port  | Image                                    |
 |---------------|-------|------------------------------------------|
 | jellyfin      | 8096  | jellyfin-with-yt-dlp:latest (custom)     |
-| alloy         | 12345 | grafana/alloy:v1.5.1                     |
-| cadvisor      | 18080 | gcr.io/cadvisor/cadvisor:v0.49.1         |
-| node_exporter | 9100  | quay.io/prometheus/node-exporter:v1.8.2  |
+| alloy         | 12345 | grafana/alloy:v1.18.0                    |
+| cadvisor      | 18080 | gcr.io/cadvisor/cadvisor:v0.55.1         |
+| node_exporter | 9100  | quay.io/prometheus/node-exporter:v1.12.1 |
 
 The jellyfin container runs with `mem_limit: 4g` / `mem_reservation: 1g` — **the limit must stay
 below the LXC's 6 GB** (see the ffprobe OOM brownout section for why). The sidecars are capped
@@ -236,7 +238,8 @@ media info; the file itself had been in the library (corrupt) since 2025-10.
 **Fix applied 2026-07-04:**
 
 1. **Container memory cap fixed** (the fix that actually ended the outages) in
-   `roles/jellyfin_lxc/files/docker-compose.yml`: `mem_limit` was **8g on a 6 GB LXC** (could never
+   `roles/jellyfin_lxc/templates/docker-compose.yml.j2` (then `files/docker-compose.yml`):
+   `mem_limit` was **8g on a 6 GB LXC** (could never
    trigger — the LXC wall was always hit first). Now `mem_limit: 4g`, `mem_reservation: 1g`,
    transcode tmpfs 4g → 2g (tmpfs pages count against the container's limit). A runaway ffprobe is
    now killed inside the container cgroup in ~10 s; the LXC keeps ~2 GB headroom. Verified on the
