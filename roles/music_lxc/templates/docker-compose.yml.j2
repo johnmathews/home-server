@@ -40,7 +40,7 @@ services:
       - /srv/apps/navidrome/data:/data
       - /mnt/nfs/music:/music:ro
     environment:
-      - TZ={{ TZ }}
+      - TZ={{ tz }}
       - ND_SCANSCHEDULE=@every 1h
       - ND_LOGLEVEL=info
       - ND_SESSIONTIMEOUT=72h

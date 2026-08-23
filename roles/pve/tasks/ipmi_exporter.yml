@@ -12,7 +12,11 @@
 
 - name: Download IPMI exporter binary
   ansible.builtin.get_url:
-    url: "https://github.com/prometheus-community/ipmi_exporter/releases/download/v{{ pve_ipmi_exporter_version }}/ipmi_exporter-{{ pve_ipmi_exporter_version }}.linux-amd64.tar.gz"
+    # Broken inside a {{ }} tag: whitespace there is insignificant to Jinja, so the
+    # rendered URL is one token (a `>-` fold would insert a space mid-URL).
+    url: >-
+      https://github.com/prometheus-community/ipmi_exporter/releases/download/v{{
+      pve_ipmi_exporter_version }}/ipmi_exporter-{{ pve_ipmi_exporter_version }}.linux-amd64.tar.gz
     dest: "/tmp/ipmi_exporter.tar.gz"
     mode: '0644'
 
@@ -39,6 +43,8 @@
     mode: '0644'
   notify: Restart ipmi_exporter
 
+# The ExecStart line below breaks inside a {{ }} tag; Jinja ignores that whitespace,
+# so the rendered unit has ExecStart on one line.
 - name: Create ipmi_exporter systemd unit
   ansible.builtin.copy:
     dest: /etc/systemd/system/ipmi_exporter.service
@@ -51,7 +57,8 @@
       After=network.target
 
       [Service]
-      ExecStart={{ pve_ipmi_exporter_install_dir }}/ipmi_exporter --config.file={{ pve_ipmi_exporter_install_dir }}/ipmi.yml --web.listen-address=":{{ pve_ipmi_exporter_listen_port }}"
+      ExecStart={{ pve_ipmi_exporter_install_dir }}/ipmi_exporter --config.file={{
+        pve_ipmi_exporter_install_dir }}/ipmi.yml --web.listen-address=":{{ pve_ipmi_exporter_listen_port }}"
       User=root
       Restart=always
 

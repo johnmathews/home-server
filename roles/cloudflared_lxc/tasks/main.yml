@@ -23,7 +23,11 @@
 
 - name: Sync tunnel config to Cloudflare API
   ansible.builtin.uri:
-    url: "https://api.cloudflare.com/client/v4/accounts/{{ cloudflared_lxc_cloudflared_account_id }}/cfd_tunnel/{{ cloudflared_lxc_cloudflared_tunnel_id }}/configurations"
+    # Broken inside a {{ }} tag: whitespace there is insignificant to Jinja, so the
+    # rendered URL is one token (a `>-` fold would insert a space mid-URL).
+    url: >-
+      https://api.cloudflare.com/client/v4/accounts/{{
+      cloudflared_lxc_cloudflared_account_id }}/cfd_tunnel/{{ cloudflared_lxc_cloudflared_tunnel_id }}/configurations
     method: PUT
     headers:
       Authorization: "Bearer {{ cloudflared_lxc_cloudflared_api_token }}"

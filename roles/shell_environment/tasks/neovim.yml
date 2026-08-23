@@ -118,7 +118,10 @@
     owner: "{{ item[0].split(':')[0] }}"
     group: "{{ item[0].split(':')[0] }}"
     mode: '0644'
-  loop: "{{ shell_environment_target_shell_users | product(['options.lua', 'plugins.lua', 'functions.lua', 'mappings.lua', 'autocmd.lua', 'colorscheme.lua']) | list }}"
+  loop: >-
+    {{ shell_environment_target_shell_users
+    | product(['options.lua', 'plugins.lua', 'functions.lua', 'mappings.lua', 'autocmd.lua', 'colorscheme.lua'])
+    | list }}
   become: true
   tags: [nvim]
 

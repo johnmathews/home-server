@@ -72,7 +72,7 @@ dns_fallback: "9.9.9.9" # Quad9 (matches Unbound upstream)
 primary_domain_name: "itsa-pizza.com"
 
 # Common defaults shared across roles (override in role defaults or host_vars as needed)
-TZ: Europe/Amsterdam
+tz: Europe/Amsterdam
 puid: 1001
 guid: 1001
 docker_user: john
