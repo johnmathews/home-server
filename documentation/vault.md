@@ -102,7 +102,7 @@ Update the off-site backup of `.vault_pass.txt` immediately afterward.
 1. **Vault names are prefixed `vault_`.** This makes it grep-able and obvious in templates that a value comes from the
    vault.
 2. **Prefer aliases over referencing vault vars directly in templates.** Add a plaintext alias in the role's
-   `defaults/main.yml` (e.g. `cloudflared_api_token: "{{ vault_cloudflared_api_token }}"`) and reference the alias.
+   `defaults/main.yml` (e.g. `cloudflared_lxc_cloudflared_api_token: "{{ vault_cloudflared_api_token }}"`) and reference the alias.
    This keeps the vault list curated and makes refactoring easier. In practice this is not applied uniformly —
    several templates (e.g. `roles/media_vm/templates/.env.j2`, `roles/immich_lxc/templates/.env.j2`,
    `roles/infra_vm/templates/homepage/services.yaml.j2`) reference `vault_*` vars directly; follow the alias

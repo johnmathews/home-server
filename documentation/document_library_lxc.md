@@ -175,7 +175,7 @@ Routed through the Cloudflare Tunnel **directly to `192.168.2.117:8010`, not via
 (`roles/cloudflared_lxc/defaults/main.yml:156-162`), so it gets Cloudflare Zero Access
 protection rather than Traefik's rate limiting. Three hostnames all reach this app —
 `library.itsa-pizza.com`, `documents.itsa-pizza.com` and `paperless.itsa-pizza.com` — the
-last two kept from the Paperless era. `cloudflared_ingress` in that file is the source of
+last two kept from the Paperless era. `cloudflared_lxc_cloudflared_ingress` in that file is the source of
 truth for the route list; see [cloudflared.md](cloudflared.md).
 
 ## 7. Monitoring
@@ -208,6 +208,6 @@ make document-library
 ```
 
 Migrations run themselves — `library-migrate` applies `alembic upgrade head` before the app
-starts. See [upgrade-procedures.md](upgrade-procedures.md) for the sidecar pins, and note
-that this role pins alloy, node-exporter and cadvisor **literally** in its own
-`defaults/main.yml` rather than via the shared `sidecar_*` variables.
+starts. See [upgrade-procedures.md](upgrade-procedures.md) for the sidecar pins. This role
+carried literal alloy, node-exporter and cadvisor pins in its own `defaults/main.yml` until
+2026-08-22; they now resolve from the shared `sidecar_*` variables like every other role.

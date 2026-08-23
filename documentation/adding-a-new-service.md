@@ -248,7 +248,7 @@ nfs_shares:
 
 ### Option A: Cloudflare Tunnel (most services)
 
-Add an entry to `cloudflared_ingress` in `roles/cloudflared_lxc/defaults/main.yml`:
+Add an entry to `cloudflared_lxc_cloudflared_ingress` in `roles/cloudflared_lxc/defaults/main.yml`:
 
 ```yaml
 - prefix: <service>

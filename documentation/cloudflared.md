@@ -18,7 +18,7 @@ ssh cloudflared
 
 ## Configuration
 
-**The source of truth is `cloudflared_ingress` in
+**The source of truth is `cloudflared_lxc_cloudflared_ingress` in
 `roles/cloudflared_lxc/defaults/main.yml`.** Read the route list there:
 
 ```bash
@@ -38,13 +38,13 @@ To add, remove, or change a tunnel route:
 
 ```sh
 # 1. Edit the ingress rules (single source of truth)
-vim roles/cloudflared_lxc/defaults/main.yml    # cloudflared_ingress list
+vim roles/cloudflared_lxc/defaults/main.yml    # cloudflared_lxc_cloudflared_ingress list
 
 # 2. Deploy (templates config, syncs to Cloudflare API, creates DNS records, restarts if changed)
 make cloudflared
 ```
 
-The `cloudflared_ingress` variable in `defaults/main.yml` is the single source of truth for all tunnel routes.
+The `cloudflared_lxc_cloudflared_ingress` variable in `defaults/main.yml` is the single source of truth for all tunnel routes.
 Both templates (`config.yml.j2` and `tunnel_config_api.json.j2`) render from this variable, so there is no
 duplication to keep in sync.
 
@@ -112,7 +112,7 @@ Internet -> Cloudflare Edge (TLS) -> Tunnel -> cloudflared LXC
 
 ## Proxied Services
 
-Derived from `cloudflared_ingress` in `roles/cloudflared_lxc/defaults/main.yml` — that
+Derived from `cloudflared_lxc_cloudflared_ingress` in `roles/cloudflared_lxc/defaults/main.yml` — that
 list is authoritative and this one is a readable summary. Key subdomains:
 
 **Via Traefik (bypass Zero Access):**
@@ -139,16 +139,16 @@ list is authoritative and this one is a readable summary. Key subdomains:
 - `sonarr.itsa-pizza.com`, `radarr.itsa-pizza.com`, etc. -> Media VM services
 - `paperless.itsa-pizza.com` / `documents.itsa-pizza.com` / `library.itsa-pizza.com` -> Library app (192.168.2.117:8010; Paperless-ngx decommissioned 2026-07-04)
 - `proxmox.itsa-pizza.com` / `pve.itsa-pizza.com` -> Proxmox UI
-- ... (full list: `cloudflared_ingress` in `roles/cloudflared_lxc/defaults/main.yml`)
+- ... (full list: `cloudflared_lxc_cloudflared_ingress` in `roles/cloudflared_lxc/defaults/main.yml`)
 
 ## Ansible
 
 - Role: `roles/cloudflared_lxc`
 - Playbook: `playbooks/cloudflared_lxc.yml`
 - Deploy: `make cloudflared`
-- Ingress rules: `roles/cloudflared_lxc/defaults/main.yml` (`cloudflared_ingress` variable)
-- Config template: `roles/cloudflared_lxc/templates/config.yml.j2` (renders from `cloudflared_ingress`)
-- API sync template: `roles/cloudflared_lxc/templates/tunnel_config_api.json.j2` (renders from `cloudflared_ingress`)
+- Ingress rules: `roles/cloudflared_lxc/defaults/main.yml` (`cloudflared_lxc_cloudflared_ingress` variable)
+- Config template: `roles/cloudflared_lxc/templates/config.yml.j2` (renders from `cloudflared_lxc_cloudflared_ingress`)
+- API sync template: `roles/cloudflared_lxc/templates/tunnel_config_api.json.j2` (renders from `cloudflared_lxc_cloudflared_ingress`)
 - Vault secrets: `vault_cloudflared_account_id`, `vault_cloudflared_api_token`
 
 The LXC was originally created manually via a Proxmox community script. The Ansible role manages the tunnel

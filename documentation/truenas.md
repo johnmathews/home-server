@@ -14,10 +14,10 @@ make nas t=refresh-shares
 ### Configuration
 
 Variables in `roles/nas/defaults/main.yml`:
-- `refresh_shares_enabled: true`
-- `refresh_shares_nfs_path: "tank/document-store"`
-- `refresh_shares_smb_path: "tank/time-machine-backups/johns-laptop"`
-- `refresh_shares_wait_seconds: 5`
+- `nas_refresh_shares_enabled: true`
+- `nas_refresh_shares_nfs_path: "tank/document-store"`
+- `nas_refresh_shares_smb_path: "tank/time-machine-backups/johns-laptop"`
+- `nas_refresh_shares_wait_seconds: 5`
 
 ### UI
 
@@ -36,7 +36,7 @@ Variables in `roles/nas/defaults/main.yml`:
 1. Verifies TrueNAS API is accessible
 2. Looks up NFS and SMB share IDs via API
 3. Disables both shares
-4. Waits 5 seconds (`refresh_shares_wait_seconds`)
+4. Waits 5 seconds (`nas_refresh_shares_wait_seconds`)
 5. Re-enables both shares
 6. Logs everything to `/mnt/swift/logs/refresh_shares.log`
 
@@ -218,11 +218,11 @@ make nas t=safe-reboot
 ### Configuration
 
 Variables in `roles/nas/defaults/main.yml`:
-- `safe_reboot_max_retries: 4` - Maximum number of retry attempts
-- `safe_reboot_retry_sleep_seconds: 300` - Wait time between retries (5 minutes)
-- `safe_reboot_io_sample_duration: 180` - Duration to sample I/O per attempt (3 minutes)
-- `safe_reboot_io_sample_interval: 30` - Interval between I/O samples (30 seconds)
-- `safe_reboot_io_ops_threshold: 120` - Operations/minute threshold (2 ops/sec) - normalized so changing sample interval doesn't affect effective threshold
+- `nas_safe_reboot_max_retries: 4` - Maximum number of retry attempts
+- `nas_safe_reboot_retry_sleep_seconds: 300` - Wait time between retries (5 minutes)
+- `nas_safe_reboot_io_sample_duration: 180` - Duration to sample I/O per attempt (3 minutes)
+- `nas_safe_reboot_io_sample_interval: 30` - Interval between I/O samples (30 seconds)
+- `nas_safe_reboot_io_ops_threshold: 120` - Operations/minute threshold (2 ops/sec) - normalized so changing sample interval doesn't affect effective threshold
 
 ### UI
 
