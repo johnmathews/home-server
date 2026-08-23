@@ -1,10 +1,11 @@
 # Docker image versions
-# Monitoring sidecars — pinned to the versions deployed on this host (2026-07),
-# pulled and verified on the host first. Bump deliberately: pull the new tag on
-# the host first (handlers use pull:never), or run `make refresh-sidecars`.
-document_library_lxc_node_exporter_version: "v1.12.1"
-document_library_lxc_alloy_version: "v1.18.0"
-document_library_lxc_cadvisor_version: "v0.55.1"
+# Monitoring sidecars — versions come from `sidecar_*` in group_vars/all/main.yml,
+# which is the single source for the whole fleet. Do not pin a literal here.
+# Bumping the shared var needs `make refresh-sidecars`: compose handlers use
+# pull:never, so `make <host>` alone will not fetch the new image.
+document_library_lxc_node_exporter_version: "{{ sidecar_node_exporter_version }}"
+document_library_lxc_alloy_version: "{{ sidecar_alloy_version }}"
+document_library_lxc_cadvisor_version: "{{ sidecar_cadvisor_version }}"
 
 # Library (ghcr image tag = git commit sha of release)
 document_library_lxc_library_version: "latest"

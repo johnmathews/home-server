@@ -30,26 +30,35 @@ ansible_python_interpreter: /usr/bin/python3
 # Atuin version — pins both the client binary and the server Docker image (infra VM compose)
 atuin_version: "v18.13.3"
 
-# Monitoring sidecar pins — single source for the roles that reference them here.
-# Those roles point their own defaults at these vars
-# (alloy_version: "{{ sidecar_alloy_version }}"): immich, infra_vm, media_vm,
-# open_webui, pve, tubearchivist.
+# Monitoring sidecar pins — the ONLY place these three versions are set.
 #
-# NOTHING TRACKS :latest. Six roles — agent, music, prometheus, traefik,
-# document_library, family_finances — pin literal versions in their OWN
-# defaults/main.yml instead, so bumping the vars below does not move them.
-# They are currently AHEAD of these values (alloy v1.18.0, node-exporter
-# v1.12.1, cadvisor v0.55.1). traefik runs only alloy and cadvisor, no
-# node-exporter. jellyfin_lxc hardcodes its pins in a static
-# files/docker-compose.yml — keep it in sync by hand.
+# Every role in the `observability_sidecars` inventory group points its own
+# defaults at these vars (`<role>_alloy_version: "{{ sidecar_alloy_version }}"`),
+# so bumping a value here and running `make refresh-sidecars` moves the whole
+# fleet. Nothing tracks `:latest`, and nothing pins a literal any more.
+#
+# Until 2026-08-22 six roles — agent, music, prometheus, traefik,
+# document_library, family_finances — carried literal pins in their own
+# defaults, which is how production came to run two Alloy generations 13 minors
+# apart. They were consolidated onto these vars, and these vars were raised to
+# the newer of the two sets. Do not reintroduce a literal: it will silently
+# desynchronise the fleet again, and the drift is only visible on the Image
+# Freshness dashboard.
+#
+# `make <host>` alone will NOT move a version: compose handlers use
+# `pull: never`, so a bump needs `make refresh-sidecars`.
+#
+# traefik runs only alloy and cadvisor, no node-exporter. infra_vm pulls
+# node-exporter from `prom/` rather than `quay.io/prometheus/`; same project,
+# same tag scheme.
 # See documentation/upgrade-procedures.md for the full story.
+sidecar_alloy_version: "v1.18.0"
+sidecar_node_exporter_version: "v1.12.1"
+sidecar_cadvisor_version: "v0.55.1"
+
 # Portainer agent — pin to the Portainer server version (infra VM). Agents are
 # deployed by every docker role's compose; register new endpoints in Portainer.
 portainer_agent_version: "2.39.1"
-
-sidecar_alloy_version: "v1.5.1"
-sidecar_node_exporter_version: "v1.8.2"
-sidecar_cadvisor_version: "v0.49.1"
 
 # MikroTik router monitoring (MKTXP)
 mikrotik_router_ip: 192.168.2.1

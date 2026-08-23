@@ -1,6 +1,6 @@
 # Family Finances
 
-**Status:** current — verified 2026-08-22 · covers: live, roles/family_finances_lxc/**, playbooks/family_finances_lxc.yml
+**Status:** current — verified 2026-08-23 · covers: live, roles/family_finances_lxc/**, playbooks/family_finances_lxc.yml
 The container list, data-directory ownership and the absence of Tailscale were read from
 the host on that date; everything else traces to `roles/family_finances_lxc/` and
 `playbooks/family_finances_lxc.yml`.
@@ -195,9 +195,10 @@ Prometheus scrapes `node_exporter` (:9100) and `cadvisor` (:18080); both targets
 `192.168.2.120` in `roles/prometheus_lxc/templates/prometheus/prometheus.yml.j2`. Logs ship
 to Loki via Alloy. The app itself exposes no Prometheus metrics.
 
-The three sidecars are pinned **literally** in this role's own `defaults/main.yml` (alloy
-`v1.18.0`, node-exporter `v1.12.1`, cadvisor `v0.55.1`), not via the shared `sidecar_*`
-variables — see [upgrade-procedures.md](upgrade-procedures.md).
+The three sidecars resolve from the shared `sidecar_*` variables in
+`group_vars/all/main.yml` (alloy `v1.18.0`, node-exporter `v1.12.1`, cadvisor `v0.55.1` as
+of 2026-08-23), like every other role. They were pinned literally here until 2026-08-22 —
+see [upgrade-procedures.md](upgrade-procedures.md).
 
 ## 10. Upgrading
 

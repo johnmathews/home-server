@@ -17,8 +17,8 @@ and two things consume that view:
 Every docker role's compose file carries the same `portainer-agent` service
 (image `portainer/agent:{{ portainer_agent_version }}`, pinned in
 `group_vars/all/main.yml` — keep it matched to the server version; server was
-2.39.1 LTS when pinned). `roles/jellyfin_lxc` uses a static compose file with a
-literal pin — sync it by hand when bumping.
+2.39.1 LTS when pinned). Every role including `jellyfin_lxc` renders it from that
+variable; there is no hand-synchronised copy left.
 
 Before 2026-07-12 the agents were hand-run containers (~a year stale); they were
 removed and replaced by the compose-managed ones on: jellyfin, immich,
@@ -35,8 +35,9 @@ carry `AGENT_SECRET` from `vault_portainer_agent_secret`:
 
 - server: `AGENT_SECRET=${PORTAINER_AGENT_SECRET}` via the infra `.env`
 - templated roles: rendered inline in each compose's `portainer-agent` service
-- jellyfin (static compose): interpolated from `/srv/apps/.env` (mode 0600,
-  deployed by the role)
+- jellyfin: same as the other templated roles since 2026-08-22, when its static
+  compose became `templates/docker-compose.yml.j2`. `AGENT_SECRET` is still
+  interpolated from `/srv/apps/.env` (mode 0600, deployed by the role)
 
 An agent without the matching secret is rejected by the server — so when rotating
 the secret, redeploy the server first, then every host. The
@@ -65,6 +66,5 @@ collection cycle.
 
 Bump `portainer_agent_version` in `group_vars/all/main.yml` (match the server),
 pre-pull `portainer/agent:<version>` on each host (compose handlers use
-`pull: never`), update the jellyfin static compose pin, then `make <host>` per
-host. Upgrade the server first: it's `portainer/portainer-ce` (rolling tag) in
+`pull: never`), then `make <host>` per host. Upgrade the server first: it's `portainer/portainer-ce` (rolling tag) in
 `roles/infra_vm` — pull + recreate on infra.

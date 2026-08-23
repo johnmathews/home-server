@@ -1,8 +1,8 @@
 # Immich Photo Management
 
-**Status:** current — verified 2026-08-22 · covers: roles/immich_lxc/**
+**Status:** current — verified 2026-08-23 · covers: roles/immich_lxc/**
 The compose stack, NFS mounts and ML configuration were checked against
-`roles/immich_lxc/` on that date.
+`roles/immich_lxc/` on that date; the sidecar versions were read from `docker ps` on the host.
 
 ## Purpose
 
@@ -43,7 +43,9 @@ object detection, smart search). Replaces Google Photos.
 ```
 
 Version pins live in `roles/immich_lxc/defaults/main.yml` (currently: public proxy `latest`,
-cadvisor `v0.49.1`, node_exporter `v1.8.2`, alloy `v1.5.1`, image_borders `latest`).
+image_borders `latest`). The three sidecars resolve from `sidecar_*` in
+`group_vars/all/main.yml` — cadvisor `v0.55.1`, node_exporter `v1.12.1`, alloy `v1.18.0`
+as of 2026-08-23. Do not pin them here; see [upgrade-procedures.md](upgrade-procedures.md).
 
 ### Container Details
 

@@ -1,6 +1,7 @@
 # Docker image versions
-# Monitoring sidecars — pinned to the versions deployed on this host (2026-07).
-# Bump deliberately: pull the new tag on the host first (handlers use pull:never),
-# or run `make refresh-sidecars`.
-traefik_lxc_cadvisor_version: "v0.55.1"
-traefik_lxc_alloy_version: "v1.18.0"
+# Monitoring sidecars — versions come from `sidecar_*` in group_vars/all/main.yml,
+# which is the single source for the whole fleet. Do not pin a literal here.
+# Bumping the shared var needs `make refresh-sidecars`: compose handlers use
+# pull:never, so `make <host>` alone will not fetch the new image.
+traefik_lxc_cadvisor_version: "{{ sidecar_cadvisor_version }}"
+traefik_lxc_alloy_version: "{{ sidecar_alloy_version }}"

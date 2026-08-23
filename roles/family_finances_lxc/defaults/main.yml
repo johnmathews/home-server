@@ -4,12 +4,13 @@
 # Two containers: a FastAPI backend holding one encrypted SQLite file per
 # household, and nginx serving the built Vue app and proxying /api to it.
 
-# Monitoring sidecars — pinned to the versions deployed elsewhere on the
-# estate. Bump deliberately: handlers use pull:never, so pull on the host first
-# or run `make refresh-sidecars`.
-node_exporter_version: "v1.12.1"
-alloy_version: "v1.18.0"
-cadvisor_version: "v0.55.1"
+# Monitoring sidecars — versions come from `sidecar_*` in group_vars/all/main.yml,
+# which is the single source for the whole fleet. Do not pin a literal here.
+# Bumping the shared var needs `make refresh-sidecars`: compose handlers use
+# pull:never, so `make <host>` alone will not fetch the new image.
+node_exporter_version: "{{ sidecar_node_exporter_version }}"
+alloy_version: "{{ sidecar_alloy_version }}"
+cadvisor_version: "{{ sidecar_cadvisor_version }}"
 
 family_finances_docker_compose_dir: "{{ docker_compose_dir }}"
 

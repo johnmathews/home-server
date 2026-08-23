@@ -1,8 +1,8 @@
 # Upgrade Procedures
 
-**Status:** current — verified 2026-08-22 · covers: group_vars/all/main.yml, playbooks/refresh_sidecars.yml
-The sidecar pins were re-read from `group_vars/all/main.yml` on that date; nothing in the
-fleet runs `:latest`.
+**Status:** current — verified 2026-08-23 · covers: group_vars/all/main.yml, playbooks/refresh_sidecars.yml
+The sidecar pins were re-read from `group_vars/all/main.yml` on that date and cross-checked
+against `docker ps` on all 13 sidecar hosts; nothing in the fleet runs `:latest`.
 
 How to upgrade the various components of the home server infrastructure.
 
@@ -60,42 +60,63 @@ When a notification arrives:
 
 ### Monitoring sidecar upgrades
 
-Monitoring sidecars (node-exporter, cadvisor, alloy) run on every service host. Since
-2026-07-12 the pinned versions are single-sourced in `group_vars/all/main.yml`:
-`sidecar_alloy_version`, `sidecar_node_exporter_version`, `sidecar_cadvisor_version`.
-The roles that pin (immich, infra_vm, pve, media_vm, open_webui, tubearchivist)
-reference these in their own defaults — `<role>_alloy_version: "{{ sidecar_alloy_version }}"`
-for the roles already through the var-naming refactor (immich_lxc, open_webui_lxc,
-tubearchivist_lxc), bare `alloy_version:` for the ones still to be converted
-(infra_vm, media_vm, pve). The `sidecar_*` names themselves never change.
+Monitoring sidecars (node-exporter, cadvisor, alloy) run on all 13 hosts in the
+`observability_sidecars` inventory group. Their versions are single-sourced in
+`group_vars/all/main.yml` — `sidecar_alloy_version`, `sidecar_node_exporter_version`,
+`sidecar_cadvisor_version` — and **every** role reaches them through its own default:
 
-Two exceptions:
+```yaml
+<role>_alloy_version: "{{ sidecar_alloy_version }}"
+```
 
-- **Six** roles — agent, music, prometheus, traefik, document_library and
-  **family_finances** — pin explicit versions in their **own** `defaults/main.yml`
-  (not via `sidecar_*`). They used to track `:latest` and drifted, so they were pinned
-  to the versions then deployed (2026-07: alloy v1.18.0, cadvisor v0.55.1,
-  node-exporter v1.12.1). Those literals are *ahead* of the `sidecar_*` values
-  (v1.5.1 / v0.49.1 / v1.8.2), so bumping `sidecar_*` does not move them — bump each
-  role's literal defaults independently, or unify onto `sidecar_*` later.
-  `traefik_lxc` runs only alloy and cadvisor; it has no node-exporter.
+There are no exceptions and no literals. Verify with:
 
-  Nothing in the repo tracks `:latest` for these three images any more. Verify with:
+```bash
+grep -rnE '^[a-z_]*(alloy|cadvisor|node_exporter)_version:' roles/*/defaults/main.yml
+```
 
-  ```bash
-  grep -rnE '^[a-z_]*(alloy|cadvisor|node_exporter)_version:' roles/*/defaults/main.yml
-  ```
+Every line printed must end in `sidecar_*`. (The pattern allows a role prefix because the
+var-naming refactor renames these to `<role>_alloy_version` role by role; an anchored
+`^alloy_version:` misses most of them.)
 
-  (The pattern allows a role prefix: the var-naming refactor is renaming these to
-  `<role>_alloy_version` role by role, so an anchored `^alloy_version:` now misses
-  most of them.)
-- `jellyfin_lxc` deploys a static `files/docker-compose.yml` (not a template), so its
-  sidecar pins are literal in that file — update it by hand when bumping `sidecar_*`.
+Two details that are easy to trip on:
 
-To upgrade sidecars: bump the `sidecar_*` versions in `group_vars/all/main.yml` (or the
-literal defaults on the six roles above), edit the jellyfin static compose to match, then
-`make <service>` per host (or `make site`). Note the compose handlers use `pull: never` —
-pre-pull new images on each host (or temporarily allow pulling) before recreating.
+- `traefik_lxc` runs only alloy and cadvisor; it has no node-exporter, so its compose
+  names two of the three.
+- `infra_vm` pulls node-exporter from `prom/` rather than `quay.io/prometheus/`. Same
+  project, same tag scheme, different registry — so pre-pulling by image name differs
+  on that one host.
+
+**Until 2026-08-22 this was not true**, and the consequence is worth remembering. Six
+roles — agent, music, prometheus, traefik, document_library, family_finances — carried
+literal pins in their own defaults, and `jellyfin_lxc` hardcoded its pins in a static
+`files/docker-compose.yml` that had to be hand-synchronised. The result was a fleet
+running two Alloy generations 13 minors apart (v1.5.1 on seven hosts, v1.18.0 on six)
+feeding one Prometheus, with nothing but the Image Freshness dashboard to show it. Do not
+reintroduce a literal.
+
+### Bumping a sidecar version
+
+The order matters, because compose handlers use `pull: never` and several roles recreate
+with `recreate: always`:
+
+1. Bump the `sidecar_*` value in `group_vars/all/main.yml`.
+2. **Pre-pull the new tag on every affected host.** `make refresh-sidecars` cannot do this
+   for you on a *tag change*: it pulls whatever tag the host's current compose file names,
+   which is still the old one. `docker pull grafana/alloy:<new>` per host.
+3. `make <host>` per host (or `make site`). The handler now finds the image locally and
+   recreates the sidecar.
+4. Confirm convergence — one distinct version per component:
+
+   ```bash
+   for h in pve infra media traefik immich jelly music agent open-webui \
+            paperless prometheus tube finances; do
+     ssh $h 'docker ps --format "{{.Image}}"'
+   done | grep -E 'alloy|cadvisor|node-exporter' | sed 's#.*/##' | sort -u
+   ```
+
+`make refresh-sidecars` remains the right tool for the *other* case — a host sitting on an
+old local image for a tag it is already pinned to.
 
 #### Bulk refresh across hosts — `make refresh-sidecars`
 
