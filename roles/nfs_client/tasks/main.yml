@@ -15,28 +15,28 @@
 
 - name: Ensure nfs group exists
   ansible.builtin.group:
-    name: "{{ nfs_user_name }}"
-    # gid: "{{ nfs_group_gid }}"
+    name: "{{ nfs_client_nfs_user_name }}"
+    # gid: "{{ nfs_client_nfs_group_gid }}"
     state: present
     system: true
-  register: nfs_group
+  register: nfs_client_nfs_group
 
 - name: Ensure nfs user exists
   ansible.builtin.user:
-    name: "{{ nfs_user_name }}"
+    name: "{{ nfs_client_nfs_user_name }}"
     state: present
     system: true
     shell: /usr/sbin/nologin
     create_home: false
-    uid: "{{ nfs_user_uid | default(omit) }}"
-    group: "{{ nfs_user_name }}"
+    uid: "{{ nfs_client_nfs_user_uid | default(omit) }}"
+    group: "{{ nfs_client_nfs_user_name }}"
   # Not a handler: the user must exist before the mount tasks below run in the
   # same play, so this cannot be deferred to the end of the play.
-  when: nfs_group is changed # noqa: no-handler
+  when: nfs_client_nfs_group is changed # noqa: no-handler
 
 - name: Check if UID already exists
-  ansible.builtin.command: "getent passwd {{ nfs_user_uid }}"
-  register: existing_uid
+  ansible.builtin.command: "getent passwd {{ nfs_client_nfs_user_uid }}"
+  register: nfs_client_existing_uid
   changed_when: false
   failed_when: false
   # Read-only probe: must run in check mode or the guard below passes vacuously
@@ -44,19 +44,19 @@
 
 - name: Ensure NFS user exists (only if UID not already defined)
   ansible.builtin.user:
-    name: "{{ nfs_user_name }}"
+    name: "{{ nfs_client_nfs_user_name }}"
     state: present
     system: true
     shell: /usr/sbin/nologin
     create_home: false
-    uid: "{{ nfs_user_uid }}"
-    group: "{{ nfs_group_name }}"
-  when: existing_uid.stdout == ""
+    uid: "{{ nfs_client_nfs_user_uid }}"
+    group: "{{ nfs_client_nfs_group_name }}"
+  when: nfs_client_existing_uid.stdout == ""
 
 
 - name: Detect automount capability
   ansible.builtin.set_fact:
-    nfs_can_systemd_automount: "{{ (ansible_service_mgr == 'systemd') and (ansible_virtualization_type != 'lxc') }}"
+    nfs_client_nfs_can_systemd_automount: "{{ (ansible_service_mgr == 'systemd') and (ansible_virtualization_type != 'lxc') }}"
 
 - name: Prepare mountpoints that are not already mounted
   ansible.builtin.include_tasks: prepare_mount.yml
@@ -67,9 +67,9 @@
 - name: Ensure fstab entries
   become: true
   vars:
-    _opts: "{{ nfs_opts | default(nfs_opts_default) }}"
+    _opts: "{{ nfs_opts | default(nfs_client_nfs_opts_default) }}"
     _src: >-
-      {{ (':' in item.target) | ternary(item.target, truenas_ip ~ ':' ~ item.target) }}
+      {{ (':' in item.target) | ternary(item.target, nfs_client_truenas_ip ~ ':' ~ item.target) }}
   loop: "{{ nfs_shares }}"
   loop_control:
     label: "{{ item.name }}"
@@ -87,7 +87,7 @@
 
 - name: Enable+start systemd automount units (VMs only)
   become: true
-  when: nfs_can_systemd_automount
+  when: nfs_client_nfs_can_systemd_automount
   loop: "{{ nfs_shares }}"
   loop_control: { label: "{{ item.name }}" }
   ansible.builtin.systemd:
@@ -104,10 +104,10 @@
     label: "{{ item.name }}"
   ansible.builtin.command: "systemctl show -p ActiveState {{ (item.mountpoint | regex_replace('^/', '') | regex_replace('/', '-')) }}.automount"
   changed_when: false
-  when: nfs_can_systemd_automount
+  when: nfs_client_nfs_can_systemd_automount
 
 - name: Include autofs setup (LXCs only)
-  when: not nfs_can_systemd_automount
+  when: not nfs_client_nfs_can_systemd_automount
   ansible.builtin.include_tasks: autofs.yml
 
 - name: Trigger first access
@@ -126,11 +126,11 @@
   ansible.builtin.shell: |
     echo -n "{{ item.name }}: "
     if mountpoint -q {{ item.mountpoint }}; then echo "mounted"; else echo "not mounted (automount armed)"; fi
-  register: _mount_status
+  register: nfs_client_mount_status
   changed_when: false
   # Read-only probe: skipped-loop results have no stdout for the debug task below
   check_mode: false
 
 - name: Debug mount status
   ansible.builtin.debug:
-    var: _mount_status.results | map(attribute='stdout') | list
+    var: nfs_client_mount_status.results | map(attribute='stdout') | list

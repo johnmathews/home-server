@@ -2,7 +2,7 @@
 
 - name: Install autofs (LXCs only)
   become: true
-  when: not nfs_can_systemd_automount
+  when: not nfs_client_nfs_can_systemd_automount
   ansible.builtin.apt:
     name: autofs
     state: present
@@ -10,7 +10,7 @@
 
 - name: Configure autofs master map (LXCs only)
   become: true
-  when: not nfs_can_systemd_automount
+  when: not nfs_client_nfs_can_systemd_automount
   ansible.builtin.copy:
     dest: /etc/auto.master.d/nfs.autofs
     mode: '0644'
@@ -20,19 +20,19 @@
 
 - name: Build /etc/auto.nfs from nfs_shares (LXCs only)
   become: true
-  when: not nfs_can_systemd_automount
+  when: not nfs_client_nfs_can_systemd_automount
   ansible.builtin.copy:
     dest: /etc/auto.nfs
     mode: '0644'
     content: |
       {% for s in nfs_shares %}
-      {{ s.name }} -fstype=nfs4,proto=tcp,hard,retrans=2,timeo=150 {{ (':' in s.target) | ternary(s.target, truenas_ip ~ ':' ~ s.target) }}
+      {{ s.name }} -fstype=nfs4,proto=tcp,hard,retrans=2,timeo=150 {{ (':' in s.target) | ternary(s.target, nfs_client_truenas_ip ~ ':' ~ s.target) }}
       {% endfor %}
   notify: Restart autofs
 
 - name: Ensure autofs is enabled and running (LXCs only)
   become: true
-  when: not nfs_can_systemd_automount
+  when: not nfs_client_nfs_can_systemd_automount
   ansible.builtin.systemd:
     name: autofs
     enabled: true
