@@ -14,12 +14,12 @@ export PS4='+ ts=$(date +%FT%T%z) line=${LINENO} cmd='
 [[ "${DEBUG:-0}" == "1" ]] && set -x
 
 # -------- configuration --------
-SHARE_NFS_PATH="{{ refresh_shares_nfs_path }}"
-SHARE_SMB_PATH="{{ refresh_shares_smb_path }}"
-WAIT_SECONDS="{{ refresh_shares_wait_seconds | default(5) }}"
-LOG_FILE="{{ refresh_shares_log_file | default('/mnt/swift/logs/refresh_shares.log') }}"
+SHARE_NFS_PATH="{{ nas_refresh_shares_nfs_path }}"
+SHARE_SMB_PATH="{{ nas_refresh_shares_smb_path }}"
+WAIT_SECONDS="{{ nas_refresh_shares_wait_seconds | default(5) }}"
+LOG_FILE="{{ nas_refresh_shares_log_file | default('/mnt/swift/logs/refresh_shares.log') }}"
 
-TRUENAS_API_URL="{{ truenas_api_url }}"
+TRUENAS_API_URL="{{ nas_truenas_api_url }}"
 TRUENAS_API_KEY="{{ vault_truenas_api_key }}"
 
 API_RETRIES="${API_RETRIES:-3}"

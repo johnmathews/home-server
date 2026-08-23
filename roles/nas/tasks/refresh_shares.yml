@@ -6,4 +6,4 @@
     owner: root
     group: root
   tags: refresh-shares
-  when: refresh_shares_enabled | default(true)
+  when: nas_refresh_shares_enabled | default(true)
