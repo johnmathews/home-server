@@ -43,6 +43,21 @@
     creates: /usr/local/bin/deno
   tags: deno
 
+# The apt/PPA yt-dlp (tomtomtom PPA) lags for months; YouTube then answers 403 mid-download and
+# the PPA build lacks the impersonation (curl_cffi) module. The official standalone binary in
+# /usr/local/bin shadows /usr/bin/yt-dlp and bundles everything. force: true re-downloads the
+# current release on every run — `make media t=ytdlp` is the update path (`yt --update` does the
+# same download directly over ssh).
+- name: Install the official yt-dlp standalone binary (shadows the PPA package)
+  ansible.builtin.get_url:
+    url: https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux
+    dest: /usr/local/bin/yt-dlp
+    mode: "0755"
+    owner: root
+    group: root
+    force: true
+  tags: ytdlp
+
 - name: Install Docker using official role
   ansible.builtin.import_role:
     name: geerlingguy.docker
