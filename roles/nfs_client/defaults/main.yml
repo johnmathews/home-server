@@ -2,12 +2,12 @@ nfs_client_packages:
   - nfs-common
   - acl
 
-truenas_ip: "192.168.2.104"
+nfs_client_truenas_ip: "192.168.2.104"
 
-nfs_user_name: nfs_user
-nfs_group_name: nfs_group
-nfs_user_uid: 1001
-nfs_group_gid: 1001
+nfs_client_nfs_user_name: nfs_user
+nfs_client_nfs_group_name: nfs_group
+nfs_client_nfs_user_uid: 1001
+nfs_client_nfs_group_gid: 1001
 
 #  NFS options:
 #
@@ -23,7 +23,7 @@ nfs_group_gid: 1001
 #  x-systemd.idle-timeout: unmounts the share automatically after n seconds of inactivity. works with x-systemd.automount. recommended if the share is not constantly used. Saves power and avoids stale NFS handles.
 
 # do we want x-systemd.automount on LXCs?
-nfs_opts_items:
+nfs_client_nfs_opts_items:
   - _netdev
   - hard
   - nofail
@@ -32,4 +32,4 @@ nfs_opts_items:
   - x-systemd.automount
   - x-systemd.idle-timeout=180s
 
-nfs_opts_default: "{{ nfs_opts_items | join(',') }}"
+nfs_client_nfs_opts_default: "{{ nfs_client_nfs_opts_items | join(',') }}"

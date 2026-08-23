@@ -29,11 +29,11 @@ PATH=/usr/sbin:/usr/bin:/sbin:/bin
 
 # ---------- CONFIG ----------
 {% endraw %}
-MAX_RETRIES={{ safe_reboot_max_retries }}
-RETRY_SLEEP={{ safe_reboot_retry_sleep_seconds }}
-IO_SAMPLE_DURATION={{ safe_reboot_io_sample_duration }}
-IO_SAMPLE_INTERVAL={{ safe_reboot_io_sample_interval }}
-IO_OPS_THRESHOLD={{ safe_reboot_io_ops_threshold }}
+MAX_RETRIES={{ nas_safe_reboot_max_retries }}
+RETRY_SLEEP={{ nas_safe_reboot_retry_sleep_seconds }}
+IO_SAMPLE_DURATION={{ nas_safe_reboot_io_sample_duration }}
+IO_SAMPLE_INTERVAL={{ nas_safe_reboot_io_sample_interval }}
+IO_OPS_THRESHOLD={{ nas_safe_reboot_io_ops_threshold }}
 {% raw %}
 LOG_FILE="/mnt/swift/logs/safe_reboot.log" # keep on SSD; never wakes HDDs
 LOG_MAX_SIZE=$((10 * 1024 * 1024))         # rotate logs at 10MB

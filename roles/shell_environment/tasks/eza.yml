@@ -10,7 +10,7 @@
 - name: Check if eza is already installed with correct version
   ansible.builtin.stat:
     path: "{{ shell_environment_eza_install_dir }}/eza-{{ shell_environment_eza_version }}/eza"
-  register: eza_installed
+  register: shell_environment_eza_installed
   changed_when: false
 
 - name: Download eza binary archive
@@ -20,11 +20,11 @@
     mode: '0644'
     timeout: 60
   become: true
-  when: not eza_installed.stat.exists
-  register: eza_download
+  when: not shell_environment_eza_installed.stat.exists
+  register: shell_environment_eza_download
   retries: 3
   delay: 5
-  until: eza_download is succeeded
+  until: shell_environment_eza_download is succeeded
 
 - name: Create eza versioned directory
   ansible.builtin.file:
@@ -32,7 +32,7 @@
     state: directory
     mode: '0755'
   become: true
-  when: eza_download is changed or not eza_installed.stat.exists
+  when: shell_environment_eza_download is changed or not shell_environment_eza_installed.stat.exists
 
 - name: Extract eza binary
   ansible.builtin.unarchive:
@@ -41,7 +41,7 @@
     remote_src: true
     creates: "{{ shell_environment_eza_install_dir }}/eza-{{ shell_environment_eza_version }}/eza"
   become: true
-  when: eza_download is changed or not eza_installed.stat.exists
+  when: shell_environment_eza_download is changed or not shell_environment_eza_installed.stat.exists
 
 - name: Create symlink for eza binary
   ansible.builtin.file:
@@ -56,4 +56,4 @@
     path: "/tmp/eza-{{ shell_environment_eza_version }}.tar.gz"
     state: absent
   become: true
-  when: eza_download is changed
+  when: shell_environment_eza_download is changed

@@ -14,15 +14,15 @@
 - name: Check if running on Proxmox host
   ansible.builtin.stat:
     path: /usr/bin/pct
-  register: pct_check
+  register: proxmox_lxc_tun_pct_check
 
 - name: Skip if not Proxmox host
   ansible.builtin.debug:
     msg: "Skipping - not a Proxmox host (pct command not found)"
-  when: not pct_check.stat.exists
+  when: not proxmox_lxc_tun_pct_check.stat.exists
 
 - name: Configure LXC TUN devices
-  when: pct_check.stat.exists and proxmox_lxc_tun_enabled
+  when: proxmox_lxc_tun_pct_check.stat.exists and proxmox_lxc_tun_enabled
   block:
     - name: Get list of all LXC containers
       ansible.builtin.shell: |
@@ -30,18 +30,18 @@
         pct list | awk 'NR>1 {print $1}'
       args:
         executable: /bin/bash
-      register: lxc_containers
+      register: proxmox_lxc_tun_lxc_containers
       changed_when: false
 
     - name: Display found LXCs
       ansible.builtin.debug:
-        msg: "Found {{ lxc_containers.stdout_lines | length }} LXC containers: {{ lxc_containers.stdout_lines | join(', ') }}"
+        msg: "Found {{ proxmox_lxc_tun_lxc_containers.stdout_lines | length }} LXC containers: {{ proxmox_lxc_tun_lxc_containers.stdout_lines | join(', ') }}"
 
     - name: Check if LXC configs already have TUN device
       ansible.builtin.shell: |
         grep -q "lxc.cgroup2.devices.allow: c 10:200 rwm" /etc/pve/lxc/{{ item }}.conf
-      loop: "{{ lxc_containers.stdout_lines }}"
-      register: tun_check
+      loop: "{{ proxmox_lxc_tun_lxc_containers.stdout_lines }}"
+      register: proxmox_lxc_tun_tun_check
       changed_when: false
       failed_when: false
 
@@ -52,24 +52,24 @@
         block: |
           lxc.cgroup2.devices.allow: c 10:200 rwm
           lxc.mount.entry: /dev/net/tun dev/net/tun none bind,create=file
-      loop: "{{ tun_check.results }}"
+      loop: "{{ proxmox_lxc_tun_tun_check.results }}"
       when: item.rc != 0
-      register: lxc_config_updated
+      register: proxmox_lxc_tun_lxc_config_updated
 
     - name: List LXCs that were updated
       ansible.builtin.set_fact:
-        updated_lxcs: "{{ lxc_config_updated.results | selectattr('changed', 'equalto', true) | map(attribute='item') | map(attribute='item') | list }}"
+        proxmox_lxc_tun_updated_lxcs: "{{ proxmox_lxc_tun_lxc_config_updated.results | selectattr('changed', 'equalto', true) | map(attribute='item') | map(attribute='item') | list }}"
 
     - name: Display LXCs that need restart
       ansible.builtin.debug:
-        msg: "Updated {{ updated_lxcs | length }} LXC(s) with TUN device: {{ updated_lxcs | join(', ') }}"
-      when: updated_lxcs | length > 0
+        msg: "Updated {{ proxmox_lxc_tun_updated_lxcs | length }} LXC(s) with TUN device: {{ proxmox_lxc_tun_updated_lxcs | join(', ') }}"
+      when: proxmox_lxc_tun_updated_lxcs | length > 0
 
     - name: Reboot updated LXC containers
       ansible.builtin.command: "pct reboot {{ item }}"
-      loop: "{{ updated_lxcs }}"
+      loop: "{{ proxmox_lxc_tun_updated_lxcs }}"
       when:
-        - updated_lxcs | length > 0
+        - proxmox_lxc_tun_updated_lxcs | length > 0
         - proxmox_lxc_tun_auto_reboot
 
     - name: Wait for LXCs to reboot
@@ -77,13 +77,13 @@
         seconds: "{{ proxmox_lxc_tun_reboot_wait }}"
         prompt: "Waiting {{ proxmox_lxc_tun_reboot_wait }}s for LXCs to reboot..."
       when:
-        - updated_lxcs | length > 0
+        - proxmox_lxc_tun_updated_lxcs | length > 0
         - proxmox_lxc_tun_auto_reboot
 
     - name: Summary
       ansible.builtin.debug:
         msg: |
           LXC TUN device configuration complete!
-          Total LXCs: {{ lxc_containers.stdout_lines | length }}
-          Updated: {{ updated_lxcs | length }}
+          Total LXCs: {{ proxmox_lxc_tun_lxc_containers.stdout_lines | length }}
+          Updated: {{ proxmox_lxc_tun_updated_lxcs | length }}
           All LXCs now have /dev/net/tun access for VPN software.

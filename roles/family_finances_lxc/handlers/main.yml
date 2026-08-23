@@ -13,7 +13,7 @@
 
 - name: Restart all containers
   community.docker.docker_compose_v2:
-    project_src: "{{ family_finances_docker_compose_dir }}"
+    project_src: "{{ family_finances_lxc_family_finances_docker_compose_dir }}"
     state: present
     recreate: always
     pull: missing
@@ -27,7 +27,7 @@
 # member logs in, so prefer deploying when nobody is mid-upload.
 - name: Restart family finances
   community.docker.docker_compose_v2:
-    project_src: "{{ family_finances_docker_compose_dir }}"
+    project_src: "{{ family_finances_lxc_family_finances_docker_compose_dir }}"
     services:
       - backend
       - frontend
@@ -39,7 +39,7 @@
 
 - name: Restart alloy
   community.docker.docker_compose_v2:
-    project_src: "{{ family_finances_docker_compose_dir }}"
+    project_src: "{{ family_finances_lxc_family_finances_docker_compose_dir }}"
     services:
       - alloy
     state: present

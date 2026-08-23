@@ -37,16 +37,16 @@ The Proxmox guest is CT 120, named `finance-app`.
 From `roles/family_finances_lxc/templates/docker-compose.yml.j2`:
 
 ```
-+-----------------+---------------------------------------------------+--------------------------+
-| Container       | Image                                             | Role                     |
-+-----------------+---------------------------------------------------+--------------------------+
-| ff-backend      | ghcr.io/johnmathews/family-finances-backend:SHA   | FastAPI. Not published   |
-| ff-frontend     | ghcr.io/johnmathews/family-finances-frontend:SHA  | nginx + Vue app, :8080   |
-| portainer_agent | portainer/agent:{{portainer_agent_version}}       | Fleet management         |
-| node_exporter   | node-exporter:{{node_exporter_version}}           | Host metrics :9100       |
-| alloy           | grafana/alloy:{{alloy_version}}                   | Logs -> Loki :12345      |
-| cadvisor        | cadvisor:{{cadvisor_version}}                     | Container metrics :18080 |
-+-----------------+---------------------------------------------------+--------------------------+
++-----------------+-------------------------------------------------------------+--------------------------+
+| Container       | Image                                                       | Role                     |
++-----------------+-------------------------------------------------------------+--------------------------+
+| ff-backend      | ghcr.io/johnmathews/family-finances-backend:SHA             | FastAPI. Not published   |
+| ff-frontend     | ghcr.io/johnmathews/family-finances-frontend:SHA            | nginx + Vue app, :8080   |
+| portainer_agent | portainer/agent:{{portainer_agent_version}}                 | Fleet management         |
+| node_exporter   | node-exporter:{{family_finances_lxc_node_exporter_version}} | Host metrics :9100       |
+| alloy           | grafana/alloy:{{family_finances_lxc_alloy_version}}         | Logs -> Loki :12345      |
+| cadvisor        | cadvisor:{{family_finances_lxc_cadvisor_version}}           | Container metrics :18080 |
++-----------------+-------------------------------------------------------------+--------------------------+
 ```
 
 **The backend is deliberately not published** — it has `expose:` but no `ports:`. Only nginx
@@ -60,11 +60,11 @@ a backend that is not up.
 
 ## 3. Images are pinned to a commit SHA
 
-`family_finances_version` in `defaults/main.yml` is **the git commit SHA the images were
+`family_finances_lxc_family_finances_version` in `defaults/main.yml` is **the git commit SHA the images were
 built from**, not a semver tag and not `latest`:
 
 ```yaml
-family_finances_version: "6b315ad444241f5925c62ec41dd8dd4c930e8268"
+family_finances_lxc_family_finances_version: "6b315ad444241f5925c62ec41dd8dd4c930e8268"
 ```
 
 The app builds images only from a green `main`, and pinning the SHA is what makes a rollback
@@ -125,13 +125,13 @@ Vault variables (see [vault.md](vault.md)):
 
 Two settings fail **closed**, which is intentional and is what the app's tests assert:
 
-- **Registration.** An unset `family_finances_signup_code` closes registration rather than
+- **Registration.** An unset `family_finances_lxc_family_finances_signup_code` closes registration rather than
   opening it.
 - **Bank sync.** All three Enable Banking values unset means sync is simply off — a
   deployment that forgets them offers no bank connections, rather than erroring when a
   household tries to use one.
 
-`enable_banking_redirect_url` must match a Redirect URL registered on the Enable Banking
+`family_finances_lxc_enable_banking_redirect_url` must match a Redirect URL registered on the Enable Banking
 application **exactly**, and production requires HTTPS. It is currently the SPA route
 `https://finances.itsa-pizza.com/oauth/callback`.
 
@@ -185,7 +185,7 @@ routing, which is what gives it rate limiting — `routers.yml.j2` defines a sep
 `finances-auth` router with its own `finances-auth-rl` rate limit on the login, signup and
 recover paths.
 
-Route definitions: `cloudflared_ingress` in `roles/cloudflared_lxc/defaults/main.yml:31` and
+Route definitions: `cloudflared_lxc_cloudflared_ingress` in `roles/cloudflared_lxc/defaults/main.yml:31` and
 `roles/traefik_lxc/templates/routers.yml.j2:101-126,234`. See
 [cloudflared.md](cloudflared.md) and [traefik.md](traefik.md).
 
@@ -203,7 +203,7 @@ see [upgrade-procedures.md](upgrade-procedures.md).
 ## 10. Upgrading
 
 ```bash
-# 1. bump family_finances_version to the new commit SHA
+# 1. bump family_finances_lxc_family_finances_version to the new commit SHA
 vim roles/family_finances_lxc/defaults/main.yml
 # 2. converge — handlers use pull: missing, so the new image is fetched
 make finances

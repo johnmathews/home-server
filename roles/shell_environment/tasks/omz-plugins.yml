@@ -9,7 +9,7 @@
     version: master
   become: true
   become_user: "{{ item.split(':')[0] }}"
-  loop: "{{ target_shell_users }}"
+  loop: "{{ shell_environment_target_shell_users }}"
 
 - name: Install zsh-syntax-highlighting plugin
   ansible.builtin.git:
@@ -19,4 +19,4 @@
     version: master
   become: true
   become_user: "{{ item.split(':')[0] }}"
-  loop: "{{ target_shell_users }}"
+  loop: "{{ shell_environment_target_shell_users }}"

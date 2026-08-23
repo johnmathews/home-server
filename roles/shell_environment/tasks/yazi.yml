@@ -19,7 +19,7 @@
 - name: Check if yazi is already installed with correct version
   ansible.builtin.stat:
     path: "{{ shell_environment_yazi_install_dir }}/yazi-{{ shell_environment_yazi_version }}/yazi"
-  register: yazi_installed
+  register: shell_environment_yazi_installed
   changed_when: false
 
 - name: Download yazi binary archive
@@ -29,11 +29,11 @@
     mode: '0644'
     timeout: 60
   become: true
-  when: not yazi_installed.stat.exists
-  register: yazi_download
+  when: not shell_environment_yazi_installed.stat.exists
+  register: shell_environment_yazi_download
   retries: 3
   delay: 5
-  until: yazi_download is succeeded
+  until: shell_environment_yazi_download is succeeded
 
 - name: Extract yazi archive
   ansible.builtin.unarchive:
@@ -42,7 +42,7 @@
     remote_src: true
     creates: "{{ shell_environment_yazi_install_dir }}/yazi-{{ shell_environment_yazi_arch }}/yazi"
   become: true
-  when: yazi_download is changed or not yazi_installed.stat.exists
+  when: shell_environment_yazi_download is changed or not shell_environment_yazi_installed.stat.exists
 
 - name: Rename extracted directory to versioned name
   ansible.builtin.command:
@@ -51,7 +51,7 @@
       {{ shell_environment_yazi_install_dir }}/yazi-{{ shell_environment_yazi_version }}
     creates: "{{ shell_environment_yazi_install_dir }}/yazi-{{ shell_environment_yazi_version }}/yazi"
   become: true
-  when: yazi_download is changed or not yazi_installed.stat.exists
+  when: shell_environment_yazi_download is changed or not shell_environment_yazi_installed.stat.exists
 
 - name: Create symlink for yazi binary
   ansible.builtin.file:
@@ -74,7 +74,7 @@
     path: "/tmp/yazi-{{ shell_environment_yazi_version }}.zip"
     state: absent
   become: true
-  when: yazi_download is changed
+  when: shell_environment_yazi_download is changed
 
 - name: Create yazi config directory for each user
   ansible.builtin.file:
@@ -83,7 +83,7 @@
     owner: "{{ item.split(':')[0] }}"
     group: "{{ item.split(':')[0] }}"
     mode: '0755'
-  loop: "{{ target_shell_users }}"
+  loop: "{{ shell_environment_target_shell_users }}"
   become: true
 
 - name: Deploy yazi configuration
@@ -93,5 +93,5 @@
     owner: "{{ item.split(':')[0] }}"
     group: "{{ item.split(':')[0] }}"
     mode: '0644'
-  loop: "{{ target_shell_users }}"
+  loop: "{{ shell_environment_target_shell_users }}"
   become: true

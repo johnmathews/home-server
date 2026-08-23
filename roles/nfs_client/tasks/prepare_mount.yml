@@ -1,7 +1,7 @@
 - name: Check if already mounted
   become: true
   ansible.builtin.command: mountpoint -q {{ nfs_item.mountpoint }}
-  register: _is_mp
+  register: nfs_client_is_mp
   failed_when: false
   changed_when: false
 
@@ -12,5 +12,5 @@
     state: directory
     mode: "0755"
   when:
-    - _is_mp.rc != 0
-    - nfs_can_systemd_automount
+    - nfs_client_is_mp.rc != 0
+    - nfs_client_nfs_can_systemd_automount

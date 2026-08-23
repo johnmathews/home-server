@@ -18,7 +18,7 @@
     owner: "{{ item.split(':')[0] }}"
     group: "{{ item.split(':')[0] }}"
     mode: '0700'
-  loop: "{{ target_shell_users }}"
+  loop: "{{ shell_environment_target_shell_users }}"
   become: true
   when: shell_environment_ssh_setup_enabled | bool
   tags: [apps, ssh]
@@ -30,7 +30,7 @@
     owner: "{{ item.split(':')[0] }}"
     group: "{{ item.split(':')[0] }}"
     mode: '0644'
-  loop: "{{ target_shell_users }}"
+  loop: "{{ shell_environment_target_shell_users }}"
   become: true
   when: shell_environment_aliases_enabled | bool
   tags: [apps, aliases, shell]

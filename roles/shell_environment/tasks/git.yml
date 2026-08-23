@@ -11,7 +11,7 @@
     owner: "{{ item.split(':')[0] }}"
     group: "{{ item.split(':')[0] }}"
     mode: '0644'
-  loop: "{{ target_shell_users }}"
+  loop: "{{ shell_environment_target_shell_users }}"
   become: true
 
 - name: Include managed git config from each user's ~/.gitconfig
@@ -25,5 +25,5 @@
     block: |
       [include]
         path = ~/.gitconfig_managed
-  loop: "{{ target_shell_users }}"
+  loop: "{{ shell_environment_target_shell_users }}"
   become: true

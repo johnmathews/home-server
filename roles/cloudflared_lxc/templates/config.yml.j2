@@ -3,12 +3,12 @@
 
 {% set domains = [primary_domain_name] + (migration_additional_domains | default([])) %}
 
-tunnel: {{ cloudflared_tunnel_id }}
-credentials-file: /root/.cloudflared/{{ cloudflared_tunnel_id }}.json
+tunnel: {{ cloudflared_lxc_cloudflared_tunnel_id }}
+credentials-file: /root/.cloudflared/{{ cloudflared_lxc_cloudflared_tunnel_id }}.json
 
 ingress:
 {% for domain in domains %}
-{% for rule in cloudflared_ingress %}
+{% for rule in cloudflared_lxc_cloudflared_ingress %}
 {% set hostname = (rule.prefix + '.' + domain) if rule.prefix else domain %}
   - hostname: {{ hostname }}
     service: {{ rule.service }}

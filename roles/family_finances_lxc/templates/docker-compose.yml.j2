@@ -29,7 +29,7 @@ services:
   # through the proxy or its rate limiting.
   backend:
     container_name: ff-backend
-    image: ghcr.io/johnmathews/family-finances-backend:{{ family_finances_version }}
+    image: ghcr.io/johnmathews/family-finances-backend:{{ family_finances_lxc_family_finances_version }}
     restart: unless-stopped
     expose:
       - "8000"
@@ -44,10 +44,10 @@ services:
     volumes:
       # The family's financial record. This is the path the PBS guest backup
       # has to contain (family-finances docs/adr/0017).
-      - "{{ family_finances_data_dir }}:/data"
+      - "{{ family_finances_lxc_family_finances_data_dir }}:/data"
       # Read-only, and a separate mount from /data: the application key is
       # deployment configuration, not part of the family's financial record.
-      - "{{ family_finances_secrets_dir }}:/secrets:ro"
+      - "{{ family_finances_lxc_family_finances_secrets_dir }}:/secrets:ro"
     healthcheck:
       # curl is not in the slim image; the stdlib is.
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"]
@@ -61,10 +61,10 @@ services:
   # for a browser to be told about (family-finances docs/adr/0010).
   frontend:
     container_name: ff-frontend
-    image: ghcr.io/johnmathews/family-finances-frontend:{{ family_finances_version }}
+    image: ghcr.io/johnmathews/family-finances-frontend:{{ family_finances_lxc_family_finances_version }}
     restart: unless-stopped
     ports:
-      - "{{ family_finances_port }}:80"
+      - "{{ family_finances_lxc_family_finances_port }}:80"
     environment:
       TZ: "{{ TZ }}"
     depends_on:
@@ -72,7 +72,7 @@ services:
         condition: service_healthy
 
   node_exporter:
-    image: quay.io/prometheus/node-exporter:{{ node_exporter_version }}
+    image: quay.io/prometheus/node-exporter:{{ family_finances_lxc_node_exporter_version }}
     container_name: node_exporter
     command:
       - '--path.rootfs=/host'
@@ -86,7 +86,7 @@ services:
       - '/var/lib/node_exporter/textfile_collector:/textfile:ro'
 
   alloy:
-    image: grafana/alloy:{{ alloy_version }}
+    image: grafana/alloy:{{ family_finances_lxc_alloy_version }}
     container_name: alloy
     restart: unless-stopped
     environment:
@@ -111,7 +111,7 @@ services:
         max-file: "5"
 
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:{{ cadvisor_version }}
+    image: gcr.io/cadvisor/cadvisor:{{ family_finances_lxc_cadvisor_version }}
     container_name: cadvisor
     restart: always
     ports:
