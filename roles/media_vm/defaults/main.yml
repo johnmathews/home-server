@@ -19,7 +19,6 @@ media_vm_cadvisor_version: "{{ sidecar_cadvisor_version }}"
 # Changing this will require you to `cd /src/media && docker compose logs qbittorrent`
 # to get the new temp password. Then in qBittorrent set the old password again
 media_vm_reset_qbittorrent_config: false
-# qbittorrent_password_hash: 16c5e9c9b842bd6bf78aafa66643304e0cfe2586
 
 media_vm_media_stack_base_dir: /srv/media
 media_vm_media_stack_mount_dir: /mnt/media
