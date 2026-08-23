@@ -1024,7 +1024,7 @@ def cmd_verify(args: argparse.Namespace) -> None:
         print("   !", b)
     # nfo <episode> vs filename, plus .order markers — one ssh round trip (bash -s: the NAS
     # login shell is zsh, whose nomatch aborts on an empty glob)
-    script = """set -u
+    script = r"""set -u
 shopt -s nullglob
 cd "$1"
 for d in */Season\ */; do d="${d%/}"; o=none; [ -f "$d/.order" ] && o=$(tr -d '[:space:]' < "$d/.order")
@@ -1033,7 +1033,7 @@ for d in */Season\ */; do d="${d%/}"; o=none; [ -f "$d/.order" ] && o=$(tr -d '[
 done
 for f in */Season\ */*.nfo; do
   case "$f" in */season.nfo) continue;; esac
-  n=$(grep -o '<episode>[0-9]*' "$f" | tr -dc 0-9); fn=$(echo "$f" | sed -E 's/.*S[0-9]{2}E0*([0-9]+) - .*/\\1/')
+  n=$(grep -o '<episode>[0-9]*' "$f" | tr -dc 0-9); fn=$(echo "$f" | sed -E 's/.*S[0-9]{2}E0*([0-9]+) - .*/\1/')
   [ "$n" = "$fn" ] || echo "NFO-MISMATCH|$f|nfo=$n|file=$fn"
 done
 """
