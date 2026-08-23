@@ -269,18 +269,12 @@ def main() -> None:
     if res.returncode != 0:
         raise SystemExit("upload failed")
 
-    # Overviews: the plugin attached a random channel's "about" text to each series. Replace with a
-    # one-line description listing the seasons (UpdateItem round-trip; only Overview changes).
-    fields = ("Overview,Genres,Tags,Studios,People,ProviderIds,PremiereDate,ProductionYear,DateCreated,OriginalTitle,Taglines,"
-              "SortName,ForcedSortName,OfficialRating,CustomRating,CommunityRating,CriticRating,LockData,LockedFields,Path,DisplayOrder,"
-              "PreferredMetadataLanguage,PreferredMetadataCountryCode,EndDate,Status,AirTime,AirDays,ExternalUrls,DateLastMediaAdded,RunTimeTicks")
-    for sr in series:
-        names = [s["Name"] for s in sorted(seasons, key=lambda s: s.get("IndexNumber") or 0) if s["SeriesId"] == sr["Id"]]
-        dto = jf.req("GET", f"/Users/{uid}/Items/{sr['Id']}", {"fields": fields})
-        dto["Overview"] = f"{sr['Name']} — " + ", ".join(names) if names else sr["Name"]
-        jf.req("POST", f"/Items/{sr['Id']}", None, dto)
-    print(f"series overviews replaced: {len(series)}")
-
+    # NOTE: this script used to POST each series' DTO back to set a one-line Overview. It no
+    # longer touches series metadata at all: (a) an item update on a Series makes Jellyfin queue a
+    # full "replace all metadata" refresh of the whole series, and (b) series-level metadata is
+    # where the YouTube Metadata plugin's provider id lives — any show carrying that id gets its
+    # episodes renumbered by upload date by the plugin's post-scan EpisodeIndexer after every
+    # library scan (2026-08-23). Overviews were set once on 2026-08-22; edit in the UI if needed.
     # Image refresh for series + seasons only (metadata untouched), replacing the plugin's images.
     targets = series + seasons
     for it in targets:

@@ -216,3 +216,17 @@ def test_clean_overview_keeps_sentence_that_ends_with_a_link() -> None:
            "Tune in to the induction ceremony ➡️ https://ufcfightpass.com/\n\nOrder UFC PPV on ESPN+ ➡️ https://ufc.ac/x (U.S. only)")
     out = m.clean_overview(raw, "UFC", None)
     assert "Relive this iconic UFC matchup" in out and "ufcfightpass" not in out and "Order UFC PPV" not in out
+
+
+def test_countdown_numbers_oldest_keeps_top_newest_lowest() -> None:
+    m_ = m.countdown_numbers([1, 2, 3, 16])
+    assert m_ == {1: 999, 2: 998, 3: 997, 16: 996}
+    assert min(m_.values()) - 1 == 995          # the next new video goes on top
+    assert m.countdown_numbers([]) == {}
+
+
+def test_renumber_name_keeps_show_season_and_sidecar_suffix() -> None:
+    assert m.renumber_name("Kettlebell S03E02 - Mark-[abc].mkv", 998) == "Kettlebell S03E998 - Mark-[abc].mkv"
+    assert m.renumber_name("Mobility & Physio S01E16 - X-[id]-thumb.jpg", 984) == "Mobility & Physio S01E984 - X-[id]-thumb.jpg"
+    assert m.renumber_name("Bodyweight S01E05 - X-[id].trickplay", 995) == "Bodyweight S01E995 - X-[id].trickplay"
+    assert m.renumber_name("season.nfo", 1) is None

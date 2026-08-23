@@ -73,8 +73,10 @@ subcategories, seasons the sub-subcategories:
 Conventions inside the tree:
 
 - Episode file: `<Series> SnnEnn - <original yt-dlp name>-[<youtubeId>].ext`. The original
-  filename (incl. the `[id]`) is kept verbatim after the `SxxExx - ` token. Playlist seasons keep
-  yt-dlp's `001-` playlist index as the episode number; loose seasons are numbered by upload date.
+  filename (incl. the `[id]`) is kept verbatim after the `SxxExx - ` token. "Course" seasons
+  (the playlists) count up from 1; "feed" seasons (the loose ones) count **down from 999** so the
+  newest video sorts first — the kind is in `Season NN/.order` (Jellyfin has no descending
+  option; see the canonical doc §1).
 - Every episode has a `<same stem>.nfo` (title, plot, aired, season/episode, sorttitle, `uniqueid
   type="YoutubeMetadata"`) and most a `<same stem>-thumb.jpg`. `tvshow.nfo` / `season.nfo` carry
   series and season names. **Metadata for this library comes from these nfo files, not from the
@@ -162,6 +164,13 @@ curated numbered seasons. Hence the nfo approach above. A second, smaller landmi
 remote provider shells out to `yt-dlp` once per item, and a bulk scan of a few hundred items gets
 the LXC's IP rate-limited by YouTube (HTTP 429 / "sign in to confirm you're not a bot") for ~10
 minutes at a time — the Movie libraries are still exposed to that on big imports.
+
+**Landmine — the plugin's post-scan `EpisodeIndexer`.** The YouTube Metadata plugin also
+registers a task that runs after *every* library scan and renumbers, for every *show* carrying a
+`YoutubeMetadata` provider id, each season's episodes 1..N by upload date (no refresh, nothing
+logged). Our shows had that id from the first scan; it silently swapped out-of-order course
+episodes and reverted the feed seasons to 1..N on every scan (2026-08-23). No show in this
+library may carry that id — `migrate.py fix-library-options` strips it, `verify` fails on it.
 
 **Landmine — never `ReplaceAllMetadata` on this library.** A refresh with
 `ReplaceAllMetadata=true` nulled every episode's IndexNumber and Overview and the nfo reader did

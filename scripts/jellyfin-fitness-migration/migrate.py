@@ -24,6 +24,12 @@ Sub-commands (run in this order; each is idempotent / re-runnable):
                    Jellyfin already holds (API) with a fallback file for the rest,
                    export each episode's stored primary image as <stem>-thumb.*,
                    and ship them to the NAS.  --dry-run writes them under --workdir.
+  reorder-season   Make one season a "feed" (newest first): renumber its episodes
+                   down from 999 (oldest = 999), rename files/sidecars, rewrite the nfo
+                   <episode>, write Season NN/.order, refresh, re-apply watched state.
+  fix-numbers      Force season/episode numbers in Jellyfin back to the filename's SxxExx
+                   (after anything that re-derived them).
+  verify           Read-only health check (numbers, nfo, images, overviews, orders, users).
   fix-overviews    Replace every episode Overview with a cleaned YouTube description
                    ("<channel> · <date>" + first real paragraph, boilerplate removed).
   fix-names        After refresh: clear the plugin's forced sort names, retitle
@@ -539,6 +545,16 @@ def cmd_fix_library_options(args: argparse.Namespace) -> None:
     lib = next(v for v in jf.virtual_folders() if v["Name"] == plan_d["library_name"])
     lo = lib["LibraryOptions"]
     print("fetchers now:", [(t["Type"], t["MetadataFetchers"], t["ImageFetchers"]) for t in lo["TypeOptions"]])
+    # No show may carry the plugin's provider id: its post-scan EpisodeIndexer renumbers every
+    # episode of such shows by upload date after every scan (and seasons alphabetically).
+    uid = next(u["Id"] for u in jf.users())
+    stripped = 0
+    for sr in jf.items(uid, parentId=lib["ItemId"], includeItemTypes="Series", fields="ProviderIds", limit=200):
+        if (sr.get("ProviderIds") or {}).get("YoutubeMetadata"):
+            dto = jf._req("GET", f"/Users/{uid}/Items/{sr['Id']}", {"fields": UPDATE_FIELDS})
+            dto["ProviderIds"] = {k: v for k, v in (dto.get("ProviderIds") or {}).items() if k != "YoutubeMetadata"}
+            jf._req("POST", f"/Items/{sr['Id']}", None, _updatable(dto)); stripped += 1
+    print(f"series stripped of YoutubeMetadata provider id: {stripped}")
     print("local readers:", lo["LocalMetadataReaderOrder"], "disabled:", lo["DisabledLocalMetadataReaders"], "realtime:", lo["EnableRealtimeMonitor"])
 
 
@@ -764,9 +780,299 @@ def cmd_fix_overviews(args: argparse.Namespace) -> None:
             continue
         dto = jf._req("GET", f"/Users/{uid}/Items/{e['Id']}", {"fields": UPDATE_FIELDS})
         dto["Overview"] = new
-        jf._req("POST", f"/Items/{e['Id']}", None, dto)
+        jf._req("POST", f"/Items/{e['Id']}", None, _updatable(dto))
         n += 1
     print(f"overviews rewritten: {n} of {len(eps)}")
+
+
+# --------------------------------------------------------------------------- #
+# feed seasons: newest first  (episodes numbered down from 999)
+# --------------------------------------------------------------------------- #
+FEED_TOP = 999
+
+
+def countdown_numbers(old_numbers: list[int], top: int = FEED_TOP) -> dict[int, int]:
+    """Map ascending (chronological) episode numbers to a descending 'feed' numbering:
+    the oldest keeps the highest number (top), the newest gets the lowest, so that a
+    later addition (top - n - 1, ...) sorts first. Pure, testable."""
+    ordered = sorted(set(old_numbers))
+    return {old: top - i for i, old in enumerate(ordered)}
+
+
+SXXEXX_IN_NAME = re.compile(r"^(?P<show>.+?) S(?P<s>\d{2})E(?P<e>\d{2,3}) - (?P<rest>.*)$")
+
+
+def renumber_name(name: str, new_ep: int, width: int = 3) -> str | None:
+    """'Kettlebell S03E02 - X-[id].mkv' -> 'Kettlebell S03E998 - X-[id].mkv' (any sidecar suffix)."""
+    m = SXXEXX_IN_NAME.match(name)
+    if not m:
+        return None
+    return f"{m.group('show')} S{int(m.group('s')):02d}E{new_ep:0{width}d} - {m.group('rest')}"
+
+
+def cmd_reorder_season(args: argparse.Namespace) -> None:
+    """Turn one season into a 'feed' season: renumber its episodes from ascending 1..N to
+    descending from 999 (oldest = 999), rename media + every sidecar, rewrite <episode> in the
+    nfo, write Season NN/.order = feed, refresh, and re-apply watched state by YouTube id."""
+    import time
+
+    plan_d = json.loads((args.workdir / "plan.json").read_text())
+    jf = jf_from_env()
+    lib = next(v for v in jf.virtual_folders() if v["Name"] == plan_d["library_name"])
+    season_rel = f"{plan_d['target_subdir']}/{args.show}/Season {args.season:02d}"
+    nas_dir = f"{NAS_PATH_ROOT}/{season_rel}"
+    jf_dir = f"{JELLYFIN_PATH_ROOT}/{season_rel}"
+
+    # 1. listing
+    res = subprocess.run(["ssh", "-o", "BatchMode=yes", args.nas, f"cd {shlex.quote(nas_dir)} && /bin/ls -1A"], capture_output=True, text=True, check=True)
+    entries = [e for e in res.stdout.splitlines() if e]
+    media = [e for e in entries if media_stem(e)]
+    parsed = {e: SXXEXX_IN_NAME.match(e) for e in media}
+    bad = [e for e, m in parsed.items() if not m]
+    if bad:
+        raise SystemExit(f"media without SxxExx token in {season_rel}: {bad}")
+    old_nums = {e: int(parsed[e].group("e")) for e in media}  # type: ignore[union-attr]
+    if len(set(old_nums.values())) != len(old_nums):
+        raise SystemExit("duplicate episode numbers in season — fix by hand first")
+    if old_nums and min(old_nums.values()) >= 900:
+        print(f"{season_rel}: already numbered as a feed season ({min(old_nums.values())}..{max(old_nums.values())}); writing .order only")
+        mapping: dict[int, int] = {}
+    else:
+        mapping = countdown_numbers(list(old_nums.values()))
+    renames: list[tuple[str, str]] = []  # (old name, new name) for every entry sharing a media stem
+    for e in media:
+        stem = media_stem(e) or ""
+        new_ep = mapping.get(old_nums[e])
+        if new_ep is None:
+            continue
+        for other in entries:
+            if other == e or other.startswith(stem):
+                new_name = renumber_name(other, new_ep)
+                if new_name is None:
+                    raise SystemExit(f"cannot renumber sidecar {other}")
+                renames.append((other, new_name))
+    dsts = [n for _, n in renames]
+    if len(dsts) != len(set(dsts)) or set(dsts) & set(entries):
+        raise SystemExit("rename plan collides with existing names — aborting")
+    print(f"{season_rel}: {len(media)} episodes, {len(renames)} renames " + (f"({min(mapping.values())}..{max(mapping.values())})" if mapping else "(none)"))
+    for o, n in renames[:6]:
+        print(f"   {o[:70]}\n   -> {n[:70]}")
+    if args.dry_run:
+        print("dry-run: nothing changed")
+        return
+
+    # 2. export user data for this season's episodes, keyed by youtube id
+    users = jf.users()
+    saved: dict[str, list[dict[str, Any]]] = {}
+    for u in users:
+        eps = jf.items(u["Id"], parentId=lib["ItemId"], includeItemTypes="Episode", fields="Path,ProviderIds", limit=2000)
+        rows = []
+        for e in eps:
+            if not (e.get("Path") or "").startswith(jf_dir + "/"):
+                continue
+            ud = e.get("UserData") or {}
+            if has_history(ud):
+                vid = (e.get("ProviderIds") or {}).get("YoutubeMetadata") or youtube_id(e["Path"])
+                rows.append({"youtube_id": vid, "Played": bool(ud.get("Played")), "PlayCount": int(ud.get("PlayCount") or 0),
+                             "PlaybackPositionTicks": int(ud.get("PlaybackPositionTicks") or 0), "IsFavorite": bool(ud.get("IsFavorite")),
+                             "LastPlayedDate": ud.get("LastPlayedDate")})
+        saved[u["Id"]] = rows
+    print("user data saved:", {next(x["Name"] for x in users if x["Id"] == k): len(v) for k, v in saved.items() if v})
+    (args.workdir / f"reorder-{args.show.replace('/', '_')}-S{args.season:02d}-history.json").write_text(json.dumps(saved, indent=1))
+
+    # 3. renames on the NAS (two-phase via temp names), nfo <episode> rewrite, .order marker
+    lines = ["set -euo pipefail", f"cd {shlex.quote(nas_dir)}"]
+    for o, n in renames:
+        lines.append(f"mv -n {shlex.quote(o)} {shlex.quote('.reorder.' + n)}")
+    for o, n in renames:
+        lines.append(f"mv -n {shlex.quote('.reorder.' + n)} {shlex.quote(n)}")
+    for e in media:
+        new_ep = mapping.get(old_nums[e])
+        if new_ep is None:
+            continue
+        nfo = renumber_name(str(PurePosixPath(e).with_suffix(".nfo")), new_ep)
+        lines.append(f"[ -f {shlex.quote(nfo)} ] && sed -i 's|<episode>[0-9]*</episode>|<episode>{new_ep}</episode>|' {shlex.quote(nfo)} && touch {shlex.quote(nfo)} || true")
+    lines.append("printf 'feed\\n' > .order")
+    lines.append(f"echo renamed {len(renames)} entries")
+    res = subprocess.run(["ssh", "-o", "BatchMode=yes", args.nas, "bash -s"], input="\n".join(lines) + "\n", capture_output=True, text=True)
+    sys.stdout.write(res.stdout); sys.stderr.write(res.stderr)
+    if res.returncode != 0:
+        raise SystemExit("NAS rename failed — inspect the season dir; .reorder.* temp names may remain")
+
+    # 4. keep plan.json in step (write-nfo iterates it)
+    prefix = f"{season_rel}/"
+    n_plan = 0
+    for m in plan_d["moves"]:
+        if m["dst"].startswith(prefix):
+            name = m["dst"][len(prefix):]
+            for o, n in renames:
+                if name == o:
+                    m["dst"] = prefix + n
+                    if m["kind"] == "media":
+                        m["episode"] = mapping[old_nums[o]]
+                    n_plan += 1
+    (args.workdir / "plan.json").write_text(json.dumps(plan_d, indent=1))
+    print(f"plan.json entries updated: {n_plan}")
+
+    # 5. refresh (plain) and wait until the season's episodes carry the new numbers
+    jf._req("POST", f"/Items/{lib['ItemId']}/Refresh", {"Recursive": "true", "MetadataRefreshMode": "FullRefresh",
+            "ImageRefreshMode": "Default", "ReplaceAllMetadata": "false", "ReplaceAllImages": "false"})
+    uid = users[0]["Id"]
+    want = {mapping[old_nums[e]] for e in media if old_nums[e] in mapping}
+    t0 = time.time()
+    while time.time() - t0 < args.wait:
+        eps = [e for e in jf.items(uid, parentId=lib["ItemId"], includeItemTypes="Episode", fields="Path,ProviderIds", limit=2000)
+               if (e.get("Path") or "").startswith(jf_dir + "/")]
+        have = {e.get("IndexNumber") for e in eps}
+        stale = [e for e in eps if e.get("IndexNumber") not in want]
+        if want <= have and not stale and len(eps) == len(media):
+            break
+        time.sleep(15)
+    print(f"jellyfin now has {len(eps)} episodes in the season, numbers {sorted(have)[:3]}..{sorted(have)[-3:]}, stale {len(stale)}")
+
+    # 6. re-apply user data by youtube id
+    for u in users:
+        rows = saved.get(u["Id"]) or []
+        if not rows:
+            continue
+        eps = [e for e in jf.items(u["Id"], parentId=lib["ItemId"], includeItemTypes="Episode", fields="Path,ProviderIds", limit=2000)
+               if (e.get("Path") or "").startswith(jf_dir + "/")]
+        by_vid = {((e.get("ProviderIds") or {}).get("YoutubeMetadata") or youtube_id(e["Path"])): e for e in eps}
+        ok = missing = 0
+        for r in rows:
+            e = by_vid.get(r["youtube_id"])
+            if not e:
+                missing += 1; continue
+            body = {k: r[k] for k in ("Played", "PlayCount", "PlaybackPositionTicks", "IsFavorite")}
+            if r.get("LastPlayedDate"):
+                body["LastPlayedDate"] = r["LastPlayedDate"]
+            jf.update_user_data(u["Id"], e["Id"], body); ok += 1
+        print(f"   {u['Name']}: user data re-applied {ok}, unmatched {missing}")
+    # 7. new items may carry filename titles (the nfo was not visible to Jellyfin yet when they
+    #    were created — NFS attribute cache); re-title from the metadata snapshot.
+    src_path = args.workdir / "metadata-sources.json"
+    sources = json.loads(src_path.read_text()) if src_path.exists() else {}
+    titles: dict[str, str] = {}
+    for part in ("api", "old"):
+        for vid, d in sources.get(part, {}).items():
+            if d.get("name") and not looks_like_filename_title(d["name"]) and vid not in titles:
+                titles[vid] = d["name"]
+    renamed = 0
+    for e in jf.items(uid, parentId=lib["ItemId"], includeItemTypes="Episode", fields="Path,ProviderIds", limit=2000):
+        if not (e.get("Path") or "").startswith(jf_dir + "/") or not looks_like_filename_title(e["Name"]):
+            continue
+        vid = (e.get("ProviderIds") or {}).get("YoutubeMetadata") or youtube_id(e["Path"])
+        if vid in titles:
+            dto = jf._req("GET", f"/Users/{uid}/Items/{e['Id']}", {"fields": UPDATE_FIELDS})
+            dto["Name"] = titles[vid]
+            jf._req("POST", f"/Items/{e['Id']}", None, _updatable(dto)); renamed += 1
+    print(f"   filename titles fixed: {renamed}")
+    print("done — remember: yt -f now numbers this season down from", (min(mapping.values()) - 1) if mapping else "the current minimum")
+
+
+def cmd_fix_numbers(args: argparse.Namespace) -> None:
+    """Force every episode's season/episode numbers in Jellyfin back to what its filename says
+    (API item update). Needed after anything that made Jellyfin re-derive numbers — a full
+    "replace all metadata" refresh re-sorts neighbouring course episodes by upload date."""
+    plan_d = json.loads((args.workdir / "plan.json").read_text())
+    jf = jf_from_env()
+    lib = next(v for v in jf.virtual_folders() if v["Name"] == plan_d["library_name"])
+    uid = next(u["Id"] for u in jf.users())
+    eps = jf.items(uid, parentId=lib["ItemId"], includeItemTypes="Episode", fields="Path", limit=2000)
+    todo: list[tuple[dict[str, Any], int, int]] = []
+    for e in eps:
+        m = re.search(r" S(\d{2})E(\d{2,3}) - ", e.get("Path") or "")
+        if not m:
+            continue
+        fs, fe = int(m.group(1)), int(m.group(2))
+        if (e.get("ParentIndexNumber"), e.get("IndexNumber")) != (fs, fe):
+            todo.append((e, fs, fe))
+
+    def set_numbers(item_id: str, season: int, episode: int) -> None:
+        dto = jf._req("GET", f"/Users/{uid}/Items/{item_id}", {"fields": UPDATE_FIELDS})
+        dto["ParentIndexNumber"], dto["IndexNumber"] = season, episode
+        jf._req("POST", f"/Items/{item_id}", None, _updatable(dto))
+
+    # Two phases: swapped pairs collide on Jellyfin's (series, season, episode) key if set directly,
+    # so park every wrong item on a temporary number (5000 + target) first.
+    for e, fs, fe in todo:
+        set_numbers(e["Id"], fs, 5000 + fe)
+    for e, fs, fe in todo:
+        set_numbers(e["Id"], fs, fe)
+        print(f"   S{e.get('ParentIndexNumber')}E{e.get('IndexNumber')} -> S{fs:02d}E{fe:02d}  {e['Path'].rsplit('/', 1)[1][:70]}")
+    print(f"episodes renumbered to match their filenames: {len(todo)} of {len(eps)}")
+
+
+def cmd_verify(args: argparse.Namespace) -> None:
+    """Read-only health check: numbers vs filenames, nfo <episode> vs filename, images, overviews,
+    per-season numbering ranges and order markers, user data summary. Exit 1 on any mismatch."""
+    plan_d = json.loads((args.workdir / "plan.json").read_text())
+    jf = jf_from_env()
+    lib = next(v for v in jf.virtual_folders() if v["Name"] == plan_d["library_name"])
+    users = jf.users()
+    uid = users[0]["Id"]
+    eps = jf.items(uid, parentId=lib["ItemId"], includeItemTypes="Episode", fields="Path,Overview", enableImages="true", limit=2000)
+    bad = []
+    for e in eps:
+        m = re.search(r" S(\d{2})E(\d{2,3}) - ", e.get("Path") or "")
+        if not m or (e.get("ParentIndexNumber"), e.get("IndexNumber")) != (int(m.group(1)), int(m.group(2))):
+            bad.append(e["Path"].rsplit("/", 1)[1][:80])
+    noimg = sum(1 for e in eps if "Primary" not in (e.get("ImageTags") or {}))
+    noov = sum(1 for e in eps if not e.get("Overview"))
+    print(f"episodes={len(eps)} numbers-mismatched={len(bad)} no-image={noimg} no-overview={noov}")
+    for b in bad[:20]:
+        print("   !", b)
+    # nfo <episode> vs filename, plus .order markers — one ssh round trip (bash -s: the NAS
+    # login shell is zsh, whose nomatch aborts on an empty glob)
+    script = """set -u
+shopt -s nullglob
+cd "$1"
+for d in */Season\ */; do d="${d%/}"; o=none; [ -f "$d/.order" ] && o=$(tr -d '[:space:]' < "$d/.order")
+  n=0; for f in "$d"/*.mkv "$d"/*.mp4 "$d"/*.webm; do n=$((n+1)); done
+  echo "$d|$o|$n"
+done
+for f in */Season\ */*.nfo; do
+  case "$f" in */season.nfo) continue;; esac
+  n=$(grep -o '<episode>[0-9]*' "$f" | tr -dc 0-9); fn=$(echo "$f" | sed -E 's/.*S[0-9]{2}E0*([0-9]+) - .*/\\1/')
+  [ "$n" = "$fn" ] || echo "NFO-MISMATCH|$f|nfo=$n|file=$fn"
+done
+"""
+    res = subprocess.run(["ssh", "-o", "BatchMode=yes", args.nas, "bash -s -- " + shlex.quote(NAS_PATH_ROOT + "/" + plan_d["target_subdir"])],
+                         input=script, capture_output=True, text=True)
+    nfo_bad = [l for l in res.stdout.splitlines() if l.startswith("NFO-MISMATCH")]
+    seasons = [l for l in res.stdout.splitlines() if not l.startswith("NFO-MISMATCH") and l]
+    print(f"nfo-episode-mismatched={len(nfo_bad)}")
+    for l in nfo_bad[:10]:
+        print("   !", l)
+    per: dict[tuple[str, int], list[int]] = {}
+    for e in eps:
+        per.setdefault((e.get("SeriesName"), e.get("ParentIndexNumber") or 0), []).append(e.get("IndexNumber") or 0)
+    print("seasons (order | count | number range):")
+    for l in sorted(seasons):
+        d, o, n = l.split("|")
+        show, season = d.split("/Season ")
+        nums = sorted(per.get((show, int(season)), []))
+        print(f"   {d:34} {o:6} {n:>4}  {nums[0] if nums else '-'}..{nums[-1] if nums else '-'}")
+    tainted = [sr["Name"] for sr in jf.items(uid, parentId=lib["ItemId"], includeItemTypes="Series", fields="ProviderIds", limit=200)
+               if (sr.get("ProviderIds") or {}).get("YoutubeMetadata")]
+    print(f"shows carrying a YoutubeMetadata provider id (must be none): {tainted or 'none'}")
+    for u in users:
+        its = jf.items(u["Id"], parentId=lib["ItemId"], includeItemTypes="Episode", limit=2000)
+        played = sum(1 for e in its if (e.get("UserData") or {}).get("Played"))
+        prog = sum(1 for e in its if (e.get("UserData") or {}).get("PlaybackPositionTicks"))
+        if played or prog:
+            print(f"   user {u['Name']}: played={played} in-progress={prog}")
+    if bad or nfo_bad or tainted:
+        sys.exit(1)
+
+
+def _updatable(dto: dict[str, Any]) -> dict[str, Any]:
+    """Strip read-only sub-objects Jellyfin 10.11 cannot deserialize back on POST /Items/{id}
+    (TrickplayInfoDto has a constructor that JSON cannot bind) — appears once trickplay exists."""
+    d = dict(dto)
+    for k in ("Trickplay", "MediaSources", "MediaStreams", "Chapters", "ImageBlurHashes"):
+        d.pop(k, None)
+    return d
 
 
 UPDATE_FIELDS = ("Overview,Genres,Tags,Studios,People,ProviderIds,PremiereDate,ProductionYear,DateCreated,OriginalTitle,"
@@ -797,7 +1103,7 @@ def cmd_fix_names(args: argparse.Namespace) -> None:
     def update(item_id: str, **changes: Any) -> dict[str, Any]:
         before = jf._req("GET", f"/Users/{uid}/Items/{item_id}", {"fields": UPDATE_FIELDS})
         dto = dict(before); dto.update(changes)
-        jf._req("POST", f"/Items/{item_id}", None, dto)
+        jf._req("POST", f"/Items/{item_id}", None, _updatable(dto))
         after = jf._req("GET", f"/Users/{uid}/Items/{item_id}", {"fields": UPDATE_FIELDS})
         ignore = {"DateLastSaved", "Etag", "ImageBlurHashes", "ImageTags", "UserData", "SortName", "ForcedSortName", "Name"}
         unexpected = {k for k in set(before) | set(after) if k not in ignore and before.get(k) != after.get(k)}
@@ -846,6 +1152,12 @@ def main(argv: list[str] | None = None) -> None:
     p = sub.add_parser("refresh"); p.add_argument("--wait", type=int, default=900); p.set_defaults(fn=cmd_refresh)
     p = sub.add_parser("fix-names"); p.add_argument("--force-sort", action="store_true"); p.set_defaults(fn=cmd_fix_names)
     sub.add_parser("fix-overviews").set_defaults(fn=cmd_fix_overviews)
+    sub.add_parser("fix-numbers").set_defaults(fn=cmd_fix_numbers)
+    sub.add_parser("verify").set_defaults(fn=cmd_verify)
+    p = sub.add_parser("reorder-season", help="renumber one season newest-first (feed) and mark it")
+    p.add_argument("--show", required=True); p.add_argument("--season", type=int, required=True)
+    p.add_argument("--dry-run", action="store_true"); p.add_argument("--wait", type=int, default=600)
+    p.set_defaults(fn=cmd_reorder_season)
     args = ap.parse_args(argv)
     args.workdir.mkdir(parents=True, exist_ok=True)
     args.fn(args)

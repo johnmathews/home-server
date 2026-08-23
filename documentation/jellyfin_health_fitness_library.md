@@ -32,6 +32,7 @@ fitness/
 │   ├── landscape.jpg                     the show's 16:9 thumbcard (generated, see §4)
 │   └── Season NN/                        e.g. Season 03/
 │       ├── season.nfo                    <title>Tutorials</title><seasonnumber>3</seasonnumber>
+│       ├── .order                        "feed" (newest first) or "course" (oldest first) — see rules
 │       ├── folder.jpg                    the season's 2:3 thumbcard (generated, see §4)
 │       ├── landscape.jpg                 the season's 16:9 thumbcard (generated, see §4)
 │       ├── <Show> SNNEnn - <original name>-[<youtubeId>].mkv
@@ -45,9 +46,19 @@ Rules that everything else relies on:
 - **Episode filename** = `<Show> S<season,2 digits>E<episode,2 or 3 digits> - <whatever>-[<youtubeId>].<ext>`.
   Jellyfin derives season/episode numbers from the `SxxExx` token; the `[youtubeId]` (11 chars
   in square brackets) is what every script uses as the stable key. Keep both.
-- **Episode order** inside a season is the episode number. Playlist seasons carry yt-dlp's
-  `001-` index; loose seasons were numbered by upload date at migration time; new videos just
-  take the next free number.
+- **Episode order** inside a season is the episode number, ascending — Jellyfin has no
+  "newest first" switch, so the numbering encodes the wanted order and every season declares
+  its kind in `Season NN/.order`:
+  - **`course`** — oldest first, numbered 1, 2, 3… (the playlist seasons: Heavy Club Basics /
+    Exercise Tutorials, Kettlebell Compilations / Turkish Get-Up). A new video gets max+1.
+  - **`feed`** — newest first: numbered **down from 999** (the first video of the season is
+    E999, the next E998 …). A new video gets min−1 and therefore sorts to the top; nothing
+    already in the season ever has to be renamed. Visible numbers are large ("983.") — the
+    accepted price. All the loose seasons (Bodyweight, Mobility & Physio, Endurance,
+    Inspiration, Combat Sports, Health, Kettlebell/Tutorials) are feeds since 2026-08-23.
+  No marker = course. `yt -f` asks once for a season without a marker; `yt --season-order
+  "<Show>/<Season>" feed|course` sets it; turning an existing ascending season into a feed is
+  `migrate.py reorder-season` (§2), which renumbers and carries watched state across.
 - **Names shown in Jellyfin** come from `tvshow.nfo` (show), `season.nfo` (season) and the
   episode `.nfo` (title, plot, aired date, sort title). The folder names are only for humans.
 - **No metadata comes from the internet for this library.** The YouTube Metadata plugin is
@@ -108,6 +119,16 @@ W=scripts/jellyfin-fitness-migration/state      # working dir: plan, snapshots, 
 |                                          | an existing Name).                                        |
 | migrate.py --workdir $W fix-overviews    | Rewrite every episode overview with the cleaned YouTube   |
 |                                          | description (§3).                                         |
+| migrate.py --workdir $W verify           | Read-only health check: numbers vs filenames, nfo         |
+|                                          | <episode>, images, overviews, per-season order/range,     |
+|                                          | no show carrying a YoutubeMetadata id, user data. Run it  |
+|                                          | after anything that scans or refreshes. Exit 1 on drift.  |
+| migrate.py --workdir $W fix-numbers      | Force every episode's S/E back to its filename (two-phase |
+|                                          | item updates). The repair for the §6 post-scan landmine.  |
+| migrate.py --workdir $W reorder-season   | Turn one season into a feed: renumber its episodes down   |
+|   --show "<Show>" --season N [--dry-run] | from 999 (oldest=999), rename media+sidecars, rewrite the |
+|                                          | nfo <episode>, write .order=feed, refresh, re-apply       |
+|                                          | watched state by YouTube id. Idempotent.                  |
 | make_posters.py --workdir $W [--dry-run] | Generate + upload + refresh the thumbcards for every show |
 |                                          | and season (§4). Needs pillow: run with                   |
 |                                          | `uv run --python 3.13 --with pillow ...`.                 |
@@ -222,8 +243,13 @@ yt -f "Kettlebell/3" "https://…"              #            …or by number
 ```
 
 Interactive flow: it shows the video's title, lists the existing shows (`1) Bodyweight … n) new
-show`), then that show's seasons with episode counts (`1) Compilations (17 episodes) … n) new
-season`), then `Add '<title>' there? [Y/n]`. Numbers or names both work; Enter accepts.
+show`), then that show's seasons with episode counts and order (`1) Compilations (17 episodes,
+course) … 3) Tutorials (9 episodes, feed) … n) new season`), then `Add '<title>' there? [Y/n]`.
+Numbers or names both work; Enter accepts. A new season is asked `Order — [f]eed / [c]ourse`
+(default feed); an existing season with no `.order` marker is asked once. Feed seasons get the
+next number *down* (newest first), course seasons the next number up.
+`yt --season-order "Kettlebell/Tutorials" feed|course` shows or sets a season's order;
+`Show/N:Name:feed` / `Show/3:course` work inline too.
 
 It then downloads on the media VM, names the file `<Show> SnnEnn - <uploader>-<title>-[id].mkv`
 with the **next free episode number**, writes the `.nfo` (cleaned description, aired date, sort
@@ -272,11 +298,21 @@ If the library ever has to be recreated: create it as `tvshows` on `/movies/yout
 run `fix-library-options`, scan, `fix-names`, then `apply-history` from `state/history.json`
 (or a fresh `export-history` taken before deleting). Everything else is on disk.
 
-## 6. Landmines (all hit on 2026-08-22)
+## 6. Landmines (all hit on 2026-08-22/23)
 
-- **YouTube Metadata plugin + numbered seasons = broken.** Its episode provider hard-codes
-  `IndexNumber = 1` (and a date sort name); 237/249 fetched episodes collapsed to "E1". Keep it
-  disabled for this library (`fix-library-options`). It is fine for channel-as-series libraries.
+- **YouTube Metadata plugin + numbered seasons = broken, twice over.** (1) Its episode provider
+  hard-codes `IndexNumber = 1` (and a date sort name); 237/249 fetched episodes collapsed to "E1".
+  Keep it disabled for this library (`fix-library-options`). (2) Worse and sneakier: the plugin
+  registers a **post-scan task (`EpisodeIndexer`)** that runs after *every* library scan and,
+  for every **show carrying a `YoutubeMetadata` provider id**, renumbers each season's episodes
+  1..N by upload date (and the seasons alphabetically) — no refresh, no log line. Our eight
+  shows got that id from the plugin's series provider during the first scan; from the next
+  scan on, course pairs whose upload order differs from playlist order were silently swapped
+  and, once the feed seasons were renumbered, every scan reverted them to 1..N. The fix is
+  structural: **no show in this library may carry a `YoutubeMetadata` provider id**
+  (`fix-library-options` strips it, `verify` fails if one appears; `tvshow.nfo` must never get a
+  `<uniqueid type="YoutubeMetadata">`). Episode-level ids are fine (the task keys on the show).
+  Repair after the fact: `fix-numbers`, `fix-names`, `write-nfo --no-images`, `verify`.
 - **Never refresh with `ReplaceAllMetadata=true`.** It nulls every episode's number and overview
   and the nfo reader does not refill them. Plain `FullRefresh` (the `refresh` command) is right.
 - **Image fetcher names have spaces**: `Embedded Image Extractor`, `Screen Grabber`.
