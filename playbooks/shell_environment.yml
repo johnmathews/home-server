@@ -6,3 +6,10 @@
 
   roles:
     - shell_environment
+
+  # Tag matches the 16 per-host playbooks that also invoke this role
+  # (`- role: shell_environment` / `tags: shell`). Without it this play was
+  # the one shell_environment invocation in site.yml that SKIP=shell could
+  # not skip, which is why a scoped fleet dry run still paid for it.
+  tags:
+    - shell
