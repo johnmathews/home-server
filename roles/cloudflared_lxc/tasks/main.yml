@@ -4,7 +4,7 @@
 
 - name: Ensure cloudflared config directory exists
   ansible.builtin.file:
-    path: "{{ cloudflared_config_dir }}"
+    path: "{{ cloudflared_lxc_cloudflared_config_dir }}"
     state: directory
     mode: '0700'
     owner: root
@@ -14,7 +14,7 @@
 - name: Template cloudflared tunnel config
   ansible.builtin.template:
     src: config.yml.j2
-    dest: "{{ cloudflared_config_dir }}/config.yml"
+    dest: "{{ cloudflared_lxc_cloudflared_config_dir }}/config.yml"
     owner: root
     group: root
     mode: '0600'
@@ -23,10 +23,10 @@
 
 - name: Sync tunnel config to Cloudflare API
   ansible.builtin.uri:
-    url: "https://api.cloudflare.com/client/v4/accounts/{{ cloudflared_account_id }}/cfd_tunnel/{{ cloudflared_tunnel_id }}/configurations"
+    url: "https://api.cloudflare.com/client/v4/accounts/{{ cloudflared_lxc_cloudflared_account_id }}/cfd_tunnel/{{ cloudflared_lxc_cloudflared_tunnel_id }}/configurations"
     method: PUT
     headers:
-      Authorization: "Bearer {{ cloudflared_api_token }}"
+      Authorization: "Bearer {{ cloudflared_lxc_cloudflared_api_token }}"
       Content-Type: application/json
     body_format: json
     body: "{{ lookup('template', 'tunnel_config_api.json.j2') }}"
@@ -39,7 +39,7 @@
 
 - name: Extract hostnames from tunnel config template
   ansible.builtin.set_fact:
-    tunnel_hostnames: >-
+    cloudflared_lxc_tunnel_hostnames: >-
       {{ (lookup('template', 'config.yml.j2') | from_yaml).ingress
          | selectattr('hostname', 'defined')
          | map(attribute='hostname')
@@ -51,9 +51,9 @@
     url: "https://api.cloudflare.com/client/v4/zones?name={{ item }}"
     method: GET
     headers:
-      Authorization: "Bearer {{ cloudflared_api_token }}"
+      Authorization: "Bearer {{ cloudflared_lxc_cloudflared_api_token }}"
     return_content: true
-  register: zone_lookups
+  register: cloudflared_lxc_zone_lookups
   delegate_to: localhost
   become: false
   check_mode: false
@@ -66,9 +66,9 @@
 
 - name: Build zone ID map
   ansible.builtin.set_fact:
-    cloudflared_zone_ids: >-
-      {{ cloudflared_zone_ids | default({}) | combine({item.item: item.json.result[0].id}) }}
-  loop: "{{ zone_lookups.results }}"
+    cloudflared_lxc_cloudflared_zone_ids: >-
+      {{ cloudflared_lxc_cloudflared_zone_ids | default({}) | combine({item.item: item.json.result[0].id}) }}
+  loop: "{{ cloudflared_lxc_zone_lookups.results }}"
   loop_control:
     label: "{{ item.item }}"
   tags: cloudflared
@@ -78,51 +78,51 @@
     url: "https://api.cloudflare.com/client/v4/zones/{{ item.value }}/dns_records?type=CNAME&per_page=5000"
     method: GET
     headers:
-      Authorization: "Bearer {{ cloudflared_api_token }}"
+      Authorization: "Bearer {{ cloudflared_lxc_cloudflared_api_token }}"
     return_content: true
-  register: dns_lookups
+  register: cloudflared_lxc_dns_lookups
   delegate_to: localhost
   become: false
   check_mode: false
   changed_when: false
   no_log: true
-  loop: "{{ cloudflared_zone_ids | dict2items }}"
+  loop: "{{ cloudflared_lxc_cloudflared_zone_ids | dict2items }}"
   loop_control:
     label: "{{ item.key }}"
   tags: cloudflared
 
 - name: Determine missing DNS records
   ansible.builtin.set_fact:
-    missing_dns_hostnames: >-
-      {{ tunnel_hostnames | difference(
-           dns_lookups.results | map(attribute='json') | map(attribute='result') | flatten | map(attribute='name') | list
+    cloudflared_lxc_missing_dns_hostnames: >-
+      {{ cloudflared_lxc_tunnel_hostnames | difference(
+           cloudflared_lxc_dns_lookups.results | map(attribute='json') | map(attribute='result') | flatten | map(attribute='name') | list
          ) }}
   tags: cloudflared
 
 - name: Show missing DNS records to create
   ansible.builtin.debug:
-    msg: "Creating CNAME records: {{ missing_dns_hostnames }}"
-  when: missing_dns_hostnames | length > 0
+    msg: "Creating CNAME records: {{ cloudflared_lxc_missing_dns_hostnames }}"
+  when: cloudflared_lxc_missing_dns_hostnames | length > 0
   tags: cloudflared
 
 - name: Create missing CNAME DNS records
   ansible.builtin.uri:
-    url: "https://api.cloudflare.com/client/v4/zones/{{ cloudflared_zone_ids[item.split('.')[-2:] | join('.')] }}/dns_records"
+    url: "https://api.cloudflare.com/client/v4/zones/{{ cloudflared_lxc_cloudflared_zone_ids[item.split('.')[-2:] | join('.')] }}/dns_records"
     method: POST
     headers:
-      Authorization: "Bearer {{ cloudflared_api_token }}"
+      Authorization: "Bearer {{ cloudflared_lxc_cloudflared_api_token }}"
       Content-Type: application/json
     body_format: json
     body:
       type: CNAME
       name: "{{ item }}"
-      content: "{{ cloudflared_tunnel_id }}.cfargotunnel.com"
+      content: "{{ cloudflared_lxc_cloudflared_tunnel_id }}.cfargotunnel.com"
       proxied: true
     status_code: 200
   delegate_to: localhost
   become: false
   no_log: true
-  loop: "{{ missing_dns_hostnames }}"
+  loop: "{{ cloudflared_lxc_missing_dns_hostnames }}"
   loop_control:
     label: "{{ item }}"
   tags: cloudflared

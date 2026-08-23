@@ -1,12 +1,12 @@
-cloudflared_config_dir: /etc/cloudflared
-cloudflared_tunnel_id: e1e3b9c4-789a-4ad3-adff-a0c71bff1122
-cloudflared_account_id: "{{ vault_cloudflared_account_id }}"
-cloudflared_api_token: "{{ vault_cloudflared_api_token }}"
+cloudflared_lxc_cloudflared_config_dir: /etc/cloudflared
+cloudflared_lxc_cloudflared_tunnel_id: e1e3b9c4-789a-4ad3-adff-a0c71bff1122
+cloudflared_lxc_cloudflared_account_id: "{{ vault_cloudflared_account_id }}"
+cloudflared_lxc_cloudflared_api_token: "{{ vault_cloudflared_api_token }}"
 
 # Tunnel ingress rules — single source of truth for both config.yml and API sync.
 # Each entry has: prefix (subdomain, or "" for bare domain), service (origin URL).
 # Optional: no_tls_verify (bool), set_host_header (bool).
-cloudflared_ingress:
+cloudflared_lxc_cloudflared_ingress:
   # if local network address is 192.168.2.108 and there is no port then it goes via traefik
   # Public services (via Traefik — no Zero Access, rate-limited)
   - prefix: ""

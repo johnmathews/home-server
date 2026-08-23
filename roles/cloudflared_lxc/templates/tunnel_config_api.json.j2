@@ -5,7 +5,7 @@
   "config": {
     "ingress": [
 {% for domain in domains %}
-{% for rule in cloudflared_ingress %}
+{% for rule in cloudflared_lxc_cloudflared_ingress %}
 {% set hostname = (rule.prefix + '.' + domain) if rule.prefix else domain %}
 {% set origin = {} %}
 {% if rule.no_tls_verify | default(false) %}{% set origin = origin | combine({"noTLSVerify": true}) %}{% endif %}
