@@ -3,7 +3,7 @@
 # this defines the UPS monitoring daemon
 
 RUN_AS_USER root
-MONITOR {{ nut_ups_name }}@localhost 1 {{ nut_mon_user }} {{ nut_mon_pass }} master
+MONITOR {{ pve_nut_ups_name }}@localhost 1 {{ pve_nut_mon_user }} {{ pve_nut_mon_pass }} master
 
 MINSUPPLIES 1
 
@@ -11,8 +11,8 @@ MINSUPPLIES 1
 SHUTDOWNCMD "/sbin/shutdown -h now"
 
 NOTIFYCMD "/usr/sbin/upssched"
-POLLFREQ {{ nut_upsmon_pollfreq }}
-POLLFREQALERT {{ nut_upsmon_pollfreqalert }}
+POLLFREQ {{ pve_nut_upsmon_pollfreq }}
+POLLFREQALERT {{ pve_nut_upsmon_pollfreqalert }}
 HOSTSYNC 15
 DEADTIME 24
 POWERDOWNFLAG /etc/killpower

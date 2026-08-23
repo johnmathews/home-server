@@ -4,7 +4,7 @@
 
 - name: Ensure IPMI exporter directory exists
   ansible.builtin.file:
-    path: "{{ ipmi_exporter_install_dir }}"
+    path: "{{ pve_ipmi_exporter_install_dir }}"
     state: directory
     owner: root
     group: root
@@ -12,28 +12,28 @@
 
 - name: Download IPMI exporter binary
   ansible.builtin.get_url:
-    url: "https://github.com/prometheus-community/ipmi_exporter/releases/download/v{{ ipmi_exporter_version }}/ipmi_exporter-{{ ipmi_exporter_version }}.linux-amd64.tar.gz"
+    url: "https://github.com/prometheus-community/ipmi_exporter/releases/download/v{{ pve_ipmi_exporter_version }}/ipmi_exporter-{{ pve_ipmi_exporter_version }}.linux-amd64.tar.gz"
     dest: "/tmp/ipmi_exporter.tar.gz"
     mode: '0644'
 
 - name: Extract IPMI exporter binary
   ansible.builtin.unarchive:
     src: "/tmp/ipmi_exporter.tar.gz"
-    dest: "{{ ipmi_exporter_install_dir }}"
+    dest: "{{ pve_ipmi_exporter_install_dir }}"
     remote_src: true
-    creates: "{{ ipmi_exporter_install_dir }}/ipmi_exporter-{{ ipmi_exporter_version }}.linux-amd64/ipmi_exporter"
+    creates: "{{ pve_ipmi_exporter_install_dir }}/ipmi_exporter-{{ pve_ipmi_exporter_version }}.linux-amd64/ipmi_exporter"
 
 - name: Create symlink to stable binary path
   ansible.builtin.file:
-    src: "{{ ipmi_exporter_install_dir }}/ipmi_exporter-{{ ipmi_exporter_version }}.linux-amd64/ipmi_exporter"
-    dest: "{{ ipmi_exporter_install_dir }}/ipmi_exporter"
+    src: "{{ pve_ipmi_exporter_install_dir }}/ipmi_exporter-{{ pve_ipmi_exporter_version }}.linux-amd64/ipmi_exporter"
+    dest: "{{ pve_ipmi_exporter_install_dir }}/ipmi_exporter"
     state: link
     force: true
 
 - name: Deploy IPMI exporter config
   ansible.builtin.template:
     src: ipmi.yml.j2
-    dest: "{{ ipmi_exporter_install_dir }}/ipmi.yml"
+    dest: "{{ pve_ipmi_exporter_install_dir }}/ipmi.yml"
     owner: root
     group: root
     mode: '0644'
@@ -51,7 +51,7 @@
       After=network.target
 
       [Service]
-      ExecStart={{ ipmi_exporter_install_dir }}/ipmi_exporter --config.file={{ ipmi_exporter_install_dir }}/ipmi.yml --web.listen-address=":{{ ipmi_exporter_listen_port }}"
+      ExecStart={{ pve_ipmi_exporter_install_dir }}/ipmi_exporter --config.file={{ pve_ipmi_exporter_install_dir }}/ipmi.yml --web.listen-address=":{{ pve_ipmi_exporter_listen_port }}"
       User=root
       Restart=always
 

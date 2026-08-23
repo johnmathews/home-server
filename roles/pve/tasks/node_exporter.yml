@@ -12,7 +12,7 @@
 
 # - name: Download node_exporter binary
 #   get_url:
-#     url: "https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.linux-amd64.tar.gz"
+#     url: "https://github.com/prometheus/node_exporter/releases/download/v{{ pve_node_exporter_version }}/node_exporter-{{ pve_node_exporter_version }}.linux-amd64.tar.gz"
 #     dest: "/tmp/node_exporter.tar.gz"
 #     mode: '0644'
 
@@ -21,11 +21,11 @@
 #     src: "/tmp/node_exporter.tar.gz"
 #     dest: "{{ node_exporter_install_dir }}"
 #     remote_src: yes
-#     creates: "{{ node_exporter_install_dir }}/node_exporter-{{ node_exporter_version }}.linux-amd64/node_exporter"
+#     creates: "{{ node_exporter_install_dir }}/node_exporter-{{ pve_node_exporter_version }}.linux-amd64/node_exporter"
 
 # - name: Create symlink to stable node_exporter binary
 #   file:
-#     src: "{{ node_exporter_install_dir }}/node_exporter-{{ node_exporter_version }}.linux-amd64/node_exporter"
+#     src: "{{ node_exporter_install_dir }}/node_exporter-{{ pve_node_exporter_version }}.linux-amd64/node_exporter"
 #     dest: "{{ node_exporter_install_dir }}/node_exporter"
 #     state: link
 #     force: yes

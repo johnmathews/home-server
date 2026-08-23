@@ -5,8 +5,8 @@
   block:
     - name: Check if GNU tar (gtar) is available
       ansible.builtin.command: which gtar
-      register: gnu_tar_check
-      failed_when: gnu_tar_check.rc != 0
+      register: pve_gnu_tar_check
+      failed_when: pve_gnu_tar_check.rc != 0
       changed_when: false
 
     - name: Warn if GNU tar not found in PATH
@@ -15,7 +15,7 @@
           GNU tar (gtar) is required for this role to work locally.
           Install it using: brew install gnu-tar
           And add to your PATH: export PATH="/opt/homebrew/opt/gnu-tar/libexec/gnubin:$PATH"
-      when: gnu_tar_check.rc != 0
+      when: pve_gnu_tar_check.rc != 0
 
 - name: Install & configure Prometheus Smartctl Exporter
   ansible.builtin.import_role:
