@@ -79,9 +79,10 @@ Conventions inside the tree:
   type="YoutubeMetadata"`) and most a `<same stem>-thumb.jpg`. `tvshow.nfo` / `season.nfo` carry
   series and season names. **Metadata for this library comes from these nfo files, not from the
   YouTube Metadata plugin** — see the landmine below.
-- Artwork: every series has a generated `poster.jpg` and every season a `folder.jpg` (2:3: the
-  season's *first* episode thumbnail, full width and uncropped, over a blurred copy of itself,
-  plus a name band; series posters use the first episode of the first season) — made by
+- Artwork: every series has a generated `poster.jpg` (2:3) + `landscape.jpg` (16:9) and every
+  season a `folder.jpg` + `landscape.jpg` (the season's *first* episode thumbnail; the poster
+  letterboxes it over a blurred copy with a name band, the landscape cover-fits it with a slim
+  band; without a landscape/Thumb image Jellyfin centre-crops the poster on 16:9 tiles) — made by
   `scripts/jellyfin-fitness-migration/make_posters.py` (`uv run --with pillow`). Without a season
   image Jellyfin shows the series image for every season, so keep one per season. Re-run the
   script after adding a season (it regenerates all posters and refreshes series/season images

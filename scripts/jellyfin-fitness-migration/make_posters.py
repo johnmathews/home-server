@@ -24,8 +24,13 @@ Overrides (checked in this order, first hit wins):
      episode's thumbnail instead of the first one.
   3. default: first episode of the season / of the first season.
 
-Output: <out>/fitness/<Series>/poster.jpg and <out>/fitness/<Series>/Season NN/folder.jpg
-(Jellyfin's local image names for series and season primaries), then uploaded
+Output per show: poster.jpg (2:3 Primary) AND landscape.jpg (16:9 Thumb); per season:
+Season NN/folder.jpg (2:3 Primary) AND Season NN/landscape.jpg (16:9 Thumb). The
+landscape file matters: TV layouts / "thumb" views draw 16:9 tiles, and without a
+Thumb image Jellyfin centre-crops the portrait poster (top of the thumbnail lost,
+blurred strip at the bottom). Manual landscape sources: art/<Show>/landscape.jpg,
+art/<Show>/Season NN/landscape.jpg (used as-is when already 16:9-ish, else cover-cropped).
+Posters and landscapes are uploaded
 to the NAS and image-refreshed (series/season items only; ReplaceAllImages).
 Uploaded files get a current mtime: Jellyfin's image cache tag is derived from
 the file's path + mtime, so without that a regenerated poster keeps the old tag
@@ -116,6 +121,28 @@ def compose(thumb: bytes | None, title: str, subtitle: str | None) -> bytes:
     return out.getvalue()
 
 
+LW, LH, LBAND = 1280, 720, 96
+
+
+def compose_landscape(thumb: bytes | None, title: str, subtitle: str | None) -> bytes:
+    """16:9 thumb: the source cover-cropped to 1280x720 with a slim name band at the bottom."""
+    from PIL import Image, ImageDraw
+    img = Image.open(io.BytesIO(thumb)).convert("RGB") if thumb else Image.new("RGB", (16, 9), (40, 40, 44))
+    canvas = _cover(img, (0, 0, LW, LH))
+    draw = ImageDraw.Draw(canvas, "RGBA")
+    draw.rectangle((0, LH - LBAND, LW, LH), fill=(12, 12, 14, 215))
+    draw.rectangle((0, LH - LBAND, LW, LH - LBAND + 4), fill=(0, 164, 220, 255))
+    label = title if not subtitle else f"{title}  ·  {subtitle}"
+    size = 52
+    while size > 28 and draw.textlength(label, font=_font(size)) > LW - 80:
+        size -= 4
+    f = _font(size)
+    draw.text(((LW - draw.textlength(label, font=f)) / 2, LH - LBAND + (LBAND - size) / 2 - 4), label, font=f, fill=(245, 245, 245, 255))
+    out = io.BytesIO()
+    canvas.save(out, "JPEG", quality=88, optimize=True)
+    return out.getvalue()
+
+
 class Jellyfin:
     def __init__(self) -> None:
         self.url = os.environ.get("JELLYFIN_URL", "http://192.168.2.110:8096").rstrip("/")
@@ -146,8 +173,8 @@ def main() -> None:
     series_image_id = {sr["name"]: sr.get("image") for sr in cfg.get("series", [])}
     season_image_id = {(sr["name"], int(se["number"])): se.get("image") for sr in cfg.get("series", []) for se in sr.get("seasons", [])}
 
-    def manual_art(rel_dir: str) -> bytes | None:
-        for name in ("poster", "folder"):
+    def manual_art(rel_dir: str, names: tuple[str, ...] = ("poster", "folder")) -> bytes | None:
+        for name in names:
             for ext in (".jpg", ".jpeg", ".png", ".webp"):
                 f = a.art / rel_dir / (name + ext)
                 if f.exists():
@@ -197,7 +224,9 @@ def main() -> None:
         if first is None:
             print(f"  ! no thumbnail for {s.get('SeriesName')} / {s['Name']}", file=sys.stderr)
         files[f"{season_dir}/folder.jpg"] = compose(first, s["Name"], s.get("SeriesName"))
-        sources[f"{s.get('SeriesName')} / {s['Name']}"] = src
+        land = manual_art(art_rel, ("landscape", "thumb"))
+        files[f"{season_dir}/landscape.jpg"] = compose_landscape(land or (first if manual is None else None) or first, s["Name"], s.get("SeriesName"))
+        sources[f"{s.get('SeriesName')} / {s['Name']}"] = src + (" (+manual landscape)" if land else "")
         if first is not None and manual is None:
             series_first.setdefault(s["SeriesId"], first)
     for sr in series:
@@ -212,10 +241,12 @@ def main() -> None:
         else:
             img, src = series_first.get(sr["Id"]), "first episode of first season"
         files[f"{series_dir}/poster.jpg"] = compose(img, sr["Name"], None)
-        sources[sr["Name"]] = src
+        land = manual_art(art_rel, ("landscape", "thumb"))
+        files[f"{series_dir}/landscape.jpg"] = compose_landscape(land or (img if manual is None else None) or img, sr["Name"], None)
+        sources[sr["Name"]] = src + (" (+manual landscape)" if land else "")
     for k, v in sorted(sources.items()):
         print(f"   {k:40} <- {v}")
-    print(f"generated {len(files)} posters ({len(series)} series, {len(seasons)} seasons)")
+    print(f"generated {len(files)} images ({len(series)} series + {len(seasons)} seasons, poster + landscape each)")
 
     if a.dry_run:
         out = a.workdir / "posters"
@@ -256,13 +287,15 @@ def main() -> None:
         jf.req("POST", f"/Items/{it['Id']}/Refresh", {"MetadataRefreshMode": "None", "ImageRefreshMode": "FullRefresh", "ReplaceAllImages": "true"})
     time.sleep(20)
     hashes: dict[str, str] = {}
+    n_thumb = 0
     for it in targets:
         cur = next(x for x in jf.req("GET", "/Items", {"userId": uid, "ids": it["Id"], "enableImages": "true"})["Items"])
+        n_thumb += "Thumb" in (cur.get("ImageTags") or {})
         if "Primary" in (cur.get("ImageTags") or {}):
             hashes[f"{it.get('SeriesName') or it['Name']} / {it['Name']}"] = hashlib.md5(
                 jf.req("GET", f"/Items/{it['Id']}/Images/Primary", {"format": "Jpg", "maxWidth": "200"}, raw=True)).hexdigest()[:10]
     dup = len(hashes) - len(set(hashes.values()))
-    print(f"primary images present on {len(hashes)}/{len(targets)} series+seasons; duplicate images: {dup}")
+    print(f"primary images present on {len(hashes)}/{len(targets)} series+seasons (thumb/landscape on {n_thumb}); duplicate images: {dup}")
     for k, v in sorted(hashes.items()):
         print(f"   {v}  {k}")
 

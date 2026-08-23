@@ -28,10 +28,12 @@ realtime monitoring, Custom CSS storage) are in [`jellyfin_lxc.md`](jellyfin_lxc
 fitness/
 ├── <Show>/                               e.g. Kettlebell/
 │   ├── tvshow.nfo                        <title>Kettlebell</title>
-│   ├── poster.jpg                        the show's thumbcard (generated, see §4)
+│   ├── poster.jpg                        the show's 2:3 thumbcard (generated, see §4)
+│   ├── landscape.jpg                     the show's 16:9 thumbcard (generated, see §4)
 │   └── Season NN/                        e.g. Season 03/
 │       ├── season.nfo                    <title>Tutorials</title><seasonnumber>3</seasonnumber>
-│       ├── folder.jpg                    the season's thumbcard (generated, see §4)
+│       ├── folder.jpg                    the season's 2:3 thumbcard (generated, see §4)
+│       ├── landscape.jpg                 the season's 16:9 thumbcard (generated, see §4)
 │       ├── <Show> SNNEnn - <original name>-[<youtubeId>].mkv
 │       ├── <Show> SNNEnn - <original name>-[<youtubeId>].nfo      episode metadata (§3)
 │       ├── <Show> SNNEnn - <original name>-[<youtubeId>]-thumb.jpg episode thumbnail
@@ -159,15 +161,19 @@ If it HURTS, you're doing it WRONG...</plot>
 
 ## 4. Thumbcards (show and season posters)
 
-Jellyfin shows a show's `poster.jpg` and a season's `folder.jpg`. **A season without its own
-image inherits the show's image**, so every season must have one or several seasons look
-identical. `make_posters.py` guarantees that: it writes one 2:3 poster per show and per season
-and image-refreshes them.
+Jellyfin has two thumbcard shapes and clients pick whichever fits the view: the 2:3 **Primary**
+(`poster.jpg` for a show, `Season NN/folder.jpg` for a season) and the 16:9 **Thumb**
+(`landscape.jpg` in the same folders). TV layouts, "thumb" view modes and home-screen rows draw
+16:9 tiles; **if no Thumb exists Jellyfin centre-crops the portrait poster** (top of the picture
+lost, blurred strip at the bottom — seen on the TV 2026-08-23). **A season without its own
+images inherits the show's**, so several seasons look identical. `make_posters.py` guarantees
+both: it writes one poster *and* one landscape per show and per season and image-refreshes them.
 
-**Default art:** the season's *first* episode thumbnail, full width and uncropped, over a blurred
-copy of itself, with a dark band carrying the season name (and show name, smaller). Shows use
-the first episode of their first season. Generated posters are deliberately labelled so they are
-legible on the TV app and in home-screen rows that print no caption.
+**Default art:** the season's *first* episode thumbnail. Poster (2:3): full width and uncropped
+over a blurred copy of itself, dark band with the season name (and show name, smaller).
+Landscape (16:9): the thumbnail cover-fitted with a slim name band. Shows use the first episode
+of their first season. Generated art is deliberately labelled so it stays legible on the TV and
+in home-screen rows that print no caption.
 
 **To set a specific thumbcard** — pick whichever is easier, re-run `make_posters.py`, done:
 
@@ -180,8 +186,10 @@ legible on the TV app and in home-screen rows that print no caption.
 | Use a different episode's thumbnail for    | In mapping.toml, on the show (same level as      |
 |   a show                                   |   name): image = "<youtubeId>"                   |
 | Use your own image for a season            | Save it as art/<Show>/Season NN/folder.jpg       |
-|                                            |   (.png/.webp fine)                              |
+|                                            |   (.png/.webp fine); it is used for both shapes  |
 | Use your own image for a show              | Save it as art/<Show>/poster.jpg                 |
+| Use a *different* image just for the 16:9  | Add art/<Show>/landscape.jpg or                  |
+|   shape                                    |   art/<Show>/Season NN/landscape.jpg             |
 +--------------------------------------------+--------------------------------------------------+
 ```
 
