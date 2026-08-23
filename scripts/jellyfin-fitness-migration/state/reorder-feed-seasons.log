@@ -1,0 +1,50 @@
+===== Bodyweight S1 =====
+fitness/Bodyweight/Season 01: 22 episodes, 58 renames (978..999)
+user data saved: {'john': 5, 'TV': 3}
+renamed 58 entries
+plan.json entries updated: 22
+jellyfin now has 22 episodes in the season, numbers [978, 979, 980]..[997, 998, 999], stale 0
+   john: user data re-applied 5, unmatched 0
+   TV: user data re-applied 3, unmatched 0
+done — remember: yt -f now numbers this season down from 977
+===== Endurance S1 =====
+fitness/Endurance/Season 01: 23 episodes, 71 renames (977..999)
+user data saved: {'john': 4, 'TV': 3}
+renamed 71 entries
+plan.json entries updated: 27
+jellyfin now has 23 episodes in the season, numbers [977, 978, 979]..[997, 998, 999], stale 0
+   john: user data re-applied 4, unmatched 0
+   TV: user data re-applied 3, unmatched 0
+done — remember: yt -f now numbers this season down from 976
+===== Inspiration S1 =====
+fitness/Inspiration/Season 01: 4 episodes, 12 renames (996..999)
+user data saved: {'TV': 1}
+renamed 12 entries
+plan.json entries updated: 4
+jellyfin now has 4 episodes in the season, numbers [996, 997, 998]..[997, 998, 999], stale 0
+   TV: user data re-applied 1, unmatched 0
+done — remember: yt -f now numbers this season down from 995
+===== Combat Sports S1 =====
+fitness/Combat Sports/Season 01: 3 episodes, 8 renames (997..999)
+user data saved: {}
+renamed 8 entries
+plan.json entries updated: 3
+jellyfin now has 3 episodes in the season, numbers [997, 998, 999]..[997, 998, 999], stale 0
+done — remember: yt -f now numbers this season down from 996
+===== Health S1 =====
+fitness/Health/Season 01: 5 episodes, 15 renames (995..999)
+user data saved: {'john': 1}
+renamed 15 entries
+plan.json entries updated: 5
+jellyfin now has 5 episodes in the season, numbers [995, 996, 997]..[997, 998, 999], stale 0
+   john: user data re-applied 1, unmatched 0
+done — remember: yt -f now numbers this season down from 994
+===== Kettlebell S3 =====
+fitness/Kettlebell/Season 03: 9 episodes, 25 renames (991..999)
+user data saved: {'john': 2}
+renamed 25 entries
+plan.json entries updated: 9
+jellyfin now has 9 episodes in the season, numbers [991, 992, 993]..[997, 998, 999], stale 0
+   john: user data re-applied 2, unmatched 0
+done — remember: yt -f now numbers this season down from 990
+ALL DONE rc=0

@@ -206,3 +206,13 @@ Book library server (`ghcr.io/booklore-app/booklore` — the project left Docker
 (`lscr.io/linuxserver/mariadb`, pinned). Both are in the media-vm compose template;
 port 6060, data under `/srv/media/config/booklore/` plus the `/mnt/nfs/books` share.
 Part of `sleep_hours_stop_containers`.
+
+## yt-dlp (standalone binary)
+
+`yt-dlp` on this VM is the **official standalone binary** in `/usr/local/bin/yt-dlp`, installed
+and refreshed by the `media_vm` role (`make media t=ytdlp`, task uses `force: true` so every run
+pulls the current release). It shadows the apt/PPA package (`/usr/bin/yt-dlp`, tomtomtom PPA),
+which lags for months — the symptom was HTTP 403 part-way through downloads and "no impersonate
+target is available" (2026-08-23, PPA stuck at 2026.03.17). `yt --update` in
+`photo-video-music-tools/download-video` performs the same download over ssh. `deno` is installed
+alongside as yt-dlp's JavaScript runtime.

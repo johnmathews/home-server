@@ -111,6 +111,53 @@ and `Embedded Image Extractor`, with spaces. I had configured `ScreenGrabber`/`E
 (copied from an options.xml dump that had been piped through `tr -d " "`), which matches nothing,
 so 31 episodes without an exported thumb got no image until the names were fixed.
 
+## 2026-08-23 addendum
+
+- Kettlebell's show and "Compilations" thumbcards still showed the old triptych in John's
+  browser although the files on the NAS were the new single-image posters: the tar upload wrote
+  them with mtime 0 both times, Jellyfin's image tag is path+mtime, so the tag never changed
+  and clients kept the cached image. `make_posters.py` now stamps a current mtime; tags changed,
+  19/19 verified distinct at a fresh size.
+- Thumbcard overrides added to `make_posters.py`: `art/<Show>/poster.jpg`,
+  `art/<Show>/Season NN/folder.jpg` (portrait used as-is, landscape letterboxed+band), or
+  `image = "<youtubeId>"` on a show/season in `mapping.toml`.
+- New canonical doc `documentation/jellyfin_health_fitness_library.md` (layout, nfo, thumbcards,
+  scripts, runbooks, landmines); `jellyfin_lxc.md` keeps a summary and points to it.
+
+## 2026-08-23 addendum 2 — `yt -f` and newest-first "feed" seasons
+
+- `yt -f` (download-video PR #1) adds a video to a show/season interactively or via
+  `Show/Season`; first live run exposed two exit-status traps (`[ … ] && printf` as the last
+  statement of the listing script; `[[ -n … ]] && printf` at the end of the picker) — both read
+  as "nothing listed"/"aborted". Fixed; 38 bats.
+- John wants loose seasons **newest first**. Jellyfin orders episodes by number only, so: each
+  season carries `Season NN/.order` = `course` (1..N, playlists) or `feed` (numbered down from
+  999; a new video gets min−1 and lands on top; nothing existing is renamed). `yt -f` asks for
+  the order on a new season / once for an unmarked one; `yt --season-order` sets it.
+- `migrate.py reorder-season` renumbered the 7 loose seasons (E01→E999 … newest = lowest),
+  renaming media + nfo + thumbs, rewriting `<episode>`, plain refresh, watched state re-applied
+  by YouTube id (e.g. Mobility & Physio: 16 episodes → 984..999, 4/4 user rows). The four
+  playlist seasons were marked `course`.
+
+## 2026-08-23 addendum 3 — the post-scan renumbering landmine
+
+While verifying the feed renumber, 18 course episodes turned out swapped (adjacent pairs in
+Heavy Club S02 / Kettlebell S02 whose upload order differs from playlist order), and after the
+17:00 scan the freshly renumbered feed seasons had reverted to 1..N with filename titles, nfo
+rewritten to match. Chased through DB snapshot diffs (same item id, only IndexNumber changed,
+no refresh timestamp change → not a metadata refresh), plugin DLL strings and the plugin source:
+the YouTube Metadata plugin registers an `ILibraryPostScanTask` (`EpisodeIndexer`) that runs
+after every scan and renumbers, for every *show* with a `YoutubeMetadata` provider id, each
+season's episodes 1..N by PremiereDate (seasons alphabetically). Our shows got the id from the
+plugin's series provider during the first scan on 08-22; it had been renumbering since the
+19:00 scan that day (my checks pre-dated it). Fix: stripped the id from the 8 shows
+(`fix-library-options` now does it; `verify` fails if it reappears), repaired with
+`fix-numbers` (two-phase — Jellyfin rejects direct swaps on its (series,S,E) key; also strip
+`Trickplay` from DTOs or POST /Items fails with a deserialization 500), `fix-names`, `write-nfo`,
+then a deliberate full scan: nothing moved. `make_posters.py` no longer updates series items
+(an item update on a Series queues a full replace-all refresh of the series). Lesson written
+into the docs: after any scan/refresh, run `verify`.
+
 ## Follow-ups
 
 - Delete the five emptied libraries (Gym, Heavy Club ×2, Kettlebell Compilations, Turkish Get-Up)

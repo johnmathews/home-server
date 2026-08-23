@@ -56,6 +56,10 @@ Library configs: `/srv/apps/jellyfin/appdata/root/default/<name>/options.xml`
 
 ### Health & Fitness (Shows library, 2026-08-22)
 
+**Canonical doc: [`jellyfin_health_fitness_library.md`](jellyfin_health_fitness_library.md)** —
+layout, nfo/thumbcard conventions, scripts, runbooks for adding videos/seasons/shows and setting
+thumbcards, landmines. The summary below is kept for context; when they disagree, that doc wins.
+
 One *Shows* library replaces the five former per-playlist movie libraries. Series are the
 subcategories, seasons the sub-subcategories:
 
@@ -69,15 +73,18 @@ subcategories, seasons the sub-subcategories:
 Conventions inside the tree:
 
 - Episode file: `<Series> SnnEnn - <original yt-dlp name>-[<youtubeId>].ext`. The original
-  filename (incl. the `[id]`) is kept verbatim after the `SxxExx - ` token. Playlist seasons keep
-  yt-dlp's `001-` playlist index as the episode number; loose seasons are numbered by upload date.
+  filename (incl. the `[id]`) is kept verbatim after the `SxxExx - ` token. "Course" seasons
+  (the playlists) count up from 1; "feed" seasons (the loose ones) count **down from 999** so the
+  newest video sorts first — the kind is in `Season NN/.order` (Jellyfin has no descending
+  option; see the canonical doc §1).
 - Every episode has a `<same stem>.nfo` (title, plot, aired, season/episode, sorttitle, `uniqueid
   type="YoutubeMetadata"`) and most a `<same stem>-thumb.jpg`. `tvshow.nfo` / `season.nfo` carry
   series and season names. **Metadata for this library comes from these nfo files, not from the
   YouTube Metadata plugin** — see the landmine below.
-- Artwork: every series has a generated `poster.jpg` and every season a `folder.jpg` (2:3: the
-  season's *first* episode thumbnail, full width and uncropped, over a blurred copy of itself,
-  plus a name band; series posters use the first episode of the first season) — made by
+- Artwork: every series has a generated `poster.jpg` (2:3) + `landscape.jpg` (16:9) and every
+  season a `folder.jpg` + `landscape.jpg` (the season's *first* episode thumbnail; the poster
+  letterboxes it over a blurred copy with a name band, the landscape cover-fits it with a slim
+  band; without a landscape/Thumb image Jellyfin centre-crops the poster on 16:9 tiles) — made by
   `scripts/jellyfin-fitness-migration/make_posters.py` (`uv run --with pillow`). Without a season
   image Jellyfin shows the series image for every season, so keep one per season. Re-run the
   script after adding a season (it regenerates all posters and refreshes series/season images
@@ -93,9 +100,10 @@ Conventions inside the tree:
   Series/Season/Episode, image fetchers `Embedded Image Extractor, Screen Grabber` for episodes
   (the provider *display names, with spaces* — `ScreenGrabber` silently matches nothing),
   `LocalMetadataReaderOrder = [Nfo]`, `DisabledLocalMetadataReaders = [YoutubeMetadata]`.
-- Adding a new video: drop it into the right season folder with the next `SnnEnn` number and an
-  nfo (the `yt` wrapper's fitness mode does this — see `photo-video-music-tools/download-video`).
-  Without an nfo Jellyfin shows the filename as the title.
+- Adding a new video: `yt -f <url>` (asks show/season) or `yt -f "<Show>/<Season>" <url>` —
+  the `yt` wrapper's fitness mode names the file with the next `SnnEnn`, writes the nfo and
+  thumbnail and copies it into the season folder (`photo-video-music-tools/download-video`,
+  runbook in the canonical doc §5). Without an nfo Jellyfin shows the filename as the title.
 
 **Custom CSS.** Two places, easy to confuse:
 
@@ -120,15 +128,18 @@ rendered as a list):
 ```css
 /* hide "Next Up" on every series page */
 .nextUpSection { display: none; }
-/* Season page: episodes as a card grid instead of a list (verified on 10.11.11, desktop web) */
+/* Season page: episodes as a card grid instead of a list (jellyfin-web 10.11).
+   No CSS custom properties and no aspect-ratio: TV browsers (webOS/Tizen) run old engines. */
 /* 4 columns >= 1800px, 3 by default, 2 <= 1100px, 1 <= 640px */
-#childrenContent .itemsContainer.vertical-list { display: flex !important; flex-direction: row !important; flex-wrap: wrap !important; gap: 1.6em 1.2em; align-items: flex-start; --ep-cols: 3; }
-@media (min-width: 1800px) { #childrenContent .itemsContainer.vertical-list { --ep-cols: 4; } }
-@media (max-width: 1100px) { #childrenContent .itemsContainer.vertical-list { --ep-cols: 2; } }
-@media (max-width: 640px)  { #childrenContent .itemsContainer.vertical-list { --ep-cols: 1; } }
-#childrenContent .itemsContainer.vertical-list > .listItem { flex: 0 0 calc((100% - (var(--ep-cols) - 1) * 1.2em) / var(--ep-cols)) !important; width: auto !important; max-width: calc((100% - (var(--ep-cols) - 1) * 1.2em) / var(--ep-cols)); margin: 0 !important; padding: 0 !important; }
+#childrenContent .itemsContainer.vertical-list { display: flex !important; flex-direction: row !important; flex-wrap: wrap !important; gap: 1.6em 1.2em; align-items: flex-start; }
+#childrenContent .itemsContainer.vertical-list > .listItem { flex: 0 0 calc(33.333% - 0.8em) !important; width: auto !important; max-width: calc(33.333% - 0.8em); margin: 0 !important; padding: 0 !important; }
+@media (min-width: 1800px) { #childrenContent .itemsContainer.vertical-list > .listItem { flex-basis: calc(25% - 0.9em) !important; max-width: calc(25% - 0.9em); } }
+@media (max-width: 1100px) { #childrenContent .itemsContainer.vertical-list > .listItem { flex-basis: calc(50% - 0.6em) !important; max-width: calc(50% - 0.6em); } }
+@media (max-width: 640px)  { #childrenContent .itemsContainer.vertical-list > .listItem { flex-basis: 100% !important; max-width: 100%; } }
 #childrenContent .listItem-content { display: flex; flex-direction: column; align-items: stretch; }
-#childrenContent .listItemImage.listItemImage-large { width: 100% !important; height: auto !important; aspect-ratio: 16 / 9; margin: 0 !important; }
+/* 16:9 image box via a padding-top pseudo element (works without aspect-ratio support) */
+#childrenContent .listItemImage.listItemImage-large { width: 100% !important; height: auto !important; min-height: 0 !important; margin: 0 !important; background-size: cover !important; background-position: center center !important; }
+#childrenContent .listItemImage.listItemImage-large::before { content: ""; display: block; flex: 0 0 0; width: 0; padding-top: 56.25%; }
 #childrenContent .listItemBody { padding: 0.6em 0 0 0; }
 #childrenContent .listItemBody > .listItemBodyText:first-child { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3em; height: 2.6em; }
 #childrenContent .listItem-overview { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
@@ -137,6 +148,11 @@ rendered as a list):
 ```
 Both rules affect every Shows-type library (Shows, Kids Shows, Kids Youtube too). The grid
 clamps titles to two lines and shows one line of overview (the channel/date line).
+**Keep it old-engine-safe:** the first version used `aspect-ratio` and CSS custom properties;
+on the TV (jellyfin-web in a TV browser/app, old Chromium) `aspect-ratio` was ignored, the image
+box collapsed to the play-button height and `cover` showed only the middle band of each
+thumbnail. Hence the `::before { padding-top: 56.25% }` box and literal per-breakpoint widths.
+The live value is kept in `scripts/jellyfin-fitness-migration/state/custom-css.css`.
 
 **Landmine — YouTube Metadata plugin episode provider hard-codes episode numbers.** The plugin's
 `YTDLJsonToEpisode` sets `IndexNumber = 1` and `ParentIndexNumber = 1` on every episode it
@@ -148,6 +164,13 @@ curated numbered seasons. Hence the nfo approach above. A second, smaller landmi
 remote provider shells out to `yt-dlp` once per item, and a bulk scan of a few hundred items gets
 the LXC's IP rate-limited by YouTube (HTTP 429 / "sign in to confirm you're not a bot") for ~10
 minutes at a time — the Movie libraries are still exposed to that on big imports.
+
+**Landmine — the plugin's post-scan `EpisodeIndexer`.** The YouTube Metadata plugin also
+registers a task that runs after *every* library scan and renumbers, for every *show* carrying a
+`YoutubeMetadata` provider id, each season's episodes 1..N by upload date (no refresh, nothing
+logged). Our shows had that id from the first scan; it silently swapped out-of-order course
+episodes and reverted the feed seasons to 1..N on every scan (2026-08-23). No show in this
+library may carry that id — `migrate.py fix-library-options` strips it, `verify` fails on it.
 
 **Landmine — never `ReplaceAllMetadata` on this library.** A refresh with
 `ReplaceAllMetadata=true` nulled every episode's IndexNumber and Overview and the nfo reader did
