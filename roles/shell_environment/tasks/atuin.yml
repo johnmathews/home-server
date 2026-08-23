@@ -19,8 +19,8 @@
   args:
     executable: /bin/bash
   become: true
-  register: atuin_install
-  changed_when: "'exit 0' not in atuin_install.stdout"
+  register: shell_environment_atuin_install
+  changed_when: "'exit 0' not in shell_environment_atuin_install.stdout"
   when: shell_environment_atuin_enabled | bool
   tags: [atuin, shell]
 
@@ -31,7 +31,7 @@
     mode: '0755'
     owner: "{{ item.split(':')[0] }}"
     group: "{{ item.split(':')[0] }}"
-  loop: "{{ target_shell_users }}"
+  loop: "{{ shell_environment_target_shell_users }}"
   when: shell_environment_atuin_enabled | bool
   tags: [atuin, shell]
 
@@ -43,6 +43,6 @@
     group: "{{ item.split(':')[0] }}"
     mode: '0644'
     backup: true
-  loop: "{{ target_shell_users }}"
+  loop: "{{ shell_environment_target_shell_users }}"
   when: shell_environment_atuin_enabled | bool
   tags: [atuin, shell, config]

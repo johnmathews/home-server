@@ -9,7 +9,7 @@
     version: master
   become: true
   become_user: "{{ item.split(':')[0] }}"
-  loop: "{{ target_shell_users }}"
+  loop: "{{ shell_environment_target_shell_users }}"
 
 - name: Deploy Powerlevel10k config
   ansible.builtin.template:
@@ -18,5 +18,5 @@
     owner: "{{ item.split(':')[0] }}"
     group: "{{ item.split(':')[0] }}"
     mode: '0644'
-  loop: "{{ target_shell_users }}"
+  loop: "{{ shell_environment_target_shell_users }}"
   become: true

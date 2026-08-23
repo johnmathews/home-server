@@ -36,25 +36,25 @@
 - name: Check if Neovim is already installed with correct version
   ansible.builtin.stat:
     path: "{{ shell_environment_neovim_install_dir }}/nvim-{{ shell_environment_neovim_version }}/usr/bin/nvim"
-  register: nvim_installed
+  register: shell_environment_nvim_installed
   become: true
 
 - name: Map architecture to Neovim naming convention
   ansible.builtin.set_fact:
-    neovim_arch: "{{ 'arm64' if ansible_architecture == 'aarch64' else ansible_architecture }}"
+    shell_environment_neovim_arch: "{{ 'arm64' if ansible_architecture == 'aarch64' else ansible_architecture }}"
 
 - name: Download Neovim AppImage
   ansible.builtin.get_url:
-    url: "https://github.com/neovim/neovim/releases/download/{{ shell_environment_neovim_version }}/nvim-linux-{{ neovim_arch }}.appimage"
+    url: "https://github.com/neovim/neovim/releases/download/{{ shell_environment_neovim_version }}/nvim-linux-{{ shell_environment_neovim_arch }}.appimage"
     dest: "/tmp/nvim-{{ shell_environment_neovim_version }}.appimage"
     mode: '0755'
     timeout: 120
   become: true
-  when: not nvim_installed.stat.exists
-  register: nvim_download
+  when: not shell_environment_nvim_installed.stat.exists
+  register: shell_environment_nvim_download
   retries: 3
   delay: 5
-  until: nvim_download is succeeded
+  until: shell_environment_nvim_download is succeeded
 
 - name: Extract Neovim AppImage
   ansible.builtin.command:
@@ -62,7 +62,7 @@
     chdir: "/tmp"
     creates: "/tmp/squashfs-root/usr/bin/nvim"
   become: true
-  when: nvim_download is changed or not nvim_installed.stat.exists
+  when: shell_environment_nvim_download is changed or not shell_environment_nvim_installed.stat.exists
 
 - name: Move extracted Neovim to install directory
   ansible.builtin.command:
@@ -70,7 +70,7 @@
       mv /tmp/squashfs-root {{ shell_environment_neovim_install_dir }}/nvim-{{ shell_environment_neovim_version }}
     creates: "{{ shell_environment_neovim_install_dir }}/nvim-{{ shell_environment_neovim_version }}/usr/bin/nvim"
   become: true
-  when: nvim_download is changed or not nvim_installed.stat.exists
+  when: shell_environment_nvim_download is changed or not shell_environment_nvim_installed.stat.exists
 
 - name: Create symlink for nvim binary
   ansible.builtin.file:
@@ -85,7 +85,7 @@
     path: "/tmp/nvim-{{ shell_environment_neovim_version }}.appimage"
     state: absent
   become: true
-  when: nvim_download is changed or not nvim_installed.stat.exists
+  when: shell_environment_nvim_download is changed or not shell_environment_nvim_installed.stat.exists
 
 - name: Create Neovim config directory for each user
   ansible.builtin.file:
@@ -94,7 +94,7 @@
     owner: "{{ item.split(':')[0] }}"
     group: "{{ item.split(':')[0] }}"
     mode: '0755'
-  loop: "{{ target_shell_users }}"
+  loop: "{{ shell_environment_target_shell_users }}"
   become: true
   tags: [nvim]
 
@@ -106,7 +106,7 @@
     group: "{{ item[0].split(':')[0] }}"
     mode: '0755'
   with_nested:
-    - "{{ target_shell_users }}"
+    - "{{ shell_environment_target_shell_users }}"
     - ['lua', 'lua/plugins', 'lua/snippets', 'ftplugin', 'docs', 'scripts']
   become: true
   tags: [nvim]
@@ -118,7 +118,7 @@
     owner: "{{ item[0].split(':')[0] }}"
     group: "{{ item[0].split(':')[0] }}"
     mode: '0644'
-  loop: "{{ target_shell_users | product(['options.lua', 'plugins.lua', 'functions.lua', 'mappings.lua', 'autocmd.lua', 'colorscheme.lua']) | list }}"
+  loop: "{{ shell_environment_target_shell_users | product(['options.lua', 'plugins.lua', 'functions.lua', 'mappings.lua', 'autocmd.lua', 'colorscheme.lua']) | list }}"
   become: true
   tags: [nvim]
 
@@ -130,7 +130,7 @@
     group: "{{ item.split(':')[0] }}"
     mode: '0644'
     directory_mode: '0755'
-  loop: "{{ target_shell_users }}"
+  loop: "{{ shell_environment_target_shell_users }}"
   become: true
   tags: [nvim]
 
@@ -142,7 +142,7 @@
     group: "{{ item.split(':')[0] }}"
     mode: '0644'
     directory_mode: '0755'
-  loop: "{{ target_shell_users }}"
+  loop: "{{ shell_environment_target_shell_users }}"
   become: true
   tags: [nvim]
 
@@ -153,7 +153,7 @@
     owner: "{{ item.split(':')[0] }}"
     group: "{{ item.split(':')[0] }}"
     mode: '0644'
-  loop: "{{ target_shell_users }}"
+  loop: "{{ shell_environment_target_shell_users }}"
   become: true
   tags: [nvim]
 
@@ -165,7 +165,7 @@
     group: "{{ item.split(':')[0] }}"
     mode: '0644'
     directory_mode: '0755'
-  loop: "{{ target_shell_users }}"
+  loop: "{{ shell_environment_target_shell_users }}"
   become: true
   tags: [nvim]
 
@@ -177,7 +177,7 @@
     group: "{{ item.split(':')[0] }}"
     mode: '0644'
     directory_mode: '0755'
-  loop: "{{ target_shell_users }}"
+  loop: "{{ shell_environment_target_shell_users }}"
   become: true
   when: shell_environment_neovim_deploy_docs | bool
   tags: [nvim]
@@ -189,7 +189,7 @@
     owner: "{{ item[0].split(':')[0] }}"
     group: "{{ item[0].split(':')[0] }}"
     mode: '0644'
-  loop: "{{ target_shell_users | product(['README.md', 'AGENTS.md', 'lazy-lock.json', 'stylua.toml']) | list }}"
+  loop: "{{ shell_environment_target_shell_users | product(['README.md', 'AGENTS.md', 'lazy-lock.json', 'stylua.toml']) | list }}"
   become: true
   when: shell_environment_neovim_config_style == 'custom'
   tags: [nvim]
@@ -202,7 +202,7 @@
     group: "{{ item.split(':')[0] }}"
     mode: '0755'
     directory_mode: '0755'
-  loop: "{{ target_shell_users }}"
+  loop: "{{ shell_environment_target_shell_users }}"
   become: true
   when: shell_environment_neovim_deploy_scripts | bool
   tags: [nvim]

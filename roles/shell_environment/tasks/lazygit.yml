@@ -7,20 +7,20 @@
     lazygit --version 2>/dev/null | grep -oP 'version=\K[^,]+'
   args:
     executable: /bin/bash
-  register: lazygit_current_version
+  register: shell_environment_lazygit_current_version
   changed_when: false
   failed_when: false
 
 - name: Set lazygit version without v prefix
   ansible.builtin.set_fact:
-    lazygit_version_bare: "{{ shell_environment_lazygit_version | regex_replace('^v', '') }}"
+    shell_environment_lazygit_version_bare: "{{ shell_environment_lazygit_version | regex_replace('^v', '') }}"
 
 - name: Set lazygit download URL  # noqa: var-naming[no-role-prefix]
   ansible.builtin.set_fact:
     lazygit_url: >-
       https://github.com/jesseduffield/lazygit/releases/download/{{
       shell_environment_lazygit_version }}/lazygit_{{
-      lazygit_version_bare }}_linux_x86_64.tar.gz
+      shell_environment_lazygit_version_bare }}_linux_x86_64.tar.gz
 
 - name: Download lazygit binary archive
   ansible.builtin.get_url:
@@ -29,11 +29,11 @@
     mode: '0644'
     timeout: 60
   become: true
-  when: lazygit_current_version.stdout != lazygit_version_bare
-  register: lazygit_download
+  when: shell_environment_lazygit_current_version.stdout != shell_environment_lazygit_version_bare
+  register: shell_environment_lazygit_download
   retries: 3
   delay: 5
-  until: lazygit_download is succeeded
+  until: shell_environment_lazygit_download is succeeded
 
 - name: Create lazygit extraction directory  # noqa: no-handler
   ansible.builtin.file:
@@ -41,7 +41,7 @@
     state: directory
     mode: '0755'
   become: true
-  when: lazygit_download is changed
+  when: shell_environment_lazygit_download is changed
 
 - name: Extract lazygit archive  # noqa: no-handler
   ansible.builtin.unarchive:
@@ -49,7 +49,7 @@
     dest: "/tmp/lazygit-{{ shell_environment_lazygit_version }}"
     remote_src: true
   become: true
-  when: lazygit_download is changed and not ansible_check_mode
+  when: shell_environment_lazygit_download is changed and not ansible_check_mode
 
 - name: Install lazygit binary  # noqa: no-handler
   ansible.builtin.copy:
@@ -58,7 +58,7 @@
     remote_src: true
     mode: '0755'
   become: true
-  when: lazygit_download is changed and not ansible_check_mode
+  when: shell_environment_lazygit_download is changed and not ansible_check_mode
 
 - name: Remove lazygit temp files  # noqa: no-handler
   ansible.builtin.file:
@@ -70,4 +70,4 @@
   loop_control:
     loop_var: temp_item
   become: true
-  when: lazygit_download is changed
+  when: shell_environment_lazygit_download is changed

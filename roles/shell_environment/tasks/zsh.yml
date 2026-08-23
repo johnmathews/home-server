@@ -13,6 +13,6 @@
   ansible.builtin.user:
     name: "{{ item.split(':')[0] }}"
     shell: /usr/bin/zsh
-  loop: "{{ target_shell_users }}"
+  loop: "{{ shell_environment_target_shell_users }}"
   become: true
   when: shell_environment_set_default_shell | bool
