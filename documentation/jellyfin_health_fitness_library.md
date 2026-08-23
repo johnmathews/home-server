@@ -210,32 +210,45 @@ browsers keep showing the cached old image (this bit us once).
 
 ## 5. Runbooks
 
-### 5.1 Add a video to an existing season
+### 5.1 Add a video to a season — `yt -f`
 
-Until the `yt` wrapper grows a fitness mode (open item), this is manual:
+The `yt` wrapper (`photo-video-music-tools/download-video/yt.sh`, sourced in your shell) has a
+fitness mode that does the whole thing:
 
-1. Download as usual (`yt -g <url>` lands it in `/movies/youtube/training/`).
-2. Move + rename it into the season with the next episode number, keeping the yt-dlp name and
-   `[id]`:
-   `fitness/Kettlebell/Season 03/Kettlebell S03E10 - Mark_Wildman-Some_Title-[VIDEOID].mkv`
-   (any `.en.vtt`/`.jpg` sidecars: same new stem). 3-digit episode numbers are fine.
-3. Give it an nfo: copy a neighbour's `.nfo`, set title / season / episode / plot / aired /
-   uniqueid. (Or add the ID to `state/metadata-sources.json` "api" section and run
-   `write-nfo --no-images` — it rewrites *all* nfo, harmless.)
-4. `migrate.py --workdir $W refresh` (picks up the file; numbers from the filename; nfo fills
-   the rest), then `make_posters.py` only if it is the new first episode of the season.
+```sh
+yt -f "https://youtu.be/xQqCyl-2ixQ"          # asks: which show? which season? confirm
+yt -f "Kettlebell/Tutorials" "https://…"      # fast path: season by name
+yt -f "Kettlebell/3" "https://…"              #            …or by number
+```
+
+Interactive flow: it shows the video's title, lists the existing shows (`1) Bodyweight … n) new
+show`), then that show's seasons with episode counts (`1) Compilations (17 episodes) … n) new
+season`), then `Add '<title>' there? [Y/n]`. Numbers or names both work; Enter accepts.
+
+It then downloads on the media VM, names the file `<Show> SnnEnn - <uploader>-<title>-[id].mkv`
+with the **next free episode number**, writes the `.nfo` (cleaned description, aired date, sort
+title, YouTube id) and `-thumb.jpg`, and copies everything into `fitness/<Show>/Season NN/`.
+Videos already in that show (same YouTube id, any season) are skipped. Jellyfin picks the file
+up on its scheduled scan; export `JELLYFIN_URL=http://192.168.2.110:8096` and
+`JELLYFIN_API_KEY` (the vault key) in your shell and it triggers a scan immediately.
+
+Manual fallback (e.g. a file that did not come from YouTube): copy it into the season folder as
+`<Show> SnnEnn - <name>-[<id or anything>].ext` with the next number, copy a neighbour's `.nfo`
+and edit title/season/episode/plot/aired, then `migrate.py --workdir $W refresh`.
 
 ### 5.2 Add a season to a show
 
-Create `fitness/<Show>/Season NN/` with a `season.nfo` (`<title>` + `<seasonnumber>`), add the
-episodes as in 5.1, add the season to `mapping.toml` (name, number — and ids if you want the
-planner to know about it), run `refresh`, `fix-names` (applies the season name if Jellyfin
-already created the season as "Season NN"), then `make_posters.py`.
+`yt -f "<Show>/<N>:<Name>" <url>` — or answer `n) new season` in the interactive flow — creates
+`Season NN/` with a `season.nfo` carrying the name and files the first episode. Then run
+`make_posters.py` so the new season gets its own thumbcards (until then it inherits the show's),
+and add the season to `mapping.toml` (number + name; ids optional) so `fix-names` knows the name
+if a refresh ever renames it back to "Season NN".
 
 ### 5.3 Add a show (subgenre)
 
-Create `fitness/<Show>/` with `tvshow.nfo` (`<title>`), at least one season as in 5.2, add the
-show to `mapping.toml`, `refresh`, `fix-names`, `make_posters.py`.
+`yt -f "<Show>/1:<First season name>" <url>` — or `n) new show` interactively — creates
+`fitness/<Show>/` with `tvshow.nfo` and its first season. Then `make_posters.py`, and add the
+show to `mapping.toml`.
 
 ### 5.4 Move a video between seasons / shows, or rename a show or season
 
@@ -290,7 +303,7 @@ the middle band of each thumbnail there); the live snippet is mirrored in
 
 - The five emptied libraries (Gym, Heavy Club Basics, Heavy Club Exercise Tutorials, Kettlebell
   Compilations, Turkish Get-Up) still exist in Jellyfin and should be deleted.
-- `yt` wrapper fitness mode (`photo-video-music-tools/download-video/yt.sh`): download straight
-  into `fitness/<Show>/Season NN/` with the next `SnnEnn`, write the nfo, rerun posters.
+- `yt -f` (download-video PR #1, 2026-08-23) covers adding videos/seasons/shows; it does not
+  regenerate thumbcards — `make_posters.py` after a new season/show is still a manual step.
 - Same treatment for the other YouTube libraries (Create, Humanity, Travel, Math + Engineering,
   Ukraine Lectures) if wanted.

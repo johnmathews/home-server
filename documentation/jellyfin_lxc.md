@@ -98,9 +98,10 @@ Conventions inside the tree:
   Series/Season/Episode, image fetchers `Embedded Image Extractor, Screen Grabber` for episodes
   (the provider *display names, with spaces* — `ScreenGrabber` silently matches nothing),
   `LocalMetadataReaderOrder = [Nfo]`, `DisabledLocalMetadataReaders = [YoutubeMetadata]`.
-- Adding a new video: drop it into the right season folder with the next `SnnEnn` number and an
-  nfo (the `yt` wrapper's fitness mode does this — see `photo-video-music-tools/download-video`).
-  Without an nfo Jellyfin shows the filename as the title.
+- Adding a new video: `yt -f <url>` (asks show/season) or `yt -f "<Show>/<Season>" <url>` —
+  the `yt` wrapper's fitness mode names the file with the next `SnnEnn`, writes the nfo and
+  thumbnail and copies it into the season folder (`photo-video-music-tools/download-video`,
+  runbook in the canonical doc §5). Without an nfo Jellyfin shows the filename as the title.
 
 **Custom CSS.** Two places, easy to confuse:
 
