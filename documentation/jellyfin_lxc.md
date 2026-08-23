@@ -124,15 +124,18 @@ rendered as a list):
 ```css
 /* hide "Next Up" on every series page */
 .nextUpSection { display: none; }
-/* Season page: episodes as a card grid instead of a list (verified on 10.11.11, desktop web) */
+/* Season page: episodes as a card grid instead of a list (jellyfin-web 10.11).
+   No CSS custom properties and no aspect-ratio: TV browsers (webOS/Tizen) run old engines. */
 /* 4 columns >= 1800px, 3 by default, 2 <= 1100px, 1 <= 640px */
-#childrenContent .itemsContainer.vertical-list { display: flex !important; flex-direction: row !important; flex-wrap: wrap !important; gap: 1.6em 1.2em; align-items: flex-start; --ep-cols: 3; }
-@media (min-width: 1800px) { #childrenContent .itemsContainer.vertical-list { --ep-cols: 4; } }
-@media (max-width: 1100px) { #childrenContent .itemsContainer.vertical-list { --ep-cols: 2; } }
-@media (max-width: 640px)  { #childrenContent .itemsContainer.vertical-list { --ep-cols: 1; } }
-#childrenContent .itemsContainer.vertical-list > .listItem { flex: 0 0 calc((100% - (var(--ep-cols) - 1) * 1.2em) / var(--ep-cols)) !important; width: auto !important; max-width: calc((100% - (var(--ep-cols) - 1) * 1.2em) / var(--ep-cols)); margin: 0 !important; padding: 0 !important; }
+#childrenContent .itemsContainer.vertical-list { display: flex !important; flex-direction: row !important; flex-wrap: wrap !important; gap: 1.6em 1.2em; align-items: flex-start; }
+#childrenContent .itemsContainer.vertical-list > .listItem { flex: 0 0 calc(33.333% - 0.8em) !important; width: auto !important; max-width: calc(33.333% - 0.8em); margin: 0 !important; padding: 0 !important; }
+@media (min-width: 1800px) { #childrenContent .itemsContainer.vertical-list > .listItem { flex-basis: calc(25% - 0.9em) !important; max-width: calc(25% - 0.9em); } }
+@media (max-width: 1100px) { #childrenContent .itemsContainer.vertical-list > .listItem { flex-basis: calc(50% - 0.6em) !important; max-width: calc(50% - 0.6em); } }
+@media (max-width: 640px)  { #childrenContent .itemsContainer.vertical-list > .listItem { flex-basis: 100% !important; max-width: 100%; } }
 #childrenContent .listItem-content { display: flex; flex-direction: column; align-items: stretch; }
-#childrenContent .listItemImage.listItemImage-large { width: 100% !important; height: auto !important; aspect-ratio: 16 / 9; margin: 0 !important; }
+/* 16:9 image box via a padding-top pseudo element (works without aspect-ratio support) */
+#childrenContent .listItemImage.listItemImage-large { width: 100% !important; height: auto !important; min-height: 0 !important; margin: 0 !important; background-size: cover !important; background-position: center center !important; }
+#childrenContent .listItemImage.listItemImage-large::before { content: ""; display: block; flex: 0 0 0; width: 0; padding-top: 56.25%; }
 #childrenContent .listItemBody { padding: 0.6em 0 0 0; }
 #childrenContent .listItemBody > .listItemBodyText:first-child { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3em; height: 2.6em; }
 #childrenContent .listItem-overview { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
@@ -141,6 +144,11 @@ rendered as a list):
 ```
 Both rules affect every Shows-type library (Shows, Kids Shows, Kids Youtube too). The grid
 clamps titles to two lines and shows one line of overview (the channel/date line).
+**Keep it old-engine-safe:** the first version used `aspect-ratio` and CSS custom properties;
+on the TV (jellyfin-web in a TV browser/app, old Chromium) `aspect-ratio` was ignored, the image
+box collapsed to the play-button height and `cover` showed only the middle band of each
+thumbnail. Hence the `::before { padding-top: 56.25% }` box and literal per-breakpoint widths.
+The live value is kept in `scripts/jellyfin-fitness-migration/state/custom-css.css`.
 
 **Landmine — YouTube Metadata plugin episode provider hard-codes episode numbers.** The plugin's
 `YTDLJsonToEpisode` sets `IndexNumber = 1` and `ParentIndexNumber = 1` on every episode it

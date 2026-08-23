@@ -1,0 +1,19 @@
+/* hide "Next Up" on every series page */
+.nextUpSection { display: none; }
+
+/* Season page: episodes as a card grid instead of a list (jellyfin-web 10.11).
+   No CSS custom properties and no aspect-ratio: TV browsers (webOS/Tizen) run old engines. */
+#childrenContent .itemsContainer.vertical-list { display: flex !important; flex-direction: row !important; flex-wrap: wrap !important; gap: 1.6em 1.2em; align-items: flex-start; }
+#childrenContent .itemsContainer.vertical-list > .listItem { flex: 0 0 calc(33.333% - 0.8em) !important; width: auto !important; max-width: calc(33.333% - 0.8em); margin: 0 !important; padding: 0 !important; }
+@media (min-width: 1800px) { #childrenContent .itemsContainer.vertical-list > .listItem { flex-basis: calc(25% - 0.9em) !important; max-width: calc(25% - 0.9em); } }
+@media (max-width: 1100px) { #childrenContent .itemsContainer.vertical-list > .listItem { flex-basis: calc(50% - 0.6em) !important; max-width: calc(50% - 0.6em); } }
+@media (max-width: 640px)  { #childrenContent .itemsContainer.vertical-list > .listItem { flex-basis: 100% !important; max-width: 100%; } }
+#childrenContent .listItem-content { display: flex; flex-direction: column; align-items: stretch; }
+/* 16:9 image box via a padding-top pseudo element (works without aspect-ratio support) */
+#childrenContent .listItemImage.listItemImage-large { width: 100% !important; height: auto !important; min-height: 0 !important; margin: 0 !important; background-size: cover !important; background-position: center center !important; }
+#childrenContent .listItemImage.listItemImage-large::before { content: ""; display: block; flex: 0 0 0; width: 0; padding-top: 56.25%; }
+#childrenContent .listItemBody { padding: 0.6em 0 0 0; }
+#childrenContent .listItemBody > .listItemBodyText:first-child { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3em; height: 2.6em; }
+#childrenContent .listItem-overview { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+#childrenContent .listItem-overview p { margin: 0; }
+#childrenContent .listViewUserDataButtons { align-self: flex-start; padding-top: 0.2em; }

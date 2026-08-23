@@ -272,8 +272,11 @@ run `fix-library-options`, scan, `fix-names`, then `apply-history` from `state/h
 Server-wide Custom CSS (Dashboard → General; stored in `branding.xml` on the LXC, see
 [`jellyfin_lxc.md`](jellyfin_lxc.md) for the snippet and the server-vs-browser distinction):
 hides "Next Up" on series pages and renders a season's episodes as a responsive card grid
-instead of the list. Both apply to every Shows-type library — there is no per-library hook in
-jellyfin-web.
+instead of the list (4/3/2/1 columns by width). Both apply to every Shows-type library — there is
+no per-library hook in jellyfin-web. The grid CSS deliberately avoids `aspect-ratio` and CSS
+custom properties because the TV runs jellyfin-web on an old engine (first version showed only
+the middle band of each thumbnail there); the live snippet is mirrored in
+`scripts/jellyfin-fitness-migration/state/custom-css.css`.
 
 ## 8. Open items
 
