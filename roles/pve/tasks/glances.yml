@@ -25,7 +25,7 @@
 
 - name: Get Python major.minor version in Glances venv
   ansible.builtin.command: /opt/glances-venv/bin/python -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')"
-  register: glances_python_version
+  register: pve_glances_python_version
   changed_when: false
 
 - name: Install Glances and dependencies in virtualenv using uv
@@ -38,7 +38,7 @@
   ansible.builtin.command: >
     uv pip install --python /opt/glances-venv/bin/python jinja2
   args:
-    creates: "/opt/glances-venv/lib/python{{ glances_python_version.stdout }}/site-packages/jinja2"
+    creates: "/opt/glances-venv/lib/python{{ pve_glances_python_version.stdout }}/site-packages/jinja2"
 
 - name: Create Glances systemd service
   ansible.builtin.copy:

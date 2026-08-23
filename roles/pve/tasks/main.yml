@@ -42,11 +42,6 @@
   ansible.builtin.import_tasks: ipmi_exporter.yml
   tags: metrics
 
-# - name: Set up Node exporter
-# use docker service instead
-#   import_tasks: node_exporter.yml
-#   tags: [metrics]
-
 - name: Set up Proxmox exporter
   ansible.builtin.import_tasks: pve_exporter.yml
   tags: metrics

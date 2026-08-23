@@ -1,11 +1,11 @@
-[{{ nut_admin_user }}]
+[{{ pve_nut_admin_user }}]
   password = {{ vault_nut_admin_pass }}
   actions = SET
   instcmds = ALL
   upsmon master
 
 # ups mon (the monitoring daemon) connects to upsd using this user
-[{{ nut_mon_user }}]
+[{{ pve_nut_mon_user }}]
   password = {{ vault_nut_mon_pass }}
   upsmon master
 

@@ -12,7 +12,9 @@
 
 - name: Set target users (explicit + discovered, deduplicated)
   ansible.builtin.set_fact:
-    shell_environment_target_shell_users: "{{ ((shell_environment_shell_users + (shell_environment_shell_users_raw.stdout_lines | default([]))) | reject('equalto', '') | select('match', '^[^:]+:[^:]+:[^:]+$') | list | unique) }}"
+    shell_environment_target_shell_users: >-
+      {{ ((shell_environment_shell_users + (shell_environment_shell_users_raw.stdout_lines | default([])))
+      | reject('equalto', '') | select('match', '^[^:]+:[^:]+:[^:]+$') | list | unique) }}
   tags: [always]
 
 - name: Install shell environment prerequisites

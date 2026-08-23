@@ -7,7 +7,8 @@
     set -eo pipefail
     export ATUIN_DONT_PRINT_WELCOME=1
     # Skip if atuin is already the desired version
-    if [ -f /usr/local/bin/atuin ] && [ ! -L /usr/local/bin/atuin ] && /usr/local/bin/atuin --version 2>/dev/null | grep -q '{{ atuin_version | regex_replace("^v", "") }}'; then
+    if [ -f /usr/local/bin/atuin ] && [ ! -L /usr/local/bin/atuin ] &&
+       /usr/local/bin/atuin --version 2>/dev/null | grep -q '{{ atuin_version | regex_replace("^v", "") }}'; then
       exit 0
     fi
     # Remove broken symlink if present

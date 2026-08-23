@@ -12,9 +12,9 @@
     path: /etc/hdparm.conf
     create: true
     block: |
-      {{ hdparm_disk_id }} {
-          spindown_time = {{ hdparm_spindown }}
-          apm = {{ hdparm_apm }}
+      {{ pve_hdparm_disk_id }} {
+          spindown_time = {{ pve_hdparm_spindown }}
+          apm = {{ pve_hdparm_apm }}
           write_cache = on
           acoustic_management = 128
       }

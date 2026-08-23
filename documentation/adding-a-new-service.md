@@ -27,7 +27,7 @@ roles/<service_name>/
 Use centralized variables from `group_vars/all/main.yml` where possible:
 
 ```yaml
-# Role-specific variables only — don't redefine puid, guid, TZ, etc.
+# Role-specific variables only — don't redefine puid, guid, tz, etc.
 # Every variable a role declares must start with the role name: ansible-lint's
 # var-naming[no-role-prefix] enforces it, and an unprefixed name can be shadowed
 # by group_vars without any error at apply time.
@@ -96,7 +96,7 @@ services:
     ports:
       - "{{ <service>_port }}:8080"
     environment:
-      TZ: "{{ TZ }}"
+      TZ: "{{ tz }}"
       PUID: "{{ puid }}"
       PGID: "{{ guid }}"
 

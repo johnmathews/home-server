@@ -1,13 +1,13 @@
-maxretry = {{ nut_maxretry }} 
+maxretry = {{ pve_nut_maxretry }} 
 
-[{{ nut_ups_name }}]
-    driver = {{ nut_driver }}
-    port = {{ nut_port }}
-    desc = "{{ nut_desc }}"
-    vendorid = {{ nut_vendorid }}
-    productid = {{ nut_productid }}
-    pollinterval = {{ nut_pollinterval }}
-    override.battery.runtime.low = {{ ups_battery_runtime_low }}
-    override.battery.charge.low = {{ ups_battery_charge_low }}
+[{{ pve_nut_ups_name }}]
+    driver = {{ pve_nut_driver }}
+    port = {{ pve_nut_port }}
+    desc = "{{ pve_nut_desc }}"
+    vendorid = {{ pve_nut_vendorid }}
+    productid = {{ pve_nut_productid }}
+    pollinterval = {{ pve_nut_pollinterval }}
+    override.battery.runtime.low = {{ pve_ups_battery_runtime_low }}
+    override.battery.charge.low = {{ pve_ups_battery_charge_low }}
 
 

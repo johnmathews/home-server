@@ -1,10 +1,10 @@
 # vim: ft=yaml
-# infra_vm/templates/docker-compose.yml
+# infra_vm/templates/docker-compose.yml.j2
 
 services:
 
   documentation-webapp:
-    image: ghcr.io/johnmathews/unified-documentation-webapp:{{ documentation_ui_version }}
+    image: ghcr.io/johnmathews/unified-documentation-webapp:{{ infra_vm_documentation_ui_version }}
     container_name: documentation-webapp
     restart: unless-stopped
     # Stateless SvelteKit proxy. Steady state ~50 MB; bounded per-request
@@ -95,7 +95,7 @@ services:
         max-file: "3"
 
   timer:
-    image: ghcr.io/johnmathews/gym-timer:{{ gym_timer_version }}
+    image: ghcr.io/johnmathews/gym-timer:{{ infra_vm_gym_timer_version }}
     container_name: timer
     volumes:
       - ./timer/:/config
@@ -104,7 +104,7 @@ services:
     restart: unless-stopped
 
   sre-ingest:
-    image: ghcr.io/johnmathews/sre-agent:{{ sre_assistant_version }}
+    image: ghcr.io/johnmathews/sre-agent:{{ infra_vm_sre_assistant_version }}
     container_name: sre-ingest
     command: ["python", "-m", "scripts.ingest_runbooks"]
     user: 1001:1001
@@ -116,7 +116,7 @@ services:
     profiles: ["setup"]
 
   sre-agent:
-    image: ghcr.io/johnmathews/sre-agent:{{ sre_assistant_version }}
+    image: ghcr.io/johnmathews/sre-agent:{{ infra_vm_sre_assistant_version }}
     container_name: sre-agent
     user: "1001:1001"
     ports:
@@ -165,7 +165,7 @@ services:
       start_period: 10s
 
   loki:
-    image: grafana/loki:{{ loki_version }}
+    image: grafana/loki:{{ infra_vm_loki_version }}
     container_name: loki
     command: ["-config.file=/etc/loki/config.yml"]
     ports:
@@ -181,7 +181,7 @@ services:
     restart: unless-stopped
 
   alloy:
-    image: grafana/alloy:{{ alloy_version }}
+    image: grafana/alloy:{{ infra_vm_alloy_version }}
     container_name: alloy
     restart: unless-stopped
     mem_limit: 128m # ADDED: currently ~82MB
@@ -212,7 +212,7 @@ services:
         max-file: "5"
 
   mkdocs:
-    image: squidfunk/mkdocs-material:{{ mkdocs_material_version }}
+    image: squidfunk/mkdocs-material:{{ infra_vm_mkdocs_material_version }}
     container_name: mkdocs
     working_dir: /docs
     volumes:
@@ -232,7 +232,7 @@ services:
       - "5201:5201/udp" # UDP
 
   homepage:
-    image: ghcr.io/gethomepage/homepage:{{ homepage_version }}
+    image: ghcr.io/gethomepage/homepage:{{ infra_vm_homepage_version }}
     container_name: homepage
     mem_limit: 192m
     environment:
@@ -249,7 +249,7 @@ services:
     restart: always
 
   grafana:
-    image: grafana/grafana-oss:{{ grafana_version }}
+    image: grafana/grafana-oss:{{ infra_vm_grafana_version }}
     container_name: grafana
     mem_limit: 256m # ADDED: currently ~183MB, biggest consumer
     oom_score_adj: -500 # Observability backstop, see loki above.
@@ -263,7 +263,7 @@ services:
     restart: always
 
   node-exporter:
-    image: prom/node-exporter:{{ node_exporter_version }}
+    image: prom/node-exporter:{{ infra_vm_node_exporter_version }}
     container_name: node-exporter
     restart: always
     oom_score_adj: -500 # Observability backstop, see loki above.
@@ -281,7 +281,7 @@ services:
       - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($|/)'
 
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:{{ cadvisor_version }}
+    image: gcr.io/cadvisor/cadvisor:{{ infra_vm_cadvisor_version }}
     container_name: cadvisor
     restart: unless-stopped
     mem_limit: 96m # ADDED: currently ~45MB
@@ -307,7 +307,7 @@ services:
       - '--store_container_labels=true'
 
   uptime-kuma:
-    image: louislam/uptime-kuma:{{ uptime_kuma_version }}
+    image: louislam/uptime-kuma:{{ infra_vm_uptime_kuma_version }}
     container_name: uptime-kuma
     mem_limit: 192m # ADDED: currently ~142MB
     ports:
@@ -319,7 +319,7 @@ services:
     restart: always
 
   dozzle:
-    image: amir20/dozzle:{{ dozzle_version }}
+    image: amir20/dozzle:{{ infra_vm_dozzle_version }}
     container_name: dozzle
     ports:
       - "9999:8080"
@@ -341,7 +341,7 @@ services:
     restart: always
 
   mikrotik_exporter:
-    image: ghcr.io/akpw/mktxp:{{ mktxp_version }}
+    image: ghcr.io/akpw/mktxp:{{ infra_vm_mktxp_version }}
     container_name: mikrotik_exporter
     user: "1001:1001"
     command: mktxp --cfg-dir /etc/mktxp export
@@ -352,7 +352,7 @@ services:
     restart: always
 
   container-health-exporter:
-    image: ghcr.io/johnmathews/container-status-exporter:{{ container_status_exporter_version }}
+    image: ghcr.io/johnmathews/container-status-exporter:{{ infra_vm_container_status_exporter_version }}
     container_name: container-status-exporter
     ports:
       - "8081:8081"

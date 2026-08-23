@@ -58,7 +58,9 @@
 
     - name: List LXCs that were updated
       ansible.builtin.set_fact:
-        proxmox_lxc_tun_updated_lxcs: "{{ proxmox_lxc_tun_lxc_config_updated.results | selectattr('changed', 'equalto', true) | map(attribute='item') | map(attribute='item') | list }}"
+        proxmox_lxc_tun_updated_lxcs: >-
+          {{ proxmox_lxc_tun_lxc_config_updated.results | selectattr('changed', 'equalto', true)
+          | map(attribute='item') | map(attribute='item') | list }}
 
     - name: Display LXCs that need restart
       ansible.builtin.debug:

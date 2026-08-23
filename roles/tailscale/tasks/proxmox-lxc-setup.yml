@@ -85,7 +85,11 @@
 
     - name: Wait for LXC containers to come back online
       ansible.builtin.wait_for:
-        host: "{{ hostvars[groups['lxcs'] | select('match', '.*_lxc') | list | map('regex_replace', '_lxc$', '') | select('match', '.*' ~ item.item.item ~ '.*') | first | default('localhost')]['ansible_host'] | default('localhost') }}"
+        host: >-
+          {{ hostvars[groups['lxcs'] | select('match', '.*_lxc') | list
+          | map('regex_replace', '_lxc$', '')
+          | select('match', '.*' ~ item.item.item ~ '.*')
+          | first | default('localhost')]['ansible_host'] | default('localhost') }}
         port: 22
         delay: 5
         timeout: 60

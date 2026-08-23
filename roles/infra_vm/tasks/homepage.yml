@@ -20,7 +20,7 @@
     mode: '0644'
   with_fileglob:
     - "files/homepage_config/*"
-  register: homepage_config_uploads
+  register: infra_vm_homepage_config_uploads
   become: true
   notify: Restart homepage
 

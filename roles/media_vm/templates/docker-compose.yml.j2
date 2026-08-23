@@ -1,5 +1,5 @@
 # vim: ft=yaml
-# media_vm/files/docker-compose.yml
+# media_vm/templates/docker-compose.yml.j2
 
 services:
   journal-webapp:
@@ -13,7 +13,7 @@ services:
 
   journal-server:
     container_name: journal-server
-    image: ghcr.io/johnmathews/journal-server:{{ journal_agent_version }}
+    image: ghcr.io/johnmathews/journal-server:{{ media_vm_journal_agent_version }}
     environment:
       - TZ=${TZ:-Europe/Amsterdam}
       - DB_PATH=/data/journal.db
@@ -63,7 +63,7 @@ services:
 
   journal-chromadb:
     container_name: journal-chromadb
-    image: ghcr.io/johnmathews/journal-chromadb:{{ journal_chromadb_version }}
+    image: ghcr.io/johnmathews/journal-chromadb:{{ media_vm_journal_chromadb_version }}
     environment:
       - TZ=${TZ:-Europe/Amsterdam}
     volumes:
@@ -79,7 +79,7 @@ services:
       start_interval: 2s
 
   slskd:
-    image: slskd/slskd:{{ slskd_version }}
+    image: slskd/slskd:{{ media_vm_slskd_version }}
     container_name: slskd
     user: "${PUID}:${PGID}"
     environment:
@@ -159,7 +159,7 @@ services:
 
   # smb shares
   sabnzbd:
-    image: lscr.io/linuxserver/sabnzbd:{{ sabnzbd_version }}
+    image: lscr.io/linuxserver/sabnzbd:{{ media_vm_sabnzbd_version }}
     container_name: sabnzbd
     environment:
       - PUID=${PUID}
@@ -183,7 +183,7 @@ services:
 
   booklore:
     # BookLore moved off Docker Hub (booklore/booklore is dead); official registry is ghcr
-    image: ghcr.io/booklore-app/booklore:{{ booklore_version }}
+    image: ghcr.io/booklore-app/booklore:{{ media_vm_booklore_version }}
     container_name: booklore
     environment:
       - USER_ID=1001
@@ -232,7 +232,7 @@ services:
       retries: 10
 
   sonarr:
-    image: linuxserver/sonarr:{{ sonarr_version }}
+    image: linuxserver/sonarr:{{ media_vm_sonarr_version }}
     container_name: sonarr
     user: "${PUID}:${PGID}"
     environment:
@@ -257,7 +257,7 @@ services:
     restart: always
 
   radarr:
-    image: linuxserver/radarr:{{ radarr_version }}
+    image: linuxserver/radarr:{{ media_vm_radarr_version }}
     container_name: radarr
     user: "${PUID}:${PGID}"
     environment:
@@ -283,7 +283,7 @@ services:
 
   flaresolverr:
     # DockerHub mirror flaresolverr/flaresolverr
-    image: ghcr.io/flaresolverr/flaresolverr:{{ flaresolverr_version }}
+    image: ghcr.io/flaresolverr/flaresolverr:{{ media_vm_flaresolverr_version }}
     container_name: flaresolverr
     environment:
       - LOG_LEVEL=${LOG_LEVEL:-info}
@@ -295,7 +295,7 @@ services:
     restart: always
 
   prowlarr:
-    image: lscr.io/linuxserver/prowlarr:{{ prowlarr_version }}
+    image: lscr.io/linuxserver/prowlarr:{{ media_vm_prowlarr_version }}
     container_name: prowlarr
     environment:
       - PUID=${PUID}
@@ -308,7 +308,7 @@ services:
     restart: always
 
   jellyseerr:
-    image: fallenbagel/jellyseerr:{{ jellyseerr_version }}
+    image: fallenbagel/jellyseerr:{{ media_vm_jellyseerr_version }}
     container_name: jellyseerr
     ports:
       - 5055:5055
@@ -334,7 +334,7 @@ services:
     restart: always
 
   alloy:
-    image: grafana/alloy:{{ alloy_version }}
+    image: grafana/alloy:{{ media_vm_alloy_version }}
     container_name: alloy
     restart: always
     environment:
@@ -362,7 +362,7 @@ services:
         max-file: "5"
 
   node_exporter:
-    image: quay.io/prometheus/node-exporter:{{ node_exporter_version }}
+    image: quay.io/prometheus/node-exporter:{{ media_vm_node_exporter_version }}
     container_name: node_exporter
     command:
       - '--path.rootfs=/host'
@@ -377,7 +377,7 @@ services:
       - '/run/udev:/run/udev:ro'
 
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:{{ cadvisor_version }}
+    image: gcr.io/cadvisor/cadvisor:{{ media_vm_cadvisor_version }}
     container_name: cadvisor
     restart: unless-stopped
     ports:

@@ -114,15 +114,15 @@ NOTIFYMSG LOWBATT "UPS %s battery is low"
 
 For example:
 
-- `override.battery.charge.low = {{ ups_battery_charge_low }}`
+- `override.battery.charge.low = {{ pve_ups_battery_charge_low }}`
 
 Update `ups.conf` then run `make pve --tags=nut`. 
 
 ### Normal parameters
 
 - `nut_shutdown_threshold=40`
-- `ups_battery_charge_low: 20`
-- `ups_battery_runtime_low: 600` (10 minutes)
+- `pve_ups_battery_charge_low: 40`
+- `pve_ups_battery_runtime_low: 720` (12 minutes)
 
 ### Testing parameters
 
@@ -131,8 +131,8 @@ If `nut_shutdown_threshold` is lower than `battery.charge.low` then the
 will initiate shutdown. `ups-battery-monitor` seems redundant.
 
 - `nut_shutdown_threshold=70`
-- `ups_battery_charge_low: 75`
-- `ups_battery_runtime_low: 2100` (35 minutes)
+- `pve_ups_battery_charge_low: 75`
+- `pve_ups_battery_runtime_low: 2100` (35 minutes)
 
 ## Notes
 

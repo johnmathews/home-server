@@ -11,15 +11,15 @@ and vector search over journal entries.
 | Container          | Image                                                          | Host port | Memory  |
 |--------------------|----------------------------------------------------------------|-----------|---------|
 | `journal-webapp`   | `ghcr.io/johnmathews/journal-webapp:latest`                    | 8402 → 80 | (default) |
-| `journal-server`   | `ghcr.io/johnmathews/journal-server:{{ journal_agent_version }}` | 8400 → 8400 | (default) |
-| `journal-chromadb` | `ghcr.io/johnmathews/journal-chromadb:{{ journal_chromadb_version }}` | 8401 → 8000 | (default) |
+| `journal-server`   | `ghcr.io/johnmathews/journal-server:{{ media_vm_journal_agent_version }}` | 8400 → 8400 | (default) |
+| `journal-chromadb` | `ghcr.io/johnmathews/journal-chromadb:{{ media_vm_journal_chromadb_version }}` | 8401 → 8000 | (default) |
 
 `journal-webapp` depends on `journal-server`; `journal-server` depends on `journal-chromadb` being healthy
 (`condition: service_healthy`). The chromadb image is a custom johnmathews fork; its healthcheck uses `curl` against
 `http://localhost:8000/api/v2/heartbeat` (interval 30s, retries 3, start_period 10s with start_interval 2s).
 
-Image versions for journal-server and journal-chromadb come from `journal_agent_version` and
-`journal_chromadb_version` in `roles/media_vm/defaults/main.yml` (both `"latest"`). The webapp pins `:latest`.
+Image versions for journal-server and journal-chromadb come from `media_vm_journal_agent_version` and
+`media_vm_journal_chromadb_version` in `roles/media_vm/defaults/main.yml` (both `"latest"`). The webapp pins `:latest`.
 
 ## Data Storage
 
