@@ -27,23 +27,23 @@
   ansible.builtin.shell: "command -v python3.12 || true"
   args:
     executable: /bin/bash
-  register: py312_path
+  register: sleep_hours_py312_path
   changed_when: false
 
 # Create venv (prefer 3.12 if present)
 - name: Create venv with python3.12 if present
   become: true
-  ansible.builtin.command: "{{ py312_path.stdout }} -m venv /opt/uptimekumactl/venv"
+  ansible.builtin.command: "{{ sleep_hours_py312_path.stdout }} -m venv /opt/uptimekumactl/venv"
   args:
     creates: /opt/uptimekumactl/venv/bin/activate
-  when: py312_path.stdout | length > 0
+  when: sleep_hours_py312_path.stdout | length > 0
 
 - name: Create venv with default python3 otherwise
   become: true
   ansible.builtin.command: python3 -m venv /opt/uptimekumactl/venv
   args:
     creates: /opt/uptimekumactl/venv/bin/activate
-  when: py312_path.stdout | length == 0
+  when: sleep_hours_py312_path.stdout | length == 0
 
 # Verify venv has working pip
 - name: Verify venv has working pip
