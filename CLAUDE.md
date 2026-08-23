@@ -112,7 +112,7 @@ systemd unit — use `systemctl --user` on the agent host (see `documentation/ag
 - **YAML formatting**: Follow `.ansible-lint` warn_list (trailing spaces, empty lines, line-length)
 - **Task naming**: Use sentence case, enforce via `name[casing]` rule
 - **Modules**: Gradual migration to fully qualified collection names (FQCN) — warn on violations
-- **Variables**: Prefix internal role variables incrementally per `var-naming` rule
+- **Variables**: Prefix every role variable with `<role>_` (`var-naming[no-role-prefix]`); all roles comply as of 2026-08-23
 - **Booleans**: Use lowercase `true/false` (not `True/False`)
 - **File permissions**: Always set `mode:` on sensitive files
 - **Error handling**: Use `changed_when:` clauses where needed (warnings enforced)

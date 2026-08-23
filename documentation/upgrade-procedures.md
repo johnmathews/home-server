@@ -75,9 +75,9 @@ There are no exceptions and no literals. Verify with:
 grep -rnE '^[a-z_]*(alloy|cadvisor|node_exporter)_version:' roles/*/defaults/main.yml
 ```
 
-Every line printed must end in `sidecar_*`. (The pattern allows a role prefix because the
-var-naming refactor renames these to `<role>_alloy_version` role by role; an anchored
-`^alloy_version:` misses most of them.)
+Every line printed must end in `sidecar_*`. (The pattern allows a role prefix because every
+role names its copy `<role>_alloy_version`, `<role>_cadvisor_version`,
+`<role>_node_exporter_version`; an anchored `^alloy_version:` matches nothing.)
 
 Two details that are easy to trip on:
 

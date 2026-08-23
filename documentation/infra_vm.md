@@ -24,7 +24,7 @@ tools run here.
 
 ## Service Inventory
 
-Image tags use Jinja variables (e.g. `{{ grafana_version }}`) defined in `roles/infra_vm/defaults/main.yml`
+Image tags use Jinja variables (e.g. `{{ infra_vm_grafana_version }}`) defined in `roles/infra_vm/defaults/main.yml`
 (exception: `atuin_version` lives in `group_vars/all/main.yml`); only a few
 services pin `:latest` directly. Container names are stable.
 

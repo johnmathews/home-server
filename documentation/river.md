@@ -116,13 +116,6 @@ until 2026-08-22, which is how the fleet came to run two Alloy generations at on
 see [upgrade-procedures.md](upgrade-procedures.md) for the bump procedure, which is
 not just an edit — compose handlers use `pull: never`.
 
-The variable's **name** is mid-migration (W21-W24 of the var-naming refactor). Roles
-already prefixed use `<role>_alloy_version` — agent_lxc, document_library_lxc,
-family_finances_lxc, immich_lxc, jellyfin_lxc, music_lxc, open_webui_lxc,
-prometheus_lxc, traefik_lxc, tubearchivist_lxc. The three not yet converted still use
-bare `alloy_version`: infra_vm, media_vm, pve. `sidecar_alloy_version` itself is
-unaffected either way and keeps its name.
-
 `make refresh-sidecars` pulls and recreates the sidecars in bulk — it applies the
 pin each host already has, it does not upgrade anything. Full detail in
 [upgrade-procedures.md](upgrade-procedures.md).
