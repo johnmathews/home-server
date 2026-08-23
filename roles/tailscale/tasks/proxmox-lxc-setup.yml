@@ -3,21 +3,21 @@
 # LXCs need TUN/TAP device access which requires host-side configuration
 
 # `pct` only exists on a Proxmox host. Without this guard a failed or absent
-# `pct` leaves `lxc_containers.stdout_lines` empty, every loop below iterates
+# `pct` leaves `tailscale_lxc_containers.stdout_lines` empty, every loop below iterates
 # zero times, and the play reports full success having configured nothing.
 # roles/proxmox_lxc_tun/tasks/main.yml guards the identical pipeline this way.
 - name: Check if running on Proxmox host
   ansible.builtin.stat:
     path: /usr/bin/pct
-  register: pct_check
+  register: tailscale_pct_check
 
 - name: Skip if not Proxmox host
   ansible.builtin.debug:
     msg: "Skipping - not a Proxmox host (pct command not found)"
-  when: not pct_check.stat.exists
+  when: not tailscale_pct_check.stat.exists
 
 - name: Configure LXC containers for Tailscale
-  when: pct_check.stat.exists
+  when: tailscale_pct_check.stat.exists
   block:
     - name: Get list of all LXC containers
       ansible.builtin.shell: |
@@ -25,14 +25,14 @@
         pct list | awk 'NR>1 {print $1}'
       args:
         executable: /bin/bash
-      register: lxc_containers
+      register: tailscale_lxc_containers
       changed_when: false
 
     - name: Check if LXC configs already have TUN device
       ansible.builtin.shell: |
         grep -q "lxc.cgroup2.devices.allow: c 10:200 rwm" /etc/pve/lxc/{{ item }}.conf
-      loop: "{{ lxc_containers.stdout_lines }}"
-      register: tun_check
+      loop: "{{ tailscale_lxc_containers.stdout_lines }}"
+      register: tailscale_tun_check
       changed_when: false
       failed_when: false
 
@@ -43,9 +43,9 @@
         block: |
           lxc.cgroup2.devices.allow: c 10:200 rwm
           lxc.mount.entry: /dev/net/tun dev/net/tun none bind,create=file
-      loop: "{{ tun_check.results }}"
+      loop: "{{ tailscale_tun_check.results }}"
       when: item.rc != 0
-      register: lxc_config_changed
+      register: tailscale_lxc_config_changed
 
     # Not a handler: the reboot notice below consumes this task's per-item
     # result, which a handler cannot provide.
@@ -55,9 +55,9 @@
         pct status {{ item.item }} | grep -q running
       args:
         executable: /bin/bash
-      loop: "{{ lxc_config_changed.results }}"
+      loop: "{{ tailscale_lxc_config_changed.results }}"
       when: item.changed
-      register: lxc_running_status
+      register: tailscale_lxc_running_status
       changed_when: false
       failed_when: false
 
@@ -67,7 +67,7 @@
           LXC {{ item.item.item }} configuration updated for Tailscale.
           The container needs to be restarted for changes to take effect.
           Run: pct reboot {{ item.item.item }}
-      loop: "{{ lxc_running_status.results }}"
+      loop: "{{ tailscale_lxc_running_status.results }}"
       when:
         - item.item is defined
         - item.item.changed
@@ -75,7 +75,7 @@
 
     - name: Restart LXC containers to apply TUN device access
       ansible.builtin.command: "pct reboot {{ item.item.item }}"
-      loop: "{{ lxc_running_status.results }}"
+      loop: "{{ tailscale_lxc_running_status.results }}"
       when:
         - item.item is defined
         - item.item.changed
@@ -89,7 +89,7 @@
         port: 22
         delay: 5
         timeout: 60
-      loop: "{{ lxc_running_status.results }}"
+      loop: "{{ tailscale_lxc_running_status.results }}"
       when:
         - item.item is defined
         - item.item.changed
