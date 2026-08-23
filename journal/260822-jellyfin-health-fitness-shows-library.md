@@ -111,6 +111,19 @@ and `Embedded Image Extractor`, with spaces. I had configured `ScreenGrabber`/`E
 (copied from an options.xml dump that had been piped through `tr -d " "`), which matches nothing,
 so 31 episodes without an exported thumb got no image until the names were fixed.
 
+## 2026-08-23 addendum
+
+- Kettlebell's show and "Compilations" thumbcards still showed the old triptych in John's
+  browser although the files on the NAS were the new single-image posters: the tar upload wrote
+  them with mtime 0 both times, Jellyfin's image tag is path+mtime, so the tag never changed
+  and clients kept the cached image. `make_posters.py` now stamps a current mtime; tags changed,
+  19/19 verified distinct at a fresh size.
+- Thumbcard overrides added to `make_posters.py`: `art/<Show>/poster.jpg`,
+  `art/<Show>/Season NN/folder.jpg` (portrait used as-is, landscape letterboxed+band), or
+  `image = "<youtubeId>"` on a show/season in `mapping.toml`.
+- New canonical doc `documentation/jellyfin_health_fitness_library.md` (layout, nfo, thumbcards,
+  scripts, runbooks, landmines); `jellyfin_lxc.md` keeps a summary and points to it.
+
 ## Follow-ups
 
 - Delete the five emptied libraries (Gym, Heavy Club ×2, Kettlebell Compilations, Turkish Get-Up)

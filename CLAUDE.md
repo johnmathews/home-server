@@ -235,6 +235,7 @@ path. To confirm this list is still complete:
 - `traefik.md` — Traefik reverse proxy, routing architecture, rate limiting, adding services
 - `tubearchivist_lxc.md` — TubeArchivist YouTube archiver, Elasticsearch, Jellyfin integration
 - `jellyfin_lxc.md` — Jellyfin LXC setup, plugins, NFS monitoring issue, 10.11.x known issues
+- `jellyfin_health_fitness_library.md` — the Health & Fitness Shows library (show = subgenre, season = sub-subgenre): layout, nfo/thumbcard conventions, scripts, runbooks for adding videos/seasons/shows and setting thumbcards, landmines
 - `journal_agent.md` — Journal agent and ChromaDB on media VM (MCP journaling, vector search)
 - `proxmox_host_tuning.md` — ZFS ARC, KSM, VM ballooning, memory management
 - `truenas.md` — TrueNAS scripts: share refresh, disk spindown, exporter

@@ -56,6 +56,10 @@ Library configs: `/srv/apps/jellyfin/appdata/root/default/<name>/options.xml`
 
 ### Health & Fitness (Shows library, 2026-08-22)
 
+**Canonical doc: [`jellyfin_health_fitness_library.md`](jellyfin_health_fitness_library.md)** —
+layout, nfo/thumbcard conventions, scripts, runbooks for adding videos/seasons/shows and setting
+thumbcards, landmines. The summary below is kept for context; when they disagree, that doc wins.
+
 One *Shows* library replaces the five former per-playlist movie libraries. Series are the
 subcategories, seasons the sub-subcategories:
 

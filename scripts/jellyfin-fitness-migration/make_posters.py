@@ -13,9 +13,23 @@ portrait canvas, plus a dark band with the season name (and series name,
 smaller) at the bottom. Series posters use the first episode of the first
 season. (An earlier 3-thumbnail stack was judged confusing.)
 
+Overrides (checked in this order, first hit wins):
+  1. a source image in the repo's art/ dir next to this script:
+        art/<Series>/poster.jpg            -> that series' thumbcard
+        art/<Series>/Season NN/folder.jpg  -> that season's thumbcard
+     (.png/.webp also fine). A portrait source (aspect <= 0.8) is used as-is,
+     scaled to 1000x1500; a landscape source is letterboxed + name band like
+     an episode thumbnail.
+  2. `image = "<youtube id>"` on the series or season in mapping.toml -> that
+     episode's thumbnail instead of the first one.
+  3. default: first episode of the season / of the first season.
+
 Output: <out>/fitness/<Series>/poster.jpg and <out>/fitness/<Series>/Season NN/folder.jpg
 (Jellyfin's local image names for series and season primaries), then uploaded
 to the NAS and image-refreshed (series/season items only; ReplaceAllImages).
+Uploaded files get a current mtime: Jellyfin's image cache tag is derived from
+the file's path + mtime, so without that a regenerated poster keeps the old tag
+and browsers/clients keep showing the cached old image.
 
 Run:  JELLYFIN_API_KEY=... uv run --python 3.13 --with pillow scripts/jellyfin-fitness-migration/make_posters.py --workdir scripts/jellyfin-fitness-migration/state [--dry-run]
 """
@@ -74,6 +88,10 @@ def _cover(img, box):  # type: ignore[no-untyped-def]
 def compose(thumb: bytes | None, title: str, subtitle: str | None) -> bytes:
     from PIL import Image, ImageDraw, ImageEnhance, ImageFilter
     img = Image.open(io.BytesIO(thumb)).convert("RGB") if thumb else Image.new("RGB", (16, 9), (40, 40, 44))
+    if img.width / img.height <= 0.8:  # already a portrait poster (manual art): use as-is, no band
+        out = io.BytesIO()
+        _cover(img, (0, 0, W, H)).save(out, "JPEG", quality=90, optimize=True)
+        return out.getvalue()
     # background: the same image, cover-cropped to the full canvas, blurred and darkened
     bg = _cover(img, (0, 0, W, H)).filter(ImageFilter.GaussianBlur(28))
     canvas = ImageEnhance.Brightness(bg).enhance(0.45)
@@ -119,15 +137,29 @@ def main() -> None:
     ap.add_argument("--nas", default=os.environ.get("NAS_SSH_HOST", "nas"))
     ap.add_argument("--nas-root", default="/mnt/tank/movies/youtube")
     ap.add_argument("--dry-run", action="store_true", help="write posters under --workdir/posters only")
+    ap.add_argument("--mapping", type=Path, default=Path(__file__).with_name("mapping.toml"))
+    ap.add_argument("--art", type=Path, default=Path(__file__).with_name("art"), help="manual source images (see module docstring)")
     a = ap.parse_args()
     plan = json.loads((a.workdir / "plan.json").read_text())
+    import tomllib
+    cfg = tomllib.loads(a.mapping.read_text()) if a.mapping.exists() else {"series": []}
+    series_image_id = {sr["name"]: sr.get("image") for sr in cfg.get("series", [])}
+    season_image_id = {(sr["name"], int(se["number"])): se.get("image") for sr in cfg.get("series", []) for se in sr.get("seasons", [])}
+
+    def manual_art(rel_dir: str) -> bytes | None:
+        for name in ("poster", "folder"):
+            for ext in (".jpg", ".jpeg", ".png", ".webp"):
+                f = a.art / rel_dir / (name + ext)
+                if f.exists():
+                    return f.read_bytes()
+        return None
     jf = Jellyfin()
     lib = next(v for v in jf.req("GET", "/Library/VirtualFolders") if v["Name"] == plan["library_name"])
     uid = next(u["Id"] for u in jf.req("GET", "/Users"))
     q = {"userId": uid, "parentId": lib["ItemId"], "recursive": "true", "enableImages": "true", "limit": 2000, "fields": "Path"}
     series = jf.req("GET", "/Items", {**q, "includeItemTypes": "Series"})["Items"]
     seasons = jf.req("GET", "/Items", {**q, "includeItemTypes": "Season"})["Items"]
-    episodes = jf.req("GET", "/Items", {**q, "includeItemTypes": "Episode"})["Items"]
+    episodes = jf.req("GET", "/Items", {**q, "includeItemTypes": "Episode", "fields": "Path,ProviderIds"})["Items"]
 
     def thumb(ep: dict[str, Any]) -> bytes | None:
         if "Primary" not in (ep.get("ImageTags") or {}):
@@ -142,18 +174,47 @@ def main() -> None:
 
     files: dict[str, bytes] = {}  # relative path under nas-root -> bytes
     series_first: dict[str, bytes] = {}  # series id -> first episode thumb of its first season
+    by_vid = {}
+    for e in episodes:
+        vid = (e.get("ProviderIds") or {}).get("YoutubeMetadata")
+        if vid:
+            by_vid[vid] = e
+    sources: dict[str, str] = {}
     for s in sorted(seasons, key=lambda s: (s.get("SeriesName"), s.get("IndexNumber") or 0)):
         eps = by_season.get(s["Id"], [])
-        first = next((t for t in (thumb(e) for e in eps[:6]) if t), None)
+        season_dir = str(PurePosixPath(s["Path"]).relative_to("/movies/youtube"))
+        art_rel = str(PurePosixPath(season_dir).relative_to(plan["target_subdir"]))
+        chosen_id = season_image_id.get((s.get("SeriesName"), s.get("IndexNumber") or 0))
+        manual = manual_art(art_rel)
+        if manual is not None:
+            first, src = manual, f"art/{art_rel}"
+        elif chosen_id and chosen_id in by_vid:
+            first, src = thumb(by_vid[chosen_id]), f"episode {chosen_id}"
+        else:
+            if chosen_id:
+                print(f"  ! {s.get('SeriesName')} S{s.get('IndexNumber'):02d}: image id {chosen_id} not in this library, using first episode", file=sys.stderr)
+            first, src = next((t for t in (thumb(e) for e in eps[:6]) if t), None), "first episode"
         if first is None:
             print(f"  ! no thumbnail for {s.get('SeriesName')} / {s['Name']}", file=sys.stderr)
-        season_dir = str(PurePosixPath(s["Path"]).relative_to("/movies/youtube"))
         files[f"{season_dir}/folder.jpg"] = compose(first, s["Name"], s.get("SeriesName"))
-        if first is not None:
+        sources[f"{s.get('SeriesName')} / {s['Name']}"] = src
+        if first is not None and manual is None:
             series_first.setdefault(s["SeriesId"], first)
     for sr in series:
         series_dir = str(PurePosixPath(sr["Path"]).relative_to("/movies/youtube"))
-        files[f"{series_dir}/poster.jpg"] = compose(series_first.get(sr["Id"]), sr["Name"], None)
+        art_rel = str(PurePosixPath(series_dir).relative_to(plan["target_subdir"]))
+        chosen_id = series_image_id.get(sr["Name"])
+        manual = manual_art(art_rel)
+        if manual is not None:
+            img, src = manual, f"art/{art_rel}"
+        elif chosen_id and chosen_id in by_vid:
+            img, src = thumb(by_vid[chosen_id]), f"episode {chosen_id}"
+        else:
+            img, src = series_first.get(sr["Id"]), "first episode of first season"
+        files[f"{series_dir}/poster.jpg"] = compose(img, sr["Name"], None)
+        sources[sr["Name"]] = src
+    for k, v in sorted(sources.items()):
+        print(f"   {k:40} <- {v}")
     print(f"generated {len(files)} posters ({len(series)} series, {len(seasons)} seasons)")
 
     if a.dry_run:
@@ -166,9 +227,10 @@ def main() -> None:
         return
 
     buf = io.BytesIO()
+    now = int(time.time())
     with tarfile.open(fileobj=buf, mode="w") as tar:
         for rel, data in files.items():
-            ti = tarfile.TarInfo(rel); ti.size = len(data); ti.mode = 0o664
+            ti = tarfile.TarInfo(rel); ti.size = len(data); ti.mode = 0o664; ti.mtime = now  # new mtime => new Jellyfin image tag
             tar.addfile(ti, io.BytesIO(data))
     res = subprocess.run(["ssh", "-o", "BatchMode=yes", a.nas, f"cd {shlex.quote(a.nas_root)} && tar -xf - && echo uploaded"],
                          input=buf.getvalue(), capture_output=True)
