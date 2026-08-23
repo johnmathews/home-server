@@ -1,5 +1,8 @@
 # Jellyfin — Health & Fitness library
 
+**Status:** current — verified 2026-08-23 · covers: live, scripts/jellyfin-fitness-migration/**
+Layout, options and counts were read from the NAS and the Jellyfin API on that date.
+
 **What it is:** one Jellyfin *Shows*-type library for fitness/health YouTube videos, where each
 **Show = a subgenre** (Kettlebell, Heavy Club, Bodyweight, …) and each **Season = a sub-subgenre**
 (Kettlebell → Compilations / Turkish Get-Up / Tutorials). It replaced five flat per-playlist
