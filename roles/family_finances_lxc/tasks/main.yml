@@ -23,17 +23,17 @@
     group: 10001
     mode: '0700'
   loop:
-    - "{{ family_finances_data_dir }}"
-    - "{{ family_finances_data_dir }}/households"
+    - "{{ family_finances_lxc_family_finances_data_dir }}"
+    - "{{ family_finances_lxc_family_finances_data_dir }}/households"
   tags: [docker, family_finances]
 
 # Its own directory, 0700, owned by the image's app uid -- and NOT inside
-# family_finances_data_dir, which is the family's financial record. 0400 on the
+# family_finances_lxc_family_finances_data_dir, which is the family's financial record. 0400 on the
 # key because nothing needs to write it: it is generated once in the browser
 # when the application is registered, and Enable Banking never held a copy.
 - name: Create the bank-sync secrets directory
   ansible.builtin.file:
-    path: "{{ family_finances_secrets_dir }}"
+    path: "{{ family_finances_lxc_family_finances_secrets_dir }}"
     state: directory
     owner: 10001
     group: 10001
@@ -42,8 +42,8 @@
 
 - name: Install the Enable Banking application key
   ansible.builtin.copy:
-    content: "{{ enable_banking_private_key }}"
-    dest: "{{ family_finances_secrets_dir }}/enable-banking.pem"
+    content: "{{ family_finances_lxc_enable_banking_private_key }}"
+    dest: "{{ family_finances_lxc_family_finances_secrets_dir }}/enable-banking.pem"
     owner: 10001
     group: 10001
     mode: '0400'
@@ -54,7 +54,7 @@
 - name: Create environment file from template
   ansible.builtin.template:
     src: .env.j2
-    dest: "{{ family_finances_docker_compose_dir }}/.env"
+    dest: "{{ family_finances_lxc_family_finances_docker_compose_dir }}/.env"
     mode: '0600'
     owner: root
     group: root
@@ -77,7 +77,7 @@
 - name: Copy docker-compose.yml
   ansible.builtin.template:
     src: templates/docker-compose.yml.j2
-    dest: "{{ family_finances_docker_compose_dir }}/docker-compose.yml"
+    dest: "{{ family_finances_lxc_family_finances_docker_compose_dir }}/docker-compose.yml"
     mode: '0644'
     owner: root
     group: root
@@ -87,8 +87,8 @@
 - name: Log in to ghcr so the private images can be pulled
   community.docker.docker_login:
     registry_url: ghcr.io
-    username: "{{ family_finances_ghcr_user }}"
-    password: "{{ family_finances_ghcr_token }}"
+    username: "{{ family_finances_lxc_family_finances_ghcr_user }}"
+    password: "{{ family_finances_lxc_family_finances_ghcr_token }}"
     reauthorize: true
   become: false
   no_log: true
@@ -96,7 +96,7 @@
 
 - name: Converge the stack
   community.docker.docker_compose_v2:
-    project_src: "{{ family_finances_docker_compose_dir }}"
+    project_src: "{{ family_finances_lxc_family_finances_docker_compose_dir }}"
     state: present
     recreate: auto
     pull: missing

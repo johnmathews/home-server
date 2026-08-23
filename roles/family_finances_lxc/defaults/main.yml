@@ -8,32 +8,32 @@
 # which is the single source for the whole fleet. Do not pin a literal here.
 # Bumping the shared var needs `make refresh-sidecars`: compose handlers use
 # pull:never, so `make <host>` alone will not fetch the new image.
-node_exporter_version: "{{ sidecar_node_exporter_version }}"
-alloy_version: "{{ sidecar_alloy_version }}"
-cadvisor_version: "{{ sidecar_cadvisor_version }}"
+family_finances_lxc_node_exporter_version: "{{ sidecar_node_exporter_version }}"
+family_finances_lxc_alloy_version: "{{ sidecar_alloy_version }}"
+family_finances_lxc_cadvisor_version: "{{ sidecar_cadvisor_version }}"
 
-family_finances_docker_compose_dir: "{{ docker_compose_dir }}"
+family_finances_lxc_family_finances_docker_compose_dir: "{{ docker_compose_dir }}"
 
 # ghcr image tag = the git commit SHA the images were built from. Pin it, do
 # not track `latest`: the app deliberately builds images only from a green
 # `main`, and pinning is what makes a rollback one line instead of an
 # investigation. See family-finances docs/deployment.md §3.
-family_finances_version: "1626f96cc02a31a152b3131cf01284f24d7da08b"
+family_finances_lxc_family_finances_version: "1626f96cc02a31a152b3131cf01284f24d7da08b"
 
 # Where the household databases and archived statements live on the host. This
 # directory IS the family's financial record — it is what the PBS guest backup
 # has to contain (family-finances docs/adr/0017-backup-posture.md).
-family_finances_data_dir: /srv/family-finances
+family_finances_lxc_family_finances_data_dir: /srv/family-finances
 
 # Published for Traefik only. The backend is never published: nginx reaches it
 # over the compose network, and publishing it would put a route to the API on
 # the host that does not pass through the proxy.
-family_finances_port: 8080
+family_finances_lxc_family_finances_port: 8080
 
 # The invitation code required to create a household. Unset closes
 # registration, which is the safe direction and the tested one
 # (family-finances docs/adr/0016-invite-only-registration.md).
-family_finances_signup_code: "{{ vault_family_finances_signup_code }}"
+family_finances_lxc_family_finances_signup_code: "{{ vault_family_finances_signup_code }}"
 
 # Bank sync over PSD2 (family-finances docs/adr/0023-enable-banking-as-provider.md).
 #
@@ -46,24 +46,24 @@ family_finances_signup_code: "{{ vault_family_finances_signup_code }}"
 # lives inside the encrypted household database. Deployment configuration, so
 # it sits beside the signup code rather than under the rules that govern
 # household material (family-finances docs/adr/0022 §2, item 4).
-enable_banking_app_id: "{{ vault_enable_banking_app_id }}"
-enable_banking_private_key: "{{ vault_enable_banking_private_key }}"
+family_finances_lxc_enable_banking_app_id: "{{ vault_enable_banking_app_id }}"
+family_finances_lxc_enable_banking_private_key: "{{ vault_enable_banking_private_key }}"
 
-# Deliberately NOT under family_finances_data_dir. That directory IS the
+# Deliberately NOT under family_finances_lxc_family_finances_data_dir. That directory IS the
 # family's financial record; an application credential has no business inside
 # the thing the backups and the encryption exist to protect.
-family_finances_secrets_dir: /srv/family-finances-secrets
+family_finances_lxc_family_finances_secrets_dir: /srv/family-finances-secrets
 
 # Must match a Redirect URL registered on the Enable Banking application
 # EXACTLY, and production requires HTTPS. This is the SPA route added in
 # d62ed1f; the /api/ variant is also registered and exists only so the probe
 # can read the callback without the router rewriting it away.
-enable_banking_redirect_url: "https://finances.itsa-pizza.com/oauth/callback"
+family_finances_lxc_enable_banking_redirect_url: "https://finances.itsa-pizza.com/oauth/callback"
 
 # ghcr credentials. The family-finances repository is private, so its packages
 # are private too — unlike library or sre-agent, whose repositories are public
 # and whose images therefore disclose nothing by being pullable. The image
 # carries the backend's Python source, so it stays private and the guest
 # authenticates instead.
-family_finances_ghcr_user: johnmathews
-family_finances_ghcr_token: "{{ vault_family_finances_ghcr_token }}"
+family_finances_lxc_family_finances_ghcr_user: johnmathews
+family_finances_lxc_family_finances_ghcr_token: "{{ vault_family_finances_ghcr_token }}"
