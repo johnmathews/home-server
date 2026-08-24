@@ -337,8 +337,8 @@ the middle band of each thumbnail there); the live snippet is mirrored in
 
 ## 8. Open items
 
-- The five emptied libraries (Gym, Heavy Club Basics, Heavy Club Exercise Tutorials, Kettlebell
-  Compilations, Turkish Get-Up) still exist in Jellyfin and should be deleted.
+- ~~Delete the five emptied libraries~~ — done 2026-08-24 (definitions only; file counts
+  verified identical before/after; the empty folders remain under `/movies/youtube/`).
 - `yt -f` (download-video PR #1, 2026-08-23) covers adding videos/seasons/shows; it does not
   regenerate thumbcards — `make_posters.py` after a new season/show is still a manual step.
 - Same treatment for the other YouTube libraries (Create, Humanity, Travel, Math + Engineering,

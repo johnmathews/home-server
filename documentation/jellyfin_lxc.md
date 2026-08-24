@@ -42,10 +42,13 @@ works but is degraded; the media VM role already installs deno for the same reas
 ## Libraries
 
 Collections, Create, **Health & Fitness** (Shows — see below), Humanity, Kids Movies, Kids Shows,
-Kids Youtube, Math + Engineering, Movies, Our Movies, Shows, Sport, Travel, Ukraine Lectures.
-(The five former fitness libraries — Gym, Heavy Club Basics, Heavy Club Exercise Tutorials,
-Kettlebell Compilations, Turkish Get-Up — still exist as empty shells until they are deleted;
-their folders were moved into `fitness/` on 2026-08-22.)
+Kids Youtube, Math + Engineering, Movies, Our Movies, Shows, Sport, Travel, Ukraine Lectures
+(14 total). The five former fitness libraries (Gym, Heavy Club Basics, Heavy Club Exercise
+Tutorials, Kettlebell Compilations, Turkish Get-Up) were deleted on 2026-08-24 after their
+folders moved into `fitness/` — library deletion removes only the Jellyfin definition, never
+files (verified by identical file counts). The old empty folders remain under
+`/movies/youtube/` (`heavy-club-exercise-tutorials/archive.txt` is yt-dlp's download archive
+for that playlist and was kept).
 
 The non-fitness YouTube libraries (Create, Humanity, Travel, Math + Engineering, Ukraine Lectures)
 are still flat `movies`-type libraries, each pointing at one `/movies/youtube/<subdir>` folder.
