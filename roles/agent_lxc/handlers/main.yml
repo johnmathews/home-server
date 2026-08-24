@@ -47,16 +47,6 @@
     remove_orphans: true
   become: false
 
-- name: Restart nanoclaw
-  ansible.builtin.systemd:
-    name: nanoclaw
-    state: restarted
-    scope: user
-  become: true
-  become_user: john
-  environment:
-    XDG_RUNTIME_DIR: /run/user/1000
-
 - name: Restart mkdocs
   community.docker.docker_compose_v2:
     project_src: "{{ docker_compose_dir }}"

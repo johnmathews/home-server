@@ -144,12 +144,30 @@ The `agent_lxc` role handles infrastructure around NanoClaw, **not** NanoClaw it
 - Creates the `john` user
 - Sets up directory structure (`/srv/apps/`)
 - Deploys the Docker Compose stack (monitoring + MkDocs documentation sites)
-- Deploys the NanoClaw `.env` file (secrets from vault)
 - Configures Alloy for log aggregation to Loki
 - Deploys MkDocs Material sites for browsing markdown documentation
 - Applies the `shell_environment` role (CLI tools, shell config)
 
 NanoClaw itself was installed manually and is managed as a systemd user service outside of Ansible.
+That includes its `.env` — see [NanoClaw `.env` is hand-managed](#nanoclaw-env-is-hand-managed) below.
+
+### NanoClaw `.env` is hand-managed
+
+`/srv/apps/nanoclaw/.env` is **not** an Ansible artefact and must never become one again. Until
+2026-08-24 the role templated it from a v1-era `.env.j2` as `root:root 0600`; the service runs as
+`john`, reads `.env` at start (`src/env.ts` `readEnvFile`, which swallows a permission error at
+debug level) and so kept working on its in-memory config until the next restart. Every `make agent`
+re-planted the landmine — 2026-07-12 (bit on 07-14) and 2026-07-23 (bit at the 2026-08-23 18:23
+watchdog restart, 27 h outage: OneCLI 401s on every wake, no containers, no scheduled tasks). The
+task, its `Restart nanoclaw` handler (which targeted a unit name that does not exist) and the
+template were removed; see `journal/260824-nanoclaw-env-clobbered-by-ansible.md`.
+
+What the file must hold is defined by NanoClaw, not this repo: `grep -rhoE "readEnvFile\(\[[^]]*\]" src/`
+on the host lists the keys the host process reads; the Slack adapter additionally needs
+`SLACK_SIGNING_SECRET`. For this install the two that matter are `ONECLI_URL=http://172.17.0.1:10254`
+(local OneCLI proxy, no key) and `SLACK_SIGNING_SECRET`. A full v2 reference copy is
+`/srv/apps/nanoclaw/data/env/env`. **Before any host restart**, confirm `.env` is `john:john`
+and contains those keys — `docs/operational-gotchas.md` item 35 in the NanoClaw repo is the checklist.
 
 ### What runs in Docker (Compose stack)
 
@@ -495,7 +513,7 @@ Other important paths on the LXC:
 - `~/.nanobot/config.json` -- Main config
 - `~/.nanobot/workspace/` -- Agent workspace
 - `~/.nanobot/cron/` -- Cron job definitions
-- `/srv/apps/nanoclaw/.env` -- Environment variables (API keys, managed by Ansible)
+- `/srv/apps/nanoclaw/.env` -- Environment variables (API keys). Hand-managed, `john:john 0600`, NOT Ansible
 - `/srv/apps/nanoclaw/groups/` -- Group-specific configs (e.g., Slack bot CLAUDE.md)
 
 ## Deployment
@@ -512,7 +530,6 @@ To run only specific tags:
 make agent t=docker    # Docker compose stack only
 make agent t=docs      # MkDocs sites + docker compose
 make agent t=alloy     # Alloy config only
-make agent t=nanoclaw  # NanoClaw .env file only
 make agent t=shell     # Shell environment only
 ```
 
