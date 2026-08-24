@@ -158,6 +158,16 @@ then a deliberate full scan: nothing moved. `make_posters.py` no longer updates 
 (an item update on a Series queues a full replace-all refresh of the series). Lesson written
 into the docs: after any scan/refresh, run `verify`.
 
+## 2026-08-24 addendum 4 — old libraries deleted
+
+The five emptied libraries (Gym, Heavy Club Basics, Heavy Club Exercise Tutorials, Kettlebell
+Compilations, Turkish Get-Up) were deleted via `DELETE /Library/VirtualFolders` after confirming
+each pointed only at the emptied folders. Media-file safety proven by identical recursive file
+counts under `/mnt/tank/movies/youtube` before and after (489 media / 1531 files). 14 libraries
+remain; `verify` green (281 episodes — incl. the first `yt -f` addition, Mobility & Physio
+S01E983). The empty source folders and `heavy-club-exercise-tutorials/archive.txt` (yt-dlp
+download archive) were left in place.
+
 ## Follow-ups
 
 - Delete the five emptied libraries (Gym, Heavy Club ×2, Kettlebell Compilations, Turkish Get-Up)
