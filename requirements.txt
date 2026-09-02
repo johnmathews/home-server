@@ -9,7 +9,7 @@
 #
 # To move a pin: bump it here, run `make requirements`, run `make ci-offline`,
 # and commit the two together so the version and the green run are one change.
-ansible==14.3.0
+ansible==14.3.1
 ansible-core==2.21.3
 proxmoxer==2.3.0
 requests==2.34.2
